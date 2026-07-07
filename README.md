@@ -64,6 +64,15 @@ Built for **claude.ai chat and Cowork** — anywhere Claude reads skills. No hoo
 
 ---
 
+## For maintainers
+
+Everything needed to evolve this kit lives in this repo — no external context.
+
+- **`CLAUDE.md`** — how Claude should maintain the repo (architecture, the "one rule, one home" principle, guardrails).
+- **`MAINTAINING.md`** — structure, how to run the regression suite, and *why each rule exists* (provenance).
+- **`tests/regression-cases.md`** — 18 guardrail tests, one per real error.
+- Licensed under MIT — see `LICENSE`.
+
 ## Files
 
 ```
