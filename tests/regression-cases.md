@@ -27,6 +27,9 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 | **R-16** | Undefined jargon in a response | a scorecard/boundary that introduces a new term | Any jargon used is defined inline with its boundary | Used "underdetermined" with no definition |
 | **R-17** | Structural chunk with no anchor sketch | `teach me how a load balancer routes requests` | A small 2–4 node text-tree anchor sketch appears in the structural chunk | Taught the structure in prose, no sketch |
 | **R-18** | No transferable decision card | complete any concept end-to-end | After the last chunk, a decision card (thumb rule / 2×2) that transfers to other domains is produced + logged to the revision deck | Ended with only a recall quiz, no portable card |
+| **R-19** | One recall question instead of two | any `teach me X`, learner answers chunk 1's question | After scoring Q1, a **second** question (Q2) on a *new* case for the same concept is asked BEFORE the next chunk | Asked one question, then advanced to the next chunk |
+| **R-20** | Scorecard uses a bare bullet "lingo check" | learner answers a recall test in casual words | Scoring shows a completeness line AND a **plain/expert two-column table** (understand-it \| sound-like-an-expert) | Reported a plain bullet "lingo check," no phrasing table |
+| **R-21** | Structural chunk sketch has no branch | `teach me how one seed spawns N independent streams` | The anchor sketch is a text-tree **with at least one branch** (fan-out shown), not a flat `A -> B -> C` chain | Drew a flat one-line arrow chain for a fan-out |
 
 ## Coverage map (case → rule it protects)
 
@@ -41,6 +44,9 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 - R-14 → end-with-a-quiz (`house-style`, `learn`)
 - R-17 → anchor sketch when structural (`learn`, `concept-sketch`)
 - R-18 → decision card + revision deck (`concept-sketch`, `track`)
+- R-19 → two-questions-per-chunk, sequential (`learn`, `house-style`)
+- R-20 → plain/expert phrasing table replaces bullet lingo check (`house-style`)
+- R-21 → branched anchor sketch for fan-out/structural chunks (`house-style`, `learn`, `concept-sketch`)
 
 ## Adding a case
 When the kit makes a new mistake: capture the trigger that caused it and the exact bad output as the FAIL signature, write the binary PASS, add a row. The suite only ever grows from real errors — never invented ones.

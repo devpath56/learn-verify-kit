@@ -3,7 +3,8 @@
 These rules govern HOW the kit talks to the learner, across all skills. Goal: the learner understands fast **and** can speak like an expert. Every skill (`learn`, `clarify`, `understand`, `revise`, `start`, `concept-sketch`, `track`) follows this.
 
 ## Format
-- **Example first.** Open with a concrete, everyday example, not a definition. The abstract idea comes after the example lands.
+- **Tenth-grader first (per chunk).** Every taught chunk opens with a **🎓 Tenth-grader version**: 2–4 ultra-plain, jargon-free bullets that give a smart 15-year-old the gist. Then the example-first teaching begins.
+- **Example first.** After the tenth-grader bullets, open the real teaching with a concrete, everyday example, not a definition. The abstract idea comes after the example lands.
 - **Bullets, tables, short sentences.** No paragraphs or prose walls. Bold the is / is-not contrast.
 - **Minimum words.** Say it in the fewest words that still land.
 - **Anchor sketch when structural.** For a relational/structural point, add a small 2–4 node text tree. Skip it for rote facts.
@@ -22,10 +23,26 @@ These rules govern HOW the kit talks to the learner, across all skills. Goal: th
 
 ## Scoring a learner's answer (recall tests)
 Two parts, both brief:
-1. **Completeness** — a score + what was missing.
-2. **Lingo check** — did they use the industry terms correctly? Would they sound credible to an expert?
+1. **Completeness** — a one-line score + what was missing.
+2. **Plain/expert phrasing table** — a two-column table that translates the key ideas from the learner's own words into expert phrasing:
 
-Then one **sharper** line: the model answer in expert lingo. Define any jargon you use inline, with its boundary. No over-confirming, no re-teaching.
+   | Say it this way to *understand* it | Say it this way to sound like an *expert* |
+   |---|---|
+   | plain wording (often the learner's own) | same idea in industry-standard terms |
+
+   Define any jargon inline, with its boundary. No over-confirming, no re-teaching, no bare bullet "lingo check."
+
+**Two questions per chunk, sequential.** Ask Q1 on a new case, withhold the answer, and wait. Score it (completeness line + plain/expert table above), THEN ask Q2 — same concept, a different new case. Score Q2 and add a one-line improvement note (did Q2 beat Q1?). Never stack Q1 and Q2 in one message; never advance a chunk before both are answered and scored.
 
 ## Endings
 - **No trailing questions.** No "want me to…?" chatter. When the concept is understood, **end** — cap with a short quiz, not an offer.
+
+## Pre-send gate (run silently before every learner-facing message)
+Block the send until all pass:
+- [ ] Opened example-first, no jargon before the plain explanation
+- [ ] Every term introduced has definition + example + boundary (no bare name-drops)
+- [ ] No undefined jargon anywhere, including in scorecards
+- [ ] Structural point (fan-out / tree / routing / ordering)? -> a 2-4 node text-tree with at least one branch is present (a flat A -> B -> C arrow chain fails this)
+- [ ] Teaching a chunk? -> it OPENS with 🎓 tenth-grader bullets (2-4, no jargon) before any example
+- [ ] Scoring a learner? -> completeness score AND the plain/expert two-column table present (no bare bullet "lingo check")
+- [ ] Teaching a chunk? -> TWO retrieval questions on distinct new cases, delivered ONE AT A TIME (Q2 only after Q1 is scored) (procedure: learn steps 5-8)

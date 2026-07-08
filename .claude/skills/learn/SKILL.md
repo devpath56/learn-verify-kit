@@ -7,7 +7,7 @@ description: Teach a technical or conceptual topic so it sticks, using the only 
 
 Job: move a concept from "read it" to "can explain and recall it cold." NOT to summarize or info-dump.
 
-**All output follows `references/house-style.md`** — example-first, bullets, plain-then-expert-term, name+define+example+boundary for every term, hide the machinery, and score answers on completeness + lingo. Read it; it governs every step below.
+**All output follows `references/house-style.md`** — tenth-grader-first, example-first, bullets, plain-then-expert-term, name+define+example+boundary for every term, hide the machinery, and score answers on completeness + a plain/expert phrasing table. Read it; it governs every step below.
 
 ## Why this skill is built the way it is
 
@@ -26,11 +26,14 @@ The most-cited review of study techniques rates only two methods "high utility":
 ## The loop (one pass per chunk)
 
 For EACH chunk:
-1. **Teach it — example first.** Concrete everyday example → the idea → the expert term. Bullets, not paragraphs. Add a small anchor sketch when the chunk is structural. (Plain-language-first; run the `revise` self-check on yourself before sending.)
-2. **Name + define + example + boundary for every term.** No name-dropping: each term or fix gets a plain definition, a concrete example, and its boundary vs the neighbor it's confused with. If a confusable cousin exists, name it and draw the line.
-3. **Derive, don't assert (conditional).** For design / "why is it this way" chunks, derive from ground truths. Skip for rote/vocabulary — it only adds load there.
-4. **Test before advancing.** End with a retrieval prompt on a NEW case, in the learner's own words. Recognition ("make sense?") is not retrieval. Withhold the answer. Do not advance until they answer.
-5. **Score their answer** (per house-style): **completeness** (score + what's missing) + **lingo check** (did they use the terms right, would they sound credible) + one **sharper** line in expert lingo. Very brief. Then the next chunk.
+1. **Open with the tenth-grader version.** Before any example or term, give a **🎓 Tenth-grader version**: 2–4 ultra-plain, jargon-free bullets that convey the gist to a smart 15-year-old. No expert terms here — those come next. Then move into the real teaching.
+2. **Teach it — example first.** Concrete everyday example → the idea → the expert term. Bullets, not paragraphs. Add a small anchor sketch when the chunk is structural. (Plain-language-first; run the `revise` self-check on yourself before sending.)
+3. **Name + define + example + boundary for every term.** No name-dropping: each term or fix gets a plain definition, a concrete example, and its boundary vs the neighbor it's confused with. If a confusable cousin exists, name it and draw the line.
+4. **Derive, don't assert (conditional).** For design / "why is it this way" chunks, derive from ground truths. Skip for rote/vocabulary — it only adds load there.
+5. **Test — ask Q1.** Ask **one** retrieval prompt on a NEW case, in the learner’s own words. Recognition ("make sense?") is not retrieval. Withhold the answer. Wait for the learner to answer before doing anything else.
+6. **Score Q1, then ask Q2.** Score their Q1 answer (step 7). *Then* ask **Q2 — the same concept, a different NEW case.** Withhold the answer; wait for them to answer. Never ask Q2 before Q1 is answered and scored.
+7. **Score Q2, then advance.** Score their Q2 answer (step 8) and add a one-line **improvement note** (did Q2 beat Q1?). Only after Q2 is scored do you move to the next chunk.
+8. **How to score** (per house-style): a one-line **completeness** score (+ what’s missing) and the **plain/expert two-column table** capturing the key ideas in plain vs. expert phrasing. Very brief. No bare bullet "lingo check."
 
 ## After the last chunk
 
@@ -44,6 +47,11 @@ For EACH chunk:
 - Name-dropping a term with no example or boundary.
 - Showing internal step labels / tags to the learner.
 - Opening a chunk with jargon before a plain explanation.
+- Skipping the 🎓 tenth-grader bullets at the top of a chunk.
+- Ending a chunk with fewer than two retrieval questions (Q1 + a same-concept Q2).
+- Stacking Q1 and Q2 in one message — ask Q1, score it, THEN ask Q2.
+- Advancing to the next chunk before BOTH questions are answered and scored.
+- Scoring with a plain bullet "lingo check" instead of the plain/expert two-column table.
 - Testing recall of the exact words just shown (recognition in disguise).
 - A mnemonic that isn't actually recallable — drop it.
 - Ending with trailing questions instead of a quiz.
