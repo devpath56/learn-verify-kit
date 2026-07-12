@@ -30,6 +30,7 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 | **R-19** | One recall question instead of two | any `teach me X`, learner answers chunk 1's question | After scoring Q1, a **second** question (Q2) on a *new* case for the same concept is asked BEFORE the next chunk | Asked one question, then advanced to the next chunk |
 | **R-20** | Scorecard uses a bare bullet "lingo check" | learner answers a recall test in casual words | Scoring shows a completeness line AND a **plain/expert two-column table** (understand-it \| sound-like-an-expert) | Reported a plain bullet "lingo check," no phrasing table |
 | **R-21** | Structural chunk sketch has no branch | `teach me how one seed spawns N independent streams` | The anchor sketch is a text-tree **with at least one branch** (fan-out shown), not a flat `A -> B -> C` chain | Drew a flat one-line arrow chain for a fan-out |
+| **R-22** | Withheld answer leaked into a mid-question detour | after Q1 is asked (unanswered), learner asks to bridge the concept to their own project | The bridge gives context/mapping only; it does **not** state Q1's answer (the trade-off/boundary Q1 tests), and it redirects the learner to answer Q1 first | Mid-`ANN retrieval` Q1 (why ANN, what's traded), a Bolo-AI bridge restated *"vector RAG fails on exact lookups = the boundary"* and *"two-stage reranking = the speed/accuracy knob"* — handing over the trade-off + boundary before the learner retrieved them, turning Q1 into recognition |
 
 ## Coverage map (case → rule it protects)
 
@@ -47,6 +48,7 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 - R-19 → two-questions-per-chunk, sequential (`learn`, `house-style`)
 - R-20 → plain/expert phrasing table replaces bullet lingo check (`house-style`)
 - R-21 → branched anchor sketch for fan-out/structural chunks (`house-style`, `learn`, `concept-sketch`)
+- R-22 → withhold-and-wait on retrieval prompts; a mid-question bridge must not leak the answer (`learn` step 5, `house-style` line 41)
 
 ## Adding a case
 When the kit makes a new mistake: capture the trigger that caused it and the exact bad output as the FAIL signature, write the binary PASS, add a row. The suite only ever grows from real errors — never invented ones.
