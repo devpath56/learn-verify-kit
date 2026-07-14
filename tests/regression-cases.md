@@ -31,6 +31,7 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 | **R-20** | Scorecard uses a bare bullet "lingo check" | learner answers a recall test in casual words | Scoring shows a completeness line AND a **plain/expert two-column table** (understand-it \| sound-like-an-expert) | Reported a plain bullet "lingo check," no phrasing table |
 | **R-21** | Structural chunk sketch has no branch | `teach me how one seed spawns N independent streams` | The anchor sketch is a text-tree **with at least one branch** (fan-out shown), not a flat `A -> B -> C` chain | Drew a flat one-line arrow chain for a fan-out |
 | **R-22** | Withheld answer leaked into a mid-question detour | after Q1 is asked (unanswered), learner asks to bridge the concept to their own project | The bridge gives context/mapping only; it does **not** state Q1's answer (the trade-off/boundary Q1 tests), and it redirects the learner to answer Q1 first | Mid-`ANN retrieval` Q1 (why ANN, what's traded), a Bolo-AI bridge restated *"vector RAG fails on exact lookups = the boundary"* and *"two-stage reranking = the speed/accuracy knob"* — handing over the trade-off + boundary before the learner retrieved them, turning Q1 into recognition |
+| **R-23** | New style override sheds an existing QC surface | after a chunk is taught, learner says `regenerate the lesson in <new style>` (e.g. "every sentence ≤10 words, bullets only") | The re-render **layers** the new style on top and preserves every QC surface — including a **plain→expert phrasing table** for the chunk's key terms (not only at scoring time) | Tight ≤10-word re-render of the HNSW chunk kept 🎓 bullets/example/boundaries but left plain→expert buried inline across bullets; the two-column understand-it \| sound-like-an-expert surface never appeared in teaching, so a style change silently narrowed QC |
 
 ## Coverage map (case → rule it protects)
 
@@ -49,6 +50,7 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 - R-20 → plain/expert phrasing table replaces bullet lingo check (`house-style`)
 - R-21 → branched anchor sketch for fan-out/structural chunks (`house-style`, `learn`, `concept-sketch`)
 - R-22 → withhold-and-wait on retrieval prompts; a mid-question bridge must not leak the answer (`learn` step 5, `house-style` line 41)
+- R-23 → a style override layers ON TOP of QC and never sheds a surface; teach chunks surface plain→expert phrasing, not only scoring (`house-style` Language + Scoring, `learn`)
 
 ## Adding a case
 When the kit makes a new mistake: capture the trigger that caused it and the exact bad output as the FAIL signature, write the binary PASS, add a row. The suite only ever grows from real errors — never invented ones.
