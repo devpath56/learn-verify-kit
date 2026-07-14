@@ -44,6 +44,11 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 | **T-19 [seed]** | Compare = two stapled summaries | `compare Cursor and Copilot` | Leads with the **fork** (opposite choices on a shared job) + the bet behind each, not two isolated descriptions | Described each product back-to-back, no divergence |
 | **T-20 [seed]** | Winner crowned with no "for whom" | `which is better designed, X or Y` | Any "better" is scoped to a specific user + constraint | Declared X "just better" with no user named |
 | **T-21 [seed]** | Silent wrong-product commit | `tear down Nova` (overloaded name) | Flags ambiguity + offers ≤3 distinct products before tearing down | Silently tore down the wrong "Nova" |
+| **T-22 [seed]** | Single-cause / hindsight "why it won" | `why did Cursor win` | Names 2–3 contributing factors AND a would-be-wrong-if falsifier | Gave one tidy cause, no falsifier |
+| **T-23 [seed]** | No failure-mode analysis | complete any teardown end-to-end | A "what would kill it" pass with 2–3 past-tense contributing factors is emitted | Ended on a present-tense snapshot, no kill-it pass |
+| **T-24 [seed]** | Choice named with only upside | `tear down X's key design choice` | Names choice + rejected alternative **and at least one downside it still carries** | Listed only the benefits of the choice |
+| **T-25 [seed]** | GTM lens misses anti-fit + unit economics | `tear down X's go-to-market` | Names who it's NOT for AND marginal cost / who owns the demand relationship | Only "who it's for" + pricing |
+| **T-26 [seed]** | Missing evolution pass on a product that pivoted | `tear down Slack` (pivoted from a game) | One line on build-it-yourself → commodity + last pivot + next move; and correctly *skipped* for a brand-new tool with no pivot | Pure present-tense snapshot despite a known pivot |
 
 ## Coverage map (case → rule it protects)
 
@@ -61,6 +66,11 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 - T-17, T-18 → steal-this cards, bounded (`extract-patterns`, `house-style`)
 - T-19, T-20 → the fork, scoped winner (`compare`)
 - T-21 → ambiguity pick-list (`house-style`, `teardown`)
+- T-22 → contributing-factors + falsifiability, not single-cause (`house-style`, `lens-rubric`)
+- T-23 → the "what would kill it" pre-mortem pass (`teardown`, `house-style`)
+- T-24 → road-not-taken carries its cost / downside (`house-style`, `lens-rubric`)
+- T-25 → anti-persona + unit economics in the GTM lens (`lens-rubric`)
+- T-26 → the evolution pass (`lens-rubric`, `teardown`)
 
 ## Adding a case
 When the kit makes a new mistake: capture the trigger and the exact bad output as the FAIL signature, write the binary PASS, add a row. Promote a **[seed]** case to real by replacing its watched-for signature with the one you actually observed, and drop the `[seed]` tag. The suite only ever grows from real errors — never invented ones.

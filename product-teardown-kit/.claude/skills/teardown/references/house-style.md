@@ -16,8 +16,10 @@ These rules govern HOW the kit talks to the reader, across all skills. Goal: the
 
 ## Depth — the whole point (no brochure restates)
 - **Every claim must reach ≥ L2 (a real tradeoff), never L0 (a marketing restate).** The full L0–L5 depth scale and the four lenses live in `references/lens-rubric.md`. Read it; it is the second half of this law.
-- **Name the road not taken.** A teardown line is only load-bearing if it says what the team chose **and the alternative they gave up**. "It uses streaming" is L1. "It streams tokens instead of buffering, trading a cleaner final render for a faster first-word — a bet that perceived latency beats polish" is L3.
+- **Name the road not taken — and its cost.** A teardown line is only load-bearing if it says what the team chose, **the alternative they gave up, and at least one downside the choice still carries**. "It uses streaming" is L1. "It streams tokens instead of buffering — faster first word, but a messier final render and harder error handling; a bet that perceived latency beats polish" is L3.
 - **Cite what's known, flag what's inferred.** Mark verified facts with an inline `[Source: …]`; mark reasoned guesses as **(inferred)**. Never launder a guess as a fact.
+- **Say what would falsify it.** For each load-bearing claim, add a short **would be wrong if ___** — the observation that would disprove it. This is the cheapest guard against explaining a *win* by hindsight or survivorship.
+- **Prefer contributing factors; ask who benefits.** When you explain *why*, give 2–3 interacting reasons over one tidy cause, and name *who benefits / what incentive* produced the shape. Single-cause stories are usually wrong.
 
 ## Hide the machinery
 - The reader sees the analysis, never the kit's internals. No step labels ("Step 0 · Research"), no internal tags, no lens letter-codes or metric vocab in reader-facing text. **Product/domain jargon = teach it; kit-internals = hide it.**
@@ -36,6 +38,8 @@ Whenever you rate a product or a reader's own teardown attempt, two parts, both 
    | plain wording | same idea in industry-standard terms |
 
    Define any jargon inline, with its boundary. No over-confirming, no re-explaining.
+
+**Bias self-check (one line).** If you're explaining a *win*, ask what a product that *lost* but looked similar would also show. If your reason fits both, it isn't the reason (survivorship guard).
 
 ## Retrieval — end every teardown with a test
 - A teardown that is only read is forgotten. **After the lenses, ask two retrieval questions applied to a DIFFERENT product** (transfer), one at a time: ask Q1, withhold the answer, score it, then ask Q2. Never stack them.
@@ -56,4 +60,6 @@ Block the send until all pass:
 - [ ] Facts carry `[Source: …]`; guesses are marked **(inferred)** — no guess laundered as fact
 - [ ] Structural point (agent loop / data flow / components)? → a 2–4 node text-tree with at least one branch is present
 - [ ] No kit internals leaked (no step labels, lens codes, or metric vocab in reader text)
+- [ ] Each load-bearing claim carries a **would-be-wrong-if** falsifier (no hindsight/survivorship laundering)
+- [ ] Finished a teardown? → the **what-would-kill-it** pass ran (2–3 contributing factors, past tense); plus the one-line evolution note *if the product has pivoted*
 - [ ] Finished a teardown? → at least one 🧰 steal-this card AND two transfer questions, delivered ONE AT A TIME

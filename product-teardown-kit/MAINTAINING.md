@@ -58,6 +58,11 @@ The suite in `tests/regression-cases.md` has two levels:
 | Steal-this card, bounded | No portable takeaway / a slogan | T-17, T-18 |
 | Compare = the fork | Two stapled summaries; unscoped winner | T-19, T-20 |
 | Ambiguity → ≤3 distinct-product pick-list | Tearing down the wrong product | T-21 |
+| Contributing-factors + falsifiability (would-be-wrong-if) | Single-cause / hindsight "why it won" | T-22 |
+| "What would kill it" pre-mortem pass | No failure-mode analysis | T-23 |
+| Road-not-taken carries its cost | Choice named with only upside | T-24 |
+| Anti-persona + unit economics in GTM lens | GTM missing the sharp negative + serve cost | T-25 |
+| Evolution pass (when the product has moved) | Present-tense snapshot despite a pivot | T-26 |
 
 ## Releasing
 1. Run the behavioral suite; fix any regression.
@@ -65,4 +70,5 @@ The suite in `tests/regression-cases.md` has two levels:
 3. Commit, push. To hand someone a single file: `zip -r product-teardown-kit.zip . -x '.git/*' '*.DS_Store'`.
 
 ## Changelog
+- **v1.1** — Depth-rigor pass, from a heavily-engineering-blog-weighted research sweep (ADRs, Google SRE postmortems, pre-mortems, Wardley, Stratechery). Added: falsifiability (`would-be-wrong-if`) on every claim; a "what would kill it" pre-mortem; L4/L5 reframed as generality vs contingency with plural contributing factors; road-not-taken must carry its cost; a conditional evolution pass; anti-persona + unit-economics probes on the GTM lens; a survivorship self-check. Five matching regression cases (T-22–T-26), filed `[seed]` since they're method-driven, not yet from an observed live failure.
 - **v1.0** — Initial release. Chat/Cowork-native (no hooks). Seven skills + two shared laws (house-style + lens-rubric). Four lenses, L0–L5 depth scale, self-check gate, spaced review. Content discipline ported from the Learn·Verify Kit; regression suite seeded (Tier A inherited-real, Tier B design-seed) and set to grow only from real errors.
