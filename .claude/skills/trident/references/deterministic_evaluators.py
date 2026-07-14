@@ -31,7 +31,12 @@ Record schema (canonical keys the factories bind to)
 If your data uses different keys, pass `input_mapping=` to `run_oracle` /
 `.evaluate` (a dict of arg-name -> record-path or callable); the SDK remaps.
 
-Install:  pip install arize-phoenix-evals
+Dependencies:  none required. If `arize-phoenix-evals` is installed we use it;
+otherwise we fall back to a tiny stdlib-only shim (below) that provides the same
+`Score` / `create_evaluator` / `.evaluate(record)` contract. These evaluators are
+deterministic (no LLM), so the shim is faithful — phoenix's model machinery was
+never needed here. Install phoenix only if you want its dashboards/experiments:
+    pip install arize-phoenix-evals
 """
 
 from __future__ import annotations
@@ -41,7 +46,60 @@ import json
 import re
 from typing import Any, Iterable, Sequence
 
-from phoenix.evals import Score, create_evaluator
+try:  # real phoenix when present …
+    from phoenix.evals import Score, create_evaluator  # type: ignore
+except ModuleNotFoundError:  # … else a stdlib-only, no-LLM compatible shim.
+    import inspect
+
+    class Score:  # noqa: D401 - minimal compatible stand-in
+        """A single evaluation result. Extra phoenix-only kwargs are ignored."""
+
+        def __init__(self, name: str = "", score: Any = None, label: Any = None,
+                     explanation: str | None = None, direction: str = "maximize",
+                     **_ignored: Any) -> None:
+            self.name = name
+            self.score = score
+            self.label = label
+            self.explanation = explanation
+            self.direction = direction
+
+        def __repr__(self) -> str:  # pragma: no cover - debug aid
+            return (f"Score(name={self.name!r}, score={self.score!r}, "
+                    f"label={self.label!r}, explanation={self.explanation!r})")
+
+    class _Evaluator:
+        """Binds a function's argument names to keys in the work record."""
+
+        def __init__(self, fn, name: str, direction: str = "maximize",
+                     **_ignored: Any) -> None:
+            self._fn = fn
+            self.name = name
+            self.direction = direction
+            self._params = list(inspect.signature(fn).parameters)
+
+        def _bind(self, record: dict, input_mapping) -> list:
+            args = []
+            for p in self._params:
+                if input_mapping and p in input_mapping:
+                    m = input_mapping[p]
+                    args.append(m(record) if callable(m) else record[m])
+                else:
+                    args.append(record[p])  # KeyError -> caught by run_oracle as FAIL
+            return args
+
+        def evaluate(self, record: dict, input_mapping=None) -> list:
+            out = self._fn(*self._bind(record, input_mapping))
+            if isinstance(out, Score):
+                if not out.name:
+                    out.name = self.name
+                return [out]
+            ok = bool(out)
+            return [Score(name=self.name, score=int(ok), label=str(ok))]
+
+    def create_evaluator(name: str, direction: str = "maximize", **_ignored: Any):
+        def _decorate(fn):
+            return _Evaluator(fn, name=name, direction=direction)
+        return _decorate
 
 # `kind="code"` is the documented flag; the SDK also accepts `source="code"`.
 _CODE = dict(kind="code")
