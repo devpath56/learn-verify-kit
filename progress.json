@@ -19,9 +19,9 @@
     {
       "topic": "Temporal (durable execution)",
       "depth_reached": "recall ✓",
-      "last_score": "pass",
-      "last_reviewed": "2026-07-13",
-      "next_review": "2026-07-14"
+      "last_score": "partial",
+      "last_reviewed": "2026-07-14",
+      "next_review": "2026-07-15"
     },
     {
       "topic": "RAGAs (RAG evaluation)",
