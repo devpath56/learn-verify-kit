@@ -20,7 +20,7 @@ The most-cited review of study techniques rates only two methods "high utility":
 ## Before you teach
 
 1. **Scope + disambiguate.** Default to the software/tech reading. If the term genuinely spans domains, don't guess — flag it and offer a pick-list of the DISTINCT meanings (max 3 options, under 10 words each). Let the learner pick, then continue.
-2. **Research (web) if unfamiliar or possibly stale.** Pull authoritative sources, reconcile them, cite inline `[Source: Title — URL — date]`. Feed the teaching; never dump raw results. No web tools → teach from known ground, flag uncertainty. Don't teach from a shaky prior.
+2. **Research (web) if unfamiliar or possibly stale.** Pull authoritative sources, reconcile them, cite inline `[Source: Title — URL — date]`. Feed the teaching; never dump raw results. No web tools → teach from known ground, flag uncertainty. Don't teach from a shaky prior. **For any metric/rule with asymmetric or exclusionary behavior** ("checks X but not Y," "penalizes Z"), don't stop at the first generic summary — a plain "measures how well it does X" phrasing can silently hide a penalty/exclusion clause that changes real scoring outcomes.
 3. **Chunk + preview.** Break into <=4 chunks (working memory caps ~4). **Show a 3-bullet preview of the chunks BEFORE teaching chunk 1**, so the learner sees where the lesson is going.
 
 ## The loop (one pass per chunk)

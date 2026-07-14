@@ -30,6 +30,8 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 | **R-19** | One recall question instead of two | any `teach me X`, learner answers chunk 1's question | After scoring Q1, a **second** question (Q2) on a *new* case for the same concept is asked BEFORE the next chunk | Asked one question, then advanced to the next chunk |
 | **R-20** | Scorecard uses a bare bullet "lingo check" | learner answers a recall test in casual words | Scoring shows a completeness line AND a **plain/expert two-column table** (understand-it \| sound-like-an-expert) | Reported a plain bullet "lingo check," no phrasing table |
 | **R-21** | Structural chunk sketch has no branch | `teach me how one seed spawns N independent streams` | The anchor sketch is a text-tree **with at least one branch** (fan-out shown), not a flat `A -> B -> C` chain | Drew a flat one-line arrow chain for a fan-out |
+| **R-22** | Pipeline-position / stacked-boundary chunk taught with no anchor sketch | `teach me RAGAs` (chunk 1: RAGAs' position relative to the RAG pipeline it grades, plus two boundary contrasts — reference-free vs reference-based eval, RAGAs vs the pipeline itself) | A 2–4 node anchor sketch/boundary map renders the pipeline position + stacked boundaries together, not left as scattered prose bullets | Explained "RAGAs sits after your pipeline runs" and two separate boundary contrasts entirely in prose/bullets, no sketch at all |
+| **R-23** | Shallow research hides an asymmetric/exclusion clause, producing a wrong scoring verdict | `teach me RAGAs` (Answer Relevancy chunk: score a case where an answer adds true-but-unrequested extra content) | Taught definition states Answer Relevancy penalizes redundant/unnecessary/incomplete information, not just off-topic content; scoring reflects that | First research pass only surfaced "measures if the answer addresses the query," missed the official "penalizes redundant information" clause, and a case with true-but-unrequested extra content was scored as "Answer Relevancy unaffected" |
 
 ## Coverage map (case → rule it protects)
 
@@ -47,6 +49,8 @@ Feed each trigger to the kit in a fresh chat, then check PASS/FAIL against the c
 - R-19 → two-questions-per-chunk, sequential (`learn`, `house-style`)
 - R-20 → plain/expert phrasing table replaces bullet lingo check (`house-style`)
 - R-21 → branched anchor sketch for fan-out/structural chunks (`house-style`, `learn`, `concept-sketch`)
+- R-22 → anchor sketch also required for pipeline-position + stacked boundary-contrast chunks (`house-style`, `learn`)
+- R-23 → research step must dig past a generic summary for asymmetric/exclusion clauses (`learn`)
 
 ## Adding a case
 When the kit makes a new mistake: capture the trigger that caused it and the exact bad output as the FAIL signature, write the binary PASS, add a row. The suite only ever grows from real errors — never invented ones.
