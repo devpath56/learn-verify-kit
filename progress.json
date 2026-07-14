@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "schema": {
+    "topic": "string — the concept name",
+    "depth_reached": "string — best level so far (e.g. 'recall ✓', 'grill L3', 'insight L4', 'cert 4.3/5')",
+    "last_score": "string|number — most recent result (e.g. 4.3, 'pass', 'fail')",
+    "last_reviewed": "string|null — ISO date YYYY-MM-DD of the last recall, or null if never reviewed",
+    "next_review": "string — ISO date YYYY-MM-DD when this topic is due again"
+  },
+  "intervals": ["1 day", "3 days", "1 week", "2 weeks", "5 weeks"],
+  "topics": [
+    {
+      "topic": "otel-gui",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-07-13",
+      "next_review": "2026-07-14"
+    },
+    {
+      "topic": "Temporal (durable execution)",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-07-13",
+      "next_review": "2026-07-14"
+    },
+    {
+      "topic": "RAGAs (RAG evaluation)",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-07-13",
+      "next_review": "2026-07-14"
+    }
+  ]
+}

@@ -23,6 +23,19 @@ Maintain one table for the session. Add a row the moment a concept clears its fi
 
 The chat is the source of truth. If the user asks, print the table so they can copy it out; there is no background file and no automatic persistence in chat.
 
+## File-backed persistence (Claude Code surface only)
+
+In **Claude Code** (where Claude can read/write files and run git), the in-chat table is mirrored to `progress.json` at the repo root, so the log survives across sessions and days. On claude.ai / Cowork there is no file — chat stays the source of truth and this section does not apply.
+
+When file tools and a repo are available:
+
+1. **At the start of any review or session** ("review", "quiz me", "what have I learned", or the first message of a session): **read `progress.json`** and load its `topics` into the running table. What's *due* = any row whose `next_review` date is today or earlier.
+2. **When a topic clears its first retrieval** (in `learn`), a grill (`understand`), or is **re-quizzed** in a resurface: **upsert its row** and write the file. One row per topic (match on `topic`); update in place, don't duplicate.
+3. **Field mapping** (schema lives in `progress.json`): `topic`, `depth_reached` (best level so far), `last_score` (most recent result), `last_reviewed` (today's ISO date), `next_review` (advance from the last *pass* along `1 day -> 3 days -> 1 week -> 2 weeks -> 5 weeks`; a fail resets to 1 day).
+4. **Commit after each write**: `git add progress.json && git commit -m "track: <topic> -> <result>"`. Push if a remote is configured. This is the durable "revise DB" — the commit is what makes it survive to another day.
+
+Keep the file the *mirror*, not a second brain: the live table and `progress.json` must always agree after a write. Never invent rows for topics not actually taught or reviewed this session.
+
 ## Revision deck (transferable cards)
 
 When a concept finishes, its `concept-sketch` **decision card** (thumb rule / 2×2) joins a revision deck alongside the learning table. Resurface these the same way — as a quiz ("apply this rule to a new case"), not a re-read. In chat the deck lives in the conversation; print a copy-out block on request.
