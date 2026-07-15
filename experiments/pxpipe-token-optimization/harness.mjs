@@ -6,6 +6,11 @@
 // the image-token cost it paid (`imageTokens`). Savings = 1 - image/text.
 // Nothing is sent to any model and this session is never rerouted.
 //
+// The run also prints (a) a render-determinism check — proving the imaged prefix
+// is byte-stable and therefore cacheable — and (b) a whole-request model showing
+// how the block savings translate to the bill under cache-cold vs cache-warm
+// conditions. Those two sections are the "so what" of the block numbers.
+//
 //   node harness.mjs                 # offline gate measurement (default)
 //   node harness.mjs --verify-api    # cross-check vs real /v1/messages/count_tokens
 //                                    #   (needs ANTHROPIC_API_KEY; optional)
@@ -14,8 +19,12 @@
 // as an explicit, opt-in live step because it costs model calls; a scaffold is
 // provided in fidelity.mjs.
 
-import { transformAnthropicMessages, buildCountTokensBodies } from "pxpipe-proxy";
-import { SCENARIOS, MODEL } from "./corpus.mjs";
+import {
+  transformAnthropicMessages, buildCountTokensBodies,
+  renderTextToImages, CACHE_READ_RATE, CACHE_CREATE_RATE,
+} from "pxpipe-proxy";
+import { SCENARIOS, MODEL, prose } from "./corpus.mjs";
+import { createHash } from "node:crypto";
 
 const args = new Set(process.argv.slice(2));
 const VERIFY_API = args.has("--verify-api");
@@ -126,6 +135,41 @@ async function main() {
     `NOTE: ${rows.length - applied.length} block(s) left as text by the estimator ` +
     `(sparse / below floor) — that is the intended "don't image everything" behavior.`
   );
+
+  // --- render determinism: is the imaged prefix itself cacheable? ---
+  const hash = async () =>
+    createHash("sha256").update(Buffer.from((await renderTextToImages(prose(100))).pages[0].png)).digest("hex");
+  const [h1, h2] = [await hash(), await hash()];
+  console.log(
+    `\nRENDER DETERMINISM: same text → ${h1 === h2 ? "IDENTICAL" : "DIFFERENT"} PNG bytes ` +
+    `(${h1.slice(0, 12)}). ${h1 === h2 ? "Imaged prefix is byte-stable, so it caches like text — no re-render churn." : "WARNING: churn would defeat prompt caching."}`
+  );
+
+  // --- block savings are regime-invariant; whole-request savings are not ---
+  // Model a request as [ imaged static slab T ] + [ dynamic tail D, always text ].
+  // cache-cold: everything full price. cache-warm: the stable prefix is a cache
+  // read (CACHE_READ_RATE); the dynamic tail stays full price either way.
+  if (totText > 0) {
+    const T = Math.round(totText), I = Math.round(totImg);
+    console.log("\nWHOLE-REQUEST MODEL (slab T=%d text tok → I=%d image tok, + dynamic tail D of full-price text):", T, I);
+    console.log(
+      "  dynamic tail D".padEnd(20) +
+      "cold: whole-req savings".padStart(26) + "warm: whole-req savings".padStart(26)
+    );
+    for (const frac of [0.25, 1, 3]) {
+      const D = Math.round(T * frac);
+      const cold = 1 - (I + D) / (T + D);
+      const warm = 1 - (I * CACHE_READ_RATE + D) / (T * CACHE_READ_RATE + D);
+      console.log(
+        `  D=${D} (${frac}× slab)`.padEnd(20) +
+        pct(cold).padStart(26) + pct(warm).padStart(26)
+      );
+    }
+    console.log(
+      `  (rates: cache-read ${CACHE_READ_RATE}×, cache-create ${CACHE_CREATE_RATE}×.) ` +
+      `Warm savings shrink because caching already discounts the slab pxpipe targets.`
+    );
+  }
 
   if (VERIFY_API) {
     console.log("\n--- live count_tokens cross-check ---");

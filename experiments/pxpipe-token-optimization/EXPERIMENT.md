@@ -81,6 +81,45 @@ ANTHROPIC_API_KEY=... node fidelity.mjs claude-opus-4-8   # H3 on Opus 4.8
   images at 86.7 %, but whether that saving is *usable* depends entirely on the
   fidelity gap, which is the whole point of the probe.
 
+### 5a. Block savings ≠ the bill: the caching interaction (measured)
+
+The ~87 % is a reduction on the *imaged block*, and two effects dilute it into
+the whole-request number:
+
+1. **The dynamic tail stays text.** pxpipe never images the live turn (or
+   unclosed history), so that portion is unchanged; whole-request savings = block
+   savings × the slab's share of the request.
+2. **Caching already discounts the slab.** In Claude Code the system prompt +
+   tool docs are the *stable, cached* prefix, billed at **0.1×** on a warm request
+   (pxpipe exposes `CACHE_READ_RATE = 0.1`, `CACHE_CREATE_RATE = 1.25`). So on
+   warm turns pxpipe is compressing a block that is already cheap.
+
+Modeling a request as `[slab T=26 875 → I=3 405] + [dynamic tail D of full-price
+text]` (harness prints this):
+
+| dynamic tail D | cache-**cold** whole-request savings | cache-**warm** whole-request savings |
+|---|:--:|:--:|
+| 0.25× slab | ~69.9 % | ~25.0 % |
+| 1× slab | ~43.7 % | ~7.9 % |
+| 3× slab | ~21.8 % | ~2.8 % |
+
+**Interpretation.** pxpipe's value is concentrated in the **cache-cold, slab-heavy**
+corner — a fresh session with large tool-doc overhead and a short conversation.
+In the warm steady state (long session, stable system prompt, the prefix a cheap
+cache read) the same 87 % block win collapses to single-digit whole-request
+savings. pxpipe's published ~59–70 % is the cold / slab-heavy case, not the
+average request.
+
+### 5b. Render determinism (measured)
+
+`renderTextToImages` is **byte-deterministic**: identical input text yields a
+bit-identical PNG across runs (harness verifies via SHA-256). This is what makes
+the caching story work in pxpipe's favor — the imaged prefix is itself a stable,
+cacheable block, so pxpipe does not trade an existing text cache hit for a
+per-request re-render (which, at the 1.25× create rate, would be a net loss on
+warm workloads). Had rendering been nondeterministic, warm-path savings could go
+*negative*; they do not.
+
 ## 6. Threats to validity / honest caveats
 
 - **Block savings ≠ whole-request savings.** The table measures the *imaged
