@@ -1,0 +1,14 @@
+{
+  "name": "pxpipe-token-optimization-experiment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated research harness measuring pxpipe token savings + fidelity. NOT part of the shipped Learn-Verify skill bundle.",
+  "scripts": {
+    "bench": "node harness.mjs",
+    "bench:verify": "node harness.mjs --verify-api"
+  },
+  "dependencies": {
+    "pxpipe-proxy": "0.9.0"
+  }
+}
