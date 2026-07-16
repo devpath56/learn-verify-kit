@@ -53,9 +53,14 @@
         "signal": {"type": "string", "description": "The FAIL signature — what the check flags."}
       }
     },
+    "enterprise_environments": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Where this failure predictably recurs in real deployments, each as 'env: how it manifests'. Generic categories only — no personal/company specifics."
+    },
     "pm_implication": {
-      "type": "string",
-      "description": "Optional reusable design lesson (the public IP)."
+      "type": ["string", "array"],
+      "description": "Reusable design lesson(s) — the public IP. String or list of strings."
     },
     "trace": {
       "type": "array",
