@@ -27,7 +27,7 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 
 ## Decision card (transferable)
 
-Beyond the recall scaffold, emit a **decision card**: a one-line thumb rule and/or a small 2×2 the learner can apply to *other* problems in other domains. A recall scaffold makes a concept memorable; a decision card makes it portable. Plain rule first, then name the pattern. Hand the card to `track` for the revision deck.
+Beyond the recall scaffold, emit a **decision card**: a one-line thumb rule and/or a small 2×2 the learner can apply to *other* problems in other domains. A recall scaffold makes a concept memorable; a decision card makes it portable. Plain rule first, then name the pattern. Hand the card to `track` for the revision deck — and on the Claude Code surface, **invoke `track` to persist automatically** (write + commit + merge `progress.json`); do not wait for the user to type "track."
 
 ## Rubric
 
@@ -43,7 +43,7 @@ Run every output against `references/recall-rubric.md`. If any check fails, fix 
 
 ## Filing for revision (spacing is half the method)
 
-A sketch that renders once and dies forfeits spaced practice. After rendering, save the **spec** (chunked nodes + per-node questions, in markdown — the questions are the retrieval items, the image is ephemeral). Give the learner a simple revision schedule: review at day 1, 3, 7, 16, 35; advance the interval on a pass, reset to 1 day on a fail. File the question set, not the raw image; re-render on demand.
+A sketch that renders once and dies forfeits spaced practice. After rendering, save the **spec** (chunked nodes + per-node questions, in markdown — the questions are the retrieval items, the image is ephemeral). Give the learner a simple revision schedule: review at day 1, 3, 7, 16, 35; advance the interval on a pass, reset to 1 day on a fail. File the question set, not the raw image; re-render on demand. On the Claude Code surface, filing is not merely in-chat: invoke `track` so `progress.json` is written, committed, and merged to the default branch **automatically at consolidation** — never left waiting for the user to type "track."
 
 ## Reference
 

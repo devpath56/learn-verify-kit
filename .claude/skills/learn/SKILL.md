@@ -38,7 +38,7 @@ For EACH chunk:
 ## After the last chunk
 
 1. **Consolidate.** Call `concept-sketch` for the recall scaffold, AND emit a transferable **decision card** — a thumb rule or small 2×2 the learner can apply to other problems in other domains. Hand the card to `track` for the revision deck.
-2. **Space it.** Offer re-tests; log the concept to `track`.
+2. **Space it — automatically.** Immediately invoke `track` to log every concept just taught. On the Claude Code surface that means write + commit + **merge `progress.json` to the default branch** (see `track` → "File-backed persistence") **without waiting for the user to type "track."** Then offer re-tests. The durable write must never depend on the learner remembering to trigger it.
 3. **Cap with a short quiz.** End the session with a final quiz — never a trailing "want me to…" question.
 
 ## Anti-patterns (refuse these)

@@ -12,7 +12,7 @@ Everything you need to evolve this kit lives in this repo. No external context r
   revise/         Recall Rubric + self-check   → references/certification-gate.md
   concept-sketch/ dual-coded sketch + decision card  → references/recall-rubric.md
   track/          session log + spaced review
-tests/regression-cases.md   18 guardrail tests, one per real error
+tests/regression-cases.md   24 guardrail tests, one per real error
 CLAUDE.md         how Claude should maintain this repo
 README.md / INSTALL.md      user-facing
 ```
@@ -48,6 +48,7 @@ Every rule traces to a real failure caught during the kit's hardening. Don't und
 | Define jargon inline with boundary | Using a term in feedback without defining it | R-16 |
 | Anchor sketch when structural | Teaching a structure with no visual | R-17 |
 | Decision card + revision deck | Ending with no transferable, portable takeaway | R-18 |
+| Auto-persist revise-DB at consolidation | Consolidation ends with only an in-chat deck; log never saved to `progress.json` until a manual "track" | R-24 |
 
 ## Releasing
 1. Run the behavioral suite; fix any regression.

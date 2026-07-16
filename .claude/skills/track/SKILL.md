@@ -27,12 +27,20 @@ The chat is the source of truth. If the user asks, print the table so they can c
 
 In **Claude Code** (where Claude can read/write files and run git), the in-chat table is mirrored to `progress.json` at the repo root, so the log survives across sessions and days. On claude.ai / Cowork there is no file — chat stays the source of truth and this section does not apply.
 
-When file tools and a repo are available:
+When file tools and a repo are available, run this **automatically at the consolidation step** of `learn` / `understand` / `clarify` — do **not** wait for the user to type "track" or "review". A manual trigger still works, but the durable write must never depend on the learner remembering:
 
 1. **At the start of any review or session** ("review", "quiz me", "what have I learned", or the first message of a session): **read `progress.json`** and load its `topics` into the running table. What's *due* = any row whose `next_review` date is today or earlier.
 2. **When a topic clears its first retrieval** (in `learn`), a grill (`understand`), or is **re-quizzed** in a resurface: **upsert its row** and write the file. One row per topic (match on `topic`); update in place, don't duplicate.
 3. **Field mapping** (schema lives in `progress.json`): `topic`, `depth_reached` (best level so far), `last_score` (most recent result), `last_reviewed` (today's ISO date), `next_review` (advance from the last *pass* along `1 day -> 3 days -> 1 week -> 2 weeks -> 5 weeks`; a fail resets to 1 day).
-4. **Commit after each write**: `git add progress.json && git commit -m "track: <topic> -> <result>"`. Push if a remote is configured. This is the durable "revise DB" — the commit is what makes it survive to another day.
+4. **Commit after each write** — commit *only* `progress.json`: `git add progress.json && git commit -m "track: <topic> -> <result>"`. Never fold code or skill edits into this commit. This is the durable "revise DB" — the commit is what makes it survive to another day.
+5. **Merge the log to the default branch, automatically.** The revise-DB is only useful if it lives on the branch a fresh session reads first. After committing, bring **just `progress.json`** to the repo's default branch and push — without waiting for the user to ask:
+   ```
+   git checkout <default> && git pull --ff-only origin <default>
+   git checkout <work-branch> -- progress.json
+   git add progress.json && git commit -m "track: <topic> -> <result>" && git push origin <default>
+   git checkout <work-branch>
+   ```
+   **Scope hard to `progress.json`** — this auto-merge carries the learning log and nothing else; code and skill edits stay on their own branch and follow normal review. If the default branch rejects a direct push (branch protection), open a one-file PR for `progress.json` and report it; do not block the session waiting on it.
 
 Keep the file the *mirror*, not a second brain: the live table and `progress.json` must always agree after a write. Never invent rows for topics not actually taught or reviewed this session.
 
