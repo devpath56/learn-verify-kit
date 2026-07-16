@@ -29,6 +29,34 @@
       "last_score": "pass",
       "last_reviewed": "2026-07-14",
       "next_review": "2026-07-17"
+    },
+    {
+      "topic": "Agent memory: the four notebooks (working/episodic/semantic/procedural)",
+      "depth_reached": "recall ✓",
+      "last_score": "partial",
+      "last_reviewed": "2026-07-15",
+      "next_review": "2026-07-16"
+    },
+    {
+      "topic": "RBAC memory: scope-then-retrieve + tenant isolation",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-07-15",
+      "next_review": "2026-07-18"
+    },
+    {
+      "topic": "Temporal KG boundary (bi-temporal vs static CMDB/wiki)",
+      "depth_reached": "recall ✓",
+      "last_score": "partial",
+      "last_reviewed": "2026-07-15",
+      "next_review": "2026-07-16"
+    },
+    {
+      "topic": "Scope → Time → Load decision card",
+      "depth_reached": "recall ✓",
+      "last_score": "partial",
+      "last_reviewed": "2026-07-15",
+      "next_review": "2026-07-16"
     }
   ]
 }
