@@ -10,7 +10,7 @@ Seven skills under `.claude/skills/` that turn Claude into a quizzing tutor (tea
 - `learn/SKILL.md` — the teaching loop (disambiguate → research → roadmap → per-chunk teach+test → consolidate).
 - `clarify`, `understand`, `revise`, `start`, `concept-sketch`, `track` — the other verbs; each is one `SKILL.md`.
 - `tests/regression-cases.md` — 18 behavioral guardrail tests, each derived from a real error.
-- `progress.json` — the durable "revise DB" for the **Claude Code surface only**: a git-tracked mirror of the `track` learning log (fields: `topic`, `depth_reached`, `last_score`, `last_reviewed`, `next_review`). Claude reads it at the start of a review and upserts + commits a row when a topic finishes or is re-quizzed. On claude.ai / Cowork it is ignored — chat stays the source of truth, so the zero-setup guarantee holds. The read/write/commit rules live in `track/SKILL.md` → "File-backed persistence."
+- `progress.json` — the durable "revise DB" for the **Claude Code surface only**: a git-tracked mirror of the `track` learning log (fields: `topic`, `depth_reached`, `last_score`, `last_reviewed`, `next_review`). Claude reads it at the start of a review and, **automatically at consolidation (no manual "track" trigger)**, upserts + commits a row and merges **`progress.json` only** to the default branch when a topic finishes or is re-quizzed. On claude.ai / Cowork it is ignored — chat stays the source of truth, so the zero-setup guarantee holds. The read/write/commit rules live in `track/SKILL.md` → "File-backed persistence."
 
 ## How to modify
 1. A cross-cutting rule (formatting, scoring, endings, boundaries) → edit `house-style.md`.
