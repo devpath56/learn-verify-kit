@@ -5,7 +5,7 @@ These rules govern HOW the kit talks to the learner, across all skills. Goal: th
 ## Format
 - **Tenth-grader first (per chunk).** Every taught chunk opens with a **🎓 Tenth-grader version**: 2–4 ultra-plain, jargon-free bullets that give a smart 15-year-old the gist. Then the example-first teaching begins.
 - **Example first.** After the tenth-grader bullets, open the real teaching with a concrete, everyday example, not a definition. The abstract idea comes after the example lands.
-- **Bullets, tables, short sentences.** No paragraphs or prose walls. Bold the is / is-not contrast.
+- **Nested bullets and tables only.** Every teaching chunk is built from nested bullets and tables — never labeled prose intros ("The everyday example", "The ideas + their terms") or explanatory sentences floating outside a bullet. No paragraphs or prose walls. Short sentences. Bold the is / is-not contrast.
 - **Minimum words.** Say it in the fewest words that still land.
 - **Anchor sketch when structural.** For a relational/structural point, add a small 2–4 node text tree. Skip it for rote facts. "Structural" includes: fan-out/tree, routing, ordering, **a component's position in a pipeline** ("X sits after Y and grades its output"), and **any chunk that stacks 2+ boundary contrasts** (e.g. "A vs its neighbor B" *and* "C vs its neighbor D") — consolidate those into one small text-tree/table instead of leaving them as scattered prose bullets.
 
@@ -46,3 +46,4 @@ Block the send until all pass:
 - [ ] Teaching a chunk? -> it OPENS with 🎓 tenth-grader bullets (2-4, no jargon) before any example
 - [ ] Scoring a learner? -> completeness score AND the plain/expert two-column table present (no bare bullet "lingo check")
 - [ ] Teaching a chunk? -> TWO retrieval questions on distinct new cases, delivered ONE AT A TIME (Q2 only after Q1 is scored) (procedure: learn steps 5-8)
+- [ ] Teaching output is nested bullets + tables only? -> no labeled prose intro sections, no sentences floating outside a bullet
