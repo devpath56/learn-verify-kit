@@ -23,7 +23,19 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 2. **Chunk** nodes into <=3 named groups. Seven flat boxes never recall; three chunks do. Name each chunk with a real word, ideally a verb sequence (e.g. AIM -> CALL -> LOOP).
 3. **Attach one question per node.** This is the retrieval cue and the non-negotiable step. The question, not the label, is what makes recall self-prompting: each answer hands you the next question.
 4. **Pick exactly one focus node** and emphasize it (Signaling). Everything else is neutral.
-5. **Render — in chat, default to a text tree.** The whole kit runs in chat, so the baseline output is a monospace/markdown tree that renders everywhere, including the Claude Code terminal: chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, and the question directly under its node (Spatial contiguity). Never a separate webpage or file. Only where the surface renders inline visuals (e.g. claude.ai, Cowork) may you upgrade to an SVG carrying the same chunks, focus, and per-node questions. The text tree is the contract; the SVG is a where-supported enhancement, not a replacement.
+5. **Render — in chat, default to a *visually encoded* text tree.** The whole kit runs in chat, so the baseline output is a monospace/markdown tree that renders everywhere, including the Claude Code terminal: chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, and the question directly under its node (Spatial contiguity). Never a separate webpage or file. Only where the surface renders inline visuals (e.g. claude.ai, Cowork) may you upgrade to an SVG carrying the same chunks, focus, and per-node questions. The text tree is the contract; the SVG is a where-supported enhancement, not a replacement.
+   - **Make it colorful and memorable, per house-style's "Sketches are visually encoded" rule.** A bare gray ASCII tree under-signals and reads like rereading. Apply a *meaning-bearing* visual system that survives the terminal + markdown (emoji + box glyphs, never ANSI color):
+     - **One color-token per chunk** — a ≤3 categorical palette (🟦 / 🟩 / 🟧), each chunk's token repeated on its nodes, and named once in a one-line **legend** so a glance groups the sketch (Gestalt grouping, dual coding).
+     - **One ⭐ focus node** — the single most important node carries ⭐; everything else stays neutral (Signaling).
+     - **`❓` marks each retrieval question** sitting directly under its node (Spatial contiguity).
+     - Color encodes **grouping or focus only** — never decoration (Coherence). This *strengthens* the color-discipline rule; it does not loosen it.
+   - Shape to copy:
+     ```
+     Legend: 🟦 AIM · 🟩 CALL · 🟧 LOOP
+     🟦 AIM ──► 🟩 CALL ──► 🟧 LOOP
+     🟦 ⭐[what problem?]      🟩 [who runs it?]     🟧 [when repeat?]
+        ❓ names the goal         ❓ picks the tool       ❓ sets the exit test
+     ```
 
 ## Decision card (transferable)
 
@@ -39,6 +51,7 @@ Run every output against `references/recall-rubric.md`. If any check fails, fix 
 - An acronym that doesn't spell a pronounceable word (GLEJBVA). Drop it.
 - A decorative analogy that adds nodes without lowering load (a courtroom layered on a pipeline). Coherence violation — cut it.
 - Color used for nothing. Color must encode meaning or be a single neutral ramp.
+- A bare monochrome ASCII tree — no per-chunk color-token, no legend, no marked ⭐ focus node. It under-signals and reads like rereading; apply the meaning-bearing visual encoding (step 5).
 - Detail front-loaded into boxes. Boxes get <=5 words; the rest goes in the prose reply.
 
 ## Filing for revision (spacing is half the method)

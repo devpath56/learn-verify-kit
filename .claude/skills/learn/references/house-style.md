@@ -8,6 +8,7 @@ These rules govern HOW the kit talks to the learner, across all skills. Goal: th
 - **Nested bullets and tables only.** Every teaching chunk is built from nested bullets and tables — never labeled prose intros ("The everyday example", "The ideas + their terms") or explanatory sentences floating outside a bullet. No paragraphs or prose walls. Short sentences. Bold the is / is-not contrast.
 - **Minimum words.** Say it in the fewest words that still land.
 - **Anchor sketch when structural.** For a relational/structural point, add a small 2–4 node text tree. Skip it for rote facts. "Structural" includes: fan-out/tree, routing, ordering, **a component's position in a pipeline** ("X sits after Y and grades its output"), and **any chunk that stacks 2+ boundary contrasts** (e.g. "A vs its neighbor B" *and* "C vs its neighbor D") — consolidate those into one small text-tree/table instead of leaving them as scattered prose bullets.
+- **Sketches are visually encoded, never monochrome.** Any sketch — an anchor sketch here or a full `concept-sketch` — uses a *meaning-bearing* visual system so it's memorable at a glance, not a bare gray ASCII tree: a colored token/emoji per chunk-or-role (a **≤3 categorical palette**, e.g. 🟦/🟩/🟧, introduced in a one-line legend), **one** clearly marked focus node (⭐), a `❓` under a node when it carries a retrieval question, and consistent box/arrow glyphs. The color must encode **grouping or focus** — never decoration (Mayer coherence). Renders everywhere: emoji + box-drawing survive the terminal and markdown; never rely on ANSI color, which chat drops.
 
 ## Language
 - **Plain first, then the expert term.** Explain in plain words, then name the industry-standard term so the learner can say it in the room. Never open with jargon.
@@ -47,3 +48,4 @@ Block the send until all pass:
 - [ ] Scoring a learner? -> completeness score AND the plain/expert two-column table present (no bare bullet "lingo check")
 - [ ] Teaching a chunk? -> TWO retrieval questions on distinct new cases, delivered ONE AT A TIME (Q2 only after Q1 is scored) (procedure: learn steps 5-8)
 - [ ] Teaching output is nested bullets + tables only? -> no labeled prose intro sections, no sentences floating outside a bullet
+- [ ] Rendering a sketch (anchor or concept)? -> meaning-bearing visual encoding present (per-chunk/role color token + one-line legend + one marked ⭐ focus node), not a bare monochrome ASCII tree
