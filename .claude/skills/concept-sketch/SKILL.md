@@ -25,6 +25,15 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 4. **Pick exactly one focus node** and emphasize it (Signaling). Everything else is neutral.
 5. **Render — in chat, default to a text tree.** The whole kit runs in chat, so the baseline output is a monospace/markdown tree that renders everywhere, including the Claude Code terminal: chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, and the question directly under its node (Spatial contiguity). Never a separate webpage or file. Only where the surface renders inline visuals (e.g. claude.ai, Cowork) may you upgrade to an SVG carrying the same chunks, focus, and per-node questions. The text tree is the contract; the SVG is a where-supported enhancement, not a replacement.
 
+## Vivid, not decorative (one anchor image per chunk)
+
+A flat sketch of terse boxes is forgettable — that is the failure mode to fix. The fix is **one concrete, sensory anchor image per chunk that IS the mnemonic**, not layered decoration. Vivid ≠ decorative:
+
+- **Load-bearing (do this, required):** a single concrete image that *encodes* the idea, so recalling the image recalls the concept — e.g. "the idle chef at a cold stove" for blocked/idle time. It lives in the focus node and its question; the ≤5-word box label still holds.
+- **Decorative (still banned):** imagery that adds nodes without lowering load — a courtroom layered over a pipeline. Encodes nothing, raises load.
+
+The test: **does the image, on its own, hand back the concept?** If yes, it is load-bearing — keep it. If it only looks nice, cut it. A sketch with zero anchor image is as much a miss as one buried in decoration.
+
 ## Decision card (transferable)
 
 Beyond the recall scaffold, emit a **decision card**: a one-line thumb rule and/or a small 2×2 the learner can apply to *other* problems in other domains. A recall scaffold makes a concept memorable; a decision card makes it portable. Plain rule first, then name the pattern. Hand the card to `track` for the revision deck.
@@ -37,7 +46,8 @@ Run every output against `references/recall-rubric.md`. If any check fails, fix 
 
 - 7+ flat nodes in a row. Chunk them.
 - An acronym that doesn't spell a pronounceable word (GLEJBVA). Drop it.
-- A decorative analogy that adds nodes without lowering load (a courtroom layered on a pipeline). Coherence violation — cut it.
+- A decorative analogy that adds nodes without lowering load (a courtroom layered on a pipeline). Coherence violation — cut it. (But a single load-bearing anchor image per chunk is *required*, not decoration — see "Vivid, not decorative.")
+- A flat sketch of terse boxes with no anchor image at all. Add one load-bearing image per chunk.
 - Color used for nothing. Color must encode meaning or be a single neutral ramp.
 - Detail front-loaded into boxes. Boxes get <=5 words; the rest goes in the prose reply.
 
