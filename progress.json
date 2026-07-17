@@ -57,6 +57,13 @@
       "last_score": "partial",
       "last_reviewed": "2026-07-15",
       "next_review": "2026-07-16"
+    },
+    {
+      "topic": "Loop engineering",
+      "depth_reached": "cert 4.3/5",
+      "last_score": 4.3,
+      "last_reviewed": "2026-07-17",
+      "next_review": "2026-07-18"
     }
   ]
 }
