@@ -10,7 +10,8 @@ Every check derives from a cited principle. Fail any -> fix before showing.
 | 4 | Coherence | No decorative element (analogy, image, color) that doesn't lower cognitive load | Mayer, Coherence principle |
 | 5 | Signaling | Exactly one focus node emphasized; rest neutral | Mayer, Signaling principle |
 | 6 | Spatial contiguity | Label/question sits on or beside its node, not in a distant legend | Mayer, Spatial contiguity |
-| 7 | Color discipline | <=2 ramps; color encodes meaning or is one neutral ramp | Extraneous-load reduction |
+| 7 | Color discipline | Color encodes meaning: EITHER one neutral ramp OR a ≤3 categorical palette that tags chunk membership (one token per chunk, named in a legend). Never decorative | Extraneous-load reduction |
+| 7b | Visual encoding present | Sketch is not a bare monochrome tree: per-chunk color-token + legend + one marked ⭐ focus node are all present | Signaling + Gestalt grouping; dual coding |
 | 8 | Box brevity | <=5 words per box; detail lives in the prose reply | Extraneous-load reduction |
 | 9 | Mnemonic honesty | Any mnemonic is a real word/phrase and actually recallable, else dropped | No-slop rule |
 | 10 | Dual coding pairing | Sketch is delivered with, or as part of, a retrieval step (learn loop), never as a standalone "study this" poster | Dual coding works only paired with retrieval |

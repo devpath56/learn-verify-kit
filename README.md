@@ -2,7 +2,7 @@
 
 A drop-in skill bundle that turns Claude into a **quizzing tutor**, not a summarizer. It researches a concept, teaches it until you can recall it cold, scores your brainstorms, stress-tests your understanding, self-checks its own answers for plain language, and keeps a running log of what you learn so you can quiz yourself on it later.
 
-**The whole experience runs in chat** — claude.ai or Cowork. Nothing to install, no hooks, no config, nothing renders to a webpage. You talk, it teaches and tests.
+**The whole experience runs in chat** — claude.ai or Cowork. Nothing to install, no hooks, no config. You talk, it teaches and tests. The one thing rendered as a visual is the **concept sketch**, published as a self-contained inline visual (Artifact / SVG) on surfaces that can show one; its retrieval questions are always delivered as text.
 
 It is fully self-contained. Nothing here references any private files, stories, or company context. Drop it in and use it.
 
@@ -70,7 +70,7 @@ Everything needed to evolve this kit lives in this repo — no external context.
 
 - **`CLAUDE.md`** — how Claude should maintain the repo (architecture, the "one rule, one home" principle, guardrails).
 - **`MAINTAINING.md`** — structure, how to run the regression suite, and *why each rule exists* (provenance).
-- **`tests/regression-cases.md`** — 18 guardrail tests, one per real error.
+- **`tests/regression-cases.md`** — 27 guardrail tests, one per real error.
 - Licensed under MIT — see `LICENSE`.
 
 ## Files

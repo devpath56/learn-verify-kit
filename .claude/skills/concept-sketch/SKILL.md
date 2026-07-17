@@ -7,7 +7,7 @@ description: Turn raw concept text into a memorable, self-testable concept sketc
 
 **All output follows `../learn/references/house-style.md`.**
 
-Input: raw concept text. Output: one sketch (SVG if a rendering tool is available, else a structured text diagram) that is visual + verbal + self-testable.
+Input: raw concept text. Output: one **inline visual** sketch — a self-contained Artifact or inline SVG — that is visual + verbal + self-testable. No ASCII text-diagram fallback; where no inline visual can render, the retrieval question set (always emitted as text) carries the method.
 
 ## The hard constraint (read first)
 
@@ -23,7 +23,12 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 2. **Chunk** nodes into <=3 named groups. Seven flat boxes never recall; three chunks do. Name each chunk with a real word, ideally a verb sequence (e.g. AIM -> CALL -> LOOP).
 3. **Attach one question per node.** This is the retrieval cue and the non-negotiable step. The question, not the label, is what makes recall self-prompting: each answer hands you the next question.
 4. **Pick exactly one focus node** and emphasize it (Signaling). Everything else is neutral.
-5. **Render — in chat, default to a text tree.** The whole kit runs in chat, so the baseline output is a monospace/markdown tree that renders everywhere, including the Claude Code terminal: chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, and the question directly under its node (Spatial contiguity). Never a separate webpage or file. Only where the surface renders inline visuals (e.g. claude.ai, Cowork) may you upgrade to an SVG carrying the same chunks, focus, and per-node questions. The text tree is the contract; the SVG is a where-supported enhancement, not a replacement.
+5. **Render — always an inline VISUAL (Artifact / SVG). No text-tree diagram fallback.** Publish a self-contained, theme-aware inline **Artifact** (HTML) or inline **SVG** carrying the chunks, the one marked ⭐ focus node, and each node's `❓` question beside it (Spatial contiguity). Render it **inline** — never a bare download-only file. This kit draws its sketches only where a surface can show an inline visual; on a bare terminal, do NOT substitute an ASCII text-tree diagram. The retrieval **question set is always delivered and filed as text** regardless of surface (see "Filing for revision") — that text is the study scaffold, the diagram is the ephemeral visual, so the method still holds even where no visual renders.
+   - **Encode meaning, not decoration** (per house-style's "Sketches are visually encoded" rule):
+     - **One color per chunk** — a ≤3 categorical palette; every node in a chunk shares its color, named once in a **legend** (Gestalt grouping, dual coding).
+     - **One ⭐ focus node** — the single most important node; everything else neutral (Signaling).
+     - **`❓` beside each node** — the retrieval cue sits with its node (Spatial contiguity).
+     - Color encodes **grouping or focus only** — never decoration (Coherence).
 
 ## Decision card (transferable)
 
@@ -39,6 +44,8 @@ Run every output against `references/recall-rubric.md`. If any check fails, fix 
 - An acronym that doesn't spell a pronounceable word (GLEJBVA). Drop it.
 - A decorative analogy that adds nodes without lowering load (a courtroom layered on a pipeline). Coherence violation — cut it.
 - Color used for nothing. Color must encode meaning or be a single neutral ramp.
+- A bare monochrome ASCII tree — no per-chunk color-token, no legend, no marked ⭐ focus node. It under-signals and reads like rereading; apply the meaning-bearing visual encoding (step 5).
+- Shipping a text tree on a visual-capable surface (claude.ai / Cowork) when an inline Artifact/SVG was possible, or attaching the visual as a download-only file instead of rendering it inline. Render inline (step 5).
 - Detail front-loaded into boxes. Boxes get <=5 words; the rest goes in the prose reply.
 
 ## Filing for revision (spacing is half the method)
