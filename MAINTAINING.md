@@ -51,7 +51,7 @@ Every rule traces to a real failure caught during the kit's hardening. Don't und
 | Auto-persist revise-DB at consolidation | Consolidation ends with only an in-chat deck; log never saved to `progress.json` until a manual "track" | R-24 |
 | Nested bullets + tables only (no prose intros) | Chunks opened with labeled prose sections / floating sentences | R-25 |
 | Sketches visually encoded, not monochrome | Anchor/concept sketch rendered as a bare gray ASCII tree (low retention) | R-26 |
-| Inline visual sketch on visual-capable surfaces | Text-only sketch on claude.ai/Cowork when an inline Artifact/SVG was possible | R-27 |
+| Sketch renders as an inline visual (no text-tree fallback) | Emitted an ASCII text-tree diagram or a download-only file instead of an inline Artifact/SVG | R-27 |
 
 ## Releasing
 1. Run the behavioral suite; fix any regression.

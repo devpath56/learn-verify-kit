@@ -7,7 +7,7 @@ description: Turn raw concept text into a memorable, self-testable concept sketc
 
 **All output follows `../learn/references/house-style.md`.**
 
-Input: raw concept text. Output: one sketch (SVG if a rendering tool is available, else a structured text diagram) that is visual + verbal + self-testable.
+Input: raw concept text. Output: one **inline visual** sketch — a self-contained Artifact or inline SVG — that is visual + verbal + self-testable. No ASCII text-diagram fallback; where no inline visual can render, the retrieval question set (always emitted as text) carries the method.
 
 ## The hard constraint (read first)
 
@@ -23,22 +23,12 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 2. **Chunk** nodes into <=3 named groups. Seven flat boxes never recall; three chunks do. Name each chunk with a real word, ideally a verb sequence (e.g. AIM -> CALL -> LOOP).
 3. **Attach one question per node.** This is the retrieval cue and the non-negotiable step. The question, not the label, is what makes recall self-prompting: each answer hands you the next question.
 4. **Pick exactly one focus node** and emphasize it (Signaling). Everything else is neutral.
-5. **Render — surface-adaptive; prefer an inline visual where the surface can show one.** Match the render to what the surface can display, and carry the SAME chunks, focus node, and per-node questions in every form:
-   - **Visual-capable surface (claude.ai, Cowork, or any client that renders inline artifacts/images): render an inline VISUAL by default — not a text tree.** Publish an inline **Artifact** (self-contained, theme-aware HTML) or an inline **SVG** with grouped/colored nodes, one marked ⭐ focus node, and each node's `❓` question beside it. On these surfaces a plain text tree is an under-render — the previous "text-first, visual is an optional upgrade" default is reversed. Never a bare download-only file when an inline render is possible.
-   - **Terminal / no-inline-visuals surface (e.g. the Claude Code CLI): the visually-encoded text tree is the fallback and the guaranteed-everywhere contract** — monospace/markdown, chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, question directly under its node (Spatial contiguity).
-   - Same content either way: switching surfaces changes the medium, never the chunks, the focus, or the questions.
-   - **Make it colorful and memorable, per house-style's "Sketches are visually encoded" rule.** A bare gray ASCII tree under-signals and reads like rereading. Apply a *meaning-bearing* visual system that survives the terminal + markdown (emoji + box glyphs, never ANSI color):
-     - **One color-token per chunk** — a ≤3 categorical palette (🟦 / 🟩 / 🟧), each chunk's token repeated on its nodes, and named once in a one-line **legend** so a glance groups the sketch (Gestalt grouping, dual coding).
-     - **One ⭐ focus node** — the single most important node carries ⭐; everything else stays neutral (Signaling).
-     - **`❓` marks each retrieval question** sitting directly under its node (Spatial contiguity).
-     - Color encodes **grouping or focus only** — never decoration (Coherence). This *strengthens* the color-discipline rule; it does not loosen it.
-   - Shape to copy:
-     ```
-     Legend: 🟦 AIM · 🟩 CALL · 🟧 LOOP
-     🟦 AIM ──► 🟩 CALL ──► 🟧 LOOP
-     🟦 ⭐[what problem?]      🟩 [who runs it?]     🟧 [when repeat?]
-        ❓ names the goal         ❓ picks the tool       ❓ sets the exit test
-     ```
+5. **Render — always an inline VISUAL (Artifact / SVG). No text-tree diagram fallback.** Publish a self-contained, theme-aware inline **Artifact** (HTML) or inline **SVG** carrying the chunks, the one marked ⭐ focus node, and each node's `❓` question beside it (Spatial contiguity). Render it **inline** — never a bare download-only file. This kit draws its sketches only where a surface can show an inline visual; on a bare terminal, do NOT substitute an ASCII text-tree diagram. The retrieval **question set is always delivered and filed as text** regardless of surface (see "Filing for revision") — that text is the study scaffold, the diagram is the ephemeral visual, so the method still holds even where no visual renders.
+   - **Encode meaning, not decoration** (per house-style's "Sketches are visually encoded" rule):
+     - **One color per chunk** — a ≤3 categorical palette; every node in a chunk shares its color, named once in a **legend** (Gestalt grouping, dual coding).
+     - **One ⭐ focus node** — the single most important node; everything else neutral (Signaling).
+     - **`❓` beside each node** — the retrieval cue sits with its node (Spatial contiguity).
+     - Color encodes **grouping or focus only** — never decoration (Coherence).
 
 ## Decision card (transferable)
 
