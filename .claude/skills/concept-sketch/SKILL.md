@@ -23,7 +23,10 @@ A concept sketch you only look at is closer to rereading than to learning, and r
 2. **Chunk** nodes into <=3 named groups. Seven flat boxes never recall; three chunks do. Name each chunk with a real word, ideally a verb sequence (e.g. AIM -> CALL -> LOOP).
 3. **Attach one question per node.** This is the retrieval cue and the non-negotiable step. The question, not the label, is what makes recall self-prompting: each answer hands you the next question.
 4. **Pick exactly one focus node** and emphasize it (Signaling). Everything else is neutral.
-5. **Render — in chat, default to a *visually encoded* text tree.** The whole kit runs in chat, so the baseline output is a monospace/markdown tree that renders everywhere, including the Claude Code terminal: chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, and the question directly under its node (Spatial contiguity). Never a separate webpage or file. Only where the surface renders inline visuals (e.g. claude.ai, Cowork) may you upgrade to an SVG carrying the same chunks, focus, and per-node questions. The text tree is the contract; the SVG is a where-supported enhancement, not a replacement.
+5. **Render — surface-adaptive; prefer an inline visual where the surface can show one.** Match the render to what the surface can display, and carry the SAME chunks, focus node, and per-node questions in every form:
+   - **Visual-capable surface (claude.ai, Cowork, or any client that renders inline artifacts/images): render an inline VISUAL by default — not a text tree.** Publish an inline **Artifact** (self-contained, theme-aware HTML) or an inline **SVG** with grouped/colored nodes, one marked ⭐ focus node, and each node's `❓` question beside it. On these surfaces a plain text tree is an under-render — the previous "text-first, visual is an optional upgrade" default is reversed. Never a bare download-only file when an inline render is possible.
+   - **Terminal / no-inline-visuals surface (e.g. the Claude Code CLI): the visually-encoded text tree is the fallback and the guaranteed-everywhere contract** — monospace/markdown, chunk headers, boxed nodes, arrows for the verb chain, one focus node marked, question directly under its node (Spatial contiguity).
+   - Same content either way: switching surfaces changes the medium, never the chunks, the focus, or the questions.
    - **Make it colorful and memorable, per house-style's "Sketches are visually encoded" rule.** A bare gray ASCII tree under-signals and reads like rereading. Apply a *meaning-bearing* visual system that survives the terminal + markdown (emoji + box glyphs, never ANSI color):
      - **One color-token per chunk** — a ≤3 categorical palette (🟦 / 🟩 / 🟧), each chunk's token repeated on its nodes, and named once in a one-line **legend** so a glance groups the sketch (Gestalt grouping, dual coding).
      - **One ⭐ focus node** — the single most important node carries ⭐; everything else stays neutral (Signaling).
@@ -52,6 +55,7 @@ Run every output against `references/recall-rubric.md`. If any check fails, fix 
 - A decorative analogy that adds nodes without lowering load (a courtroom layered on a pipeline). Coherence violation — cut it.
 - Color used for nothing. Color must encode meaning or be a single neutral ramp.
 - A bare monochrome ASCII tree — no per-chunk color-token, no legend, no marked ⭐ focus node. It under-signals and reads like rereading; apply the meaning-bearing visual encoding (step 5).
+- Shipping a text tree on a visual-capable surface (claude.ai / Cowork) when an inline Artifact/SVG was possible, or attaching the visual as a download-only file instead of rendering it inline. Render inline (step 5).
 - Detail front-loaded into boxes. Boxes get <=5 words; the rest goes in the prose reply.
 
 ## Filing for revision (spacing is half the method)
