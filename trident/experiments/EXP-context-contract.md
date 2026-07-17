@@ -51,6 +51,22 @@ boundary. Simba holds the IntentCard; the **Fable Auditor** (never the Opus Do-e
 **The proposal PASSES iff P1 ∧ P2 ∧ P3 ∧ P4.** Any unmet criterion → **FAILS**, and we log why (candidate CF).
 If Arm B drops the tripwire **and** P4's gate would not have caught it → the proposal is unsafe as written.
 
+## Anticipated failures (primed from `failures.jsonl` before running)
+The Auditor's prime-Simba step, applied to *this experiment's own design*:
+- **CF-014** — measure behavior, not code text: M2/M3 **execute** `parse_config` and assert outcomes; never
+  grep the source for `"ValueError"`.
+- **CF-010 / CF-037** — no self-scored quality and no narrated results: deterministic unit tests decide M2/M3,
+  the **Fable** Auditor (never the Opus Do-er) renders the verdict, and every claim cites a real tool call.
+- **CF-021** — don't win on one axis while another rots: PASS needs P2∧P3 (quality/intent) *and* P1 (tokens).
+- **CF-051** — deterministic-first: M1 (chars), M2/M3 (tests), M4 (grep) are all deterministic.
+- **CF-056** — feasibility probe first: R1 doubles as the Phase-0 probe (prove a Do-er's code can be extracted
+  and executed here before spending the full run).
+- **CF-004** — real numbers only; no simulated measurements.
+- **n=1 caveat (the load-bearing point):** a single Arm-B run preserving the invariant could be luck. The
+  **guarantee is P4, not P2** — the contract is safe *by construction* only if the deterministic gate catches
+  any compaction that drops the invariant. P2 is a sanity observation; P4 is the proof. Arms differ **only**
+  in the context regime (same task, same Opus Do-er, same round instructions, shared R1 seed) — no confound.
+
 ## What each outcome means
 - **Pass:** wire the context-contract into `method.md` as the standing mechanism, with the gate mandatory.
 - **Fail on P2, P4 catches it:** the contract needs the gate to be *non-optional* (compaction is unsafe bare).
