@@ -7,7 +7,7 @@ These rules govern HOW the kit talks to the learner, across all skills. Goal: th
 - **Example first.** After the tenth-grader bullets, open the real teaching with a concrete, everyday example, not a definition. The abstract idea comes after the example lands.
 - **Bullets, tables, short sentences.** No paragraphs or prose walls. Bold the is / is-not contrast.
 - **Minimum words.** Say it in the fewest words that still land.
-- **Anchor sketch when structural.** For a relational/structural point, add a small 2–4 node text tree. Skip it for rote facts.
+- **Anchor sketch when structural — and vivid, not a bare box tree.** For a relational/structural point, add a small 2–4 node text tree whose nodes carry a concrete, sensory anchor (a mini-image or scenario that *encodes* the idea), not abstract labels alone. A flat tree of terse abstract boxes is the failure mode — the same vivid≠decorative rule as `concept-sketch`: the anchor must, on its own, hand back the concept. Skip the sketch entirely for rote facts.
 
 ## Language
 - **Plain first, then the expert term.** Explain in plain words, then name the industry-standard term so the learner can say it in the room. Never open with jargon.
