@@ -64,6 +64,13 @@
       "last_score": 4.3,
       "last_reviewed": "2026-07-17",
       "next_review": "2026-07-18"
+    },
+    {
+      "topic": "Prompt contract (interface for a probabilistic producer)",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-07-19",
+      "next_review": "2026-07-20"
     }
   ]
 }
