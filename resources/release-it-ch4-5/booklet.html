@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stability Antipatterns &amp; Stability Patterns — Study Booklet</title>
+<style>
+:root{
+  --ink:#151719; --soft:#5b6168; --rule:#c9ced4; --hair:#e4e8ec;
+  --c1:#1d5fa8; --c1bg:#eaf1fa;   /* chunk 1 */
+  --c2:#1c7a52; --c2bg:#e8f5ee;   /* chunk 2 */
+  --c3:#b05a10; --c3bg:#fdf1e3;   /* chunk 3 */
+  --c4:#6b3fa0; --c4bg:#f1ecf9;   /* chunk 4 */
+  --warn:#a3161d; --warnbg:#fdecec;
+}
+@page{ size:A4; margin:16mm 15mm 16mm 15mm; }
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+body{
+  font-family:"Charter","Georgia","Times New Roman",serif;
+  color:var(--ink); font-size:10.4pt; line-height:1.44; margin:0;
+}
+h1,h2,h3,h4,.ui{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+h1{font-size:23pt; line-height:1.12; margin:0 0 6pt; letter-spacing:-.4pt}
+h2{font-size:15pt; margin:0 0 4pt; letter-spacing:-.2pt}
+h3{font-size:11.6pt; margin:14pt 0 5pt; letter-spacing:-.1pt}
+h4{font-size:9.6pt; margin:10pt 0 4pt; text-transform:uppercase; letter-spacing:.9pt; color:var(--soft)}
+p{margin:0 0 6pt}
+ul,ol{margin:0 0 7pt; padding-left:17px}
+li{margin:0 0 3pt}
+li > ul{margin-top:3pt}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:#f2f4f6; padding:.5pt 3pt; border-radius:2px}
+small{font-size:8.6pt; color:var(--soft)}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.nobreak,.box,.qbox,.sketch,.matrix{break-inside:avoid; page-break-inside:avoid}
+
+/* ---------- cover ---------- */
+.cover{padding-top:22mm}
+.kicker{font-size:9pt; letter-spacing:2.4pt; text-transform:uppercase; color:var(--soft); margin-bottom:10pt}
+.cover .sub{font-size:13pt; color:var(--soft); margin:8pt 0 20pt; line-height:1.35}
+.cover .rule{height:3px; background:var(--ink); width:64px; margin:16pt 0}
+.meta{font-size:9.4pt; color:var(--soft); line-height:1.7}
+.chunkstrip{display:flex; gap:6px; margin:22pt 0 0}
+.chunkstrip div{flex:1; padding:8pt 9pt; border-radius:4px; font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
+.cs1{background:var(--c1bg); border-left:3px solid var(--c1)}
+.cs2{background:var(--c2bg); border-left:3px solid var(--c2)}
+.cs3{background:var(--c3bg); border-left:3px solid var(--c3)}
+.cs4{background:var(--c4bg); border-left:3px solid var(--c4)}
+.chunkstrip b{display:block; font-size:9.6pt; margin-bottom:2pt}
+
+/* ---------- chunk headers ---------- */
+.chunkhead{border-radius:5px; padding:11pt 13pt; margin:0 0 12pt; color:#fff}
+.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase; opacity:.85}
+.chunkhead h2{color:#fff; margin:3pt 0 0}
+.chunkhead p{margin:5pt 0 0; font-size:9.4pt; opacity:.93}
+.h1c{background:var(--c1)} .h2c{background:var(--c2)} .h3c{background:var(--c3)} .h4c{background:var(--c4)}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--rule); border-radius:4px; padding:9pt 11pt; margin:0 0 9pt}
+.tenth{background:#fbfaf4; border:1px solid #e0d9bd; border-left:4px solid #c9a227}
+.tenth h4{color:#8a6d10}
+.bound{background:#f7f8f9; border-left:4px solid var(--soft)}
+.quote{background:var(--warnbg); border:none; border-left:4px solid var(--warn); font-style:italic; padding:8pt 11pt}
+.quote .who{font-style:normal; font-size:8.4pt; color:var(--warn); display:block; margin-top:4pt; letter-spacing:.4pt; font-family:Helvetica,Arial,sans-serif}
+.tip{background:#eef6f2; border-left:4px solid var(--c2)}
+.qbox{border:1.5px solid var(--ink); border-radius:4px; padding:10pt 12pt; margin:0 0 8pt; background:#fff}
+.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--soft)}
+.qbox p{margin:4pt 0 0}
+.writeline{border-bottom:1px dotted #aeb4ba; height:15pt}
+.writelines{margin-top:8pt}
+
+/* ---------- tables ---------- */
+table{width:100%; border-collapse:collapse; margin:0 0 9pt; font-size:9.1pt}
+th,td{border:1px solid var(--hair); padding:4.5pt 6pt; text-align:left; vertical-align:top}
+th{background:#f4f6f8; font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--soft); font-weight:600}
+td b{font-weight:700}
+tr{break-inside:avoid}
+.tight td,.tight th{padding:3.5pt 5pt; font-size:8.8pt}
+
+/* ---------- 2x2 ---------- */
+.matrix{margin:6pt 0 10pt}
+.matrix .ylab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.2pt; text-transform:uppercase; color:var(--soft); margin-bottom:3pt}
+.grid2{display:grid; grid-template-columns:26mm 1fr 1fr; grid-template-rows:auto auto auto; gap:4px}
+.grid2 .corner{}
+.grid2 .colh,.grid2 .rowh{
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; font-weight:700; line-height:1.35;
+  background:#eef1f4; padding:6pt 7pt; border-radius:3px;
+}
+.grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
+.grid2 .cell{border:1px solid var(--rule); border-radius:3px; padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
+.grid2 .cell b{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.cell.focus{border:2px solid var(--warn); background:var(--warnbg)}
+.cell.good{background:#eef7f1}
+.legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
+
+/* ---------- sketch ---------- */
+.sketch{border:1px solid var(--rule); border-radius:5px; padding:11pt 12pt; background:#fcfcfd; margin:0 0 9pt}
+.node{display:inline-block; border-radius:4px; padding:4pt 7pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt; line-height:1.3; margin:2pt 0; border:1px solid}
+.n1{background:var(--c1bg); border-color:var(--c1); color:#0f3c6d}
+.n2{background:var(--c2bg); border-color:var(--c2); color:#0f4d33}
+.n3{background:var(--c3bg); border-color:var(--c3); color:#7a3d09}
+.n4{background:var(--c4bg); border-color:var(--c4); color:#472a6b}
+.nstar{background:#fff6d6; border:2px solid #c9a227; color:#6b5200; font-weight:700}
+.tree{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:8.6pt; line-height:1.7; white-space:pre}
+/* tokens used INSIDE .tree — colour only, so monospace alignment survives */
+.tree .tk1{color:var(--c1); font-weight:700}
+.tree .tk2{color:var(--c2); font-weight:700}
+.tree .tk3{color:var(--c3); font-weight:700}
+.tree .tk4{color:var(--c4); font-weight:700}
+.tree .tks{color:#8a6d10; font-weight:700; background:#fff6d6}
+.q{color:var(--warn); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt}
+
+/* ---------- misc ---------- */
+.two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.three{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt; text-transform:uppercase; padding:2pt 6pt; border-radius:9px; background:#eceff2; color:var(--soft); margin-right:4pt}
+.p1{background:var(--c1bg); color:var(--c1)} .p2{background:var(--c2bg); color:var(--c2)}
+.p3{background:var(--c3bg); color:var(--c3)} .p4{background:var(--c4bg); color:var(--c4)}
+.toc td{border:none; border-bottom:1px dotted var(--hair); padding:5pt 4pt}
+.toc td:last-child{text-align:right; color:var(--soft); font-family:Helvetica,Arial,sans-serif; font-size:8.6pt}
+.ans{font-size:9.2pt}
+.ans h4{margin-top:11pt}
+.foot{margin-top:14pt; padding-top:6pt; border-top:1px solid var(--hair); font-size:8.2pt; color:var(--soft)}
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Stability Antipatterns<br>&amp; Stability Patterns</h1>
+  <div class="rule"></div>
+  <div class="sub">How a small fault becomes a total outage — and the twelve moves that stop it.<br>
+  Built from <i>Release It!</i> (2nd ed.), Chapters 4 and 5, by Michael T. Nygard.</div>
+
+  <div class="chunkstrip">
+    <div class="cs1"><b>1 · Where cracks start</b>Every integration point, and the two speeds of network failure.</div>
+    <div class="cs2"><b>2 · How cracks spread</b>Blocked threads, chain reactions, cascading failures, slow responses.</div>
+    <div class="cs3"><b>3 · Load turns on you</b>Users, scale, unbalanced capacity, self-denial, dogpiles, automation.</div>
+    <div class="cs4"><b>4 · The counter-moves</b>Twelve stability patterns and when each is the wrong one.</div>
+  </div>
+
+  <div style="margin-top:24pt" class="box tip nobreak">
+    <h4>What this booklet is for</h4>
+    <p>Not a summary. A <b>testing engine on paper</b>. Every section ends with two questions on cases that are <i>not</i> in the book, and the answers live in the back so you can genuinely fail before you check. Reading this cover to cover without writing anything gets you about a third of the value.</p>
+  </div>
+
+  <div class="meta" style="margin-top:20pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no “fit to page”).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+  <p>Two study methods beat all the others by a wide margin: <b>pulling an answer out of your head</b> (retrieval) and <b>spreading the attempts over days</b> (spacing). Re-reading, highlighting and summarising feel productive and are close to worthless. Everything below is arranged around those two.</p>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the <b>plain version</b> box first. If it doesn't make sense, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: “X is <i>this</i>, its look-alike Y is <i>that</i>.”</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines — in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking “yes, I know this” — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per section.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — Where cracks start: integration points</td><td>teach + 2 questions + 2×2</td></tr>
+    <tr><td><b>3</b> — How a crack becomes an outage</td><td>teach + 2 questions + 2×2</td></tr>
+    <tr><td><b>4</b> — Load-shaped failure: demand, scale, automation</td><td>teach + 2 questions + 2×2</td></tr>
+    <tr><td><b>5</b> — The counter-moves: twelve stability patterns</td><td>teach + 2 questions + 2×2</td></tr>
+    <tr><td><b>6</b> — Concept sketch (whole-chapter map) + master 2×2</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → pattern lookup</td><td>on-call reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary · Say-it-like-an-expert index</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Scoring rubric · Spaced-review tracker</td><td>workbook</td></tr>
+  </table>
+
+  <div class="box bound">
+    <h4>One warning before you start, from the author himself</h4>
+    <p>“Don't make the mistake of assuming that a system that includes more of these patterns is superior to one with fewer of them. <b>‘Count of patterns applied’ is never a good quality metric.</b>” The goal is a <i>recovery-oriented mind-set</i>, not a checklist score.</p>
+  </div>
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Given a real outage description (“the process is up but nothing responds”, “one node died and ten minutes later all twelve were gone”, “the site was fine until marketing sent an email”), you can:</p>
+    <ol>
+      <li><b>Name the failure mode</b> in the industry's vocabulary, not in adjectives.</li>
+      <li><b>Say which way it travelled</b> — sideways across peers, or upward across layers — and what carried it across the gap.</li>
+      <li><b>Pick the pattern that stops it</b>, name the one it's most often confused with, and say why you didn't pick that one.</li>
+      <li><b>State the price</b> of the pattern you chose. Every one of them costs something.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>A fault is unavoidable — a bug, a leak, a failing switch, a marketing email. A fault becomes a <b>crack</b>. Cracks are harmless until something <b>propagates</b> them: a blocked thread, a redistributed load, a retry loop, an automated control plane. Two structural properties decide how far a crack runs: <b>tight coupling</b> (a failure here forces a change there) and <b>high interactive complexity</b> (nobody's mental model of the system is complete, so operators' instincts are wrong). Systems with both live at what James R. Chiles calls the <b>technology frontier</b>, where small events routinely become full-blown failures. Chapter 4 catalogues what propagates cracks. Chapter 5 catalogues what stops them.</p>
+
+  <div class="box tenth nobreak">
+    <h4>🎓 The whole thing for a smart 15-year-old</h4>
+    <ul>
+      <li>Programs are constantly waiting on other programs across a network. Waiting is where they die.</li>
+      <li>A thing that says “no” quickly is fine. A thing that says nothing at all is what kills you — because you sit there holding the phone.</li>
+      <li>Enough of your workers stuck holding phones = you are down, even though nothing crashed.</li>
+      <li>So: never wait forever, stop calling things that keep failing, and build walls so one flooded room doesn't sink the ship.</li>
+    </ul>
+  </div>
+
+  <h3>The four sections, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Section</th><th>What it covers</th><th style="width:52mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>Where cracks start</b></td><td>Integration points; sockets and the TCP handshake; fast vs slow network failure; the 5 a.m. problem; HTTP-level and vendor-library hazards.</td><td>Every other failure in the book is downstream of a call across a wire. Start at the source.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>How a crack spreads</b></td><td>Blocked Threads, Chain Reactions, Cascading Failures, Slow Responses, fan-in.</td><td>Faults are unavoidable; propagation is not. This is the section that actually decides your uptime.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Load turns on you</b></td><td>Users and sessions, Expensive/Unwanted/Malicious users, Scaling Effects, Unbalanced Capacities, Self-Denial Attacks, Dogpile, Force Multiplier, Unbounded Result Sets.</td><td>These are the <i>triggers</i> — the things that light the fault that the machinery in §2 then spreads.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>The counter-moves</b></td><td>Timeouts, Circuit Breaker, Bulkheads, Steady State, Fail Fast, Let It Crash, Handshaking, Test Harnesses, Decoupling Middleware, Shed Load, Back Pressure, Governor.</td><td>Each one is the mirror image of something in §1–§3. Learn them <i>as answers</i>, not as a list.</td></tr>
+  </table>
+
+  <div class="box quote">
+    “Everything breaks. Faults are unavoidable. Don't pretend you can eliminate every possible source of them… Assume the worst. Faults will happen. We need to examine what happens <i>after</i> the fault creeps in.”
+    <span class="who">Release It! — Chapter 4</span>
+  </div>
+</section>
+
+<!-- ============================== 2. CHUNK 1 ============================== -->
+<section class="page">
+  <div class="chunkhead h1c">
+    <div class="n">Section 2 · Chunk 1 of 4</div>
+    <h2>Where cracks start: every integration point</h2>
+    <p>Sockets, handshakes, and the difference between failing fast and failing silently.</p>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>🎓 Tenth-grader version</h4>
+    <ul>
+      <li>Your program talks to other programs over a wire. Every one of those conversations can go wrong.</li>
+      <li>The worst kind of “wrong” isn't an error message. It's <b>silence</b> — your code just sits there waiting.</li>
+      <li>A worker stuck waiting can't do anything else. Enough stuck workers and your whole system is effectively down, even though nothing crashed.</li>
+      <li>So: never wait forever, and never trust what comes back.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the phone call</h3>
+  <ul>
+    <li>You ring a friend to ask one question. Exactly three things can happen:
+      <ul>
+        <li><b>They answer.</b> Fine.</li>
+        <li><b>The line is dead</b> and you hear a tone immediately. Annoying, but it costs you two seconds and you move on.</li>
+        <li><b>It rings… and rings…</b> and you stand there with the phone to your ear for thirty minutes.</li>
+      </ul>
+    </li>
+    <li>The third one is the one that ruins your afternoon — <b>not because you got a worse answer, but because your ear was occupied</b>. You couldn't take any other calls.</li>
+    <li>That ear is a request-handling thread. That's the whole chapter in one image.</li>
+  </ul>
+
+  <h4>Now the same three outcomes in network terms</h4>
+  <table>
+    <tr><th style="width:33mm">Phone call</th><th style="width:52mm">What the network is actually doing</th><th>Cost to you</th></tr>
+    <tr><td>Dead line, instant tone</td><td>Nobody listening on the port → remote stack replies with a TCP <b>reset</b>. Your code gets an exception or a bad return value.</td><td><b>Milliseconds.</b> This is a <i>fast failure</i>, and it's the good case: your language has made it obvious that connections fail, so programmers actually handle it.</td></tr>
+    <tr><td>Ringing forever</td><td>Someone <i>is</i> listening, but the port's <b>listen queue</b> is full of half-open connections. Your <code>open()</code> is blocked inside the OS kernel.</td><td><b>Minutes.</b> Connection timeouts vary by OS but are measured in minutes. “The listen queue is the worst place to be.”</td></tr>
+    <tr><td>They pick up, say nothing</td><td>Connection established, request sent, server never gets around to responding. Your <code>read()</code> blocks — and the default in most stacks is <b>block forever</b>.</td><td><b>Unbounded</b>, unless you set a socket timeout. And then you must be ready for the exception.</td></tr>
+  </table>
+
+  <div class="box quote">“Network failures can hit you in two ways: fast or slow… The blocked thread can't process other transactions, so overall capacity is reduced. If all threads end up getting blocked, then for all practical purposes, the server is down. <b>Clearly, a slow response is a lot worse than no response.</b>”</div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:48mm">Plain definition</th><th style="width:52mm">Concrete example</th><th>Boundary — the thing it gets confused with</th></tr>
+    <tr>
+      <td><b>Integration point</b></td>
+      <td>Any place your system talks to another one: socket, database call, HTTP request, queue, vendor client library, named pipe.</td>
+      <td>Checkout calling a credit-card authoriser; an app server calling Oracle; a feed from the pricing system.</td>
+      <td>Not the same as a <b>dependency</b>. The dependency is the <i>thing</i> you rely on; the integration point is the <i>wire</i>. The wire is what fails, and it fails even when the thing at the other end is healthy.</td>
+    </tr>
+    <tr>
+      <td><b>Fast failure</b></td>
+      <td>The call comes back with an error almost immediately.</td>
+      <td>“Connection refused.” A TCP reset. HTTP 500.</td>
+      <td>Not the same as <b>Fail Fast</b> (a pattern, §5). Fast failure is something that <i>happens to you</i>; Fail Fast is something <i>you do to your callers</i>.</td>
+    </tr>
+    <tr>
+      <td><b>Slow failure</b></td>
+      <td>The call neither succeeds nor errors for a long time; the thread is held.</td>
+      <td>A dropped ACK → the stack retransmits → the caller blocks for twenty to thirty minutes.</td>
+      <td>Not the same as a <b>slow response</b>. A slow response eventually arrives. A slow failure eventually throws — much later, having burnt capacity the whole time.</td>
+    </tr>
+    <tr>
+      <td><b>Three-way handshake</b></td>
+      <td>SYN → SYN/ACK → ACK. The ritual that makes discrete packets look like a continuous connection.</td>
+      <td>Under 10 ms if both machines are on the same switch.</td>
+      <td>Not the same as “the connection.” A connection is a <b>logical construct</b> — state in memory at two endpoints. Nothing on the wire <i>is</i> the connection; there are only packets.</td>
+    </tr>
+    <tr>
+      <td><b>Listen queue</b></td>
+      <td>The kernel's waiting room, per port, for connections that have SYN'd but not been accepted.</td>
+      <td>A hammered service whose accept loop can't keep up.</td>
+      <td>A <b>full</b> listen queue is <i>good news</i> — further attempts are refused quickly. Being <i>in</i> the queue is the bad case. Fullness fails fast; membership fails slow.</td>
+    </tr>
+    <tr>
+      <td><b>Idle-connection reaping</b><br><small>(the “5 a.m. problem”)</small></td>
+      <td>A firewall silently forgets a connection that has been quiet too long, then drops its packets — while both endpoints still believe the connection is fine.</td>
+      <td>A LIFO connection pool reuses one connection overnight, leaving 39 idle past the firewall's one-hour timeout. At the morning ramp-up all 39 hang at once.</td>
+      <td>Not the same as a <b>half-open socket</b>. Half-open gives you a reset or an error. A reaped connection gives you <i>nothing</i> — no ICMP unreachable — so the stack just retransmits until <code>tcp_retries2</code> expires.</td>
+    </tr>
+    <tr>
+      <td><b>Vendor client-library risk</b></td>
+      <td>The vendor's client code is ordinary code: it blocks, it pools internally, it hides sockets from you.</td>
+      <td>A messaging library whose <code>messageReceived()</code> callback runs on an unknown thread already holding unknown locks — a deadlock minefield. Plugged callbacks block <code>send()</code>, which blocks request handlers.</td>
+      <td>Not the same as <b>the vendor's server</b>. The server may well be hardened by a thousand deployments; the client library rarely is, and you usually can't see its source.</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 1 continued</div>
+
+  <h3>The 5 a.m. problem, in full — because it teaches the method, not just the fact</h3>
+  <ul>
+    <li><b>Symptom:</b> thirty app-server instances all hang within a five-minute window at ~5 a.m., every day, right as traffic ramps up. Restarting clears it.</li>
+    <li><b>First evidence:</b> thread dumps show every request-handling thread blocked inside the JDBC driver, in low-level socket reads and writes.</li>
+    <li><b>The clue was an absence.</b> Packet capture on the database network showed <i>nothing at all</i> — like Sherlock Holmes' dog that didn't bark.</li>
+    <li><b>Mechanism:</b> a firewall is a specialised router with a finite table of established connections and a “last packet” timestamp per entry. Past its idle timeout, it drops the entry. TCP was never designed for a third party in the middle, so there's no way to tell the endpoints. The firewall was also configured to suppress ICMP (those double as attacker probes), so packets went on the floor <b>silently</b>.</li>
+    <li><b>Why it took so long to fail:</b> the stack sends, waits for an ACK, doesn't get one, retransmits — faithfully. Linux 2.6 with <code>tcp_retries2=15</code> ≈ <b>twenty minutes</b> before the socket library is told the connection is broken. The HP-UX boxes: <b>thirty minutes</b>. Reading could block <i>forever</i>.</li>
+    <li><b>Why it happened at 5 a.m. specifically:</b> the connection pool used <b>last-in, first-out</b>. Overnight, one connection served all the light traffic; the other thirty-nine sat idle well past the firewall's one-hour timeout. When traffic ramped, all thirty-nine locked instantly — and eventually the one good connection got checked out by a thread already blocked elsewhere. Total hang.</li>
+    <li><b>Fixes considered and rejected:</b> validation query on checkout (<code>SELECT SYSDATE FROM DUAL</code>) — hangs. Discard connections older than an hour — tearing down sends a packet, hangs. A “reaper” thread — hairy.</li>
+    <li><b>Fix used:</b> Oracle's <b>dead connection detection</b>. Its purpose is to notice crashed clients, but the periodic ping packet was what mattered: it refreshed the firewall's “last packet” clock and kept the entry alive.</li>
+  </ul>
+
+  <div class="box quote">
+    “The main lesson here is that <b>not every problem can be solved at the level of abstraction where it manifests.</b> Sometimes the causes reverberate up and down the layers. You need to know how to drill through at least two layers of abstraction to find the ‘reality’ at that level.”
+  </div>
+
+  <h3>Above the socket: HTTP and the shape of a hostile response</h3>
+  <p>Everything above still runs on sockets, so it inherits every failure above <i>plus</i> its own. Ways a provider can hurt an HTTP caller:</p>
+  <ul>
+    <li>Accepts the TCP connection but never responds to the request.</li>
+    <li>Accepts the connection but never <i>reads</i> the request. A large body fills the provider's TCP window, which fills your send buffer, which blocks your socket write — <b>you can't even finish sending</b>.</li>
+    <li>Returns a status you don't handle: “418 I'm a teapot”, or more realistically “451 Resource censored”.</li>
+    <li>Returns a content type you didn't expect — a generic HTML 404 page instead of JSON. (Your ISP injecting an HTML page on a failed DNS lookup is a real instance of this.)</li>
+    <li>Claims JSON and sends plain text, kernel binaries, or Weird Al Yankovic MP3s.</li>
+  </ul>
+  <div class="box tip">
+    <h4>The practical rule</h4>
+    <p>Use a client library that gives you <b>fine-grained control over both connect and read timeouts</b> and over response handling. <b>Avoid libraries that map responses straight into domain objects.</b> Treat a response as <i>data</i> — maps and lists — until you have confirmed it meets your expectations. Only then turn it into objects.</p>
+  </div>
+
+  <h3>Trade-offs — nothing here is free</h3>
+  <table class="tight">
+    <tr><th style="width:38mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:38mm">Choose it when</th></tr>
+    <tr><td>Aggressive read timeout</td><td>A bounded blast radius; the thread comes back.</td><td>You will cut off some slow-but-valid work, and you need error-handling code at every call site.</td><td>Always. Derive the value from your own SLA, not from a round number.</td></tr>
+    <tr><td>Keep-alive ping on idle pooled connections</td><td>Survives firewalls and NAT devices that reap idle entries.</td><td>A trickle of extra traffic and one more thing to configure per data source.</td><td>Any long-lived pooled connection crossing a firewall.</td></tr>
+    <tr><td>Native / “thick” driver for better failover</td><td>Vendor failover features, sometimes better throughput.</td><td>Native code means a memory failure can <b>crash the runtime</b> instead of raising a catchable error.</td><td>When you actually need the failover feature and have tested the crash path.</td></tr>
+    <tr><td>Response → domain object automatically</td><td>Less code, faster to write.</td><td>A malformed or hostile response becomes an exception deep inside your object graph, or worse, a valid-looking object.</td><td>Only for providers you control, with schema validation in front.</td></tr>
+    <tr><td>Decompile and patch a vendor library</td><td>Unblocks you now.</td><td>An unsupported build you must carry until the official patch lands.</td><td>Genuine emergency, with a ticket open against the vendor.</td></tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — what an integration-point failure <i>is not</i></h4>
+    <p><b>It is not</b> a nice error response delivered through the defined protocol. That's the comfortable case you already handle.<br>
+    <b>It is</b> a protocol violation, a hang, a slow response, a wrong content type, a truncated body, or a connection that silently stopped existing. Expect the ugly ones; the protocol won't help you.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 1 · anchor sketch, expert phrasing, questions</div>
+
+  <h3>Anchor sketch — the failure taxonomy at one integration point</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n1">blue = chunk 1 nodes</span> &nbsp; <span class="node nstar">* highlighted = the node that matters most</span> &nbsp; <span class="q">❓ = cover the page and answer this</span></div>
+<div class="tree">                  <span class="tk1">A CALL ACROSS A WIRE</span>
+                           │
+           ┌───────────────┴───────────────┐
+           │                               │
+     <span class="tk1">FAST failure</span>                 <span class="tks">* SLOW failure</span>
+     ms, then throws               minutes → forever
+           │                               │
+           │            ┌──────────────────┴──────────────┐
+           │            │                                 │
+   <span class="tk1">connection refused</span>  <span class="tk1">stuck in the</span>                   <span class="tk1">connected,</span>
+   <span class="tk1">TCP reset</span>           <span class="tk1">listen queue</span>                   <span class="tk1">no reply / reaped</span>
+           │            │                                 │
+   already handled   blocks in open()             blocks in read()
+   by your code      for minutes                  possibly forever
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">❓</span> Why is the ⭐ node the dangerous one when the fast branch is the one that <i>throws an error</i>?<br>
+      <span class="q">❓</span> Which of the three leaves gives you <b>no packets at all</b> to look at, and what does that absence tell you?<br>
+      <span class="q">❓</span> Name the one setting that converts the right-hand branch into the left-hand branch.
+    </div>
+  </div>
+
+  <h3>Say it so you understand it → say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>“The other service didn't answer and our code just sat there.”</td><td>“The integration point hung — the calling thread blocked on a socket read with no timeout, so we lost capacity rather than getting an error.”</td></tr>
+    <tr><td>“It broke instantly.”</td><td>“Fast failure — connection refused, TCP reset, a few milliseconds. That's the cheap case.”</td></tr>
+    <tr><td>“The firewall forgot about us.”</td><td>“The firewall reaped the idle entry from its connection table and dropped subsequent packets without an ICMP unreachable, so our stack retransmitted until <code>tcp_retries2</code> expired.”</td></tr>
+    <tr><td>“We had to go look at the actual network.”</td><td>“We dropped a layer of abstraction and took a packet capture — <code>tcpdump</code> in promiscuous mode, analysed off-box in Wireshark.”</td></tr>
+    <tr><td>“Their client library is sketchy.”</td><td>“The vendor client library does unsafe blocking with no configurable failure modes, and it hides the socket so we can't set our own timeouts.”</td></tr>
+    <tr><td>“Don't just parse it straight into our objects.”</td><td>“Treat the response as data until it's validated — deserialise into maps and lists, then extract. Cynical parsing.”</td></tr>
+  </table>
+
+  <div class="box quote">“Integration points are the number-one killer of systems. Every single one of those feeds presents a stability risk. Every socket, process, pipe, or remote procedure call can and will hang.”</div>
+
+  <h3>Retrieval — cover the page first</h3>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 1 · Question 1</div>
+    <p>Your payments service calls an external fraud-scoring API. During an incident, monitoring shows CPU at 3%, memory flat, no errors in the application log — and yet every request-handling thread is occupied and the service returns nothing to anyone.</p>
+    <p><b>(a)</b> Name the failure mode at the integration point. <b>(b)</b> Explain why the <i>absence</i> of errors and the <i>absence</i> of load is the strongest clue you have. <b>(c)</b> Name the two settings you would check first, and say which one you'd bet on.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 1 · Question 2</div>
+    <p>A nightly job holds a pooled TCP connection to a partner's service. It runs fine all week. Every Monday at 06:10 it hangs for about thirty minutes, then throws. No code has changed. The partner insists their service was up the whole time — and their logs prove it.</p>
+    <p><b>(a)</b> State your hypothesis in one sentence. <b>(b)</b> Name the single packet-level observation that would confirm it. <b>(c)</b> Give the cheapest fix and say why the two obvious fixes — validating the connection before use, or closing connections older than an hour — both fail.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 1 · decision matrix</div>
+  <h3>2×2 — how to classify any integration-point failure in ten seconds</h3>
+  <p>The two questions worth asking during an incident: <b>how fast did it fail?</b> and <b>did it fail inside the protocol or outside it?</b> The answers land you in one of four boxes, and each box has a different move.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: how the failure behaved with respect to the protocol →</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Inside the protocol<br><small style="font-weight:400">a defined error you can read</small></div>
+      <div class="colh">Outside the protocol<br><small style="font-weight:400">a violation, a hang, or garbage</small></div>
+
+      <div class="rowh">FAST<br>milliseconds</div>
+      <div class="cell good"><b>The comfortable quadrant</b>
+        Connection refused · TCP reset · HTTP 500 · a full listen queue rejecting quickly.<br>
+        <i>Move:</i> ordinary error handling. Already covered by your language's exception model, which is exactly why developers do handle it.</div>
+      <div class="cell"><b>Cynicism required</b>
+        HTML 404 page where JSON was promised · content type lies · truncated body · “451 Resource censored”.<br>
+        <i>Move:</i> parse as data first, validate, then build objects. Never map straight into your domain.</div>
+
+      <div class="rowh">SLOW<br>minutes → forever</div>
+      <div class="cell"><b>Timeout territory</b>
+        Sat in the listen queue · provider accepted and is taking its time · TCP window full so even your write blocks.<br>
+        <i>Move:</i> explicit connect <i>and</i> read timeouts, plus a checkout timeout on the pool behind it.</div>
+      <div class="cell focus"><b>⭐ The killer quadrant</b>
+        The 5 a.m. problem. Firewall reaped the entry, packets dropped silently, no ICMP, endless retransmits. Both ends still “believe” they're connected.<br>
+        <i>Move:</i> timeouts and a keep-alive that refreshes the middlebox's clock — and a packet capture, because nothing at the application layer will show you this.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the danger rises as you go down and to the right. Everything in the bottom-right is invisible from inside your application; you must drop a layer to see it.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this chunk</h4>
+    <p><b>Every wait must be bounded, and every response must be doubted.</b> If you can only afford one change to a legacy integration, make it the read timeout — that single setting moves failures from the bottom row to the top row, where your code already knows what to do.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Which patterns answer this chunk (forward reference to §5)</h4>
+    <ul style="margin-bottom:0">
+      <li><b>Timeouts</b> — stop waiting for an answer that isn't coming.</li>
+      <li><b>Circuit Breaker</b> — stop making the call at all once it's clearly sick.</li>
+      <li><b>Decoupling Middleware</b> — remove the synchronous wait entirely.</li>
+      <li><b>Handshaking</b> — ask whether the provider is ready before you commit a thread.</li>
+      <li><b>Test Harnesses</b> — a deliberately malicious fake provider, so you meet these failures before production does.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== 3. CHUNK 2 ============================== -->
+<section class="page">
+  <div class="chunkhead h2c">
+    <div class="n">Section 3 · Chunk 2 of 4</div>
+    <h2>How a crack becomes an outage</h2>
+    <p>Blocked Threads, Chain Reactions, Cascading Failures, Slow Responses — the propagation machinery.</p>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>🎓 Tenth-grader version</h4>
+    <ul>
+      <li>One broken thing almost never stays one broken thing.</li>
+      <li>When a server dies, its work goes to its neighbours — which makes <i>them</i> more likely to die too.</li>
+      <li>When something you depend on dies, everything of yours that was waiting on it dies with it.</li>
+      <li>And slowness travels <i>upward</i> and multiplies, because impatient users hit Reload and add even more traffic.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the bridge</h3>
+  <ul>
+    <li>A four-lane bridge closes one lane. The other three now carry a third more traffic each. If they were already near capacity, the next lane buckles sooner, then the next — <b>sideways, within the bridge</b>.</li>
+    <li>Meanwhile the roads <i>feeding</i> the bridge back up all the way into the city. The jam has jumped from one layer (the bridge) to another (the street grid) — <b>upward, across a boundary</b>.</li>
+    <li>Those two directions are the two antipatterns everybody mixes up. Sideways among peers is a <b>chain reaction</b>. Upward across a layer boundary is a <b>cascading failure</b>.</li>
+  </ul>
+
+  <h4>The arithmetic that makes a chain reaction inevitable</h4>
+  <table class="tight">
+    <tr><th>Farm size</th><th>Load per node, healthy</th><th>After one node dies</th><th>Increase on each survivor</th></tr>
+    <tr><td>8 servers</td><td>12.5%</td><td>14.3%</td><td>+1.8 points of total load — but <b>+15% on that server</b></td></tr>
+    <tr><td>2 servers</td><td>50%</td><td>100%</td><td><b>+100%</b> — the survivor's workload doubles</td></tr>
+  </table>
+  <p>That's the whole mechanism: if the first node died of something <i>load-related</i> — a memory leak, an intermittent race condition — then every survivor just got closer to the same cliff. And they're running the same code, so they have the same defect.</p>
+
+  <div class="box quote">
+    <p><b>The search farm.</b> A dozen search engines behind a load balancer, half a million SKUs. The engine had a memory leak. Because the load balancer had shared traffic evenly all morning, they all approached death together. As each went dark its share went to the survivors, which then ran out of memory <i>faster</i>. Charting their “last response” timestamps showed the acceleration plainly: five or six minutes between the first crash and the second, three or four between the second and third, seconds between the last two. Losing the final search server locked up the entire front end — that part was the cascade.</p>
+    <span class="who">Release It! — “Searching…”</span>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:46mm">Plain definition</th><th style="width:52mm">Concrete example</th><th>Boundary</th></tr>
+    <tr>
+      <td><b>Chain Reaction</b></td>
+      <td>Failure spreads <b>sideways within one horizontally-scaled layer</b>, because the dead node's load lands on its peers.</td>
+      <td>The search farm above. Also: a race condition that only trips under high load, so each new death makes the next one likelier.</td>
+      <td>vs <b>Cascading Failure</b>: same layer, peers, driven by <i>redistributed load</i> — not by a caller/provider relationship. The only real cure is fixing the underlying defect; bulkheads merely split one chain reaction into two slower ones.</td>
+    </tr>
+    <tr>
+      <td><b>Cascading Failure</b></td>
+      <td>A crack <b>jumps a layer boundary</b>, upward from provider to caller.</td>
+      <td>A database cluster goes dark → the connection pool drains → every caller thread blocks → the caller is down too.</td>
+      <td>vs <b>Chain Reaction</b>: crosses layers, and it needs a <i>mechanism</i> to jump the gap — usually blocked threads, sometimes an over-aggressive retry. “Cascading failures are the number-one crack accelerator.”</td>
+    </tr>
+    <tr>
+      <td><b>Blocked Threads</b></td>
+      <td>The process is alive and the interpreter is running, but every thread that could serve a request is waiting on something that will never arrive.</td>
+      <td>See the cache story opposite. Also: any pool checkout without a timeout; any <code>synchronized</code> method that can make a remote call.</td>
+      <td>vs a <b>crash</b>: a crash is visible and a process monitor catches it. A hang looks perfectly healthy to a process monitor, a port monitor, and often to log scraping. Only a synthetic transaction from outside notices.</td>
+    </tr>
+    <tr>
+      <td><b>Slow Responses</b></td>
+      <td>Answers that do arrive, but too late to be useful.</td>
+      <td>Memory-leak-driven garbage collection showing as high CPU that isn't doing any transaction work. Or a hand-rolled socket protocol whose <code>read()</code> doesn't loop until the receive buffer is drained, stalling TCP.</td>
+      <td>vs <b>Fail Fast</b> (the pattern): slow response is the disease, Fail Fast is the treatment. And for a website, slow responses <i>generate</i> traffic — users hit Reload.</td>
+    </tr>
+    <tr>
+      <td><b>Fan-in</b></td>
+      <td>How many callers a service has.</td>
+      <td>An authentication service everything calls.</td>
+      <td>vs <b>fan-out</b>, which is how many services <i>you</i> call. High fan-in = wide blast radius; “crucial services with a high fan-in… spread their problems widely, so they are worth extra scrutiny.”</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 2 continued</div>
+
+  <h3>The blocked-thread story worth memorising</h3>
+  <ul>
+    <li>A retailer needed in-store availability. The inventory system was slow (seconds per call) and undersized, but results stayed valid ~15 minutes, and 25% of lookups were on the week's hot items. Obvious answer: cache them.</li>
+    <li>The developer extended an existing <code>GlobalObjectCache</code> and overrode <code>get()</code> to do the remote call on a miss — a textbook read-through caching proxy, with timestamps for expiry. <b>Functionally it was a nice piece of work.</b></li>
+    <li>The parent's <code>get()</code> was declared <code>synchronized</code>: only one thread inside at a time. That was fine in tests, because every test returned quickly.</li>
+    <li>In production the inventory back end got flooded and crashed. Now <b>one</b> thread sat inside <code>create()</code> waiting for a response that would never come — holding the monitor. Every other caller queued behind it. Every request-handling thread on the box, gone.</li>
+    <li>Nobody would have said yes to “should the whole site go down if we can't check in-store availability?” — and nobody was asked.</li>
+  </ul>
+
+  <div class="box quote">“No one designed this failure mode into the combined system, <b>but no one designed it out either</b>.”</div>
+
+  <h4>Two technical points hiding inside that story</h4>
+  <ul>
+    <li><b>You cannot see blocking at the call site.</b> <code>globalObjectCache.get(key)</code> looks identical whether it's a hash lookup or a three-second network round trip. The interface said nothing about synchronisation either.</li>
+    <li><b>A subclass that adds <code>synchronized</code> violates the Liskov substitution principle</b> — any property true of type T should be true of its subtypes. Java and C# forbid the other LSP violations but allow this one. As the book puts it: <b>“functional behavior composes, but concurrency does not compose.”</b> So you cannot transparently substitute the synchronised subclass for the superclass, even though the compiler says you can.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>Design rules that fall out of it</h4>
+    <ul style="margin-bottom:0">
+      <li>If you're synchronising methods on domain objects, rethink the design. It breaks the moment you run on more than one server (in-memory coherence is meaningless when another box is changing the data), and it stops request threads scaling.</li>
+      <li>Prefer <b>immutable</b> domain objects for query and rendering; change state by issuing a command object. That's Command Query Responsibility Separation, and it sidesteps a large class of concurrency problems.</li>
+      <li>Don't roll your own connection pool. “It's always more difficult than you think to make a reliable, safe, high-performance connection pool” — and once you add metrics it stops being a fun exercise and becomes a grind.</li>
+      <li>Third-party libraries that pool internally are a classic hiding place. If you can't set a timeout, you may have to wrap the call in your own worker-thread pool returning a future — but go far down that road and you've written a reactive wrapper around the whole client. <i>Here there be dragons.</i></li>
+    </ul>
+  </div>
+
+  <h3>Why cascades happen even when everyone was careful</h3>
+  <ul>
+    <li><b>Resource pools are the usual gap-jumper.</b> A failure in a lower layer drains the pool; threads holding connections block forever; every other thread blocks waiting for a connection. Safe pools always cap how long a thread may wait to check one out.</li>
+    <li><b>Integration points without timeouts are a surefire way to create cascading failures.</b> That sentence is close to a law.</li>
+    <li><b>The reverse also happens — an over-aggressive caller.</b> One system got a quick error from a lower layer, and because of a historical race condition the upstream developer had decided to retry on that error. The lower layer couldn't distinguish transient errors from serious ones. When the lower layer developed a real problem (packet loss from a failed switch), the caller hammered it harder and harder until it was spending 100% of CPU making failing calls and logging them.</li>
+    <li><b>Speculative retries</b> jump the gap the same way: a provider slowdown makes the caller fire <i>more</i> hedged requests, tying up more of the caller's threads exactly when the provider can least afford the load.</li>
+  </ul>
+
+  <h3>Detection — the part most teams get wrong</h3>
+  <ul>
+    <li>Internal monitors (process monitoring, port checks, log scraping) all report “healthy” during a total hang. The process <i>is</i> running.</li>
+    <li>Supplement them with <b>external monitoring</b>: a mock client <i>outside your data centre</i> running synthetic transactions on a schedule. It sees what a user sees.</li>
+    <li>Business-level counters catch it earliest of all: “successful logins”, “failed credit cards”. A counter going flat is visible long before an alert threshold fires.</li>
+    <li>Stop arguing about “crashed” versus “hung”. Only one variable is observable to anyone who matters: <b>is it processing transactions?</b> Or in the sponsor's phrasing, “is it generating revenue?”</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — three failures people call by each other's names</h4>
+    <table class="tight" style="margin:5pt 0 0">
+      <tr><th style="width:34mm">Antipattern</th><th style="width:30mm">Direction</th><th style="width:44mm">Carried by</th><th>The defence</th></tr>
+      <tr><td><b>Blocked Threads</b></td><td>Inside one process</td><td>A monitor, a pool, or a socket read with no bound</td><td>Timeouts everywhere; proven concurrency primitives</td></tr>
+      <tr><td><b>Chain Reaction</b></td><td>Sideways, peer to peer</td><td>Redistributed load onto identical code with the same defect</td><td>Fix the defect. Bulkheads to split it. Autoscaling with health checks, if the scaler is faster than the reaction</td></tr>
+      <tr><td><b>Cascading Failure</b></td><td>Upward, layer to layer</td><td>Drained resource pools; retry storms; speculative retries</td><td>Circuit Breaker and Timeouts. “Preventing cascading failures is the very key to resilience.”</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 2 · anchor sketch, expert phrasing, questions</div>
+
+  <h3>Anchor sketch — one crack, two directions</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n2">green = chunk 2 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+<div class="tree">          <span class="tk2">A FAULT</span>  (leak · race condition · dead database)
+                           │
+                        becomes
+                           │
+                       <span class="tk2">A CRACK</span>
+                           │
+        ┌──────────────────┴──────────────────┐
+    sideways                               upward
+  (same layer)                        (across layers)
+        │                                    │
+ <span class="tk2">CHAIN REACTION</span>                    <span class="tks">* CASCADING FAILURE</span>
+ peers absorb the                  carried by <span class="tk2">BLOCKED THREADS</span>
+ dead node's load                  or by a retry storm
+        │                                    │
+ crash intervals                     <span class="tk2">SLOW RESPONSES</span> climb,
+ get shorter                         users hit Reload,
+        │                            which adds MORE load
+ whole layer dark                            │
+        └───────────── feeds ────────────────┘
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">❓</span> Why does the diagram loop back on itself at the bottom?<br>
+      <span class="q">❓</span> A chain reaction takes out a whole layer. What must the layer <i>above</i> have in place so this stays one outage instead of two?<br>
+      <span class="q">❓</span> Name the mechanism that most often carries a crack across a layer boundary — and one that carries it in the opposite direction from what you'd expect.
+    </div>
+  </div>
+
+  <h3>Say it so you understand it → say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>“One box died and then they all died, faster and faster.”</td><td>“A chain reaction across the horizontally-scaled layer — a load-related defect, so each death raised the load and the failure probability on the survivors.”</td></tr>
+    <tr><td>“The database went down and took the app with it.”</td><td>“A cascading failure. The crack jumped the layer boundary through an exhausted connection pool — threads blocked on checkout with no timeout.”</td></tr>
+    <tr><td>“The server's up but nothing works.”</td><td>“The process is running but every request-handling thread is blocked. Process and port monitoring show green; only synthetic transactions from outside the data centre catch it.”</td></tr>
+    <tr><td>“It got slower and slower and then it died.”</td><td>“Slow responses propagating upward as a gradual cascading failure, amplified by user reloads and by the caller's retries.”</td></tr>
+    <tr><td>“Loads of teams call this service.”</td><td>“It's a high fan-in service, so it warrants extra scrutiny — its blast radius is the whole enterprise.”</td></tr>
+    <tr><td>“We just retry when it errors.”</td><td>“Immediate retries against a sick provider are a gap-jumping mechanism; unless the provider distinguishes transient from serious faults, retrying converts its problem into our outage.”</td></tr>
+  </table>
+
+  <h3>Retrieval — cover the page first</h3>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 2 · Question 1</div>
+    <p>Your recommendations service runs twelve instances behind a load balancer. At 14:02 one instance stops responding. By 14:09 all twelve are gone, and the gaps between failures got noticeably shorter each time. Upstream, the product-page service is also down — its own CPU and memory look normal, but its thread count is pinned at maximum.</p>
+    <p><b>(a)</b> Name the two distinct antipatterns at work. <b>(b)</b> Say which one travelled sideways and which travelled upward, and what carried each. <b>(c)</b> Give the one pattern that would have stopped each, and say why swapping the two patterns would not have worked.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 2 · Question 2</div>
+    <p>A team speeds up a slow partner API by subclassing an existing in-memory cache and overriding <code>get()</code> to fetch on a miss. The parent's <code>get()</code> is <code>synchronized</code>. Code review passes, load tests pass. In production, when the partner API stops responding, the <b>entire service</b> hangs — even though only 2% of traffic touches that feature.</p>
+    <p><b>(a)</b> Explain the mechanism in one sentence. <b>(b)</b> Name the object-oriented principle violated and the one-line reason the compiler didn't stop it. <b>(c)</b> Give one code-level fix and one architectural fix, and say which one you'd ship tonight.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 2 · decision matrix</div>
+  <h3>2×2 — locate any propagating failure</h3>
+  <p>Two questions: <b>which way did it travel</b>, and <b>what carried it</b>. Where those meet tells you the antipattern's name and, more usefully, which side of the call you need to change.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: what carried the failure →</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Resource exhaustion<br><small style="font-weight:400">threads, connections, memory</small></div>
+      <div class="colh">Redistributed demand<br><small style="font-weight:400">load, retries, reloads</small></div>
+
+      <div class="rowh">WITHIN<br>one layer</div>
+      <div class="cell"><b>Blocked Threads</b>
+        One monitor, one pool, one unbounded read. The process is alive and does nothing.<br>
+        <i>Fix on:</i> your own code. Timeouts on every wait, proven concurrency primitives, no <code>synchronized</code> around a remote call.</div>
+      <div class="cell"><b>Chain Reaction</b>
+        A load-related defect in identical peers; the dead node's share lands on the survivors.<br>
+        <i>Fix on:</i> the defect itself. Then bulkheads to split the layer, and health-checked autoscaling that reacts faster than the reaction spreads.</div>
+
+      <div class="rowh">ACROSS<br>layers</div>
+      <div class="cell focus"><b>⭐ Cascading Failure</b>
+        The lower layer dies; your pool drains; your threads block; you die too.<br>
+        <i>Fix on:</i> the <b>calling</b> side. Circuit Breaker to stop calling, Timeouts to come back from the calls you do make. This is the quadrant that decides your resilience.</div>
+      <div class="cell"><b>Slow Responses → retry storms</b>
+        Latency climbs; callers retry, users reload, speculative retries multiply; the amplification is upward.<br>
+        <i>Fix on:</i> the <b>provider</b> side. Fail Fast inside your SLA, shed load, and never let a caller mistake “slow” for “try harder”.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the left column is fixed by bounding waits; the right column is fixed by bounding demand. The bottom-left is the one that turns an incident into an outage.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this chunk</h4>
+    <p><b>Faults are unavoidable; propagation is optional.</b> Ask of every dependency: “when this is dead, what of mine is holding a thread waiting for it?” Whatever that thing is, it is your gap-jumper — and it is where a timeout or a breaker belongs.</p>
+  </div>
+</section>
+
+<!-- ============================== 4. CHUNK 3 ============================== -->
+<section class="page">
+  <div class="chunkhead h3c">
+    <div class="n">Section 4 · Chunk 3 of 4</div>
+    <h2>Load-shaped failure: demand, scale, and automation turning on you</h2>
+    <p>Users · Scaling Effects · Unbalanced Capacities · Self-Denial · Dogpile · Force Multiplier · Unbounded Result Sets</p>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>🎓 Tenth-grader version</h4>
+    <ul>
+      <li>More users is the goal <i>and</i> the threat. Growth is what breaks the thing you built for growth.</li>
+      <li>Some breakages only appear at production size — never on your laptop, never in the test environment.</li>
+      <li>The worst traffic spikes come from inside your own building: a marketing email, a midnight cron job, a robot with bad information.</li>
+      <li>Any number nobody bothered to put a limit on — sessions, rows, retries, servers — will one day be enormous.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the supermarket</h3>
+  <ul>
+    <li>One till serves the shoppers comfortably. Then a coupon goes viral and the store fills — <b>external surge</b>.</li>
+    <li>Most shoppers grab one item and leave; a few do a full deli order with price checks and returns. The <b>expensive</b> ones are exactly the ones you want more of, because they're the ones who spend.</li>
+    <li>The manager announces over the PA: “free samples at 5 p.m. sharp.” Everyone arrives in the same minute — <b>self-inflicted, synchronised</b>.</li>
+    <li>And the single loyalty-card scanner that every till shares becomes the thing the whole store waits on — a <b>shared resource</b> bottleneck that got worse purely because you added tills.</li>
+    <li>Four different failure shapes, one store. That's this chunk.</li>
+  </ul>
+
+  <h3>The demand side: your users</h3>
+  <table class="tight">
+    <tr><th style="width:32mm">Term</th><th style="width:46mm">Plain definition</th><th style="width:50mm">Concrete example</th><th>Boundary</th></tr>
+    <tr><td><b>Capacity</b></td><td>The maximum throughput you can sustain at acceptable performance under a given workload.</td><td>When a transaction takes too long, demand has exceeded capacity.</td><td>vs <b>performance</b>: performance is one transaction's speed; capacity is how many you hold at that speed. Passing internal hard limits creates cracks, and cracks propagate faster under stress.</td></tr>
+    <tr><td><b>Session memory &amp; dead time</b></td><td>Every user costs memory, and the session lingers after the last request until it times out.</td><td>Keeping a whole search result set in session for pagination — it may never be read again, and it holds bytes for thirty minutes.</td><td>vs a <b>cache</b>: a cache is a bet you can lose cheaply. A session is memory you're obliged to hold. When memory runs short, you may not even be able to log the error, because logging needs memory.</td></tr>
+    <tr><td><b>Weak / soft references</b></td><td>A holder that keeps a payload only until the garbage collector needs the space.</td><td><code>SoftReference</code> in Java, <code>System.WeakReference</code> in C#, <code>weakref</code> in Python. Wrap the expensive object, put the wrapper in the session.</td><td>vs an <b>eviction policy</b>: you don't decide — the collector does, and the only guarantee is that weakly-reachable objects go before an out-of-memory error. Callers must handle <code>null</code>. Best answer is still: keep it out of the session.</td></tr>
+    <tr><td><b>Off-heap / off-host memory</b></td><td>Move per-user state into another process or machine.</td><td>Memcached; Redis as a “data structure server” between cache and database.</td><td>A trade in the <b>memory hierarchy</b> — registers, cache, local memory, disk, tape. Networks are now fast enough that <i>someone else's memory</i> can beat your local disk. Local memory still beats remote memory. There is no one-size answer.</td></tr>
+    <tr><td><b>Socket &amp; port limits</b></td><td>Port numbers are 16 bits, so one IP caps out.</td><td>IANA ephemeral range 49152–65535 ≈ 16,383 connections; stretch to 1024–65535 ≈ 64,511. A million concurrent connections needs ~16 virtual IPs bound to the interface, plus kernel buffer tuning.</td><td>vs <b>TIME_WAIT</b>, which is about sockets you already <i>closed</i>: a delay before reuse, protecting against <b>bogons</b> — stray late packets that could be accepted as legitimate data on a reused socket. Real on the open internet, largely irrelevant inside your own data centre, so you can turn the interval down.</td></tr>
+    <tr><td><b>Expensive users</b></td><td>The users who cost the most are the ones who buy.</td><td>Checkout is 4–5 pages and pulls in credit-card authorisation, tax calculation, address standardisation, inventory and shipping. Browsers are cacheable and touch almost no integration points.</td><td>There is <b>no defence</b>, and you shouldn't want one — they're the revenue. Instead <i>test</i> for them: if you expect a 2% conversion rate, load-test at 4, 6 or 10%. Testing at 100% is a fine stability test but a terrible capacity plan — build for that and you'll overspend tenfold.</td></tr>
+    <tr><td><b>Unwanted users</b></td><td>Not malicious, just destructive: broken proxies, home-brew bots, screen scrapers.</td><td>A misconfigured proxy replaying a user's last URL, accelerating to 4–5 requests a second, each without a session cookie so each creates a new session. Competitive-intelligence firms scraping your catalogue page by page.</td><td>The cheapest denial of service against a session-creating web app: request a deep link without cookies and <b>drop the socket immediately</b>. The web server never tells the app server the client left; the app server builds the session and the response anyway. 100 bytes of request, kilobytes of memory.</td></tr>
+    <tr><td><b>Malicious users</b></td><td>Deliberate attackers; overwhelmingly “script kiddies” by volume.</td><td>DDoS from a botnet, forcing you to saturate your own outbound bandwidth and rack up the bill. Session management is the most vulnerable point of a server-side web app.</td><td>vs the rare <b>advanced persistent threat</b>: if you're targeted by one you will almost certainly be breached — that's a security-consultant problem, not an architecture one. Run DDoS mitigation appliances in learning/baseline mode for at least a month first.</td></tr>
+  </table>
+
+  <div class="box tip nobreak">
+    <h4>Why sessions keep showing up as the weak point</h4>
+    <p>HTTP is stateless: each request emerges from the fog and disappears again. Cookies were grafted on to fix that, but real state in cookies costs bandwidth and CPU and is unsafe unencrypted — so cookies shrank to a tag, and the real state moved into server memory. <b>A session is a cache in memory keyed by a tag the client controls.</b> Anything that fails to send the tag manufactures a new one. That is why bots, scrapers and broken proxies all turn into memory exhaustion.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 3 continued</div>
+
+  <h3>The structural side: scale, capacity ratios, and shared resources</h3>
+  <table class="tight">
+    <tr><th style="width:34mm">Term</th><th style="width:48mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary</th></tr>
+    <tr><td><b>Scaling Effects</b></td><td>Any many-to-one or many-to-few relationship breaks when the “many” side grows.</td><td>The square–cube law: a bug's weight goes as O(n³), its leg strength as O(n²), so there are no elephant-sized spiders. A database that's fine with ten callers crashes at sixty.</td><td>Dev has one machine, test has two, production has <i>n</i>. That's precisely why these defects survive QA. <b>This type of defect cannot be tested out; it must be designed out.</b></td></tr>
+    <tr><td><b>Point-to-point communication</b></td><td>Every instance talks directly to every other instance.</td><td>Connections grow as the square of instance count. Fine at two servers, painful at a hundred.</td><td>Distinguish point-to-point <i>inside</i> a service (O(n²), the problem) from the normal fan-in <i>between</i> services through a load balancer (a different case entirely). Replacements, cheapest first: UDP broadcast → multicast → publish/subscribe → message queues. “Do the simplest thing that will work.”</td></tr>
+    <tr><td><b>Shared resource</b></td><td>A facility every member of a horizontally-scaled layer must use.</td><td>A distributed lock manager, a cluster manager, a cache-coherency manager.</td><td>Harmless when it is <b>redundant and non-exclusive</b> — then you scale the bottleneck. Dangerous when it's allocated <b>exclusively</b> per unit of work: contention scales with both transactions and clients; saturation → connection backlog → listen queue overflow → failed transactions → for cache managers, stale data or loss of integrity.</td></tr>
+    <tr><td><b>Shared-nothing architecture</b></td><td>Each server runs without knowing anything about any other. Capacity scales roughly linearly.</td><td>The hypothetical ideal for horizontal scaling; in reality there's always some coordination.</td><td>The catch is <b>failover</b>. Session failover needs the session to leave the original server — a backup server, a database table, a designated peer — and that means shared resources. Middle path: <b>reduce fan-in</b>, e.g. pair servers as each other's failover.</td></tr>
+    <tr><td><b>Unbalanced Capacities</b></td><td>One tier can flood another because their capacities were never matched.</td><td>Front end: 20 hosts, 75 instances, <b>3,000 threads</b>. Back end: 6 hosts, 6 instances, <b>450 threads</b>. Normally a tiny fraction of front-end threads call the back end — until marketing offers free installation for one day.</td><td>A <b>special case of Scaling Effects</b> where one side scaled far more than the other. Matching every service to the front end is a gross misuse of capital — the infrastructure would sit 99% idle for five years. So make both sides resilient instead: Circuit Breaker on the caller, Handshaking and Back Pressure on the provider, Bulkheads to reserve capacity for critical callers.</td></tr>
+  </table>
+
+  <h3>The self-inflicted side: your own organisation and your own robots</h3>
+  <table class="tight">
+    <tr><th style="width:34mm">Term</th><th style="width:48mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary</th></tr>
+    <tr><td><b>Self-Denial Attack</b></td><td>The system — including its humans — conspires against itself.</td><td>An electronics retailer emailed the exact preorder date and time for the Xbox 360, with a deep link that bypassed the CDN so every image and stylesheet came from origin. “One minute before the appointed time, the entire site lit up like a nova, then went dark. It was gone in sixty seconds.”</td><td>vs an external flash mob: same shape, but <b>you knew in advance</b> and could have prepared. Machine-side version: a single rogue server damaging all the others through a shared lock manager. Defences: shared-nothing, no deep links in mass mail, send in waves, static landing zones, pre-scale <i>before</i> the campaign, fallback modes (pessimistic → optimistic locking), and above all keep the lines of communication open.</td></tr>
+    <tr><td><b>Fight Club bug</b></td><td>Increased front-end load causing exponentially increasing back-end work.</td><td>A popular item modified by mistake, so thousands of threads across hundreds of servers serialise on one write lock.</td><td>vs ordinary load growth, which is linear. Look for it wherever a shared resource is touched per request.</td></tr>
+    <tr><td><b>Dogpile</b></td><td>Demand that arrives all at once instead of spread out.</td><td>A fleet booting after a deploy, every instance with a cold cache hammering the database. Cron jobs all set to midnight. A config-management push. A server room whose breaker trips because every machine starts at once.</td><td>vs sustained overload: a dogpile is <b>transient but concentrated</b>, so it forces you to buy peak capacity you'd otherwise never need. Fixes: randomised clock slew, backoff with jitter (a fixed retry interval re-synchronises callers), random deltas on load-test think times. Think of pedestrians re-clumped by every traffic light.</td></tr>
+    <tr><td><b>Force Multiplier</b></td><td>Control-plane automation making a large mistake very quickly.</td><td><b>Reddit, 11 Aug 2016</b>: admins stopped the autoscaler to upgrade ZooKeeper → the package manager noticed it was off and restarted it → it read half-migrated ZooKeeper data describing a much smaller fleet → it shut down most app and cache servers → manual restore brought instances back with <b>cold caches</b>, which dogpiled the database. ~90 minutes down, ~90 minutes degraded.</td><td>vs a plain bug: the automation was working <b>exactly as designed</b>. The failure was a divergence between its belief about desired state and reality. Same shape in a service-discovery node that gets network-partitioned: it can't tell “the universe vanished” from “I'm blindfolded”, and it gossips “everything crashed” to the healthy nodes.</td></tr>
+    <tr><td><b>Unbounded Result Set</b></td><td>The caller lets the other side decide how much data to send.</td><td><b>Black Monday</b>: a table backing a database-implemented JMS should have held ~1,000 rows; it held over ten million. The app selected them all — with <code>select … for update</code>, so it held locks — ran out of memory, and because the type-2 JDBC driver ran <i>native</i> code, the JVM <b>crashed</b> rather than raising an out-of-memory error. The crash rolled back the transaction, released the lock, and the next instance walked off the same cliff. Over 75% of a hundred-instance farm down.</td><td>Not really a database problem — <b>it's a handshaking failure</b>. In any API the caller should state how much it's prepared to accept, the way TCP does with the window field. Beware relationships that accumulate without limit: orders→order lines, profiles→visits, anything with an audit trail. And beware distributions: social connections follow a <b>power law</b>, not a bell curve, so an entity with a million times the average <i>is guaranteed to exist</i>.</td></tr>
+  </table>
+
+  <div class="box tip nobreak">
+    <h4>Safeguards for control-plane automation — borrowed from industrial robot safety</h4>
+    <ul style="margin-bottom:0">
+      <li>If observations say more than <b>80% of the system is unavailable</b>, suspect the observer, not the system.</li>
+      <li><b>Apply hysteresis.</b> Start machines quickly; shut them down slowly. Starting is the safe direction.</li>
+      <li><b>Signal for confirmation</b> when the gap between expected and observed state is large — the software equivalent of the big yellow warning lamp.</li>
+      <li>Resource-consuming systems should be <b>stateful enough to notice</b> they're about to spin up infinity instances.</li>
+      <li>Build <b>deceleration zones</b> for momentum: if you sense load every second but a VM takes five minutes to boot, don't start 300 of them because the load persisted.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 3 · trade-offs, sketch, phrasing, questions</div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:40mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:36mm">Choose it when</th></tr>
+    <tr><td>Sessions in Redis/Memcached instead of heap</td><td>Heap pressure gone; session survives an instance dying.</td><td>Network latency on every access; a new dependency that can itself fail.</td><td>Sessions are large, or you need failover without pinning users to instances.</td></tr>
+    <tr><td>Weak/soft references for expensive session data</td><td>Automatic relief exactly when memory is tight.</td><td>Indirection, null-handling in every accessor, non-deterministic behaviour that's miserable to test.</td><td>You genuinely can't keep it out of the session. Otherwise, just don't put it there.</td></tr>
+    <tr><td>Shared-nothing</td><td>Near-linear scaling, no coordination bottleneck.</td><td>You lose session failover and cache coherency, or must rebuild them.</td><td>Scaling matters more than transparent failover — or you can reduce fan-in instead of eliminating sharing.</td></tr>
+    <tr><td>Point-to-point → pub/sub</td><td>Kills O(n²) growth; late subscribers still get messages.</td><td>Serious infrastructure cost and operational surface.</td><td>Past roughly tens of nodes. Below that, point-to-point is genuinely fine — as long as it doesn't block when a peer dies.</td></tr>
+    <tr><td>Autoscaling</td><td>Absorbs surges without human intervention.</td><td>Minutes of lag; can push the overload onto a downstream platform service; buggy apps can autoscale you a spectacular bill.</td><td>Always with a <b>financial constraint</b> attached, and health checks on every group.</td></tr>
+    <tr><td>Blocking scrapers at the CDN or firewall</td><td>Reclaims real capacity — and it's a form of Circuit Breaker.</td><td>False positives on ISP super-proxies; scrapers rotate addresses and user agents; blocks must be expired or your firewall slows down.</td><td>You've identified them and can afford the maintenance. “Consider it pest control — once you stop, the infestation resumes.”</td></tr>
+    <tr><td>Pagination in the API contract</td><td>Ends the whole unbounded-result-set class of failure.</td><td>A contract change: first-item and count parameters in, approximate total out; callers must loop.</td><td>Always, for any query that isn't guaranteed to return exactly one row.</td></tr>
+  </table>
+
+  <h3>Anchor sketch — four load shapes, four different answers</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n3">orange = chunk 3 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+<div class="tree">                            <span class="tk3">DEMAND</span>
+                               │
+             ┌─────────────────┴─────────────────┐
+        from OUTSIDE                        from INSIDE
+             │                                   │
+      ┌──────┴──────┐                   ┌─────────┴─────────┐
+   <span class="tk3">growth</span>         <span class="tk3">spike</span>              <span class="tk3">structure</span>        <span class="tks">* automation</span>
+   users          flash mob          scaling effects    self-denial
+   expensive      DDoS               unbalanced         dogpile
+   users          celebrity link     capacities         force multiplier
+   unbounded                         shared resource
+   result sets
+      │              │                     │                  │
+   capacity      shed load /          design it out       governor +
+   planning      circuit breaker      (cannot test it)    hysteresis
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">❓</span> Why is the ⭐ branch the one that does damage fastest, even though it involves no attacker and no bug?<br>
+      <span class="q">❓</span> Which branch cannot be caught by testing at all, and what's the reason?<br>
+      <span class="q">❓</span> Two of these four branches are things <i>you</i> caused. Name them and name the person you should be talking to about each.
+    </div>
+  </div>
+
+  <h3>Say it so you understand it → say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>“Marketing broke the site.”</td><td>“A self-denial attack — unthrottled internal demand, amplified by a deep link that bypassed the CDN so every asset came from origin.”</td></tr>
+    <tr><td>“Everything restarted at once and the database fell over.”</td><td>“A dogpile: synchronised transient load with cold caches. Fix with randomised clock slew and jittered exponential backoff.”</td></tr>
+    <tr><td>“It works fine in the test environment.”</td><td>“Test is one-to-one; production is ten-to-one. Unbalanced capacities are a scaling effect — this class of defect can't be tested out, it has to be designed out.”</td></tr>
+    <tr><td>“The query came back with way too much data.”</td><td>“Unbounded result set. It's a handshaking failure — the caller never stated how much it was prepared to accept.”</td></tr>
+    <tr><td>“The autoscaler went nuts.”</td><td>“A control-plane force multiplier: the automation's belief about desired state diverged from reality. It needs a governor with hysteresis and a confirmation step on large gaps.”</td></tr>
+    <tr><td>“All the servers talk to each other.”</td><td>“Point-to-point intra-service communication — connections grow as the square of instance count. Past tens of nodes, move to multicast or publish/subscribe.”</td></tr>
+    <tr><td>“Our best customers get the worst performance.”</td><td>“Expensive users, plus an unbounded traversal — the customers with the most history load the largest result sets. Power-law distribution, not a bell curve.”</td></tr>
+  </table>
+
+  <div class="box quote">
+    “Good marketing can kill you at any time.” <span class="who">Paul Lord, quoted in Release It!</span>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 3 · questions and decision matrix</div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 3 · Question 1</div>
+    <p>Your team ships pagination by storing each user's full search-result set in the session. Load tests at 500 concurrent users pass comfortably. Two months after launch the fleet starts running out of memory every afternoon, and the crashes across instances get closer together each time.</p>
+    <p><b>(a)</b> Name the three antipatterns chained together here and the order they fire in. <b>(b)</b> Give the cheapest code change that stops today's bleeding. <b>(c)</b> Give the change that eliminates the whole class of problem, and say what it costs you.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 3 · Question 2</div>
+    <p>An ops team sets the config-management agent to pull on the hour and the cache-warming job to run at 00:00. Separately, they add an autoscaler that reacts to one-second CPU samples, while a new instance takes five minutes to become useful.</p>
+    <p><b>(a)</b> Name the two failure modes you now expect. <b>(b)</b> Say which one is a control-plane problem and what makes it different in kind from the other. <b>(c)</b> Give one specific safeguard for each, and name the pattern each safeguard belongs to.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2×2 — classify a load event before you react to it</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: what shape did the demand arrive in? →</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Sustained growth<br><small style="font-weight:400">a trend, over weeks or months</small></div>
+      <div class="colh">Synchronised spike<br><small style="font-weight:400">everything in the same minute</small></div>
+
+      <div class="rowh">FROM<br>OUTSIDE</div>
+      <div class="cell"><b>Users, and what they cost</b>
+        Session memory, expensive checkout users, socket and port limits, result sets that grow with your own history.<br>
+        <i>Move:</i> capacity modelling; keep sessions thin; paginate everything; load-test at 4–10% conversion, not 2%.</div>
+      <div class="cell"><b>Flash mob / hostile mob</b>
+        A celebrity link, a link aggregator, or a botnet DDoS. Session management is the soft spot in both cases.<br>
+        <i>Move:</i> shed load at the edge, per-host circuit breakers, CDN and firewall blocks, DDoS appliances baselined for a month first.</div>
+
+      <div class="rowh">FROM<br>INSIDE</div>
+      <div class="cell"><b>Structural mismatch</b>
+        Scaling effects, O(n²) point-to-point, shared-resource fan-in, unbalanced front-to-back capacity ratios.<br>
+        <i>Move:</i> design it out — it will not show up in a two-server test environment. Bulkheads, handshaking, back pressure, and a scaled-up QA.</div>
+      <div class="cell focus"><b>⭐ Self-inflicted spike</b>
+        Marketing email with a deep link · midnight cron · config push · fleet restart with cold caches · an autoscaler acting on stale truth.<br>
+        <i>Move:</i> talk to humans <i>before</i> the event; clock slew and jitter; pre-scale rather than autoscale; put a governor on every automated action that runs in the unsafe direction.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the left column is an engineering problem you can model. The right column is a coordination problem — the top-right with strangers, the bottom-right with your own colleagues and your own robots. The bottom-right is the one you can actually prevent, which is why it's the focus cell.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this chunk</h4>
+    <p><b>Bound every number a caller doesn't control.</b> Rows returned, sessions created, retries fired, instances started, bytes cached. “The only sensible numbers are <i>zero</i>, <i>one</i>, and <i>lots</i>” — so unless a query returns exactly one row, it can return too many, and you must say how many you'll take.</p>
+  </div>
+</section>
+
+<!-- ============================== 5. CHUNK 4 ============================== -->
+<section class="page">
+  <div class="chunkhead h4c">
+    <div class="n">Section 5 · Chunk 4 of 4</div>
+    <h2>The counter-moves: twelve stability patterns</h2>
+    <p>Timeouts · Circuit Breaker · Bulkheads · Steady State · Fail Fast · Let It Crash · Handshaking · Test Harnesses · Decoupling Middleware · Shed Load · Back Pressure · Governor</p>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>🎓 Tenth-grader version</h4>
+    <ul>
+      <li>You can't stop things from breaking. You can stop the break from spreading.</li>
+      <li>Two moves cover most of it: <b>stop waiting</b>, and <b>stop calling the thing that keeps hurting you</b>.</li>
+      <li>Then build walls, so one flooded room doesn't sink the ship — and learn to say “no” politely when you're full.</li>
+      <li>And keep the system boring: nothing piling up, nobody logging in at 3 a.m. to tidy it by hand.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the house, the ship and the restaurant</h3>
+  <ul>
+    <li><b>The fuse</b> is a component <i>designed to fail first</i>, so the wiring doesn't. Its two flaws — you run out of them, and a US penny was the same diameter as one — are why we now use resettable <b>circuit breakers</b>. Same principle: detect excess, fail first, open the circuit; and once the danger has passed, reset.</li>
+    <li><b>A ship's bulkheads</b> divide the hull into watertight compartments. One penetration doesn't sink the ship. That's damage containment, and it costs you usable space.</li>
+    <li><b>A full restaurant</b> turns you away at the door. That's kinder than seating you and never bringing food. And a good chef does <i>mise en place</i> — every ingredient on the counter before starting — so a missing one costs seconds, not a ruined service.</li>
+    <li><b>A steam governor</b> stops the engine spinning fast enough to tear itself apart, even when the boiler could drive it harder.</li>
+    <li>Four everyday objects, four of the twelve patterns. The rest are variations on the same two instincts: <i>bound the wait</i>, <i>contain the damage</i>.</li>
+  </ul>
+
+  <div class="box quote">“Hope is not a design method.” <span class="who">Release It! — Timeouts</span></div>
+
+  <h3>The twelve, with the neighbour each is confused with</h3>
+  <table class="tight">
+    <tr><th style="width:26mm">Pattern</th><th style="width:44mm">Plain definition</th><th style="width:52mm">Concrete example</th><th>Boundary — the pattern it's mistaken for</th></tr>
+
+    <tr><td><b>1 · Timeouts</b><br><small>outbound</small></td>
+      <td>Stop waiting once you've decided the answer isn't coming.</td>
+      <td>Socket connect and read timeouts; a checkout timeout on every resource pool; always the mutex form that takes a timeout argument. Package the whole “check out connection → query → map results → check in” sequence into one gateway so you get the error handling right in exactly one place.</td>
+      <td>vs <b>Fail Fast</b>: Timeouts protect you from <i>someone else's</i> failure and apply to <b>outbound</b> calls. Fail Fast tells your <i>callers</i> quickly and applies to <b>inbound</b> requests. “Two sides of the same coin.”<br><b>On retries:</b> immediate retry usually hits the same problem and just makes the caller wait longer. Prefer <b>queue-and-retry later</b> — store-and-forward, the way email works.</td></tr>
+
+    <tr><td><b>2 · Circuit Breaker</b><br><small>outbound</small></td>
+      <td>After enough failures, stop making the call at all for a while.</td>
+      <td><b>Closed</b> (pass through, count faults) → threshold → <b>Open</b> (fail immediately, don't even try) → after a timeout → <b>Half-Open</b> (let one trial call through) → success resets to Closed, failure returns to Open. Fallbacks: last good value, a cached value, a generic non-personalised answer, or a secondary provider.</td>
+      <td>vs <b>retry</b>: retries <i>re-execute</i> operations; breakers <i>prevent</i> them.<br>Count <b>fault density</b>, not raw totals — five faults in thirty seconds is a different animal from five spread over five hours. Use a Leaky Bucket: increment on fault, a background timer decrements toward zero.<br>Scope it to <b>one process</b>. Sharing state across processes adds an out-of-process call — your safety mechanism gains a new failure mode.<br>Log every state change and expose it; state-change frequency is a leading indicator of trouble elsewhere. Ops must be able to trip and reset it by hand.<br>Deciding what happens when it's open is a <b>business</b> decision — take the order without confirming stock? — so bring stakeholders in.</td></tr>
+
+    <tr><td><b>3 · Bulkheads</b><br><small>containment</small></td>
+      <td>Partition the system so one flooded compartment doesn't sink it.</td>
+      <td>Granularities, small to large: thread pools inside a process (always reserve one for admin requests, so a fully hung server can still be asked for a thread dump or a shutdown) → CPU core binding → separate instances → dedicated server farms per critical client → AWS zones and regions → one compartment per function invocation in FaaS. Airline example: dedicated check-in servers keep working while shared servers drown in flight-status queries during a storm.</td>
+      <td>vs <b>Circuit Breaker</b>: a bulkhead is <b>provider-side partitioning</b>; a breaker is <b>caller-side abstention</b>. A bulkhead won't help the callers of whichever partition <i>does</i> go down — that's what the breaker is for.<br>Note that redundant VMs are weaker than redundant physical machines: most provisioning tools won't guarantee physical isolation. With software-defined load balancers, bulkheads can be <b>dynamic</b> — carved out and destroyed as traffic patterns change.</td></tr>
+
+    <tr><td><b>4 · Steady State</b><br><small>hygiene</small></td>
+      <td>For every mechanism that accumulates a resource, something must recycle it.</td>
+      <td>Three kinds of sludge. <b>Data:</b> purge with <i>application</i> logic — the DBA's script doesn't know how the app behaves when rows vanish, and an ORM handles dangling references far worse than a document store. <b>Log files:</b> rotate by size; on UNIX the last 5–10% is reserved for root, so I/O errors start at 90–95% full; ship logs off-host to a central store; keep compliance retention on non-production machines. <b>Caches:</b> bound the size and invalidate.</td>
+      <td>The target is “<b>no fiddling</b>”: run at least one full deployment cycle with nobody logging in. Every human touch is an opportunity for the “ohnosecond” — one engineer resilvered a root mirror the wrong way round and instantly annihilated a live OS. Servers that need hand-holding become <i>pets</i>, and admins stay logged in permanently. Immutable infrastructure is the logical endpoint: it can't be fiddled with.<br>Cache questions to ask: <b>is the key space finite?</b> and <b>do the items change?</b> If the keys are unbounded you need a size limit and an invalidation strategy — nine times out of ten a periodic flush beats LRU. Don't cache things that are cheap to generate (one system cached hundreds of single space characters), monitor hit rates, and build caches on weak references so the collector can help rather than being obstructed.</td></tr>
+
+    <tr><td><b>5 · Fail Fast</b><br><small>inbound</small></td>
+      <td>If you can tell in advance you'll fail, say so immediately instead of failing slowly.</td>
+      <td>A load balancer with no healthy servers should <b>refuse</b> the connection, not queue it hopefully. A service can check out the connections it will need and check the state of its circuit breakers up front — <i>mise en place</i>. Validate parameters in the controller before touching the database.<br>The photo-rendering case: pre-check every font, image, background and alpha mask and preallocate memory, and the software-induced reprint rate went to zero. The one resource they <i>didn't</i> preallocate — disk space — was the one place they still failed late, minutes into a render.</td>
+      <td>vs <b>Timeouts</b>: inbound versus outbound (see pattern 1).<br><b>The nuance that matters:</b> report a <i>system</i> failure (resources unavailable) differently from an <i>application</i> failure (bad parameters). A generic “error” lets a user mashing Reload with invalid input trip an upstream circuit breaker.</td></tr>
+
+    <tr><td><b>6 · Let It Crash</b><br><small>recovery</small></td>
+      <td>Accept component-level instability to get system-level stability: the cleanest state a program ever has is right after startup.</td>
+      <td>Four things must be true. <b>Limited granularity</b> — a boundary for the crashiness (an actor in Erlang/Elixir; an actor library like Akka elsewhere, with extra code review because the runtime won't enforce the rules). <b>Fast replacement</b> — Go in a container restarts in milliseconds, so crash the container; NodeJS on a long-lived VM restarts in milliseconds but the VM takes minutes, so crash the process only; a JavaEE app with minutes of startup means this pattern is simply wrong for you. <b>Supervision</b> — a hierarchical supervisor tree that can restart a child, restart all children, or crash itself upward. <b>Reintegration</b> — the restarted thing must rejoin: circuit breakers reintegrate direct callers automatically, load-balancer health checks re-add pool members.</td>
+      <td>vs <b>Fail Fast</b>: Fail Fast refuses <i>work</i>; Let It Crash discards <i>state</i>.<br>vs an <b>autoscaler or PaaS restart</b>: those look like supervision but <b>lack discretion</b> — they'll restart a crashing instance forever, and there's no hierarchy. A real supervisor tracks restart <i>density</i> and crashes itself if restarts get too dense, because that means either the state isn't really being cleaned or the whole system is in trouble and the supervisor is masking it.<br>And: “the supervisor is not the service consumer. Managing the worker is different than requesting work.”</td></tr>
+
+    <tr><td><b>7 · Handshaking</b><br><small>cooperative</small></td>
+      <td>Let the receiver tell the sender whether it's ready.</td>
+      <td>Universal below the application layer — RS-232 flow control, the TCP three-way handshake, the TCP receive window telling a sender to stop. Nearly absent above it. The practical form you can actually build today: a <b>health-check endpoint</b> the load balancer polls, returning 503 when the instance is busy so the balancer stops sending it work.</td>
+      <td>vs <b>Circuit Breaker</b>: handshaking is <b>cooperative</b> — ask before you call. A breaker is the <b>unilateral stopgap</b> for providers who can't handshake: you just make the call and track whether it worked.<br>Why it's rare: HTTP defines 503 for exactly this, but most clients treat anything that isn't 200, 403 or 302 as fatal — some treat other 2xx codes as errors. So build handshaking into any low-level protocol you design yourself.</td></tr>
+
+    <tr><td><b>8 · Test Harnesses</b><br><small>verification</small></td>
+      <td>A deliberately malicious fake for the far end of every integration point.</td>
+      <td>One “killer” server, a different misbehaviour per port: 10200 accepts and never replies; 10201 replies with bytes from <code>/dev/random</code>; 10202 opens the connection then drops it. Failures worth emulating: refuse the connection; leave it in the listen queue; SYN/ACK then silence; nothing but resets; advertise a full receive window and never drain; connect but send no bytes; lose packets to force retransmit delays; send headers and no body; send one byte every thirty seconds; send HTML where XML was promised; send megabytes where kilobytes were expected; refuse all credentials. Have the harness log requests — your application may die without a whimper.</td>
+      <td>vs <b>mock objects</b>: a mock can only misbehave <i>within the defined interface</i>. A harness is a separate server, so it owes no allegiance to any interface and can violate the network, protocol and application layers alike.<br>vs an <b>integration-test environment</b>: that can only show you failures the remote system is <i>specified</i> to produce — layer seven only, and not even all of it. It also forces version-locking across the whole company.<br>It <b>supplements</b>, never replaces, unit, acceptance and penetration tests. Follow this road far enough and you arrive at chaos engineering.</td></tr>
+
+    <tr><td><b>9 · Decoupling Middleware</b><br><small>architecture</small></td>
+      <td>Choose how tightly caller and receiver are bound — in time as well as in space.</td>
+      <td>The spectrum, tight to loose: in-process calls → interprocess (pipes, shared memory, semaphores) → remote procedure calls (DCE RPC, DCOM, RMI, XML-RPC, HTTP — <b>yes, JSON over HTTP too</b>) → message-oriented middleware (MQ, publish/subscribe, SMTP, SMS) → tuple spaces (JavaSpaces, GigaSpaces).</td>
+      <td>Synchronous request/reply means both systems must be alive <i>at the same moment</i>. “Synchronous calls are particularly vicious amplifiers that facilitate cascading failures.” Message-oriented middleware decouples in space <b>and time</b> and therefore <b>cannot produce a cascading failure</b>.<br>The price is real: asynchronous design means exception queues, late responses, callbacks both machine-to-machine and human-to-human, and business decisions about acceptable financial risk. Every other pattern here can be added without redesigning the system; <b>this one ripples through everything</b>, so it's a near-irreversible decision to make early rather than late.</td></tr>
+
+    <tr><td><b>10 · Shed Load</b><br><small>inbound, at the edge</small></td>
+      <td>Refuse new work when load is too high — copy what TCP does with the listen queue.</td>
+      <td>Ideal trigger: your own response time measured against your SLA. Simpler: a semaphore capping concurrent in-flight requests. With a load balancer in front, return 503 on the health-check page to buy breathing room; balancers are very good at recycling connections quickly.</td>
+      <td>vs <b>Back Pressure</b>: <b>shed load at the edges</b>, where demand is uncontrolled and the consumer pool is effectively infinite. <b>Back pressure inside a system boundary</b>, where consumers are finite and known.<br>Why it's needed at all: services fall over <i>before</i> the connection queue fills, because of contention for pooled resources. “To an outside observer, there's no difference between ‘really, really slow' and ‘down'.” And: <b>“You can't out-scale the world.”</b></td></tr>
+
+    <tr><td><b>11 · Back Pressure</b><br><small>inbound, inside</small></td>
+      <td>Block the producer until the consumer catches up.</td>
+      <td>Every performance problem starts with a queue backing up somewhere. An unbounded queue consumes all memory, and by Little's law an unbounded queue means unbounded response time. So bound it — and then choose, because when a bounded queue is full you have exactly four options: pretend to accept and silently drop; accept and drop something already queued; refuse; or <b>block the producer</b>. That fourth one is back pressure. TCP does it with the window field.<br>Example: allow each API server 100 concurrent calls to the storage engine; the 101st caller blocks. Better still, move the blocking to the receiver so it can tune its own queue depth for maximum throughput rather than every server guessing.</td>
+      <td>Back pressure <b>produces blocked threads on purpose</b> — so distinguish a temporary condition from a consumer that is simply broken. At a system edge, blocked threads frustrate users or provoke retry loops, so accept requests on one thread pool and make outbound calls on another: then the request thread can time out and return <b>503</b>, or enqueue the work and return <b>202</b>.<br>Wire it to monitoring. Back pressure engaging is real information — either a trend or a consumer that went rogue.</td></tr>
+
+    <tr><td><b>12 · Governor</b><br><small>control plane</small></td>
+      <td>A stateful, time-aware, <b>asymmetric</b> limiter on automated actions, whose purpose is to buy humans time.</td>
+      <td>Reddit's fix after the outage: the autoscaler may only shut down a certain percentage of instances at a time. Unsafe directions to slow down: shutting instances off, deleting data, blocking client IPs.</td>
+      <td>vs a <b>rate limiter</b>: a plain rate limiter is symmetric. A governor is deliberately asymmetric — fast in the safe direction, slow in the unsafe one.<br>vs a <b>circuit breaker</b>: a breaker stops <i>calls</i> after observed failures. A governor slows <i>your own privileged actions</i> before any failure has occurred.<br>Safety is <b>U-shaped</b>, not one-directional: shutting instances down is unsafe for availability, spinning them up is unsafe for cost. So actions are safe within a range and meet increasing resistance outside it — that's the governor's response curve. And it's pointless unless it's wired to alerting: the entire purpose is to get a human involved while intervention is still possible rather than recovery.</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 4 continued</div>
+
+  <h3>Trade-offs — what each pattern costs you</h3>
+  <table class="tight">
+    <tr><th style="width:32mm">Pattern</th><th style="width:52mm">Buys you</th><th style="width:52mm">Costs you</th><th>Wrong choice when…</th></tr>
+    <tr><td>Timeouts</td><td>Fault isolation — someone else's problem stops being yours.</td><td>Half your code can end up being error handling. Some slow-but-valid work gets cut off.</td><td>Never wrong. But a value plucked from the air rather than derived from your SLA is close to useless.</td></tr>
+    <tr><td>Circuit Breaker</td><td>Stops you hammering a sick provider; degrades function automatically.</td><td>The fallback is a business decision, not a technical one. Per-process state means every instance rediscovers the outage independently.</td><td>The provider can genuinely handshake — then cooperate instead of guessing.</td></tr>
+    <tr><td>Bulkheads</td><td>Partial service survives. Critical callers keep their capacity.</td><td>Reserved capacity sits idle; more partitions to operate and monitor.</td><td>Capacity is so tight that reserving any of it guarantees the outage you're trying to avoid.</td></tr>
+    <tr><td>Steady State</td><td>No 3 a.m. chores; no admins permanently logged into production.</td><td>Purge logic is nasty, detail-oriented work that needs real coding and testing — which is exactly why it always slips past launch.</td><td>Never. The “we'll add purging six months after launch” plan has never once survived contact with the first emergency release.</td></tr>
+    <tr><td>Fail Fast</td><td>No wasted work; callers get their capacity back immediately.</td><td>You must separate system errors from application errors, or you'll trip upstream breakers on ordinary bad input.</td><td>The pre-check costs more than the work itself.</td></tr>
+    <tr><td>Let It Crash</td><td>The cleanest possible state, reached fast, without unreliable error recovery.</td><td>Requires all four preconditions. Without supervision it's a fork bomb; without reintegration it's a shrinking cluster.</td><td>Monoliths, heavy runtimes, anything with startup measured in minutes. “Don't crash monoliths.”</td></tr>
+    <tr><td>Handshaking</td><td>Cooperative demand control — the politest form of protection.</td><td>Both ends must implement it, and common protocols barely support it.</td><td>Third-party providers you don't control. Use a Circuit Breaker instead and stop asking.</td></tr>
+    <tr><td>Test Harnesses</td><td>The only practical way to meet out-of-spec failures before production does.</td><td>A second codebase, deliberately hostile, that someone must maintain.</td><td>As a <i>replacement</i> for other testing. It supplements.</td></tr>
+    <tr><td>Decoupling Middleware</td><td>Removes whole classes of failure — integration points, cascading failures, slow responses, blocked threads — at once.</td><td>The hardest change here, and close to irreversible. Asynchronous design is genuinely harder to reason about.</td><td>Logical simplicity of request/reply matters more than the coupling — and you've said so out loud, knowingly.</td></tr>
+    <tr><td>Shed Load</td><td>Response times stay sane no matter what the world does.</td><td>Some real users get refused.</td><td>Inside a boundary with finite consumers — back pressure is more efficient there.</td></tr>
+    <tr><td>Back Pressure</td><td>Balanced throughput across synchronously-coupled services.</td><td>Deliberate blocked threads; frustrated users if it reaches an edge.</td><td>Across a system boundary, or when your user base is the open internet.</td></tr>
+    <tr><td>Governor</td><td>Humans get time to look at the whole situation before automation finishes the job.</td><td>It slows legitimate emergency automation too.</td><td>Applied to the <i>safe</i> direction. Governors are asymmetric on purpose.</td></tr>
+  </table>
+
+  <h3>Anchor sketch — where each pattern sits relative to the call</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n4">purple = chunk 4 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+<div class="tree">                          <span class="tk4">A REQUEST</span>
+                              │
+      ┌───────────────────────┼───────────────────────┐
+  INBOUND to me         WHOLE SYSTEM           OUTBOUND from me
+      │                       │                       │
+  <span class="tk4">Fail Fast</span>               <span class="tk4">Bulkheads</span>              <span class="tks">* Timeouts</span>
+  <span class="tk4">Shed Load</span> (edge)        <span class="tk4">Steady State</span>           <span class="tks">* Circuit Breaker</span>
+  <span class="tk4">Back Pressure</span>           <span class="tk4">Let It Crash</span>           <span class="tk4">Decoupling Middleware</span>
+  <span class="tk4">Handshaking</span> (answer)   <span class="tk4">Governor</span>  (robots)     <span class="tk4">Handshaking</span> (the ask)
+      │                       │                       │
+ "no, not now"        "contain and reset"    "stop waiting / stop calling"
+                              │
+                       <span class="tk4">Test Harnesses</span>
+             prove all of the above BEFORE production
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">❓</span> Handshaking appears in two columns. Why — and which side implements which half?<br>
+      <span class="q">❓</span> Which of the twelve is an <i>architecture</i> decision rather than an implementation one, and what follows from that?<br>
+      <span class="q">❓</span> Name the two that are useless without a fourth precondition each, and name those preconditions.
+    </div>
+  </div>
+
+  <h3>Say it so you understand it → say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>“We stopped calling it after it kept failing.”</td><td>“We wrapped it in a circuit breaker. It trips on fault density rather than raw count — leaky bucket — and every state change is logged and exposed to monitoring.”</td></tr>
+    <tr><td>“We split it up so one part dying doesn't kill everything.”</td><td>“We introduced bulkheads — at the thread-pool granularity inside the process, and at the availability-zone granularity outside it.”</td></tr>
+    <tr><td>“Tell them no instead of making them wait.”</td><td>“Fail fast on inbound requests, shed load at the edge, apply back pressure inside the boundary.”</td></tr>
+    <tr><td>“Just restart it.”</td><td>“Let it crash — but only with limited granularity, fast replacement, real supervision, and automatic reintegration. Otherwise it's a fork bomb.”</td></tr>
+    <tr><td>“The queue got huge and everything slowed down.”</td><td>“Unbounded queue, so by Little's law response time is unbounded too. Bound it and pick a full-queue policy: drop new, drop old, refuse, or block the producer.”</td></tr>
+    <tr><td>“We put a limit on the autoscaler.”</td><td>“We added a governor — stateful, time-aware, asymmetric, with a U-shaped response curve and an alert when it engages.”</td></tr>
+    <tr><td>“We tested it against a fake that misbehaves.”</td><td>“We built a test harness — a separate server, so it can violate the protocol, not just the interface, the way a mock is limited to.”</td></tr>
+    <tr><td>“We should use queues instead of HTTP calls.”</td><td>“Decoupling middleware — moving from same-time, same-process coupling toward message-oriented middleware, which decouples in space and time and therefore can't cascade. It's an architecture decision, so it's near-irreversible.”</td></tr>
+  </table>
+
+  <div class="box quote">
+    “Judiciously applying these stability patterns results in software that stays up, come hell or high water. <b>The key to applying these patterns successfully is judgment.</b> Examine the software's requirements cynically. View other enterprise systems with suspicion and distrust — any of them can stab you in the back. <b>Paranoia is good engineering.</b>”
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Chunk 4 · questions and decision matrix</div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 4 · Question 1</div>
+    <p>A checkout service calls three things: <b>(i)</b> an inventory service your own team owns, <b>(ii)</b> a third-party tax API with a hard rate limit and no health endpoint, <b>(iii)</b> an internal fraud model that is slow but usually correct. Overnight, traffic doubles because of a marketing email nobody warned you about.</p>
+    <p><b>(a)</b> Choose one primary pattern for each of the three dependencies and justify each in one line. <b>(b)</b> Name the pattern you'd apply to your own <i>inbound</i> traffic, and say why it is not the same one you used for (ii) even though both are about “too much load”. <b>(c)</b> Name the conversation you should have had last week and with whom.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Chunk 4 · Question 2</div>
+    <p>A colleague proposes: “Let's wrap every outbound call in a circuit breaker, and store the breaker state in a shared Redis so all instances agree on when it's open. And let's trip it at ten failures total.”</p>
+    <p><b>(a)</b> Give the two objections the chapter makes — one about <i>where the state lives</i>, one about <i>how you count</i>. <b>(b)</b> Name the mechanism you'd propose for counting instead, and describe it in one sentence. <b>(c)</b> The team's real requirement is “we want to see globally when a provider is sick.” Satisfy that requirement <i>without</i> sharing breaker state.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2×2 — pick the right pattern in one step</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: what are you trying to do about the load? →</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Refuse fast<br><small style="font-weight:400">give an answer now, even if it's “no”</small></div>
+      <div class="colh">Absorb &amp; isolate<br><small style="font-weight:400">keep working at reduced function</small></div>
+
+      <div class="rowh">CALLER<br>side<br><small style="font-weight:400">outbound</small></div>
+      <div class="cell focus"><b>⭐ Timeouts + Circuit Breaker</b>
+        Bound the wait; then stop making the call at all once faults are dense. Together they are the default answer for every integration point.<br>
+        <i>Also:</i> Handshaking, when the provider can tell you it's not ready.</div>
+      <div class="cell"><b>Decoupling Middleware</b>
+        Don't wait at all — move to messaging, so caller and provider needn't be alive at the same moment. Plus <b>delayed, queued retries</b> rather than immediate ones.<br>
+        <i>Cost:</i> an architecture decision, not a code change.</div>
+
+      <div class="rowh">PROVIDER<br>side<br><small style="font-weight:400">inbound</small></div>
+      <div class="cell"><b>Fail Fast · Shed Load</b>
+        Check resources up front (<i>mise en place</i>) and refuse before you burn a thread. Shed load at the edge where demand is uncontrolled; 503 on the health check tells the balancer to back off.<br>
+        <i>Watch:</i> report system errors differently from user errors.</div>
+      <div class="cell"><b>Bulkheads · Back Pressure · Let It Crash · Steady State · Governor</b>
+        Partition capacity so a flood is contained; slow producers down inside your boundary; discard bad state fast and reintegrate; keep the sludge from accumulating; put a governor on anything automated that acts in an unsafe direction.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the left column returns an answer; the right column changes the structure. <b>Test Harnesses</b> sits outside the grid because it's how you find out whether any of the other eleven actually work.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this chunk</h4>
+    <p><b>Two patterns, then the rest.</b> If you can only do two things to a system, do Timeouts and Circuit Breaker on every outbound call — they cover integration points, cascading failures, blocked threads and slow responses at once. Everything else is refinement. And resist counting: “count of patterns applied” is never a quality metric.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONCEPT SKETCH ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch — the whole of Chapters 4 and 5 on one page</h2>
+  <p>Three named groups, in the order the story actually runs: <b>CRACK → SPREAD → STOP</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question. If you can't quiz yourself with this, it's a poster and it's worthless.</p>
+
+  <div class="sketch nobreak" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b>
+      <span class="node n1">CRACK — where it starts</span>
+      <span class="node n2">SPREAD — how it travels</span>
+      <span class="node n4">STOP — what ends it</span>
+      <span class="node nstar">highlighted = the one node to remember</span>
+      <span class="q">❓ retrieval cue</span>
+    </div>
+
+<div class="tree"><span class="tk1">GROUP 1 — CRACK · where it starts</span>
+──────────────────────────────────────────────────────────────────
+   <span class="tk1">Integration point</span> ──┬──> <span class="tk1">fast fail</span>   ms, throws. The easy case.
+                       └──> <span class="tks">slow fail</span>   minutes to forever. The killer.
+
+   <span class="tk1">Load event</span> ────────┬──> from outside  users · mobs · scrapers · DDoS
+                       └──> from inside   self-denial · dogpile ·
+                                          force multiplier
+                                 │
+                                 v
+<span class="tk2">GROUP 2 — SPREAD · how it travels</span>
+──────────────────────────────────────────────────────────────────
+                  <span class="tk2">BLOCKED THREADS</span>  <── the usual gap-jumper
+                          │
+         sideways <───────┴───────> upward
+   <span class="tk2">CHAIN REACTION</span>                  <span class="tks">CASCADING FAILURE  (focus)</span>
+   peers absorb the dead              the crack jumps a layer;
+   node's load; intervals             preventing this is "the very
+   between crashes shrink             key to resilience"
+                          │
+                          └──> <span class="tk2">SLOW RESPONSES</span> ──> retries + reloads
+                                        ^                     │
+                                        └── amplification ────┘
+                                 │
+                                 v
+<span class="tk4">GROUP 3 — STOP · what ends it</span>
+──────────────────────────────────────────────────────────────────
+   outbound   <span class="tk4">Timeouts</span> · <span class="tk4">Circuit Breaker</span> · <span class="tk4">Decoupling Middleware</span>
+   inbound    <span class="tk4">Fail Fast</span> · <span class="tk4">Shed Load</span> · <span class="tk4">Back Pressure</span> · <span class="tk4">Handshaking</span>
+   systemic   <span class="tk4">Bulkheads</span> · <span class="tk4">Steady State</span> · <span class="tk4">Let It Crash</span> · <span class="tk4">Governor</span>
+   proof      <span class="tk4">Test Harnesses</span> — the only way to meet these first</div>
+  </div>
+
+  <h3>The question per node — cover the right column</h3>
+  <table class="tight">
+    <tr><th style="width:44mm">Node</th><th style="width:66mm">❓ Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Integration point</b></td><td>Why is it called the number-one killer?</td><td>Every socket, pipe, process and remote call can and will hang, and a stand-alone system is almost useless — so you can't avoid them.</td></tr>
+    <tr><td><b>Fast fail vs slow fail</b></td><td>Which one do you want, and why is that counter-intuitive?</td><td>Fast. It throws in milliseconds and returns the thread. Slow failure holds capacity for minutes or forever — “a slow response is a lot worse than no response.”</td></tr>
+    <tr><td><b>Load from outside</b></td><td>What's the one architectural component all four external threats attack?</td><td>Session management — sessions are the Achilles' heel of a server-side web application.</td></tr>
+    <tr><td><b>Load from inside</b></td><td>What makes self-inflicted load the most preventable kind?</td><td>Somebody in your building already knows it's coming. Communication is the fix; pre-scaling is the backup.</td></tr>
+    <tr><td><b>⭐ Blocked Threads</b></td><td>Why is this called the proximate cause of most failures?</td><td>Because “gradual slowdown” and “hung server” both reduce to it, and it's the mechanism that lets a crack jump a layer boundary.</td></tr>
+    <tr><td><b>Chain Reaction</b></td><td>Direction, cause, and the only real cure?</td><td>Sideways among peers; the dead node's load lands on identical code with the same defect; only fixing the defect cures it — bulkheads just slow it.</td></tr>
+    <tr><td><b>⭐ Cascading Failure</b></td><td>Why is this <i>the</i> node to remember?</td><td>“Preventing cascading failures is the very key to resilience.” It's the number-one crack accelerator, and Timeouts + Circuit Breaker are its direct answer.</td></tr>
+    <tr><td><b>Slow Responses</b></td><td>Why do slow responses <i>increase</i> load?</td><td>Callers retry, users hit Reload, speculative retries multiply — the response to slowness generates more demand.</td></tr>
+    <tr><td><b>Timeouts + Circuit Breaker</b></td><td>What's the division of labour between them?</td><td>Timeouts tell you there's a problem; the breaker decides to stop calling. Timeouts bound each call; the breaker bounds the <i>number</i> of calls.</td></tr>
+    <tr><td><b>Fail Fast vs Timeouts</b></td><td>The one-line distinction?</td><td>Timeouts for outbound calls (protect me from your failure); Fail Fast for inbound requests (tell you quickly I can't). Two sides of the same coin.</td></tr>
+    <tr><td><b>Shed Load vs Back Pressure</b></td><td>Where does each belong?</td><td>Shed load at the edge, where the consumer pool is the internet. Back pressure inside a boundary, where consumers are finite and can actually be slowed.</td></tr>
+    <tr><td><b>Bulkheads</b></td><td>What does it protect, and what does it explicitly <i>not</i> protect?</td><td>It preserves partial function inside your system. It does nothing for the callers of the partition that died — that's the Circuit Breaker's job.</td></tr>
+    <tr><td><b>Governor</b></td><td>What makes it different from a rate limiter?</td><td>It's stateful, time-aware and asymmetric — fast in the safe direction, increasingly resistant in the unsafe one, and wired to an alert.</td></tr>
+    <tr><td><b>Test Harnesses</b></td><td>Why can't an integration environment do this job?</td><td>An integration environment can only produce failures the remote system is <i>specified</i> to produce — application layer only. A harness is a separate server and owes no interface any loyalty.</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Section 6 continued · the transferable card</div>
+  <h2>Master 2×2 — the decision card you can carry to other problems</h2>
+  <p>This one isn't about software specifically, which is the point. It comes from the opening pages of Chapter 4, by way of Charles Perrow's work on industrial accidents and James R. Chiles' <i>Inviting Disaster</i>. Two structural properties decide whether small faults stay small — in a payments platform, a hospital ward, a supply chain, or a power grid.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: interactive complexity — can anyone hold an accurate model of the system? →</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">LOW complexity<br><small style="font-weight:400">effects are visible and traceable</small></div>
+      <div class="colh">HIGH complexity<br><small style="font-weight:400">hidden linkages; operators' instincts are wrong</small></div>
+
+      <div class="rowh">LOOSE<br>coupling</div>
+      <div class="cell good"><b>Boring. Aim here.</b>
+        Failures stay local and legible. You lose a component, not a system.<br>
+        <i>Keep it here by:</i> messaging over synchronous calls, shared-nothing where you can afford it, bulkheads at natural boundaries.</div>
+      <div class="cell"><b>Messy but survivable</b>
+        You won't understand it, but slack in the joints absorbs the surprise.<br>
+        <i>Invest in:</i> observability and external monitoring — you can't reason your way to the fault, so you must be able to see it.</div>
+
+      <div class="rowh">TIGHT<br>coupling</div>
+      <div class="cell"><b>Fast and brittle</b>
+        Predictable, so you can enumerate the failure modes — but they arrive at full speed.<br>
+        <i>Invest in:</i> timeouts, fail fast, bounded queues. Cheap, and enough at this altitude.</div>
+      <div class="cell focus"><b>⭐ The technology frontier</b>
+        “High interactive complexity and tight coupling conspire to turn rapidly moving cracks into full-blown failures.” Three Mile Island lives here. So does most of modern distributed computing.<br>
+        <i>Nothing but structure will save you:</i> circuit breakers, bulkheads, governors, back pressure, and rehearsed recovery. Fixing individual bugs will not move you out of this box.</div>
+    </div>
+    <div class="legend"><b>The move that matters:</b> you rarely reduce complexity — systems only grow. You <i>can</i> almost always reduce coupling, which means the realistic escape from the bottom-right is upward, not leftward. That is exactly what asynchronous messaging, bulkheads, and circuit breakers do: they buy looseness.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Bound every wait, every queue, every result set, and every automated action — then partition whatever is left.</b></p>
+    <p style="margin-top:6pt">Applies far outside software. A hospital triage desk bounds the wait. A factory's kanban bounds the queue. A bank's daily transfer cap bounds the automated action. A ship's bulkheads partition what's left. Every one of them is the same idea: <i>put a limit on the thing that would otherwise grow until it kills you.</i></p>
+  </div>
+
+  <div class="box quote">
+    “In time, even shockingly unlikely combinations of circumstances will eventually occur… a single small service might do ten million requests per day over three years — more than ten billion opportunities for bad things to happen. Astronomical observations indicate there are four hundred billion stars in the Milky Way. <b>Astronomically unlikely coincidences happen all the time.</b>”
+  </div>
+</section>
+
+<!-- ============================== 7. LOOKUP ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom → diagnosis → pattern</h2>
+  <p>The on-call page. Cover the middle and right columns and work down the left.</p>
+
+  <table class="tight">
+    <tr><th style="width:50mm">What you observe</th><th style="width:60mm">Most likely diagnosis</th><th>What to apply</th></tr>
+    <tr><td>Process up, port open, logs quiet, no CPU — and no responses.</td><td><b>Blocked Threads.</b> Everything is waiting on something that will never come.</td><td>Timeouts on every wait; external synthetic monitoring so you find out from outside; proven concurrency primitives.</td></tr>
+    <tr><td>One node dies, then the rest, with shrinking gaps between deaths.</td><td><b>Chain Reaction</b> from a load-related defect — usually a memory leak or a race condition.</td><td>Fix the defect. Bulkheads to split the layer. Health-checked autoscaling, if the scaler beats the reaction.</td></tr>
+    <tr><td>A dependency died and your service died with it, though your own resources looked fine.</td><td><b>Cascading Failure</b> through a drained resource pool.</td><td>Circuit Breaker plus Timeouts. Cap how long a thread may wait to check out a resource.</td></tr>
+    <tr><td>Latency climbs steadily, then callers start timing out, then their callers do.</td><td><b>Slow Responses</b> propagating upward — often GC from a leak, sometimes a TCP stall from a hand-rolled protocol.</td><td>Fail Fast against your own SLA; hunt the leak; Shed Load; check that reads loop until the receive buffer is drained.</td></tr>
+    <tr><td>Every request-handling thread is in the same third-party library.</td><td><b>Integration Point</b> plus a library that pools internally and won't let you configure failure modes.</td><td>Timeouts if it exposes them; otherwise wrap it with your own worker pool and a future — and push the vendor.</td></tr>
+    <tr><td>Hangs at the same time every day, cleared by a restart.</td><td>Idle connections reaped by a firewall or NAT device — <b>the 5 a.m. problem</b>.</td><td>Keep-alive / dead-connection detection to refresh the middlebox timer; socket timeouts; a packet capture to confirm.</td></tr>
+    <tr><td>Memory climbs all afternoon; OOM; restart; repeat tomorrow.</td><td><b>Users</b> (sessions) or an unbounded cache. Possibly an <b>Unbounded Result Set</b> feeding it.</td><td>Keep sessions thin; bound cache size and invalidate; paginate; weak references as a last resort; Steady State.</td></tr>
+    <tr><td>The database is fine, but one query returns millions of rows.</td><td><b>Unbounded Result Set</b> — a handshaking failure in disguise.</td><td><code>LIMIT</code> / <code>TOP</code> / <code>rownum</code>; pagination in the API contract; production-sized test data.</td></tr>
+    <tr><td>Traffic spike exactly on the hour, or right after a deploy.</td><td><b>Dogpile</b> — synchronised transient load, usually with cold caches.</td><td>Randomised clock slew; jittered exponential backoff; warm caches before accepting traffic; random deltas in load tests.</td></tr>
+    <tr><td>Traffic spike right after a company announcement.</td><td><b>Self-Denial Attack.</b></td><td>Talk to marketing. No deep links in mass mail; send in waves; static landing zones; pre-scale in advance.</td></tr>
+    <tr><td>Your automation did something enormous and instantaneous.</td><td><b>Force Multiplier</b> — the control plane's belief diverged from reality.</td><td>Governor with hysteresis; confirmation on large expected-vs-observed gaps; distrust any observation claiming &gt;80% of the fleet is down.</td></tr>
+    <tr><td>Back end falls over whenever the front end has a good day.</td><td><b>Unbalanced Capacities</b> — a scaling effect that QA's 1:1 ratio hides.</td><td>Circuit Breaker on the caller; Handshaking and Back Pressure on the provider; Bulkheads to reserve capacity for critical callers.</td></tr>
+    <tr><td>It only breaks in production, at production size.</td><td><b>Scaling Effects</b> — a many-to-one relationship that grew.</td><td>Design it out; you cannot test it out. Replace point-to-point with multicast or pub/sub; make shared resources redundant and non-exclusive.</td></tr>
+    <tr><td>Somebody has to log in every night to clean something up.</td><td><b>Steady State</b> violation — sludge accumulating faster than it's recycled.</td><td>Application-level purge logic; log rotation and off-host shipping; bounded caches with an invalidation strategy.</td></tr>
+    <tr><td>Restarts help for a while, and nobody knows why.</td><td>A resource leak. The restarts are papering over a Steady State violation and probably a coming Chain Reaction.</td><td>Find the leak; add the recycling mechanism; only then consider Let It Crash — and only with supervision and fast replacement.</td></tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>The mapping in the other direction — which antipatterns each pattern actually counters</h4>
+    <table class="tight" style="margin:5pt 0 0">
+      <tr><th style="width:36mm">Pattern</th><th>Counters</th></tr>
+      <tr><td>Timeouts</td><td>Integration Points · Blocked Threads · Slow Responses · (thereby) Cascading Failures</td></tr>
+      <tr><td>Circuit Breaker</td><td>Integration Points · Cascading Failures · Unbalanced Capacities · Slow Responses · abusive clients</td></tr>
+      <tr><td>Bulkheads</td><td>Chain Reactions · Unbalanced Capacities · shared-service blast radius</td></tr>
+      <tr><td>Steady State</td><td>Slow Responses · memory leaks · the “daily restart” habit</td></tr>
+      <tr><td>Fail Fast</td><td>Slow Responses · Cascading Failures · capacity loss under partial failure</td></tr>
+      <tr><td>Let It Crash</td><td>Blocked Threads · corrupt state · unreliable error recovery</td></tr>
+      <tr><td>Handshaking</td><td>Unbalanced Capacities · Slow Responses · Cascading Failures</td></tr>
+      <tr><td>Test Harnesses</td><td>Integration Points — by finding them before production does</td></tr>
+      <tr><td>Decoupling Middleware</td><td>Integration Points · Cascading Failures · Slow Responses · Blocked Threads</td></tr>
+      <tr><td>Shed Load</td><td>Users · Slow Responses · traffic beyond any possible capacity</td></tr>
+      <tr><td>Back Pressure</td><td>Unbalanced Capacities · unbounded queues · Slow Responses</td></tr>
+      <tr><td>Governor</td><td>Force Multiplier · runaway automation · runaway cost</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================== 8. REFERENCE ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <p>Not trivia — each one is the number that makes an argument land in a design review.</p>
+  <table class="tight">
+    <tr><th style="width:34mm">Number</th><th>What it's about</th><th>Why it matters in an argument</th></tr>
+    <tr><td><b>12.5% → 14.3%</b></td><td>Per-node load in an 8-server farm before and after one death.</td><td>Only 1.8 points of total load, but a <b>15% jump</b> on each survivor. That's how a chain reaction starts from a “small” failure.</td></tr>
+    <tr><td><b>50% → 100%</b></td><td>Two-node cluster losing one node.</td><td>The degenerate case: the survivor's workload <b>doubles</b>. Two-node redundancy is barely redundancy.</td></tr>
+    <tr><td><b>3,000 vs 450</b></td><td>Front-end threads vs back-end threads in the unbalanced-capacity example (20 hosts/75 instances vs 6 hosts/6 instances).</td><td>“Three thousand threads calling into seventy-five threads is not in the ballpark.” Capacity modelling has to be a ratio, not two separate numbers.</td></tr>
+    <tr><td><b>~10 ms</b></td><td>TCP three-way handshake on the same switch.</td><td>The baseline that makes “connection refused” a cheap failure — and makes a multi-minute connect obviously pathological.</td></tr>
+    <tr><td><b>20 / 30 minutes</b></td><td>Linux 2.6 with <code>tcp_retries2=15</code>; HP-UX of the era.</td><td>How long a single socket write can block when packets are silently dropped. Reads can block <b>forever</b>.</td></tr>
+    <tr><td><b>64,511</b></td><td>Max connections on one IP using ports 1024–65535 (IANA ephemeral range is 49152–65535 ≈ 16,383).</td><td>Why a million-connection server needs about <b>16 virtual IPs</b> and serious kernel buffer tuning.</td></tr>
+    <tr><td><b>O(n²)</b></td><td>Connection growth for point-to-point communication inside a service.</td><td>Fine at two nodes, painful at a hundred. The number that ends the “we'll just have them talk to each other” conversation.</td></tr>
+    <tr><td><b>2% → test at 4–10%</b></td><td>Typical retail conversion rate vs what you should load-test.</td><td>Buyers are the expensive users. Test the expensive path at several times its expected share — but don't <i>capacity-plan</i> at 100% or you'll overspend tenfold.</td></tr>
+    <tr><td><b>90–95%</b></td><td>Filesystem fullness at which a UNIX application starts getting I/O errors (the last 5–10% is reserved for root).</td><td>Log rotation isn't housekeeping; it's the thing standing between you and a reentrant exception handler consuming eight CPUs.</td></tr>
+    <tr><td><b>10–100 ms</b></td><td>“Fast enough” for a service behind a web API.</td><td>Beyond that you start losing capacity and customers. It's also the sane basis for a Fail Fast threshold.</td></tr>
+    <tr><td><b>&gt;80% unavailable</b></td><td>The control-plane heuristic.</td><td>If your monitoring says more than 80% of the system is down, suspect the <b>observer</b>. This one line would have prevented the service-discovery partition failure.</td></tr>
+    <tr><td><b>768,000</b></td><td>Angry Facebook users per day at Six Sigma quality (200 requests/page × 1.13bn daily users × 3.4 defects per million).</td><td>Why “five nines” stopped being an impressive target at scale.</td></tr>
+    <tr><td><b>10.95 billion</b></td><td>Requests in three years for a service doing 10M/day.</td><td>“Astronomically unlikely coincidences happen all the time.” The rebuttal to “that can't happen.”</td></tr>
+  </table>
+
+  <h3>Glossary — the terms you should be able to define cold</h3>
+  <table class="tight">
+    <tr><th style="width:44mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
+    <tr><td><b>Fault / crack / failure</b></td><td>A fault is the underlying defect or event. A crack is the fault beginning to have effects. A failure is the crack having propagated far enough to stop transactions. The whole book is about the middle step.</td></tr>
+    <tr><td><b>Tight coupling</b></td><td>A failure in one component forces load, delay or change onto others. Not the same as <i>dependency</i> — you can depend on something loosely, through a queue.</td></tr>
+    <tr><td><b>Interactive complexity</b></td><td>Enough moving parts and hidden internal dependencies that operators' mental models are incomplete or wrong, so their instincts do harm. This is what turns a minor fault into “problem inflation”.</td></tr>
+    <tr><td><b>Horizontal / vertical scaling</b></td><td>Horizontal adds servers (farms); vertical adds cores, memory and storage to one host. Horizontal gives fault tolerance through redundancy — and gives you chain reactions.</td></tr>
+    <tr><td><b>Fan-in / fan-out</b></td><td>Fan-in is how many call <i>you</i>; fan-out is how many <i>you</i> call. High fan-in means wide blast radius. Reducing fan-in on a shared resource is the practical approximation of shared-nothing.</td></tr>
+    <tr><td><b>Butterfly / spiderweb</b></td><td>Two shapes of integration diagram: one central system with fan-in on one side and fan-out on the other, versus many boxes with many dependencies. The constant across both: <b>connections outnumber services</b> — roughly 2N for a butterfly, up to N² for a web.</td></tr>
+    <tr><td><b>Listen queue</b></td><td>The kernel's per-port waiting room for half-open connections. Full = fast refusal (good). Occupied = blocked in <code>open()</code> for minutes (bad).</td></tr>
+    <tr><td><b>Bogon</b></td><td>A stray packet that arrives late and out of sequence, possibly after the connection closed. The reason TIME_WAIT exists. Real on the open internet, largely academic inside a data centre.</td></tr>
+    <tr><td><b>Shared-nothing</b></td><td>Each server runs without knowing about any other. The hypothetical ideal for horizontal scaling; you pay for it in failover.</td></tr>
+    <tr><td><b>Control plane</b></td><td>Software that manages infrastructure rather than serving users: logging, monitoring, schedulers, scalers, load balancers, configuration management. It senses state, compares to desired state, and acts — which is why it can act catastrophically.</td></tr>
+    <tr><td><b>Hysteresis</b></td><td>Deliberate asymmetry in a control system's response: quick in the safe direction, slow in the unsafe one. Start machines fast, stop them slowly.</td></tr>
+    <tr><td><b>Leaky Bucket</b></td><td>A counter incremented on each fault and decremented by a background timer. Measures fault <i>density</i> rather than a running total — the right input for a circuit breaker.</td></tr>
+    <tr><td><b>Little's law</b></td><td>Queue length, arrival rate and time-in-system are locked together. Practical consequence: an unbounded queue means an unbounded response time. Queues must be finite for latency to be finite.</td></tr>
+    <tr><td><b>Liskov substitution principle</b></td><td>Any property true of type T must hold for its subtypes. A subclass that adds <code>synchronized</code> breaks it — “functional behavior composes, but concurrency does not compose.”</td></tr>
+    <tr><td><b>CQRS</b></td><td>Command Query Responsibility Separation: immutable objects for querying and rendering; state changes issued as command objects. Avoids synchronising domain objects, which breaks across servers anyway.</td></tr>
+    <tr><td><b>Mise en place</b></td><td>The chef's discipline of assembling every ingredient before cooking. The Fail Fast pattern in three words.</td></tr>
+    <tr><td><b>Pets vs cattle</b></td><td>Servers you nurse individually versus servers you replace. Pets invite fiddling; fiddling invites the “ohnosecond”.</td></tr>
+    <tr><td><b>Dogpile</b></td><td>Synchronised transient load — a fleet booting, a cron hour, a config push, a logjam breaking. Costs you peak capacity you'd never otherwise need.</td></tr>
+    <tr><td><b>Fight Club bug</b></td><td>Increased front-end load causing exponentially increasing back-end work, usually via a shared resource touched per request.</td></tr>
+    <tr><td><b>Power law vs bell curve</b></td><td>Relationship counts in social systems follow a power law, so an entity with a million times the average <i>will</i> exist. Test data built on a bell curve will never show you this.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page ans">
+  <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Chunk 1 · Q1 — the fraud-scoring API</h4>
+  <p><b>(a)</b> A <b>slow failure at an integration point</b> producing <b>blocked threads</b>. The provider accepted the connection and never responded, or the connection was silently torn down by something in the middle; either way the calling threads are parked inside a socket read.</p>
+  <p><b>(b)</b> The absences are the evidence. <b>No errors</b> means nothing has thrown yet, which rules out fast failure — a refused connection or a reset would have raised an exception immediately. <b>No CPU and no memory movement</b> rules out a leak, garbage-collection thrash, or an infinite loop; the threads aren't working, they're waiting. A process monitor will call this instance healthy, so you need thread dumps or an external synthetic transaction to see the truth. This is the “dog that didn't bark” pattern from the 5 a.m. story.</p>
+  <p><b>(c)</b> The <b>socket read timeout</b> and the <b>connect timeout</b> on the HTTP client — and behind them, the <b>checkout timeout</b> on any connection pool. Bet on the read timeout being unset or infinite: that's the common default, and it's the one that produces exactly this symptom. Full marks also for noting that if the client library hides the socket you may not be able to set it, which is itself the finding.</p>
+
+  <h4>Chunk 1 · Q2 — the Monday-morning hang</h4>
+  <p><b>(a)</b> The connection sat idle over the weekend and a <b>firewall or NAT device reaped it from its state table</b>, while both endpoints still believe the connection is valid. This is the 5 a.m. problem with a weekly period instead of a daily one.</p>
+  <p><b>(b)</b> Take a packet capture on both sides. The confirming observation is <b>your side retransmitting the same segment with no response and no ICMP unreachable</b>, and simultaneously <b>nothing at all arriving at the partner's interface</b>. The silence on the far side is the proof: the packets are being dropped in the middle, not rejected at the end. (This also explains why the partner's logs are honestly clean — their application never saw a thing.)</p>
+  <p><b>(c)</b> Cheapest fix: a <b>keep-alive / periodic ping</b> on the idle connection, at an interval shorter than the middlebox's idle timeout — the mechanism Oracle's dead connection detection provided. Configuring a read timeout is a necessary companion, so the failure at least becomes fast.<br>
+  Why the obvious fixes fail: a <b>validation query before checkout</b> travels over the same dead connection, so it hangs exactly as the real query would. <b>Closing connections older than an hour</b> requires sending a teardown packet over the same dead connection — which also hangs. Both “fixes” move the hang, they don't remove it.</p>
+
+  <h4>Chunk 2 · Q1 — twelve instances in seven minutes</h4>
+  <p><b>(a)</b> A <b>Chain Reaction</b> in the recommendations layer and a <b>Cascading Failure</b> into the product-page service.</p>
+  <p><b>(b)</b> The chain reaction moved <b>sideways</b>, carried by <b>redistributed load</b>: each death handed its share to identical peers running the same defective code, so every survivor got closer to the same cliff. The shrinking gaps between failures are the signature — that acceleration is exactly what the search-farm story charted. The cascade moved <b>upward</b>, carried by <b>blocked threads</b>: the product-page service's threads were parked waiting on a service that had stopped answering, which is why its CPU and memory looked fine while its thread count pinned.</p>
+  <p><b>(c)</b> Against the chain reaction: <b>fix the underlying load-related defect</b> — a leak or a race. Structurally, <b>Bulkheads</b> split the layer into pools so one chain reaction becomes two slower ones; health-checked <b>autoscaling</b> helps if the scaler reacts faster than the reaction propagates. Against the cascade: <b>Circuit Breaker plus Timeouts</b> on the calling side.<br>
+  Why swapping them fails: a circuit breaker in the recommendations layer wouldn't have saved <i>it</i> — the peers weren't calling each other, they were absorbing traffic. And bulkheads in the recommendations layer do nothing for its callers; the book is explicit that bulkheads “won't help the callers of whichever partition does go down. Use Circuit Breaker on the calling side for that.”</p>
+
+  <h4>Chunk 2 · Q2 — the synchronized cache</h4>
+  <p><b>(a)</b> One thread entered the inherited <code>synchronized get()</code>, called the dead partner API, and blocked there indefinitely while holding the monitor — so every other thread that touched the cache queued behind it, and eventually every request-handling thread on the box was blocked, regardless of which feature it was serving.</p>
+  <p><b>(b)</b> The <b>Liskov substitution principle</b>. Any property true of a type should hold for its subtypes, but the subclass turned a fast in-memory lookup into a blocking remote call under the same lock. The compiler allows it because Java and C# don't treat synchronisation as part of a method's contract — you can't even declare an interface method <code>synchronized</code>. The underlying reason: <b>functional behaviour composes; concurrency does not.</b></p>
+  <p><b>(c)</b> <b>Code-level, ship tonight:</b> put a timeout on the remote call and take the remote call out of the critical section — synchronise only the map read and the map write, never the fetch. (A dedicated bounded thread pool returning a future for the fetch is the fuller version.) <b>Architectural:</b> a bulkhead — give this feature its own bounded thread pool or its own instances — plus a circuit breaker around the partner API so you stop calling it at all when it's sick, with a fallback of “availability unknown”. Ship the timeout tonight; the architecture change wants a design conversation and a stakeholder decision about what the page shows when availability is unknown.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Chunk 3 · Q1 — search results in the session</h4>
+  <p><b>(a)</b> Three, in this order: <b>Users</b> (session memory — a large object held for the full session timeout, most of it never read again, and the “dead time” after the last request is pure waste); then a memory leak in effect, which surfaces as <b>Slow Responses</b> as the collector works harder and harder; then a <b>Chain Reaction</b>, because every instance runs the same code with the same defect, and each death pushes its traffic onto peers that then exhaust memory faster. The accelerating crash intervals are the tell. If the result sets grew because customer history grew, you can fairly add <b>Unbounded Result Sets</b> as the root cause — and note that two months of production data is exactly the timescale on which that appears.</p>
+  <p><b>(b)</b> Cheapest: <b>stop putting the result set in the session</b> — re-query the search engine for each page of results. The book names this exact case: “it's a bad idea to keep an entire set of search results in the session for pagination.” If you must keep something, wrap it in a weak/soft reference so the collector can reclaim it, and make every accessor handle <code>null</code>.</p>
+  <p><b>(c)</b> Class-eliminating: <b>pagination in the service contract</b> — first-item and count parameters going in, an approximate total coming back — plus a hard <code>LIMIT</code> on the query, plus production-sized data in the performance environment. Cost: a contract change every caller must adopt, callers must now loop, and “approximately how many results” is a real product decision rather than a free number.</p>
+
+  <h4>Chunk 3 · Q2 — hourly pulls, midnight jobs, twitchy autoscaler</h4>
+  <p><b>(a)</b> A <b>Dogpile</b> (every agent pulling on the hour, every cache warming at midnight, and the fleet restarting with cold caches all at once), and a <b>Force Multiplier</b> (an autoscaler sampling on a one-second horizon while its actions take five minutes to land).</p>
+  <p><b>(b)</b> The autoscaler is the <b>control-plane</b> problem, and it differs in kind: it isn't a bug and it isn't excess demand. The automation senses current state, compares it to a computed desired state, and acts — correctly, by its own logic — on a belief that is either stale or unmeasurable. That's what makes it dangerous: it will be working exactly as designed while it destroys you, and it'll finish before a human notices. The dogpile, by contrast, is ordinary demand arriving in the wrong <i>shape</i>.</p>
+  <p><b>(c)</b> For the dogpile: <b>randomised clock slew</b> on the config agent and jitter on every scheduled job, so the pull spreads across the hour rather than landing on it; warm caches before an instance accepts traffic. That's the <b>Dogpile</b> counter, and jittered exponential backoff is its retry-side twin. For the autoscaler: a <b>Governor</b> — asymmetric (scale up readily, scale down slowly), stateful and time-aware, with a <b>deceleration zone</b> that accounts for the five-minute lag so it doesn't start three hundred instances because the load persisted for three hundred seconds, and an alert when it engages. Bonus marks for adding a financial ceiling and the &gt;80%-unavailable heuristic.</p>
+
+  <h4>Chunk 4 · Q1 — three dependencies and a marketing email</h4>
+  <p><b>(a)</b> <b>(i) Inventory service, which you own:</b> <b>Handshaking</b> — a health-check endpoint the caller respects, because you control both ends and cooperative throttling beats guessing. Back it with a timeout. <b>(ii) Third-party tax API, rate-limited, no health endpoint:</b> <b>Circuit Breaker</b>, explicitly because it <i>can't</i> handshake — you can't ask politely, so you make the call, track whether it works, and stop calling when it doesn't. Trip on fault density, and decide with the business what checkout does when it's open. <b>(iii) Slow internal fraud model:</b> <b>Timeouts</b> derived from your checkout SLA, plus a defined fallback (queue for asynchronous review, or accept-and-flag) — this is where <b>Decoupling Middleware</b> earns its keep if you can restructure.</p>
+  <p><b>(b)</b> For your own inbound traffic: <b>Shed Load</b> (with <b>Fail Fast</b> as its per-request form). It's not the same pattern as (ii) because the two sit on opposite sides of the call. A circuit breaker is a <i>caller-side</i> decision to stop making outbound calls; shed load is a <i>provider-side</i> decision to refuse inbound work. Note also that shed load is right here specifically because the demand is uncontrolled and effectively infinite — inside your own boundary, with a finite set of known consumers, <b>Back Pressure</b> would be the more efficient choice.</p>
+  <p><b>(c)</b> The conversation with <b>marketing</b>, last week. Self-denial attacks are the most preventable class in the book precisely because somebody in your own building already knew. Ask for the send time and volume, get the deep link removed so the CDN isn't bypassed, get the mail sent in waves, put a static landing page behind the first click, and pre-scale before the send rather than trusting autoscaling to catch up.</p>
+
+  <h4>Chunk 4 · Q2 — the shared-state circuit breaker</h4>
+  <p><b>(a)</b> <b>On where the state lives:</b> a circuit breaker should be built at the scope of a <b>single process</b>. Sharing state through Redis introduces another out-of-process call — “that means the safety mechanism would introduce a new failure mode.” Your protection now has a dependency that can itself be slow, full, or unreachable, and it fails at exactly the moment everything else is failing. The cost of not sharing is small and known: several instances each independently discover the provider is down. <b>On how you count:</b> a simple total is nearly meaningless. “There's a world of difference between observing five faults spread evenly over five hours versus five faults in the last thirty seconds.” You want fault <b>density</b>, not a running total, or the breaker will eventually trip on ancient history.</p>
+  <p><b>(b)</b> A <b>Leaky Bucket</b>: a counter incremented on every observed fault, with a background thread or timer decrementing it periodically toward zero. If the count exceeds the threshold, faults are genuinely arriving quickly. Consider tracking fault <i>types</i> separately too — a lower threshold for “timeout calling remote system” than for “connection refused”.</p>
+  <p><b>(c)</b> Keep the state local and make the <b>observability</b> global. Log every state change, expose current state for querying, and ship those events to your monitoring system; then chart the aggregate. The book is explicit that state-change frequency is itself a valuable metric and “a leading indicator of problems elsewhere in the enterprise.” You get the global picture without putting a network call inside your safety mechanism. Add a manual trip/reset control for Operations while you're there.</p>
+
+  <div class="box tip nobreak" style="margin-top:14pt">
+    <h4>How to score yourself</h4>
+    <p>Two marks per question, both quick. <b>Completeness:</b> did you name every element the answer names, and did you get the <i>direction</i> right (caller vs provider, sideways vs upward)? Missing the direction is the failure that matters. <b>Phrasing:</b> could you have said your answer out loud in a design review without hand-waving? If you wrote “it broke” where the key says “blocked threads carried a cascading failure across the layer boundary”, the concept is there but the vocabulary isn't — and the vocabulary is half the point.</p>
+  </div>
+</section>
+
+<!-- ============================== 10. WORKBOOK ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again — the reset is the whole point, not a punishment.</p>
+
+  <table class="tight">
+    <tr>
+      <th style="width:56mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:26mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> Fast vs slow failure — and why slow is worse</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> The 5 a.m. problem: mechanism, clue, fix</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Chain Reaction vs Cascading Failure — direction and carrier</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> Blocked Threads — why monitoring says “healthy”</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Slow Responses — why they <i>increase</i> load</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Scaling Effects &amp; Unbalanced Capacities — why QA can't find them</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> Self-Denial · Dogpile · Force Multiplier — the three self-inflicted ones</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> Unbounded Result Sets — why it's a handshaking failure</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Timeouts vs Fail Fast — outbound vs inbound</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> Circuit Breaker — three states, fault density, single process</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> Bulkheads — granularities, and what they don't protect</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Steady State — the three sludges, and “no fiddling”</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Let It Crash — the four preconditions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Shed Load vs Back Pressure — edge vs inside</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> Governor — asymmetric, stateful, U-shaped curve</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Test Harness vs mock vs integration environment</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> Decoupling Middleware — the coupling spectrum, and why it's irreversible</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> Master 2×2 — coupling × interactive complexity</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twelve minutes, write the answers</h3>
+  <ol>
+    <li>You have one change you're allowed to make to a legacy service with forty outbound calls and no timeouts anywhere. What do you change, and which four antipatterns does that single change address?</li>
+    <li>Name the direction of travel and the carrying mechanism for: a chain reaction, a cascading failure, a slow-response amplification loop.</li>
+    <li>Your monitoring reports that 94% of your fleet is unavailable. State your first hypothesis and your reason for it.</li>
+    <li>Give the one-line difference between Shed Load and Back Pressure, and name the property of your consumer population that decides which you use.</li>
+    <li>A teammate says “we'll add data purging six months after launch.” Give the two-sentence rebuttal, naming the pattern.</li>
+    <li>Why is a bulkhead no help to the callers of the partition that fails, and what is?</li>
+    <li>Name the four conditions that must hold before “let it crash” is a responsible strategy, and one system type where it is simply wrong.</li>
+    <li>A query “can only ever return a handful of rows.” Give the two-sentence reply, including the sentence about which numbers are sensible.</li>
+    <li>Explain in one sentence why sharing circuit-breaker state across processes is a bad trade.</li>
+    <li>Where would you rather be on the coupling × complexity matrix, which direction can you realistically move, and name three things that move you there.</li>
+  </ol>
+
+  <div class="foot">
+    <b>Source.</b> All examples, figures, quotations and numbers are drawn from Michael T. Nygard, <i>Release It! Design and Deploy Production-Ready Software</i>, 2nd edition — Chapter 4 “Stability Antipatterns” (pp. 31–90) and Chapter 5 “Stability Patterns” (pp. 91–125), The Pragmatic Bookshelf. Works referenced within those chapters and named here: James R. Chiles, <i>Inviting Disaster</i>; Brian Goetz, <i>Java Concurrency in Practice</i>; Martin Fowler, <i>Patterns of Enterprise Application Architecture</i>; Vlissides, Coplien &amp; Kerth, <i>Pattern Languages of Program Design 2</i> (Leaky Bucket, caching proxy); Liskov &amp; Wing, <i>Family Values: A Behavioral Notion of Subtyping</i>.<br><br>
+    <b>Method.</b> The structure of this booklet — plain-language version first, example before definition, every term given a definition, an example and a boundary against its look-alike, two retrieval questions per section on cases that do not appear in the source, and a fixed expanding review schedule — follows the evidence that retrieval practice and distributed practice are the only two study techniques rated high-utility in Dunlosky et al., “Improving Students' Learning With Effective Learning Techniques” (2013), and that retrieval beats concept mapping even when the final test <i>is</i> a concept map (Karpicke &amp; Blunt, <i>Science</i>, 2011).
+  </div>
+</section>
+
+</body>
+</html>
