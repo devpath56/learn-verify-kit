@@ -5,12 +5,8 @@
 <title>Stability Antipatterns &amp; Stability Patterns — Study Booklet</title>
 <style>
 :root{
-  --ink:#151719; --soft:#5b6168; --rule:#c9ced4; --hair:#e4e8ec;
-  --c1:#1d5fa8; --c1bg:#eaf1fa;   /* chunk 1 */
-  --c2:#1c7a52; --c2bg:#e8f5ee;   /* chunk 2 */
-  --c3:#b05a10; --c3bg:#fdf1e3;   /* chunk 3 */
-  --c4:#6b3fa0; --c4bg:#f1ecf9;   /* chunk 4 */
-  --warn:#a3161d; --warnbg:#fdecec;
+  --ink:#111111; --soft:#555555; --rule:#b4b4b4; --hair:#d9d9d9;
+  --fill:#f2f2f2; --fill2:#e6e6e6; --fill3:#dadada; --mid:#8c8c8c;
 }
 @page{ size:A4; margin:16mm 15mm 16mm 15mm; }
 *{box-sizing:border-box}
@@ -28,51 +24,50 @@ p{margin:0 0 6pt}
 ul,ol{margin:0 0 7pt; padding-left:17px}
 li{margin:0 0 3pt}
 li > ul{margin-top:3pt}
-code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:#f2f4f6; padding:.5pt 3pt; border-radius:2px}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:var(--fill); padding:.5pt 3pt}
 small{font-size:8.6pt; color:var(--soft)}
 .page{page-break-after:always}
 .page:last-child{page-break-after:auto}
 .nobreak,.box,.qbox,.sketch,.matrix{break-inside:avoid; page-break-inside:avoid}
 
 /* ---------- cover ---------- */
-.cover{padding-top:22mm}
+.cover{padding-top:24mm}
 .kicker{font-size:9pt; letter-spacing:2.4pt; text-transform:uppercase; color:var(--soft); margin-bottom:10pt}
 .cover .sub{font-size:13pt; color:var(--soft); margin:8pt 0 20pt; line-height:1.35}
 .cover .rule{height:3px; background:var(--ink); width:64px; margin:16pt 0}
 .meta{font-size:9.4pt; color:var(--soft); line-height:1.7}
 .chunkstrip{display:flex; gap:6px; margin:22pt 0 0}
-.chunkstrip div{flex:1; padding:8pt 9pt; border-radius:4px; font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
-.cs1{background:var(--c1bg); border-left:3px solid var(--c1)}
-.cs2{background:var(--c2bg); border-left:3px solid var(--c2)}
-.cs3{background:var(--c3bg); border-left:3px solid var(--c3)}
-.cs4{background:var(--c4bg); border-left:3px solid var(--c4)}
+.chunkstrip div{flex:1; padding:8pt 9pt; background:var(--fill); border-left:3px solid var(--ink);
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
 .chunkstrip b{display:block; font-size:9.6pt; margin-bottom:2pt}
+.chunkstrip .num{display:block; font-size:15pt; font-weight:700; line-height:1; margin-bottom:4pt}
 
-/* ---------- chunk headers ---------- */
-.chunkhead{border-radius:5px; padding:11pt 13pt; margin:0 0 12pt; color:#fff}
-.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase; opacity:.85}
+/* ---------- part headers ---------- */
+.chunkhead{padding:11pt 13pt; margin:0 0 12pt; color:#fff; background:var(--ink);
+  display:flex; align-items:flex-start; gap:12pt}
+.chunkhead .big{font-family:Helvetica,Arial,sans-serif; font-size:30pt; font-weight:700; line-height:.92;
+  border:2px solid #fff; padding:2pt 8pt; flex:0 0 auto}
+.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase}
 .chunkhead h2{color:#fff; margin:3pt 0 0}
-.chunkhead p{margin:5pt 0 0; font-size:9.4pt; opacity:.93}
-.h1c{background:var(--c1)} .h2c{background:var(--c2)} .h3c{background:var(--c3)} .h4c{background:var(--c4)}
+.chunkhead p{margin:5pt 0 0; font-size:9.4pt}
 
 /* ---------- boxes ---------- */
-.box{border:1px solid var(--rule); border-radius:4px; padding:9pt 11pt; margin:0 0 9pt}
-.tenth{background:#fbfaf4; border:1px solid #e0d9bd; border-left:4px solid #c9a227}
-.tenth h4{color:#8a6d10}
-.bound{background:#f7f8f9; border-left:4px solid var(--soft)}
-.quote{background:var(--warnbg); border:none; border-left:4px solid var(--warn); font-style:italic; padding:8pt 11pt}
-.quote .who{font-style:normal; font-size:8.4pt; color:var(--warn); display:block; margin-top:4pt; letter-spacing:.4pt; font-family:Helvetica,Arial,sans-serif}
-.tip{background:#eef6f2; border-left:4px solid var(--c2)}
-.qbox{border:1.5px solid var(--ink); border-radius:4px; padding:10pt 12pt; margin:0 0 8pt; background:#fff}
-.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--soft)}
+.box{border:1px solid var(--rule); padding:9pt 11pt; margin:0 0 9pt}
+.tenth{background:var(--fill); border:1px solid var(--rule); border-left:5px solid var(--ink)}
+.tenth h4{color:var(--ink)}
+.bound{background:#fafafa; border:1px solid var(--hair); border-left:5px solid var(--mid)}
+.quote{background:var(--fill); border:none; border-left:6px double var(--ink); font-style:italic; padding:8pt 11pt}
+.tip{background:#fff; border:1.5px solid var(--ink)}
+.qbox{border:1.5px solid var(--ink); padding:10pt 12pt; margin:0 0 8pt; background:#fff}
+.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--ink); font-weight:700}
 .qbox p{margin:4pt 0 0}
-.writeline{border-bottom:1px dotted #aeb4ba; height:15pt}
+.writeline{border-bottom:1px dotted var(--mid); height:15pt}
 .writelines{margin-top:8pt}
 
 /* ---------- tables ---------- */
 table{width:100%; border-collapse:collapse; margin:0 0 9pt; font-size:9.1pt}
 th,td{border:1px solid var(--hair); padding:4.5pt 6pt; text-align:left; vertical-align:top}
-th{background:#f4f6f8; font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--soft); font-weight:600}
+th{background:var(--fill2); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--ink); font-weight:700}
 td b{font-weight:700}
 tr{break-inside:avoid}
 .tight td,.tight th{padding:3.5pt 5pt; font-size:8.8pt}
@@ -84,43 +79,36 @@ tr{break-inside:avoid}
 .grid2 .corner{}
 .grid2 .colh,.grid2 .rowh{
   font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; font-weight:700; line-height:1.35;
-  background:#eef1f4; padding:6pt 7pt; border-radius:3px;
+  background:var(--fill2); padding:6pt 7pt;
 }
 .grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
-.grid2 .cell{border:1px solid var(--rule); border-radius:3px; padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
+.grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
 .grid2 .cell b{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
-.cell.focus{border:2px solid var(--warn); background:var(--warnbg)}
-.cell.good{background:#eef7f1}
+.cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
+.cell.focus b{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8}
 .legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
 
 /* ---------- sketch ---------- */
-.sketch{border:1px solid var(--rule); border-radius:5px; padding:11pt 12pt; background:#fcfcfd; margin:0 0 9pt}
-.node{display:inline-block; border-radius:4px; padding:4pt 7pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt; line-height:1.3; margin:2pt 0; border:1px solid}
-.n1{background:var(--c1bg); border-color:var(--c1); color:#0f3c6d}
-.n2{background:var(--c2bg); border-color:var(--c2); color:#0f4d33}
-.n3{background:var(--c3bg); border-color:var(--c3); color:#7a3d09}
-.n4{background:var(--c4bg); border-color:var(--c4); color:#472a6b}
-.nstar{background:#fff6d6; border:2px solid #c9a227; color:#6b5200; font-weight:700}
+.sketch{border:1px solid var(--rule); padding:11pt 12pt; background:#fcfcfc; margin:0 0 9pt}
+.node{display:inline-block; padding:3pt 6pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt;
+  line-height:1.3; margin:2pt 0; border:1px solid var(--ink); background:var(--fill)}
+.n1,.n2,.n3,.n4{background:var(--fill)}
+.nstar{background:var(--ink); color:#fff; border:1px solid var(--ink); font-weight:700}
 .tree{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:8.6pt; line-height:1.7; white-space:pre}
-/* tokens used INSIDE .tree — colour only, so monospace alignment survives */
-.tree .tk1{color:var(--c1); font-weight:700}
-.tree .tk2{color:var(--c2); font-weight:700}
-.tree .tk3{color:var(--c3); font-weight:700}
-.tree .tk4{color:var(--c4); font-weight:700}
-.tree .tks{color:#8a6d10; font-weight:700; background:#fff6d6}
-.q{color:var(--warn); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt}
+/* tokens used INSIDE .tree — weight and inversion only, so monospace alignment survives */
+.tree .tk1,.tree .tk2,.tree .tk3,.tree .tk4{font-weight:700}
+.tree .tks{font-weight:700; background:var(--ink); color:#fff}
+.q{color:var(--ink); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; font-weight:700}
 
 /* ---------- misc ---------- */
-.two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-.three{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
-.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt; text-transform:uppercase; padding:2pt 6pt; border-radius:9px; background:#eceff2; color:var(--soft); margin-right:4pt}
-.p1{background:var(--c1bg); color:var(--c1)} .p2{background:var(--c2bg); color:var(--c2)}
-.p3{background:var(--c3bg); color:var(--c3)} .p4{background:var(--c4bg); color:var(--c4)}
+.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt;
+  text-transform:uppercase; padding:2pt 6pt; background:var(--ink); color:#fff; margin-right:4pt; font-weight:700}
+.p1,.p2,.p3,.p4{background:var(--ink); color:#fff}
 .toc td{border:none; border-bottom:1px dotted var(--hair); padding:5pt 4pt}
 .toc td:last-child{text-align:right; color:var(--soft); font-family:Helvetica,Arial,sans-serif; font-size:8.6pt}
 .ans{font-size:9.2pt}
 .ans h4{margin-top:11pt}
-.foot{margin-top:14pt; padding-top:6pt; border-top:1px solid var(--hair); font-size:8.2pt; color:var(--soft)}
 </style>
 </head>
 <body>
@@ -130,22 +118,16 @@ tr{break-inside:avoid}
   <div class="kicker">Learn · Verify — offline study booklet</div>
   <h1>Stability Antipatterns<br>&amp; Stability Patterns</h1>
   <div class="rule"></div>
-  <div class="sub">How a small fault becomes a total outage — and the twelve moves that stop it.<br>
-  Built from <i>Release It!</i> (2nd ed.), Chapters 4 and 5, by Michael T. Nygard.</div>
+  <div class="sub">How a small fault becomes a total outage — and the twelve moves that stop it.</div>
 
   <div class="chunkstrip">
-    <div class="cs1"><b>1 · Where cracks start</b>Every integration point, and the two speeds of network failure.</div>
-    <div class="cs2"><b>2 · How cracks spread</b>Blocked threads, chain reactions, cascading failures, slow responses.</div>
-    <div class="cs3"><b>3 · Load turns on you</b>Users, scale, unbalanced capacity, self-denial, dogpiles, automation.</div>
-    <div class="cs4"><b>4 · The counter-moves</b>Twelve stability patterns and when each is the wrong one.</div>
+    <div><span class="num">1</span><b>Where cracks start</b>Every integration point, and the two speeds of network failure.</div>
+    <div><span class="num">2</span><b>How cracks spread</b>Blocked threads, chain reactions, cascading failures, slow responses.</div>
+    <div><span class="num">3</span><b>Load turns on you</b>Users, scale, unbalanced capacity, self-denial, dogpiles, automation.</div>
+    <div><span class="num">4</span><b>The counter-moves</b>Twelve stability patterns and when each is the wrong one.</div>
   </div>
 
-  <div style="margin-top:24pt" class="box tip nobreak">
-    <h4>What this booklet is for</h4>
-    <p>Not a summary. A <b>testing engine on paper</b>. Every section ends with two questions on cases that are <i>not</i> in the book, and the answers live in the back so you can genuinely fail before you check. Reading this cover to cover without writing anything gets you about a third of the value.</p>
-  </div>
-
-  <div class="meta" style="margin-top:20pt">
+  <div class="meta" style="margin-top:26pt">
     Print double-sided, short-edge bind, A4 · 100% scale (no “fit to page”).<br>
     Answer key starts at Section 9 — keep a sheet of paper over it.
   </div>
@@ -154,7 +136,6 @@ tr{break-inside:avoid}
 <!-- ============================== HOW TO USE ============================== -->
 <section class="page">
   <h2>How to use this booklet</h2>
-  <p>Two study methods beat all the others by a wide margin: <b>pulling an answer out of your head</b> (retrieval) and <b>spreading the attempts over days</b> (spacing). Re-reading, highlighting and summarising feel productive and are close to worthless. Everything below is arranged around those two.</p>
 
   <h3>The loop, per section</h3>
   <ol>
@@ -176,11 +157,11 @@ tr{break-inside:avoid}
   <h3>What's in here</h3>
   <table class="toc">
     <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
-    <tr><td><b>2</b> — Where cracks start: integration points</td><td>teach + 2 questions + 2×2</td></tr>
-    <tr><td><b>3</b> — How a crack becomes an outage</td><td>teach + 2 questions + 2×2</td></tr>
-    <tr><td><b>4</b> — Load-shaped failure: demand, scale, automation</td><td>teach + 2 questions + 2×2</td></tr>
-    <tr><td><b>5</b> — The counter-moves: twelve stability patterns</td><td>teach + 2 questions + 2×2</td></tr>
-    <tr><td><b>6</b> — Concept sketch (whole-chapter map) + master 2×2</td><td>consolidation</td></tr>
+    <tr><td><b>2</b> — Where cracks start: integration points</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — How a crack becomes an outage</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — Load-shaped failure: demand, scale, automation</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — The counter-moves: twelve stability patterns</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
     <tr><td><b>7</b> — Symptom → diagnosis → pattern lookup</td><td>on-call reference</td></tr>
     <tr><td><b>8</b> — Numbers worth remembering · Glossary · Say-it-like-an-expert index</td><td>reference</td></tr>
     <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
@@ -188,7 +169,7 @@ tr{break-inside:avoid}
   </table>
 
   <div class="box bound">
-    <h4>One warning before you start, from the author himself</h4>
+    <h4>One warning before you start</h4>
     <p>“Don't make the mistake of assuming that a system that includes more of these patterns is superior to one with fewer of them. <b>‘Count of patterns applied’ is never a good quality metric.</b>” The goal is a <i>recovery-oriented mind-set</i>, not a checklist score.</p>
   </div>
 </section>
@@ -210,10 +191,10 @@ tr{break-inside:avoid}
   </div>
 
   <h3>The core model in one paragraph</h3>
-  <p>A fault is unavoidable — a bug, a leak, a failing switch, a marketing email. A fault becomes a <b>crack</b>. Cracks are harmless until something <b>propagates</b> them: a blocked thread, a redistributed load, a retry loop, an automated control plane. Two structural properties decide how far a crack runs: <b>tight coupling</b> (a failure here forces a change there) and <b>high interactive complexity</b> (nobody's mental model of the system is complete, so operators' instincts are wrong). Systems with both live at what James R. Chiles calls the <b>technology frontier</b>, where small events routinely become full-blown failures. Chapter 4 catalogues what propagates cracks. Chapter 5 catalogues what stops them.</p>
+  <p>A fault is unavoidable — a bug, a leak, a failing switch, a marketing email. A fault becomes a <b>crack</b>. Cracks are harmless until something <b>propagates</b> them: a blocked thread, a redistributed load, a retry loop, an automated control plane. Two structural properties decide how far a crack runs: <b>tight coupling</b> (a failure here forces a change there) and <b>high interactive complexity</b> (nobody's mental model of the system is complete, so operators' instincts are wrong). Systems with both live at what James R. Chiles calls the <b>technology frontier</b>, where small events routinely become full-blown failures. Parts 1–3 catalogue what propagates cracks. Part 4 catalogues what stops them.</p>
 
   <div class="box tenth nobreak">
-    <h4>🎓 The whole thing for a smart 15-year-old</h4>
+    <h4>The whole thing for a smart 15-year-old</h4>
     <ul>
       <li>Programs are constantly waiting on other programs across a network. Waiting is where they die.</li>
       <li>A thing that says “no” quickly is fine. A thing that says nothing at all is what kills you — because you sit there holding the phone.</li>
@@ -225,7 +206,7 @@ tr{break-inside:avoid}
   <h3>The four sections, and why they're in this order</h3>
   <table>
     <tr><th style="width:24mm">Section</th><th>What it covers</th><th style="width:52mm">Why here</th></tr>
-    <tr><td><span class="pill p1">1</span><b>Where cracks start</b></td><td>Integration points; sockets and the TCP handshake; fast vs slow network failure; the 5 a.m. problem; HTTP-level and vendor-library hazards.</td><td>Every other failure in the book is downstream of a call across a wire. Start at the source.</td></tr>
+    <tr><td><span class="pill p1">1</span><b>Where cracks start</b></td><td>Integration points; sockets and the TCP handshake; fast vs slow network failure; the 5 a.m. problem; HTTP-level and vendor-library hazards.</td><td>Every other failure here is downstream of a call across a wire. Start at the source.</td></tr>
     <tr><td><span class="pill p2">2</span><b>How a crack spreads</b></td><td>Blocked Threads, Chain Reactions, Cascading Failures, Slow Responses, fan-in.</td><td>Faults are unavoidable; propagation is not. This is the section that actually decides your uptime.</td></tr>
     <tr><td><span class="pill p3">3</span><b>Load turns on you</b></td><td>Users and sessions, Expensive/Unwanted/Malicious users, Scaling Effects, Unbalanced Capacities, Self-Denial Attacks, Dogpile, Force Multiplier, Unbounded Result Sets.</td><td>These are the <i>triggers</i> — the things that light the fault that the machinery in §2 then spreads.</td></tr>
     <tr><td><span class="pill p4">4</span><b>The counter-moves</b></td><td>Timeouts, Circuit Breaker, Bulkheads, Steady State, Fail Fast, Let It Crash, Handshaking, Test Harnesses, Decoupling Middleware, Shed Load, Back Pressure, Governor.</td><td>Each one is the mirror image of something in §1–§3. Learn them <i>as answers</i>, not as a list.</td></tr>
@@ -233,20 +214,22 @@ tr{break-inside:avoid}
 
   <div class="box quote">
     “Everything breaks. Faults are unavoidable. Don't pretend you can eliminate every possible source of them… Assume the worst. Faults will happen. We need to examine what happens <i>after</i> the fault creeps in.”
-    <span class="who">Release It! — Chapter 4</span>
   </div>
 </section>
 
 <!-- ============================== 2. CHUNK 1 ============================== -->
 <section class="page">
-  <div class="chunkhead h1c">
-    <div class="n">Section 2 · Chunk 1 of 4</div>
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
     <h2>Where cracks start: every integration point</h2>
     <p>Sockets, handshakes, and the difference between failing fast and failing silently.</p>
+    </div>
   </div>
 
   <div class="box tenth nobreak">
-    <h4>🎓 Tenth-grader version</h4>
+    <h4>Tenth-grader version</h4>
     <ul>
       <li>Your program talks to other programs over a wire. Every one of those conversations can go wrong.</li>
       <li>The worst kind of “wrong” isn't an error message. It's <b>silence</b> — your code just sits there waiting.</li>
@@ -265,7 +248,7 @@ tr{break-inside:avoid}
       </ul>
     </li>
     <li>The third one is the one that ruins your afternoon — <b>not because you got a worse answer, but because your ear was occupied</b>. You couldn't take any other calls.</li>
-    <li>That ear is a request-handling thread. That's the whole chapter in one image.</li>
+    <li>That ear is a request-handling thread. That's the whole of this part in one image.</li>
   </ul>
 
   <h4>Now the same three outcomes in network terms</h4>
@@ -327,7 +310,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 1 continued</div>
+  <div class="kicker">Part 1 continued</div>
 
   <h3>The 5 a.m. problem, in full — because it teaches the method, not just the fact</h3>
   <ul>
@@ -377,16 +360,16 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 1 · anchor sketch, expert phrasing, questions</div>
+  <div class="kicker">Part 1 · anchor sketch, expert phrasing, questions</div>
 
   <h3>Anchor sketch — the failure taxonomy at one integration point</h3>
   <div class="sketch nobreak">
-    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n1">blue = chunk 1 nodes</span> &nbsp; <span class="node nstar">* highlighted = the node that matters most</span> &nbsp; <span class="q">❓ = cover the page and answer this</span></div>
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n1">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = the node that matters most</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
 <div class="tree">                  <span class="tk1">A CALL ACROSS A WIRE</span>
                            │
            ┌───────────────┴───────────────┐
            │                               │
-     <span class="tk1">FAST failure</span>                 <span class="tks">* SLOW failure</span>
+     <span class="tk1">FAST failure</span>                 <span class="tks">SLOW failure</span>
      ms, then throws               minutes → forever
            │                               │
            │            ┌──────────────────┴──────────────┐
@@ -398,9 +381,9 @@ tr{break-inside:avoid}
    by your code      for minutes                  possibly forever
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
-      <span class="q">❓</span> Why is the ⭐ node the dangerous one when the fast branch is the one that <i>throws an error</i>?<br>
-      <span class="q">❓</span> Which of the three leaves gives you <b>no packets at all</b> to look at, and what does that absence tell you?<br>
-      <span class="q">❓</span> Name the one setting that converts the right-hand branch into the left-hand branch.
+      <span class="q">Q</span> Why is the node the dangerous one when the fast branch is the one that <i>throws an error</i>?<br>
+      <span class="q">Q</span> Which of the three leaves gives you <b>no packets at all</b> to look at, and what does that absence tell you?<br>
+      <span class="q">Q</span> Name the one setting that converts the right-hand branch into the left-hand branch.
     </div>
   </div>
 
@@ -420,7 +403,7 @@ tr{break-inside:avoid}
   <h3>Retrieval — cover the page first</h3>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 1 · Question 1</div>
+    <div class="lab">Part 1 · Question 1</div>
     <p>Your payments service calls an external fraud-scoring API. During an incident, monitoring shows CPU at 3%, memory flat, no errors in the application log — and yet every request-handling thread is occupied and the service returns nothing to anyone.</p>
     <p><b>(a)</b> Name the failure mode at the integration point. <b>(b)</b> Explain why the <i>absence</i> of errors and the <i>absence</i> of load is the strongest clue you have. <b>(c)</b> Name the two settings you would check first, and say which one you'd bet on.</p>
     <div class="writelines">
@@ -429,7 +412,7 @@ tr{break-inside:avoid}
   </div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 1 · Question 2</div>
+    <div class="lab">Part 1 · Question 2</div>
     <p>A nightly job holds a pooled TCP connection to a partner's service. It runs fine all week. Every Monday at 06:10 it hangs for about thirty minutes, then throws. No code has changed. The partner insists their service was up the whole time — and their logs prove it.</p>
     <p><b>(a)</b> State your hypothesis in one sentence. <b>(b)</b> Name the single packet-level observation that would confirm it. <b>(c)</b> Give the cheapest fix and say why the two obvious fixes — validating the connection before use, or closing connections older than an hour — both fail.</p>
     <div class="writelines">
@@ -439,7 +422,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 1 · decision matrix</div>
+  <div class="kicker">Part 1 · decision matrix</div>
   <h3>2×2 — how to classify any integration-point failure in ten seconds</h3>
   <p>The two questions worth asking during an incident: <b>how fast did it fail?</b> and <b>did it fail inside the protocol or outside it?</b> The answers land you in one of four boxes, and each box has a different move.</p>
 
@@ -462,7 +445,7 @@ tr{break-inside:avoid}
       <div class="cell"><b>Timeout territory</b>
         Sat in the listen queue · provider accepted and is taking its time · TCP window full so even your write blocks.<br>
         <i>Move:</i> explicit connect <i>and</i> read timeouts, plus a checkout timeout on the pool behind it.</div>
-      <div class="cell focus"><b>⭐ The killer quadrant</b>
+      <div class="cell focus"><b>The killer quadrant</b>
         The 5 a.m. problem. Firewall reaped the entry, packets dropped silently, no ICMP, endless retransmits. Both ends still “believe” they're connected.<br>
         <i>Move:</i> timeouts and a keep-alive that refreshes the middlebox's clock — and a packet capture, because nothing at the application layer will show you this.</div>
     </div>
@@ -470,12 +453,12 @@ tr{break-inside:avoid}
   </div>
 
   <div class="box tip nobreak">
-    <h4>Carry-out rule from this chunk</h4>
+    <h4>Carry-out rule from this part</h4>
     <p><b>Every wait must be bounded, and every response must be doubted.</b> If you can only afford one change to a legacy integration, make it the read timeout — that single setting moves failures from the bottom row to the top row, where your code already knows what to do.</p>
   </div>
 
   <div class="box bound nobreak">
-    <h4>Which patterns answer this chunk (forward reference to §5)</h4>
+    <h4>Which patterns answer this part (forward reference to §5)</h4>
     <ul style="margin-bottom:0">
       <li><b>Timeouts</b> — stop waiting for an answer that isn't coming.</li>
       <li><b>Circuit Breaker</b> — stop making the call at all once it's clearly sick.</li>
@@ -488,14 +471,17 @@ tr{break-inside:avoid}
 
 <!-- ============================== 3. CHUNK 2 ============================== -->
 <section class="page">
-  <div class="chunkhead h2c">
-    <div class="n">Section 3 · Chunk 2 of 4</div>
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
     <h2>How a crack becomes an outage</h2>
     <p>Blocked Threads, Chain Reactions, Cascading Failures, Slow Responses — the propagation machinery.</p>
+    </div>
   </div>
 
   <div class="box tenth nobreak">
-    <h4>🎓 Tenth-grader version</h4>
+    <h4>Tenth-grader version</h4>
     <ul>
       <li>One broken thing almost never stays one broken thing.</li>
       <li>When a server dies, its work goes to its neighbours — which makes <i>them</i> more likely to die too.</li>
@@ -521,7 +507,6 @@ tr{break-inside:avoid}
 
   <div class="box quote">
     <p><b>The search farm.</b> A dozen search engines behind a load balancer, half a million SKUs. The engine had a memory leak. Because the load balancer had shared traffic evenly all morning, they all approached death together. As each went dark its share went to the survivors, which then ran out of memory <i>faster</i>. Charting their “last response” timestamps showed the acceleration plainly: five or six minutes between the first crash and the second, three or four between the second and third, seconds between the last two. Losing the final search server locked up the entire front end — that part was the cascade.</p>
-    <span class="who">Release It! — “Searching…”</span>
   </div>
 
   <h3>The terms, each with its look-alike</h3>
@@ -561,7 +546,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 2 continued</div>
+  <div class="kicker">Part 2 continued</div>
 
   <h3>The blocked-thread story worth memorising</h3>
   <ul>
@@ -577,7 +562,7 @@ tr{break-inside:avoid}
   <h4>Two technical points hiding inside that story</h4>
   <ul>
     <li><b>You cannot see blocking at the call site.</b> <code>globalObjectCache.get(key)</code> looks identical whether it's a hash lookup or a three-second network round trip. The interface said nothing about synchronisation either.</li>
-    <li><b>A subclass that adds <code>synchronized</code> violates the Liskov substitution principle</b> — any property true of type T should be true of its subtypes. Java and C# forbid the other LSP violations but allow this one. As the book puts it: <b>“functional behavior composes, but concurrency does not compose.”</b> So you cannot transparently substitute the synchronised subclass for the superclass, even though the compiler says you can.</li>
+    <li><b>A subclass that adds <code>synchronized</code> violates the Liskov substitution principle</b> — any property true of type T should be true of its subtypes. Java and C# forbid the other LSP violations but allow this one. The underlying reason: <b>functional behaviour composes, but concurrency does not compose.</b> So you cannot transparently substitute the synchronised subclass for the superclass, even though the compiler says you can.</li>
   </ul>
 
   <div class="box tip">
@@ -618,11 +603,11 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 2 · anchor sketch, expert phrasing, questions</div>
+  <div class="kicker">Part 2 · anchor sketch, expert phrasing, questions</div>
 
   <h3>Anchor sketch — one crack, two directions</h3>
   <div class="sketch nobreak">
-    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n2">green = chunk 2 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n2">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
 <div class="tree">          <span class="tk2">A FAULT</span>  (leak · race condition · dead database)
                            │
                         becomes
@@ -633,7 +618,7 @@ tr{break-inside:avoid}
     sideways                               upward
   (same layer)                        (across layers)
         │                                    │
- <span class="tk2">CHAIN REACTION</span>                    <span class="tks">* CASCADING FAILURE</span>
+ <span class="tk2">CHAIN REACTION</span>                    <span class="tks">CASCADING FAILURE</span>
  peers absorb the                  carried by <span class="tk2">BLOCKED THREADS</span>
  dead node's load                  or by a retry storm
         │                                    │
@@ -644,9 +629,9 @@ tr{break-inside:avoid}
         └───────────── feeds ────────────────┘
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
-      <span class="q">❓</span> Why does the diagram loop back on itself at the bottom?<br>
-      <span class="q">❓</span> A chain reaction takes out a whole layer. What must the layer <i>above</i> have in place so this stays one outage instead of two?<br>
-      <span class="q">❓</span> Name the mechanism that most often carries a crack across a layer boundary — and one that carries it in the opposite direction from what you'd expect.
+      <span class="q">Q</span> Why does the diagram loop back on itself at the bottom?<br>
+      <span class="q">Q</span> A chain reaction takes out a whole layer. What must the layer <i>above</i> have in place so this stays one outage instead of two?<br>
+      <span class="q">Q</span> Name the mechanism that most often carries a crack across a layer boundary — and one that carries it in the opposite direction from what you'd expect.
     </div>
   </div>
 
@@ -664,7 +649,7 @@ tr{break-inside:avoid}
   <h3>Retrieval — cover the page first</h3>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 2 · Question 1</div>
+    <div class="lab">Part 2 · Question 1</div>
     <p>Your recommendations service runs twelve instances behind a load balancer. At 14:02 one instance stops responding. By 14:09 all twelve are gone, and the gaps between failures got noticeably shorter each time. Upstream, the product-page service is also down — its own CPU and memory look normal, but its thread count is pinned at maximum.</p>
     <p><b>(a)</b> Name the two distinct antipatterns at work. <b>(b)</b> Say which one travelled sideways and which travelled upward, and what carried each. <b>(c)</b> Give the one pattern that would have stopped each, and say why swapping the two patterns would not have worked.</p>
     <div class="writelines">
@@ -673,7 +658,7 @@ tr{break-inside:avoid}
   </div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 2 · Question 2</div>
+    <div class="lab">Part 2 · Question 2</div>
     <p>A team speeds up a slow partner API by subclassing an existing in-memory cache and overriding <code>get()</code> to fetch on a miss. The parent's <code>get()</code> is <code>synchronized</code>. Code review passes, load tests pass. In production, when the partner API stops responding, the <b>entire service</b> hangs — even though only 2% of traffic touches that feature.</p>
     <p><b>(a)</b> Explain the mechanism in one sentence. <b>(b)</b> Name the object-oriented principle violated and the one-line reason the compiler didn't stop it. <b>(c)</b> Give one code-level fix and one architectural fix, and say which one you'd ship tonight.</p>
     <div class="writelines">
@@ -683,7 +668,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 2 · decision matrix</div>
+  <div class="kicker">Part 2 · decision matrix</div>
   <h3>2×2 — locate any propagating failure</h3>
   <p>Two questions: <b>which way did it travel</b>, and <b>what carried it</b>. Where those meet tells you the antipattern's name and, more usefully, which side of the call you need to change.</p>
 
@@ -703,7 +688,7 @@ tr{break-inside:avoid}
         <i>Fix on:</i> the defect itself. Then bulkheads to split the layer, and health-checked autoscaling that reacts faster than the reaction spreads.</div>
 
       <div class="rowh">ACROSS<br>layers</div>
-      <div class="cell focus"><b>⭐ Cascading Failure</b>
+      <div class="cell focus"><b>Cascading Failure</b>
         The lower layer dies; your pool drains; your threads block; you die too.<br>
         <i>Fix on:</i> the <b>calling</b> side. Circuit Breaker to stop calling, Timeouts to come back from the calls you do make. This is the quadrant that decides your resilience.</div>
       <div class="cell"><b>Slow Responses → retry storms</b>
@@ -714,21 +699,24 @@ tr{break-inside:avoid}
   </div>
 
   <div class="box tip nobreak">
-    <h4>Carry-out rule from this chunk</h4>
+    <h4>Carry-out rule from this part</h4>
     <p><b>Faults are unavoidable; propagation is optional.</b> Ask of every dependency: “when this is dead, what of mine is holding a thread waiting for it?” Whatever that thing is, it is your gap-jumper — and it is where a timeout or a breaker belongs.</p>
   </div>
 </section>
 
 <!-- ============================== 4. CHUNK 3 ============================== -->
 <section class="page">
-  <div class="chunkhead h3c">
-    <div class="n">Section 4 · Chunk 3 of 4</div>
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
     <h2>Load-shaped failure: demand, scale, and automation turning on you</h2>
     <p>Users · Scaling Effects · Unbalanced Capacities · Self-Denial · Dogpile · Force Multiplier · Unbounded Result Sets</p>
+    </div>
   </div>
 
   <div class="box tenth nobreak">
-    <h4>🎓 Tenth-grader version</h4>
+    <h4>Tenth-grader version</h4>
     <ul>
       <li>More users is the goal <i>and</i> the threat. Growth is what breaks the thing you built for growth.</li>
       <li>Some breakages only appear at production size — never on your laptop, never in the test environment.</li>
@@ -743,7 +731,7 @@ tr{break-inside:avoid}
     <li>Most shoppers grab one item and leave; a few do a full deli order with price checks and returns. The <b>expensive</b> ones are exactly the ones you want more of, because they're the ones who spend.</li>
     <li>The manager announces over the PA: “free samples at 5 p.m. sharp.” Everyone arrives in the same minute — <b>self-inflicted, synchronised</b>.</li>
     <li>And the single loyalty-card scanner that every till shares becomes the thing the whole store waits on — a <b>shared resource</b> bottleneck that got worse purely because you added tills.</li>
-    <li>Four different failure shapes, one store. That's this chunk.</li>
+    <li>Four different failure shapes, one store. That's this part.</li>
   </ul>
 
   <h3>The demand side: your users</h3>
@@ -766,7 +754,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 3 continued</div>
+  <div class="kicker">Part 3 continued</div>
 
   <h3>The structural side: scale, capacity ratios, and shared resources</h3>
   <table class="tight">
@@ -801,7 +789,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 3 · trade-offs, sketch, phrasing, questions</div>
+  <div class="kicker">Part 3 · trade-offs, sketch, phrasing, questions</div>
 
   <h3>Trade-offs</h3>
   <table class="tight">
@@ -817,14 +805,14 @@ tr{break-inside:avoid}
 
   <h3>Anchor sketch — four load shapes, four different answers</h3>
   <div class="sketch nobreak">
-    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n3">orange = chunk 3 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n3">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
 <div class="tree">                            <span class="tk3">DEMAND</span>
                                │
              ┌─────────────────┴─────────────────┐
         from OUTSIDE                        from INSIDE
              │                                   │
       ┌──────┴──────┐                   ┌─────────┴─────────┐
-   <span class="tk3">growth</span>         <span class="tk3">spike</span>              <span class="tk3">structure</span>        <span class="tks">* automation</span>
+   <span class="tk3">growth</span>         <span class="tk3">spike</span>              <span class="tk3">structure</span>        <span class="tks">automation</span>
    users          flash mob          scaling effects    self-denial
    expensive      DDoS               unbalanced         dogpile
    users          celebrity link     capacities         force multiplier
@@ -835,9 +823,9 @@ tr{break-inside:avoid}
    planning      circuit breaker      (cannot test it)    hysteresis
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
-      <span class="q">❓</span> Why is the ⭐ branch the one that does damage fastest, even though it involves no attacker and no bug?<br>
-      <span class="q">❓</span> Which branch cannot be caught by testing at all, and what's the reason?<br>
-      <span class="q">❓</span> Two of these four branches are things <i>you</i> caused. Name them and name the person you should be talking to about each.
+      <span class="q">Q</span> Why is the branch the one that does damage fastest, even though it involves no attacker and no bug?<br>
+      <span class="q">Q</span> Which branch cannot be caught by testing at all, and what's the reason?<br>
+      <span class="q">Q</span> Two of these four branches are things <i>you</i> caused. Name them and name the person you should be talking to about each.
     </div>
   </div>
 
@@ -854,15 +842,15 @@ tr{break-inside:avoid}
   </table>
 
   <div class="box quote">
-    “Good marketing can kill you at any time.” <span class="who">Paul Lord, quoted in Release It!</span>
+    “Good marketing can kill you at any time.”
   </div>
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 3 · questions and decision matrix</div>
+  <div class="kicker">Part 3 · questions and decision matrix</div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 3 · Question 1</div>
+    <div class="lab">Part 3 · Question 1</div>
     <p>Your team ships pagination by storing each user's full search-result set in the session. Load tests at 500 concurrent users pass comfortably. Two months after launch the fleet starts running out of memory every afternoon, and the crashes across instances get closer together each time.</p>
     <p><b>(a)</b> Name the three antipatterns chained together here and the order they fire in. <b>(b)</b> Give the cheapest code change that stops today's bleeding. <b>(c)</b> Give the change that eliminates the whole class of problem, and say what it costs you.</p>
     <div class="writelines">
@@ -871,7 +859,7 @@ tr{break-inside:avoid}
   </div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 3 · Question 2</div>
+    <div class="lab">Part 3 · Question 2</div>
     <p>An ops team sets the config-management agent to pull on the hour and the cache-warming job to run at 00:00. Separately, they add an autoscaler that reacts to one-second CPU samples, while a new instance takes five minutes to become useful.</p>
     <p><b>(a)</b> Name the two failure modes you now expect. <b>(b)</b> Say which one is a control-plane problem and what makes it different in kind from the other. <b>(c)</b> Give one specific safeguard for each, and name the pattern each safeguard belongs to.</p>
     <div class="writelines">
@@ -899,7 +887,7 @@ tr{break-inside:avoid}
       <div class="cell"><b>Structural mismatch</b>
         Scaling effects, O(n²) point-to-point, shared-resource fan-in, unbalanced front-to-back capacity ratios.<br>
         <i>Move:</i> design it out — it will not show up in a two-server test environment. Bulkheads, handshaking, back pressure, and a scaled-up QA.</div>
-      <div class="cell focus"><b>⭐ Self-inflicted spike</b>
+      <div class="cell focus"><b>Self-inflicted spike</b>
         Marketing email with a deep link · midnight cron · config push · fleet restart with cold caches · an autoscaler acting on stale truth.<br>
         <i>Move:</i> talk to humans <i>before</i> the event; clock slew and jitter; pre-scale rather than autoscale; put a governor on every automated action that runs in the unsafe direction.</div>
     </div>
@@ -907,21 +895,24 @@ tr{break-inside:avoid}
   </div>
 
   <div class="box tip nobreak">
-    <h4>Carry-out rule from this chunk</h4>
+    <h4>Carry-out rule from this part</h4>
     <p><b>Bound every number a caller doesn't control.</b> Rows returned, sessions created, retries fired, instances started, bytes cached. “The only sensible numbers are <i>zero</i>, <i>one</i>, and <i>lots</i>” — so unless a query returns exactly one row, it can return too many, and you must say how many you'll take.</p>
   </div>
 </section>
 
 <!-- ============================== 5. CHUNK 4 ============================== -->
 <section class="page">
-  <div class="chunkhead h4c">
-    <div class="n">Section 5 · Chunk 4 of 4</div>
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
     <h2>The counter-moves: twelve stability patterns</h2>
     <p>Timeouts · Circuit Breaker · Bulkheads · Steady State · Fail Fast · Let It Crash · Handshaking · Test Harnesses · Decoupling Middleware · Shed Load · Back Pressure · Governor</p>
+    </div>
   </div>
 
   <div class="box tenth nobreak">
-    <h4>🎓 Tenth-grader version</h4>
+    <h4>Tenth-grader version</h4>
     <ul>
       <li>You can't stop things from breaking. You can stop the break from spreading.</li>
       <li>Two moves cover most of it: <b>stop waiting</b>, and <b>stop calling the thing that keeps hurting you</b>.</li>
@@ -939,7 +930,7 @@ tr{break-inside:avoid}
     <li>Four everyday objects, four of the twelve patterns. The rest are variations on the same two instincts: <i>bound the wait</i>, <i>contain the damage</i>.</li>
   </ul>
 
-  <div class="box quote">“Hope is not a design method.” <span class="who">Release It! — Timeouts</span></div>
+  <div class="box quote">“Hope is not a design method.”</div>
 
   <h3>The twelve, with the neighbour each is confused with</h3>
   <table class="tight">
@@ -1008,7 +999,7 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 4 continued</div>
+  <div class="kicker">Part 4 continued</div>
 
   <h3>Trade-offs — what each pattern costs you</h3>
   <table class="tight">
@@ -1029,14 +1020,14 @@ tr{break-inside:avoid}
 
   <h3>Anchor sketch — where each pattern sits relative to the call</h3>
   <div class="sketch nobreak">
-    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n4">purple = chunk 4 nodes</span> &nbsp; <span class="node nstar">* highlighted = focus node</span> &nbsp; <span class="q">❓ = self-test cue</span></div>
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node n4">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
 <div class="tree">                          <span class="tk4">A REQUEST</span>
                               │
       ┌───────────────────────┼───────────────────────┐
   INBOUND to me         WHOLE SYSTEM           OUTBOUND from me
       │                       │                       │
-  <span class="tk4">Fail Fast</span>               <span class="tk4">Bulkheads</span>              <span class="tks">* Timeouts</span>
-  <span class="tk4">Shed Load</span> (edge)        <span class="tk4">Steady State</span>           <span class="tks">* Circuit Breaker</span>
+  <span class="tk4">Fail Fast</span>               <span class="tk4">Bulkheads</span>              <span class="tks">Timeouts</span>
+  <span class="tk4">Shed Load</span> (edge)        <span class="tk4">Steady State</span>           <span class="tks">Circuit Breaker</span>
   <span class="tk4">Back Pressure</span>           <span class="tk4">Let It Crash</span>           <span class="tk4">Decoupling Middleware</span>
   <span class="tk4">Handshaking</span> (answer)   <span class="tk4">Governor</span>  (robots)     <span class="tk4">Handshaking</span> (the ask)
       │                       │                       │
@@ -1046,9 +1037,9 @@ tr{break-inside:avoid}
              prove all of the above BEFORE production
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
-      <span class="q">❓</span> Handshaking appears in two columns. Why — and which side implements which half?<br>
-      <span class="q">❓</span> Which of the twelve is an <i>architecture</i> decision rather than an implementation one, and what follows from that?<br>
-      <span class="q">❓</span> Name the two that are useless without a fourth precondition each, and name those preconditions.
+      <span class="q">Q</span> Handshaking appears in two columns. Why — and which side implements which half?<br>
+      <span class="q">Q</span> Which of the twelve is an <i>architecture</i> decision rather than an implementation one, and what follows from that?<br>
+      <span class="q">Q</span> Name the two that are useless without a fourth precondition each, and name those preconditions.
     </div>
   </div>
 
@@ -1071,10 +1062,10 @@ tr{break-inside:avoid}
 </section>
 
 <section class="page">
-  <div class="kicker">Chunk 4 · questions and decision matrix</div>
+  <div class="kicker">Part 4 · questions and decision matrix</div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 4 · Question 1</div>
+    <div class="lab">Part 4 · Question 1</div>
     <p>A checkout service calls three things: <b>(i)</b> an inventory service your own team owns, <b>(ii)</b> a third-party tax API with a hard rate limit and no health endpoint, <b>(iii)</b> an internal fraud model that is slow but usually correct. Overnight, traffic doubles because of a marketing email nobody warned you about.</p>
     <p><b>(a)</b> Choose one primary pattern for each of the three dependencies and justify each in one line. <b>(b)</b> Name the pattern you'd apply to your own <i>inbound</i> traffic, and say why it is not the same one you used for (ii) even though both are about “too much load”. <b>(c)</b> Name the conversation you should have had last week and with whom.</p>
     <div class="writelines">
@@ -1083,9 +1074,9 @@ tr{break-inside:avoid}
   </div>
 
   <div class="qbox nobreak">
-    <div class="lab">Chunk 4 · Question 2</div>
+    <div class="lab">Part 4 · Question 2</div>
     <p>A colleague proposes: “Let's wrap every outbound call in a circuit breaker, and store the breaker state in a shared Redis so all instances agree on when it's open. And let's trip it at ten failures total.”</p>
-    <p><b>(a)</b> Give the two objections the chapter makes — one about <i>where the state lives</i>, one about <i>how you count</i>. <b>(b)</b> Name the mechanism you'd propose for counting instead, and describe it in one sentence. <b>(c)</b> The team's real requirement is “we want to see globally when a provider is sick.” Satisfy that requirement <i>without</i> sharing breaker state.</p>
+    <p><b>(a)</b> Give the two objections — one about <i>where the state lives</i>, one about <i>how you count</i>. <b>(b)</b> Name the mechanism you'd propose for counting instead, and describe it in one sentence. <b>(c)</b> The team's real requirement is “we want to see globally when a provider is sick.” Satisfy that requirement <i>without</i> sharing breaker state.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -1100,7 +1091,7 @@ tr{break-inside:avoid}
       <div class="colh">Absorb &amp; isolate<br><small style="font-weight:400">keep working at reduced function</small></div>
 
       <div class="rowh">CALLER<br>side<br><small style="font-weight:400">outbound</small></div>
-      <div class="cell focus"><b>⭐ Timeouts + Circuit Breaker</b>
+      <div class="cell focus"><b>Timeouts + Circuit Breaker</b>
         Bound the wait; then stop making the call at all once faults are dense. Together they are the default answer for every integration point.<br>
         <i>Also:</i> Handshaking, when the provider can tell you it's not ready.</div>
       <div class="cell"><b>Decoupling Middleware</b>
@@ -1118,7 +1109,7 @@ tr{break-inside:avoid}
   </div>
 
   <div class="box tip nobreak">
-    <h4>Carry-out rule from this chunk</h4>
+    <h4>Carry-out rule from this part</h4>
     <p><b>Two patterns, then the rest.</b> If you can only do two things to a system, do Timeouts and Circuit Breaker on every outbound call — they cover integration points, cascading failures, blocked threads and slow responses at once. Everything else is refinement. And resist counting: “count of patterns applied” is never a quality metric.</p>
   </div>
 </section>
@@ -1126,17 +1117,17 @@ tr{break-inside:avoid}
 <!-- ============================== 6. CONCEPT SKETCH ============================== -->
 <section class="page">
   <div class="kicker">Section 6</div>
-  <h2>Concept sketch — the whole of Chapters 4 and 5 on one page</h2>
-  <p>Three named groups, in the order the story actually runs: <b>CRACK → SPREAD → STOP</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question. If you can't quiz yourself with this, it's a poster and it's worthless.</p>
+  <h2>Concept sketch — the whole competency on one page</h2>
+  <p>Three named groups, in the order the story actually runs: <b>CRACK → SPREAD → STOP</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
 
   <div class="sketch nobreak" style="padding:13pt">
     <div class="legend" style="margin-bottom:9pt">
       <b>Legend:</b>
-      <span class="node n1">CRACK — where it starts</span>
-      <span class="node n2">SPREAD — how it travels</span>
-      <span class="node n4">STOP — what ends it</span>
-      <span class="node nstar">highlighted = the one node to remember</span>
-      <span class="q">❓ retrieval cue</span>
+      <span class="node">CRACK — where it starts</span>
+      <span class="node">SPREAD — how it travels</span>
+      <span class="node">STOP — what ends it</span>
+      <span class="node nstar">reversed = the one node to remember</span>
+      <span class="q">Q = retrieval cue</span>
     </div>
 
 <div class="tree"><span class="tk1">GROUP 1 — CRACK · where it starts</span>
@@ -1174,14 +1165,14 @@ tr{break-inside:avoid}
 
   <h3>The question per node — cover the right column</h3>
   <table class="tight">
-    <tr><th style="width:44mm">Node</th><th style="width:66mm">❓ Question</th><th>Answer in one line</th></tr>
+    <tr><th style="width:44mm">Node</th><th style="width:66mm">Question</th><th>Answer in one line</th></tr>
     <tr><td><b>Integration point</b></td><td>Why is it called the number-one killer?</td><td>Every socket, pipe, process and remote call can and will hang, and a stand-alone system is almost useless — so you can't avoid them.</td></tr>
     <tr><td><b>Fast fail vs slow fail</b></td><td>Which one do you want, and why is that counter-intuitive?</td><td>Fast. It throws in milliseconds and returns the thread. Slow failure holds capacity for minutes or forever — “a slow response is a lot worse than no response.”</td></tr>
     <tr><td><b>Load from outside</b></td><td>What's the one architectural component all four external threats attack?</td><td>Session management — sessions are the Achilles' heel of a server-side web application.</td></tr>
     <tr><td><b>Load from inside</b></td><td>What makes self-inflicted load the most preventable kind?</td><td>Somebody in your building already knows it's coming. Communication is the fix; pre-scaling is the backup.</td></tr>
-    <tr><td><b>⭐ Blocked Threads</b></td><td>Why is this called the proximate cause of most failures?</td><td>Because “gradual slowdown” and “hung server” both reduce to it, and it's the mechanism that lets a crack jump a layer boundary.</td></tr>
+    <tr><td><b>Blocked Threads</b></td><td>Why is this called the proximate cause of most failures?</td><td>Because “gradual slowdown” and “hung server” both reduce to it, and it's the mechanism that lets a crack jump a layer boundary.</td></tr>
     <tr><td><b>Chain Reaction</b></td><td>Direction, cause, and the only real cure?</td><td>Sideways among peers; the dead node's load lands on identical code with the same defect; only fixing the defect cures it — bulkheads just slow it.</td></tr>
-    <tr><td><b>⭐ Cascading Failure</b></td><td>Why is this <i>the</i> node to remember?</td><td>“Preventing cascading failures is the very key to resilience.” It's the number-one crack accelerator, and Timeouts + Circuit Breaker are its direct answer.</td></tr>
+    <tr><td><b>Cascading Failure</b></td><td>Why is this <i>the</i> node to remember?</td><td>“Preventing cascading failures is the very key to resilience.” It's the number-one crack accelerator, and Timeouts + Circuit Breaker are its direct answer.</td></tr>
     <tr><td><b>Slow Responses</b></td><td>Why do slow responses <i>increase</i> load?</td><td>Callers retry, users hit Reload, speculative retries multiply — the response to slowness generates more demand.</td></tr>
     <tr><td><b>Timeouts + Circuit Breaker</b></td><td>What's the division of labour between them?</td><td>Timeouts tell you there's a problem; the breaker decides to stop calling. Timeouts bound each call; the breaker bounds the <i>number</i> of calls.</td></tr>
     <tr><td><b>Fail Fast vs Timeouts</b></td><td>The one-line distinction?</td><td>Timeouts for outbound calls (protect me from your failure); Fail Fast for inbound requests (tell you quickly I can't). Two sides of the same coin.</td></tr>
@@ -1195,7 +1186,7 @@ tr{break-inside:avoid}
 <section class="page">
   <div class="kicker">Section 6 continued · the transferable card</div>
   <h2>Master 2×2 — the decision card you can carry to other problems</h2>
-  <p>This one isn't about software specifically, which is the point. It comes from the opening pages of Chapter 4, by way of Charles Perrow's work on industrial accidents and James R. Chiles' <i>Inviting Disaster</i>. Two structural properties decide whether small faults stay small — in a payments platform, a hospital ward, a supply chain, or a power grid.</p>
+  <p>This one isn't about software specifically, which is the point. Two structural properties decide whether small faults stay small — in a payments platform, a hospital ward, a supply chain, or a power grid.</p>
 
   <div class="matrix nobreak">
     <div class="ylab">Columns: interactive complexity — can anyone hold an accurate model of the system? →</div>
@@ -1216,7 +1207,7 @@ tr{break-inside:avoid}
       <div class="cell"><b>Fast and brittle</b>
         Predictable, so you can enumerate the failure modes — but they arrive at full speed.<br>
         <i>Invest in:</i> timeouts, fail fast, bounded queues. Cheap, and enough at this altitude.</div>
-      <div class="cell focus"><b>⭐ The technology frontier</b>
+      <div class="cell focus"><b>The technology frontier</b>
         “High interactive complexity and tight coupling conspire to turn rapidly moving cracks into full-blown failures.” Three Mile Island lives here. So does most of modern distributed computing.<br>
         <i>Nothing but structure will save you:</i> circuit breakers, bulkheads, governors, back pressure, and rehearsed recovery. Fixing individual bugs will not move you out of this box.</div>
     </div>
@@ -1332,24 +1323,24 @@ tr{break-inside:avoid}
   <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
   <h2>Answer key</h2>
 
-  <h4>Chunk 1 · Q1 — the fraud-scoring API</h4>
+  <h4>Part 1 · Q1 — the fraud-scoring API</h4>
   <p><b>(a)</b> A <b>slow failure at an integration point</b> producing <b>blocked threads</b>. The provider accepted the connection and never responded, or the connection was silently torn down by something in the middle; either way the calling threads are parked inside a socket read.</p>
   <p><b>(b)</b> The absences are the evidence. <b>No errors</b> means nothing has thrown yet, which rules out fast failure — a refused connection or a reset would have raised an exception immediately. <b>No CPU and no memory movement</b> rules out a leak, garbage-collection thrash, or an infinite loop; the threads aren't working, they're waiting. A process monitor will call this instance healthy, so you need thread dumps or an external synthetic transaction to see the truth. This is the “dog that didn't bark” pattern from the 5 a.m. story.</p>
   <p><b>(c)</b> The <b>socket read timeout</b> and the <b>connect timeout</b> on the HTTP client — and behind them, the <b>checkout timeout</b> on any connection pool. Bet on the read timeout being unset or infinite: that's the common default, and it's the one that produces exactly this symptom. Full marks also for noting that if the client library hides the socket you may not be able to set it, which is itself the finding.</p>
 
-  <h4>Chunk 1 · Q2 — the Monday-morning hang</h4>
+  <h4>Part 1 · Q2 — the Monday-morning hang</h4>
   <p><b>(a)</b> The connection sat idle over the weekend and a <b>firewall or NAT device reaped it from its state table</b>, while both endpoints still believe the connection is valid. This is the 5 a.m. problem with a weekly period instead of a daily one.</p>
   <p><b>(b)</b> Take a packet capture on both sides. The confirming observation is <b>your side retransmitting the same segment with no response and no ICMP unreachable</b>, and simultaneously <b>nothing at all arriving at the partner's interface</b>. The silence on the far side is the proof: the packets are being dropped in the middle, not rejected at the end. (This also explains why the partner's logs are honestly clean — their application never saw a thing.)</p>
   <p><b>(c)</b> Cheapest fix: a <b>keep-alive / periodic ping</b> on the idle connection, at an interval shorter than the middlebox's idle timeout — the mechanism Oracle's dead connection detection provided. Configuring a read timeout is a necessary companion, so the failure at least becomes fast.<br>
   Why the obvious fixes fail: a <b>validation query before checkout</b> travels over the same dead connection, so it hangs exactly as the real query would. <b>Closing connections older than an hour</b> requires sending a teardown packet over the same dead connection — which also hangs. Both “fixes” move the hang, they don't remove it.</p>
 
-  <h4>Chunk 2 · Q1 — twelve instances in seven minutes</h4>
+  <h4>Part 2 · Q1 — twelve instances in seven minutes</h4>
   <p><b>(a)</b> A <b>Chain Reaction</b> in the recommendations layer and a <b>Cascading Failure</b> into the product-page service.</p>
   <p><b>(b)</b> The chain reaction moved <b>sideways</b>, carried by <b>redistributed load</b>: each death handed its share to identical peers running the same defective code, so every survivor got closer to the same cliff. The shrinking gaps between failures are the signature — that acceleration is exactly what the search-farm story charted. The cascade moved <b>upward</b>, carried by <b>blocked threads</b>: the product-page service's threads were parked waiting on a service that had stopped answering, which is why its CPU and memory looked fine while its thread count pinned.</p>
   <p><b>(c)</b> Against the chain reaction: <b>fix the underlying load-related defect</b> — a leak or a race. Structurally, <b>Bulkheads</b> split the layer into pools so one chain reaction becomes two slower ones; health-checked <b>autoscaling</b> helps if the scaler reacts faster than the reaction propagates. Against the cascade: <b>Circuit Breaker plus Timeouts</b> on the calling side.<br>
-  Why swapping them fails: a circuit breaker in the recommendations layer wouldn't have saved <i>it</i> — the peers weren't calling each other, they were absorbing traffic. And bulkheads in the recommendations layer do nothing for its callers; the book is explicit that bulkheads “won't help the callers of whichever partition does go down. Use Circuit Breaker on the calling side for that.”</p>
+  Why swapping them fails: a circuit breaker in the recommendations layer wouldn't have saved <i>it</i> — the peers weren't calling each other, they were absorbing traffic. And bulkheads in the recommendations layer do nothing for its callers; bulkheads explicitly won't help the callers of whichever partition does go down — Circuit Breaker on the calling side is what covers them.</p>
 
-  <h4>Chunk 2 · Q2 — the synchronized cache</h4>
+  <h4>Part 2 · Q2 — the synchronized cache</h4>
   <p><b>(a)</b> One thread entered the inherited <code>synchronized get()</code>, called the dead partner API, and blocked there indefinitely while holding the monitor — so every other thread that touched the cache queued behind it, and eventually every request-handling thread on the box was blocked, regardless of which feature it was serving.</p>
   <p><b>(b)</b> The <b>Liskov substitution principle</b>. Any property true of a type should hold for its subtypes, but the subclass turned a fast in-memory lookup into a blocking remote call under the same lock. The compiler allows it because Java and C# don't treat synchronisation as part of a method's contract — you can't even declare an interface method <code>synchronized</code>. The underlying reason: <b>functional behaviour composes; concurrency does not.</b></p>
   <p><b>(c)</b> <b>Code-level, ship tonight:</b> put a timeout on the remote call and take the remote call out of the critical section — synchronise only the map read and the map write, never the fetch. (A dedicated bounded thread pool returning a future for the fetch is the fuller version.) <b>Architectural:</b> a bulkhead — give this feature its own bounded thread pool or its own instances — plus a circuit breaker around the partner API so you stop calling it at all when it's sick, with a fallback of “availability unknown”. Ship the timeout tonight; the architecture change wants a design conversation and a stakeholder decision about what the page shows when availability is unknown.</p>
@@ -1358,25 +1349,25 @@ tr{break-inside:avoid}
 <section class="page ans">
   <div class="kicker">Section 9 continued</div>
 
-  <h4>Chunk 3 · Q1 — search results in the session</h4>
+  <h4>Part 3 · Q1 — search results in the session</h4>
   <p><b>(a)</b> Three, in this order: <b>Users</b> (session memory — a large object held for the full session timeout, most of it never read again, and the “dead time” after the last request is pure waste); then a memory leak in effect, which surfaces as <b>Slow Responses</b> as the collector works harder and harder; then a <b>Chain Reaction</b>, because every instance runs the same code with the same defect, and each death pushes its traffic onto peers that then exhaust memory faster. The accelerating crash intervals are the tell. If the result sets grew because customer history grew, you can fairly add <b>Unbounded Result Sets</b> as the root cause — and note that two months of production data is exactly the timescale on which that appears.</p>
-  <p><b>(b)</b> Cheapest: <b>stop putting the result set in the session</b> — re-query the search engine for each page of results. The book names this exact case: “it's a bad idea to keep an entire set of search results in the session for pagination.” If you must keep something, wrap it in a weak/soft reference so the collector can reclaim it, and make every accessor handle <code>null</code>.</p>
+  <p><b>(b)</b> Cheapest: <b>stop putting the result set in the session</b> — re-query the search engine for each page of results. Keeping an entire set of search results in the session for pagination is the textbook version of this mistake. If you must keep something, wrap it in a weak/soft reference so the collector can reclaim it, and make every accessor handle <code>null</code>.</p>
   <p><b>(c)</b> Class-eliminating: <b>pagination in the service contract</b> — first-item and count parameters going in, an approximate total coming back — plus a hard <code>LIMIT</code> on the query, plus production-sized data in the performance environment. Cost: a contract change every caller must adopt, callers must now loop, and “approximately how many results” is a real product decision rather than a free number.</p>
 
-  <h4>Chunk 3 · Q2 — hourly pulls, midnight jobs, twitchy autoscaler</h4>
+  <h4>Part 3 · Q2 — hourly pulls, midnight jobs, twitchy autoscaler</h4>
   <p><b>(a)</b> A <b>Dogpile</b> (every agent pulling on the hour, every cache warming at midnight, and the fleet restarting with cold caches all at once), and a <b>Force Multiplier</b> (an autoscaler sampling on a one-second horizon while its actions take five minutes to land).</p>
   <p><b>(b)</b> The autoscaler is the <b>control-plane</b> problem, and it differs in kind: it isn't a bug and it isn't excess demand. The automation senses current state, compares it to a computed desired state, and acts — correctly, by its own logic — on a belief that is either stale or unmeasurable. That's what makes it dangerous: it will be working exactly as designed while it destroys you, and it'll finish before a human notices. The dogpile, by contrast, is ordinary demand arriving in the wrong <i>shape</i>.</p>
   <p><b>(c)</b> For the dogpile: <b>randomised clock slew</b> on the config agent and jitter on every scheduled job, so the pull spreads across the hour rather than landing on it; warm caches before an instance accepts traffic. That's the <b>Dogpile</b> counter, and jittered exponential backoff is its retry-side twin. For the autoscaler: a <b>Governor</b> — asymmetric (scale up readily, scale down slowly), stateful and time-aware, with a <b>deceleration zone</b> that accounts for the five-minute lag so it doesn't start three hundred instances because the load persisted for three hundred seconds, and an alert when it engages. Bonus marks for adding a financial ceiling and the &gt;80%-unavailable heuristic.</p>
 
-  <h4>Chunk 4 · Q1 — three dependencies and a marketing email</h4>
+  <h4>Part 4 · Q1 — three dependencies and a marketing email</h4>
   <p><b>(a)</b> <b>(i) Inventory service, which you own:</b> <b>Handshaking</b> — a health-check endpoint the caller respects, because you control both ends and cooperative throttling beats guessing. Back it with a timeout. <b>(ii) Third-party tax API, rate-limited, no health endpoint:</b> <b>Circuit Breaker</b>, explicitly because it <i>can't</i> handshake — you can't ask politely, so you make the call, track whether it works, and stop calling when it doesn't. Trip on fault density, and decide with the business what checkout does when it's open. <b>(iii) Slow internal fraud model:</b> <b>Timeouts</b> derived from your checkout SLA, plus a defined fallback (queue for asynchronous review, or accept-and-flag) — this is where <b>Decoupling Middleware</b> earns its keep if you can restructure.</p>
   <p><b>(b)</b> For your own inbound traffic: <b>Shed Load</b> (with <b>Fail Fast</b> as its per-request form). It's not the same pattern as (ii) because the two sit on opposite sides of the call. A circuit breaker is a <i>caller-side</i> decision to stop making outbound calls; shed load is a <i>provider-side</i> decision to refuse inbound work. Note also that shed load is right here specifically because the demand is uncontrolled and effectively infinite — inside your own boundary, with a finite set of known consumers, <b>Back Pressure</b> would be the more efficient choice.</p>
-  <p><b>(c)</b> The conversation with <b>marketing</b>, last week. Self-denial attacks are the most preventable class in the book precisely because somebody in your own building already knew. Ask for the send time and volume, get the deep link removed so the CDN isn't bypassed, get the mail sent in waves, put a static landing page behind the first click, and pre-scale before the send rather than trusting autoscaling to catch up.</p>
+  <p><b>(c)</b> The conversation with <b>marketing</b>, last week. Self-denial attacks are the most preventable class precisely because somebody in your own building already knew. Ask for the send time and volume, get the deep link removed so the CDN isn't bypassed, get the mail sent in waves, put a static landing page behind the first click, and pre-scale before the send rather than trusting autoscaling to catch up.</p>
 
-  <h4>Chunk 4 · Q2 — the shared-state circuit breaker</h4>
+  <h4>Part 4 · Q2 — the shared-state circuit breaker</h4>
   <p><b>(a)</b> <b>On where the state lives:</b> a circuit breaker should be built at the scope of a <b>single process</b>. Sharing state through Redis introduces another out-of-process call — “that means the safety mechanism would introduce a new failure mode.” Your protection now has a dependency that can itself be slow, full, or unreachable, and it fails at exactly the moment everything else is failing. The cost of not sharing is small and known: several instances each independently discover the provider is down. <b>On how you count:</b> a simple total is nearly meaningless. “There's a world of difference between observing five faults spread evenly over five hours versus five faults in the last thirty seconds.” You want fault <b>density</b>, not a running total, or the breaker will eventually trip on ancient history.</p>
   <p><b>(b)</b> A <b>Leaky Bucket</b>: a counter incremented on every observed fault, with a background thread or timer decrementing it periodically toward zero. If the count exceeds the threshold, faults are genuinely arriving quickly. Consider tracking fault <i>types</i> separately too — a lower threshold for “timeout calling remote system” than for “connection refused”.</p>
-  <p><b>(c)</b> Keep the state local and make the <b>observability</b> global. Log every state change, expose current state for querying, and ship those events to your monitoring system; then chart the aggregate. The book is explicit that state-change frequency is itself a valuable metric and “a leading indicator of problems elsewhere in the enterprise.” You get the global picture without putting a network call inside your safety mechanism. Add a manual trip/reset control for Operations while you're there.</p>
+  <p><b>(c)</b> Keep the state local and make the <b>observability</b> global. Log every state change, expose current state for querying, and ship those events to your monitoring system; then chart the aggregate. State-change frequency is itself a valuable metric — a leading indicator of problems elsewhere in the enterprise. You get the global picture without putting a network call inside your safety mechanism. Add a manual trip/reset control for Operations while you're there.</p>
 
   <div class="box tip nobreak" style="margin-top:14pt">
     <h4>How to score yourself</h4>
@@ -1429,10 +1420,6 @@ tr{break-inside:avoid}
     <li>Where would you rather be on the coupling × complexity matrix, which direction can you realistically move, and name three things that move you there.</li>
   </ol>
 
-  <div class="foot">
-    <b>Source.</b> All examples, figures, quotations and numbers are drawn from Michael T. Nygard, <i>Release It! Design and Deploy Production-Ready Software</i>, 2nd edition — Chapter 4 “Stability Antipatterns” (pp. 31–90) and Chapter 5 “Stability Patterns” (pp. 91–125), The Pragmatic Bookshelf. Works referenced within those chapters and named here: James R. Chiles, <i>Inviting Disaster</i>; Brian Goetz, <i>Java Concurrency in Practice</i>; Martin Fowler, <i>Patterns of Enterprise Application Architecture</i>; Vlissides, Coplien &amp; Kerth, <i>Pattern Languages of Program Design 2</i> (Leaky Bucket, caching proxy); Liskov &amp; Wing, <i>Family Values: A Behavioral Notion of Subtyping</i>.<br><br>
-    <b>Method.</b> The structure of this booklet — plain-language version first, example before definition, every term given a definition, an example and a boundary against its look-alike, two retrieval questions per section on cases that do not appear in the source, and a fixed expanding review schedule — follows the evidence that retrieval practice and distributed practice are the only two study techniques rated high-utility in Dunlosky et al., “Improving Students' Learning With Effective Learning Techniques” (2013), and that retrieval beats concept mapping even when the final test <i>is</i> a concept map (Karpicke &amp; Blunt, <i>Science</i>, 2011).
-  </div>
 </section>
 
 </body>
