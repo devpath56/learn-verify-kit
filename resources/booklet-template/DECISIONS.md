@@ -126,6 +126,7 @@ The reader should learn the rhythm by part two and be able to navigate blind. Fi
 | I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Structure the file as explicit `.page` sections so section starts are predictable. |
 | I4 | Verification | **Rasterise and look at the pages.** Never trust the HTML. Check at minimum: a part opener, a matrix page, a sketch page, the cover. |
 | I5 | Orphan check | Extract per-page text and flag any page under ~800 characters. Fix by tightening upstream copy, not by inserting filler. |
+| I6 | Register the question bank | Extract **every** question — part questions, quiz questions, concept-sketch node questions — into `resources/competency-progress.json` as a new competency entry, with the answer-key location recorded. A booklet whose bank is not registered cannot be quizzed, so the booklet is not finished until this is done. |
 
 ---
 

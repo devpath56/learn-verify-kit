@@ -12,9 +12,11 @@ Everything you need to evolve this kit lives in this repo. No external context r
   revise/         Recall Rubric + self-check   → references/certification-gate.md
   concept-sketch/ dual-coded sketch + decision card  → references/recall-rubric.md
   track/          session log + spaced review
-tests/regression-cases.md   29 guardrail tests, one per real error
+tests/regression-cases.md   30 guardrail tests, one per real error
 attempts/         graded attempt records — evidence behind progress.json
-progress.json     the revise-DB: schedule + miss-code gap counts
+progress.json     the revise-DB for chat-taught concepts: schedule + miss-code gap counts
+resources/competency-progress.json
+                  the booklet log: one entry per competency, the question bank, per-answer status
 CLAUDE.md         how Claude should maintain this repo
 README.md / INSTALL.md      user-facing
 ```
@@ -56,6 +58,7 @@ Every rule traces to a real failure caught during the kit's hardening. Don't und
 | Sketch renders as an inline visual (no text-tree fallback) | Emitted an ASCII text-tree diagram or a download-only file instead of an inline Artifact/SVG | R-27 |
 | Record the gap, not just the verdict | A log of scores with no miss type — shows a trend, never a growth area | R-28 |
 | Graded attempts filed verbatim to `attempts/` | Feedback that lives only in the conversation and dies with it | R-29 |
+| Booklet questions drawn only from the registered bank | Inventing a question with no frozen ideal, so the verdict is an impression | R-30 |
 
 ## Releasing
 1. Run the behavioral suite; fix any regression.

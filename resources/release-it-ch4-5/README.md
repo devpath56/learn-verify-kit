@@ -37,3 +37,10 @@ chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
 Any Chromium build works. Page size and margins come from the `@page` rule in the HTML.
 
 Built from the scaffold in `../booklet-template/`.
+
+## Being questioned on this
+
+All 32 questions — 8 applied cases, 10 quiz questions, 14 concept-sketch node questions — are
+registered in `../competency-progress.json`. Ask for questions whenever you want them; there is no
+schedule. Questions are drawn only from that bank, graded against the frozen answer key in
+section 9 of the booklet, and each attempt is filed verbatim to `../../attempts/`.

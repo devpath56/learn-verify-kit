@@ -21,7 +21,9 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
      file://$PWD/booklet.html
    ```
 
-4. Verify per decision I4/I5: rasterise a part opener, a matrix page, a sketch page and the cover
+4. Register the question bank into `../competency-progress.json` (decision I6) — the booklet is not
+   finished until its questions can be asked without opening the PDF.
+5. Verify per decision I4/I5: rasterise a part opener, a matrix page, a sketch page and the cover
    and look at them; then flag any page under ~800 characters and fix the orphan upstream.
 
 ## Non-negotiables
@@ -32,6 +34,8 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 - **Every part carries** a tenth-grader box, a term table with a boundary column, an anchor sketch,
   two retrieval questions on unseen cases, and one 2×2.
 - **Answers live at the back**, never on the question page.
+- **The question bank is registered** in `../competency-progress.json`, with the answer key frozen
+  before anyone attempts it.
 
 ## Reference build
 

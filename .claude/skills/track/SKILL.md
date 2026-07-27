@@ -66,19 +66,28 @@ When the learner submits an attempt — pasted text, a photo of a handwritten pa
 
 Guard against drift: if scores rise across attempts on a topic while its miss counts don't fall, say so plainly. Comfort is the failure mode of a checker who also built the test.
 
-### The weekly checkpoint — Monday
+## Booklet competency log — `resources/competency-progress.json`
 
-Cadence: **Monday mornings, one checkpoint.** This is the agreed rhythm; hold to it whether the session was woken by a scheduled Routine or the learner simply showed up.
+A **second, separate** log, for the printed competency booklets. Keep it distinct from the repo-root `progress.json`:
 
-Any session that opens on a Monday, or any Routine firing into a fresh session, runs this:
+| File | Scope | Questions come from |
+|---|---|---|
+| `progress.json` (root) | concepts taught in conversation | invented fresh each time, on a new case |
+| `resources/competency-progress.json` | the printed booklets, one competency per entry | **only** the question bank stored in the file |
 
-1. Read `progress.json` and the most recent files in `attempts/`. Report two things and nothing else: **what is due** (`next_review` today or earlier) and **which miss code is currently heaviest**.
-2. Pick the weakest or oldest-untested topic. Ask **exactly one** retrieval question, on a case that appears neither in the booklet nor in any prior attempt. Write the ideal answer down for yourself *first*, then withhold it.
-3. Wait. Accept the answer in any form — typed, pasted, dictated, or a photo of a handwritten booklet page.
-4. Grade and file per the section above: hit/miss checklist → verdict → miss codes → `attempts/<date>-<slug>.md` with the attempt verbatim → roll `gaps` and `weakest` into `progress.json` → commit and merge, log-only.
-5. Do not teach unless asked. One question, not a set. End there.
+**No schedule. On demand only.** There is no timer and no Routine. The learner says they want questions; you read the file and pick. Never nag, never open a session by launching into a quiz uninvited — report the standing if it's useful, then wait to be asked.
 
-If a durable Routine is driving this, its prompt is exactly the five steps above, written standalone — a fresh session starts from nothing and must be told to read `progress.json` first.
+When asked for questions:
+
+1. **Read the file.** Report the standing in two lines: how many are untested / shaky / comfortable, and which miss code is heaviest.
+2. **Pick, don't invent.** Order: `untested` → `shaky` → `comfortable` items whose `last_attempted` is over 35 days old. Never two in a row from the same part. **Ask only what is in the bank** — a question invented on the spot has no frozen ideal behind it, so it cannot be graded honestly. If they want a genuinely new case, say plainly that you are stepping outside the bank and that the grading is weaker for it.
+3. **Ask one, verbatim** from the question's `prompt`. Withhold the answer.
+4. **Grade and file** per "Graded attempts" above, against the answer key named in the competency's `answer_key` field — frozen before any attempt existed.
+5. **Update** the question row (`status`, `streak`, `last_verdict`, `last_attempted`, `miss_codes`, `attempts`) and the competency `rollup`, then commit. Status is derived mechanically from `status_rules` in the file — never assigned by feel.
+
+**Say "stale", not "shaky".** A comfortable item that has aged past its window is *unverified*, not failed. Conflating the two inflates the lacking list and makes the log less trustworthy, not more.
+
+**Registering a new booklet:** when a booklet is built, add its competency entry and extract its full question bank into the file — every part question, quiz question and concept-sketch node question. A booklet with no bank registered cannot be quizzed, and the set tracker (`registered_count` / `slots_remaining`) will show the gap.
 
 ## Revision deck (transferable cards)
 
