@@ -5,9 +5,25 @@
     "depth_reached": "string — best level so far (e.g. 'recall ✓', 'grill L3', 'insight L4', 'cert 4.3/5')",
     "last_score": "string|number — most recent result (e.g. 4.3, 'pass', 'fail')",
     "last_reviewed": "string|null — ISO date YYYY-MM-DD of the last recall, or null if never reviewed",
-    "next_review": "string — ISO date YYYY-MM-DD when this topic is due again"
+    "next_review": "string — ISO date YYYY-MM-DD when this topic is due again",
+    "gaps": "object — running count per miss code {name, mechanism, boundary, price, phrasing}; see house-style.md 'Record the gap'",
+    "weakest": "string|null — the miss code with the highest count, or null if never attempted",
+    "attempts": "array — relative paths to graded attempt files under attempts/, newest last"
   },
-  "intervals": ["1 day", "3 days", "1 week", "2 weeks", "5 weeks"],
+  "intervals": [
+    "1 day",
+    "3 days",
+    "1 week",
+    "2 weeks",
+    "5 weeks"
+  ],
+  "miss_codes": {
+    "name": "didn't produce the term — go back to the term table",
+    "mechanism": "named it, got the causality or direction wrong — go back to the anchor sketch",
+    "boundary": "confused it with its look-alike — go back to the boundary column",
+    "price": "prescribed without naming the cost — go back to the trade-offs table",
+    "phrasing": "had it, couldn't say it in expert terms — go back to the plain/expert table"
+  },
   "topics": [
     {
       "topic": "otel-gui",

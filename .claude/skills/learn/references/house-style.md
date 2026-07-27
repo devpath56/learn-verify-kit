@@ -33,6 +33,23 @@ Two parts, both brief:
 
    Define any jargon inline, with its boundary. No over-confirming, no re-teaching, no bare bullet "lingo check."
 
+### Record the gap, never just the verdict
+A score says *that* the learner missed. It does not say *what* they missed, so a log of scores is not a growth signal. Every score therefore also names the **miss type**, from this fixed list — and the miss type points at the exact thing to go back to:
+
+| Code | The miss | What it actually means | Go back to |
+|---|---|---|---|
+| `name` | Didn't produce the term | Has the idea, not the label | the term table |
+| `mechanism` | Named it, got the causality or direction wrong | Knows *what*, not *how* | the anchor sketch |
+| `boundary` | Confused it with its look-alike | Discrimination failure — the most predictive of the five | the boundary column |
+| `price` | Prescribed without naming the cost | Can recommend, cannot decide | the trade-offs table |
+| `phrasing` | Had it, couldn't say it in expert terms | Can use it, cannot defend it in a room | the plain/expert table |
+
+Rules that make this honest:
+- **The checker names the miss, never the learner.** Asking the learner to self-classify reintroduces the thing the log exists to remove.
+- **Derive the verdict, don't feel it.** Mark each element of the ideal answer hit/miss *first*; the verdict falls out of the checklist. Never a holistic impression.
+- **Partial is partial.** If any element of the ideal is missing, it is not a pass, however well the rest reads.
+- Codes are additive — one answer can carry `boundary` + `price`.
+
 **Two questions per chunk, sequential.** Ask Q1 on a new case, withhold the answer, and wait. Score it (completeness line + plain/expert table above), THEN ask Q2 — same concept, a different new case. Score Q2 and add a one-line improvement note (did Q2 beat Q1?). Never stack Q1 and Q2 in one message; never advance a chunk before both are answered and scored.
 
 ## Endings

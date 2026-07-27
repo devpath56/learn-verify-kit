@@ -44,6 +44,28 @@ When file tools and a repo are available, run this **automatically at the consol
 
 Keep the file the *mirror*, not a second brain: the live table and `progress.json` must always agree after a write. Never invent rows for topics not actually taught or reviewed this session.
 
+## Graded attempts — the maker–checker loop (Claude Code surface only)
+
+The learner is the **maker**. Claude is the **checker**. The learner never grades their own answer and never classifies their own miss — that is the whole point of the split, and handing either job back to them collapses it.
+
+What makes the check real is **pre-registration**: the ideal answer was written and frozen *before* the attempt existed (in the booklet's answer key, or in the question you asked and withheld). Grading against a key written after seeing the answer is not a check. If no frozen ideal exists for a question, write one *before* reading their attempt.
+
+When the learner submits an attempt — pasted text, a photo of a handwritten page, a dictated paragraph, anything:
+
+1. **Take it in any form.** They format nothing and file nothing. Friction at capture is what kills this loop; absorb it here.
+2. **Grade mechanically**, per `../learn/references/house-style.md` → "Record the gap": checklist each element of the ideal hit/miss, *then* derive the verdict and the miss codes.
+3. **Write the evidence** to `attempts/<YYYY-MM-DD>-<topic-slug>.md`:
+   - the question, verbatim
+   - **their attempt, verbatim and uncorrected** — never tidied, never paraphrased
+   - the frozen ideal
+   - the hit/miss checklist, the miss codes, and one line on what to reread
+   The verbatim attempt is what lets a third party — or a future, more sceptical version of them — audit the grading. A log of only my verdicts would be me marking my own marking.
+4. **Roll it up** into `progress.json`: `last_score`, plus `gaps` (running count per miss code) and `weakest` (the highest-count code). The counts are the growth signal; the files are the evidence behind them.
+5. **Commit and merge**, scoped to `progress.json` **and `attempts/`** — nothing else. Code and skill edits stay on their own branch and follow normal review.
+6. **Open every session with the standing** — before teaching or quizzing anything: what is due, and which miss code is currently heaviest. The learner should never have to ask how they're doing.
+
+Guard against drift: if scores rise across attempts on a topic while its miss counts don't fall, say so plainly. Comfort is the failure mode of a checker who also built the test.
+
 ## Revision deck (transferable cards)
 
 When a concept finishes, its `concept-sketch` **decision card** (thumb rule / 2×2) joins a revision deck alongside the learning table. Resurface these the same way — as a quiz ("apply this rule to a new case"), not a re-read. In chat the deck lives in the conversation; print a copy-out block on request.
