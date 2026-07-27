@@ -66,6 +66,20 @@ When the learner submits an attempt — pasted text, a photo of a handwritten pa
 
 Guard against drift: if scores rise across attempts on a topic while its miss counts don't fall, say so plainly. Comfort is the failure mode of a checker who also built the test.
 
+### The weekly checkpoint — Monday
+
+Cadence: **Monday mornings, one checkpoint.** This is the agreed rhythm; hold to it whether the session was woken by a scheduled Routine or the learner simply showed up.
+
+Any session that opens on a Monday, or any Routine firing into a fresh session, runs this:
+
+1. Read `progress.json` and the most recent files in `attempts/`. Report two things and nothing else: **what is due** (`next_review` today or earlier) and **which miss code is currently heaviest**.
+2. Pick the weakest or oldest-untested topic. Ask **exactly one** retrieval question, on a case that appears neither in the booklet nor in any prior attempt. Write the ideal answer down for yourself *first*, then withhold it.
+3. Wait. Accept the answer in any form — typed, pasted, dictated, or a photo of a handwritten booklet page.
+4. Grade and file per the section above: hit/miss checklist → verdict → miss codes → `attempts/<date>-<slug>.md` with the attempt verbatim → roll `gaps` and `weakest` into `progress.json` → commit and merge, log-only.
+5. Do not teach unless asked. One question, not a set. End there.
+
+If a durable Routine is driving this, its prompt is exactly the five steps above, written standalone — a fresh session starts from nothing and must be told to read `progress.json` first.
+
 ## Revision deck (transferable cards)
 
 When a concept finishes, its `concept-sketch` **decision card** (thumb rule / 2×2) joins a revision deck alongside the learning table. Resurface these the same way — as a quiz ("apply this rule to a new case"), not a re-read. In chat the deck lives in the conversation; print a copy-out block on request.
