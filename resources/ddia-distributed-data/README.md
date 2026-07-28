@@ -1,6 +1,6 @@
 # Distributed Data — printable study booklet
 
-- `DDIA-Distributed-Data-Study-Booklet.pdf` — 44 pages, A4, grayscale, print-ready.
+- `DDIA-Distributed-Data-Study-Booklet.pdf` — 41 pages, A4, grayscale, print-ready.
 - `booklet.html` — the rendered source. Self-contained: no images, no external CSS, no fonts to fetch.
 - `body.html` — the content alone; `booklet.html` is this plus the shared style block.
 

@@ -153,8 +153,12 @@ least one code, and each code points at the exact artefact to reread.
   choice as competencies 1–3: the ten ideals are frozen in `competency-progress.json` so the questions
   are gradeable, but they are not printed, which keeps the offline quiz honest.
 - **Competency 4's source is four chapters, not two.** The booklet teaches the load-bearing spine of
-  each chapter rather than its full contents; the booklet says so in its own "One warning before you
-  start" without naming the source. Material deliberately left out includes the detailed byte-level
-  encodings, dataflow through message brokers and services beyond the RPC boundary, request routing
-  implementations, and the formal system-model proofs.
+  each chapter rather than its full contents, and says nothing about that inside the booklet — a scope
+  note is construction commentary, which belongs here. Material deliberately left out includes the
+  detailed byte-level encodings, dataflow through message brokers and services beyond the RPC
+  boundary, request-routing implementations, and the formal system-model proofs.
+- **Competencies 1–3 have no write-lines under their printed final quizzes.** Decision E4 requires
+  ruled lines under every question; competency 4 is the first booklet to apply it to the final quiz,
+  and the template now carries it. The three earlier booklets predate the change and have not been
+  re-rendered.
 - Competencies 5–13 are unassigned pending sources.

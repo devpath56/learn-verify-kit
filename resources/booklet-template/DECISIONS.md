@@ -73,7 +73,7 @@ The reader should learn the rhythm by part two and be able to navigate blind. Fi
 | E1 | How many, and about what? | **Two per part**, on cases that do not appear in the source. Recognition of source examples is not retrieval. | Testing whether they read, not whether they know |
 | E2 | Question shape | Three parts every time: **(a) name it · (b) explain the mechanism or direction · (c) prescribe, and say why you rejected the near-miss alternative.** Part (c) is what separates knowing from listing. | Questions answerable by keyword match |
 | E3 | Where do answers live? | A **separate section at the back**, never on the same page or spread. Say on the cover which section it starts at, so the reader can cover it. | Eyes slide to the answer; no retrieval happens |
-| E4 | Write-lines | Ruled blank lines under every question. On paper, if there is nowhere to write, nobody writes. | A booklet that gets read, not worked |
+| E4 | Write-lines | Ruled blank lines under every question — **the applied cases and the final quiz alike**. On paper, if there is nowhere to write, nobody writes. | A booklet that gets read, not worked |
 | E5 | Answer length and content | Written at the length of a good design-review answer. Each answer must **also name the rejected alternative** and why it fails. | Answers that confirm rather than teach |
 
 ---
@@ -123,11 +123,14 @@ The reader should learn the rhythm by part two and be able to navigate blind. Fi
 |---|---|---|
 | I1 | Format | **One self-contained HTML file** — no external CSS, fonts, images or scripts. Render with `chrome --headless --no-pdf-header-footer --print-to-pdf`. |
 | I2 | Page setup | A4 portrait, 16mm/15mm margins, ~10.4pt serif body with sans headings. Print instruction on the cover: **100% scale, no "fit to page"**, duplex short-edge. |
-| I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Structure the file as explicit `.page` sections so section starts are predictable. |
+| I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Use **one `.page` section per part**, not one per sub-topic: every forced break is a chance for the preceding page to end early, and a long table that spills one row into a section of its own is the usual cause of an orphan. Break at part boundaries and let the rest flow. |
 | I4 | Verification | **Rasterise and look at the pages.** Never trust the HTML. Check at minimum: a part opener, a matrix page, a sketch page, the cover. |
 | I5 | Orphan check | Extract per-page text and flag any page under ~800 characters. Fix by tightening upstream copy, not by inserting filler. |
 | I6 | Register the question bank | Extract the **8 applied cases + 10 quiz questions** into `resources/competency-progress.json` as a new competency entry, with stable ids (`<competency-id>.<local-id>`) and a **frozen ideal answer stored inline for every one**. Concept-sketch node questions stay in the booklet as cues and are not tracked. If the printed answer key doesn't cover the final quiz, write those ideals here, before any attempt exists. A booklet whose bank isn't registered cannot be quizzed, so it isn't finished. |
 | I7 | Record provenance in the set spine | Add the competency's row to `resources/META.md` — source, edition, chapter and page range, plus any works it cites. This is the only place provenance is allowed to exist (G1), so skipping it loses the information rather than tidying it. |
+| I8 | Answer-key ⇄ bank sync check | Re-extract the printed answers and question text from the HTML and assert they are **byte-identical** to the `prompt` and `ideal` stored in `competency-progress.json`, and that no quiz ideal appears anywhere in the booklet. The learner is graded against the JSON copy, so a booklet edit that doesn't reach the bank silently moves the goalposts. Run it after every re-render, not once at registration. |
+| I9 | Hedge diff against the source | For every prescriptive or quantitative claim, compare the booklet's certainty with the source's. Anything the source qualifies ("say, 30 seconds", "widely used, especially if…") must stay qualified. Dropping a hedge is the easiest defect to introduce and the hardest to notice, because the sentence still reads well. |
+| I10 | Legend ⇄ artwork check | A sketch legend describes the styles actually rendered. If the trees use bold for named nodes, the legend may not say "boxed"; if it says one node is reversed, exactly one must be. Check on the rasterised page. |
 
 ---
 
