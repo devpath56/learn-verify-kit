@@ -17,7 +17,7 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 |---|---|---|---|---|
 | 1 | Stability Antipatterns & Stability Patterns | `release-it-ch4-5/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 4 "Stability Antipatterns" (pp. 31–90), Ch. 5 "Stability Patterns" (pp. 91–125). The Pragmatic Bookshelf. | Built · 18 questions registered |
 | 2 | Design for Deployment & Chaos Engineering | `release-it-ch13-17/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 13 "Design for Deployment" (pp. 241–262), Ch. 17 "Chaos Engineering" (pp. 325–336). The Pragmatic Bookshelf. | Built · 18 questions registered |
-| 3 | *unassigned* | — | — | Awaiting source |
+| 3 | Service Level Objectives & Canarying Releases | `sre-slo-canary/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 2 "Implementing SLOs" by Steven Thurgood and David Ferguson with Alex Hidalgo and Betsy Beyer (pp. 17–42), Ch. 16 "Canarying Releases" by Alec Warner and Štěpán Davidovič with Alex Hidalgo, Betsy Beyer, Kyle Smith and Matt Duftler (pp. 335–351). | Built · 18 questions registered |
 | 4 | *unassigned* | — | — | Awaiting source |
 | 5 | *unassigned* | — | — | Awaiting source |
 | 6 | *unassigned* | — | — | Awaiting source |
@@ -28,6 +28,16 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 3
+
+Cited within the source chapters and named in the booklet's teaching: the principles of chaos
+engineering are not involved here, but the chapters reference Ben Treynor, Mike Dahlin, Vivek Rau
+and Betsy Beyer, "The Calculus of Service Availability" (*ACM Queue*, 2017); Jez Humble and David
+Farley, *Continuous Delivery*; George E. P. Box and Norman R. Draper, *Empirical Model-Building and
+Response Surfaces* (the "all models are wrong" remark); ITIL's continuous-improvement service goal;
+Spearman's rank correlation coefficient; the feature-flag frameworks Gertrude, Feature and PlanOut;
+and Google's App Engine as the worked example platform.
 
 ### Works referenced inside competency 2
 
@@ -123,4 +133,7 @@ least one code, and each code points at the exact artefact to reread.
 - **Competency 2's printed final quiz also has no answers in the booklet**, by the same deliberate
   choice as competency 1: the ten ideals are frozen in `competency-progress.json` so the questions
   are gradeable, but they are not printed, which keeps the offline quiz honest.
-- Competencies 3–13 are unassigned pending sources.
+- **Competency 3's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1 and 2: the ten ideals are frozen in `competency-progress.json` so the
+  questions are gradeable, but they are not printed, which keeps the offline quiz honest.
+- Competencies 4–13 are unassigned pending sources.

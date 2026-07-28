@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Service Level Objectives &amp; Canarying Releases — Study Booklet</title>
+<style>
+:root{
+  --ink:#111111; --soft:#555555; --rule:#b4b4b4; --hair:#d9d9d9;
+  --fill:#f2f2f2; --fill2:#e6e6e6; --fill3:#dadada; --mid:#8c8c8c;
+}
+@page{ size:A4; margin:16mm 15mm 16mm 15mm; }
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+body{
+  font-family:"Charter","Georgia","Times New Roman",serif;
+  color:var(--ink); font-size:10.4pt; line-height:1.44; margin:0;
+}
+h1,h2,h3,h4,.ui{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+h1{font-size:23pt; line-height:1.12; margin:0 0 6pt; letter-spacing:-.4pt}
+h2{font-size:15pt; margin:0 0 4pt; letter-spacing:-.2pt}
+h3{font-size:11.6pt; margin:14pt 0 5pt; letter-spacing:-.1pt}
+h4{font-size:9.6pt; margin:10pt 0 4pt; text-transform:uppercase; letter-spacing:.9pt; color:var(--soft)}
+p{margin:0 0 6pt}
+ul,ol{margin:0 0 7pt; padding-left:17px}
+li{margin:0 0 3pt}
+li > ul{margin-top:3pt}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:var(--fill); padding:.5pt 3pt}
+small{font-size:8.6pt; color:var(--soft)}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.nobreak,.box,.qbox,.sketch,.matrix{break-inside:avoid; page-break-inside:avoid}
+
+/* ---------- cover ---------- */
+.cover{padding-top:24mm}
+.kicker{font-size:9pt; letter-spacing:2.4pt; text-transform:uppercase; color:var(--soft); margin-bottom:10pt}
+.cover .sub{font-size:13pt; color:var(--soft); margin:8pt 0 20pt; line-height:1.35}
+.cover .rule{height:3px; background:var(--ink); width:64px; margin:16pt 0}
+.meta{font-size:9.4pt; color:var(--soft); line-height:1.7}
+.chunkstrip{display:flex; gap:6px; margin:22pt 0 0}
+.chunkstrip div{flex:1; padding:8pt 9pt; background:var(--fill); border-left:3px solid var(--ink);
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
+.chunkstrip b{display:block; font-size:9.6pt; margin-bottom:2pt}
+.chunkstrip .num{display:block; font-size:15pt; font-weight:700; line-height:1; margin-bottom:4pt}
+
+/* ---------- part headers ---------- */
+.chunkhead{padding:11pt 13pt; margin:0 0 12pt; color:#fff; background:var(--ink);
+  display:flex; align-items:flex-start; gap:12pt}
+.chunkhead .big{font-family:Helvetica,Arial,sans-serif; font-size:30pt; font-weight:700; line-height:.92;
+  border:2px solid #fff; padding:2pt 8pt; flex:0 0 auto}
+.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase}
+.chunkhead h2{color:#fff; margin:3pt 0 0}
+.chunkhead p{margin:5pt 0 0; font-size:9.4pt}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--rule); padding:9pt 11pt; margin:0 0 9pt}
+.tenth{background:var(--fill); border:1px solid var(--rule); border-left:5px solid var(--ink)}
+.tenth h4{color:var(--ink)}
+.bound{background:#fafafa; border:1px solid var(--hair); border-left:5px solid var(--mid)}
+.quote{background:var(--fill); border:none; border-left:6px double var(--ink); font-style:italic; padding:8pt 11pt}
+.tip{background:#fff; border:1.5px solid var(--ink)}
+.qbox{border:1.5px solid var(--ink); padding:10pt 12pt; margin:0 0 8pt; background:#fff}
+.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--ink); font-weight:700}
+.qbox p{margin:4pt 0 0}
+.writeline{border-bottom:1px dotted var(--mid); height:15pt}
+.writelines{margin-top:8pt}
+
+/* ---------- tables ---------- */
+table{width:100%; border-collapse:collapse; margin:0 0 9pt; font-size:9.1pt}
+th,td{border:1px solid var(--hair); padding:4.5pt 6pt; text-align:left; vertical-align:top}
+th{background:var(--fill2); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--ink); font-weight:700}
+td b{font-weight:700}
+tr{break-inside:avoid}
+.tight td,.tight th{padding:3.5pt 5pt; font-size:8.8pt}
+
+/* ---------- 2x2 ---------- */
+.matrix{margin:6pt 0 10pt}
+.matrix .ylab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.2pt; text-transform:uppercase; color:var(--soft); margin-bottom:3pt}
+.grid2{display:grid; grid-template-columns:26mm 1fr 1fr; grid-template-rows:auto auto auto; gap:4px}
+.grid2 .corner{}
+.grid2 .colh,.grid2 .rowh{
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; font-weight:700; line-height:1.35;
+  background:var(--fill2); padding:6pt 7pt;
+}
+.grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
+.grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
+.grid2 .cell b{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
+.cell.focus b{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8}
+.legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
+
+/* ---------- sketch ---------- */
+.sketch{border:1px solid var(--rule); padding:11pt 12pt; background:#fcfcfc; margin:0 0 9pt}
+.node{display:inline-block; padding:3pt 6pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt;
+  line-height:1.3; margin:2pt 0; border:1px solid var(--ink); background:var(--fill)}
+.n1,.n2,.n3,.n4{background:var(--fill)}
+.nstar{background:var(--ink); color:#fff; border:1px solid var(--ink); font-weight:700}
+.tree{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:8.6pt; line-height:1.7; white-space:pre}
+/* tokens used INSIDE .tree — weight and inversion only, so monospace alignment survives */
+.tree .tk1,.tree .tk2,.tree .tk3,.tree .tk4{font-weight:700}
+.tree .tks{font-weight:700; background:var(--ink); color:#fff}
+.q{color:var(--ink); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; font-weight:700}
+
+/* ---------- misc ---------- */
+.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt;
+  text-transform:uppercase; padding:2pt 6pt; background:var(--ink); color:#fff; margin-right:4pt; font-weight:700}
+.p1,.p2,.p3,.p4{background:var(--ink); color:#fff}
+.toc td{border:none; border-bottom:1px dotted var(--hair); padding:5pt 4pt}
+.toc td:last-child{text-align:right; color:var(--soft); font-family:Helvetica,Arial,sans-serif; font-size:8.6pt}
+.ans{font-size:9.2pt}
+.ans h4{margin-top:11pt}
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Service Level Objectives<br>&amp; Canarying Releases</h1>
+  <div class="rule"></div>
+  <div class="sub">Reliability you can spend. How to put a number on "good enough", turn the remainder into a budget, and buy information with it instead of losing it to accidents.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>Why 100% is wrong</b>The target below perfection, and the budget that falls out of it.</div>
+    <div><span class="num">2</span><b>What to measure</b>Good events over total events; specification versus implementation; starter numbers.</div>
+    <div><span class="num">3</span><b>Making it bite</b>Agreement, policy, and deciding with the budget instead of arguing.</div>
+    <div><span class="num">4</span><b>Spending it to learn</b>Canarying: population, duration, metrics, and what isn't a canary.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — Why 100% is the wrong target</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — What to measure, and how to get a first number</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — Making it bite: agreement, policy, decisions</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — Spending the budget to buy information</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+  <div class="box bound">
+    <h4>One warning before you start</h4>
+    <p>Almost every number in this competency is a negotiation, not a calculation. An availability target, a canary population, a metric threshold — each is a claim about what users will tolerate, agreed by people who can be wrong. If you finish able to compute an error budget but unable to say <i>who has to agree to it and what they give up</i>, the booklet has failed.</p>
+  </div>
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Given a real reliability decision (&ldquo;what should our target be?&rdquo;, &ldquo;we blew the budget, now what?&rdquo;, &ldquo;is this release safe to push?&rdquo;, &ldquo;users are unhappy but we're inside SLO&rdquo;), you can:</p>
+    <ol>
+      <li><b>Name the instrument</b> — indicator, objective, budget, policy — and say which one the argument is actually about.</li>
+      <li><b>Locate the disagreement</b> between what you measure and what users feel, and say which of the two is wrong.</li>
+      <li><b>Prescribe the move</b> — tighten, loosen, change the implementation, make it aspirational, canary it — and name the near-miss you rejected.</li>
+      <li><b>State the price.</b> Every one of these costs engineering time, feature velocity, customer experience, or credibility.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>Perfect reliability is unbuyable and, past a point, unwanted: each extra nine costs more while its value to the customer approaches zero, and a system that can never change is a system that dies slowly. So you pick a target below 100%, and the gap between that target and perfection becomes a <b>budget</b> — a quantity of unreliability you are permitted to spend. That single move converts an argument about opinions into an argument about arithmetic: how much did this outage cost, is this project worth more than that one, may we ship today. And once unreliability is a currency, the interesting question stops being how to avoid spending it and becomes <b>how to spend it well</b> — which is what canarying is. A canary buys information about a release at a deliberately small, bounded price.</p>
+
+  <div class="box tenth nobreak">
+    <h4>The whole thing for a smart 15-year-old</h4>
+    <ul>
+      <li>Nothing is perfect, and chasing perfect costs more and more for less and less.</li>
+      <li>So decide how much failure is acceptable, and treat the rest as an allowance you're allowed to spend.</li>
+      <li>Now arguments about "is it reliable enough?" become arithmetic, and everybody has to agree the number in advance.</li>
+      <li>Then spend a little of that allowance on purpose — show a new version to a few users first — so you find out it's broken cheaply instead of expensively.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:52mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>Why 100% is wrong</b></td><td>The four reasons perfection is the wrong target; the error budget that falls out of a sub-100% objective; who has to own it; the preconditions without which none of this works.</td><td>Every other move depends on accepting a number below perfection. Until that is settled, there is no budget and nothing to spend.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>What to measure</b></td><td>Indicators as good-over-total ratios; specification versus implementation; the three component types and their indicators; the worked example; rounding real measurements into a first objective; time windows.</td><td>A budget is only as honest as the measurement behind it. Get the indicator wrong and every later decision is confidently wrong.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Making it bite</b></td><td>Stakeholder agreement, the error budget policy, documentation, improving coverage, recall and precision, aspirational objectives, and the decision matrix.</td><td>An objective nobody acts on is a reporting metric. This part is what turns a number into a decision-making tool.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>Spending it to learn</b></td><td>Release engineering principles, canary and control, population and duration, metric selection, isolation, monitoring requirements, and the three things that resemble canarying but aren't.</td><td>With a budget that bites, the last question is how to spend it deliberately rather than lose it accidentally. A canary is the cheapest information you can buy.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;One could even claim that without SLOs, there is no need for SREs.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>Why 100% is the wrong target</h2>
+    <p>The objective below perfection, the budget that falls out of it, and who has to own the trade.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Aiming for "never broken" sounds responsible. It's actually the most expensive possible goal, and you still won't hit it.</li>
+      <li>Your users don't experience your system directly — there's a long chain of other things between you and them, any of which can break.</li>
+      <li>If you promise perfection you can never change anything, and the biggest cause of outages <i>is</i> change.</li>
+      <li>So pick a number below perfect. The gap between that number and perfect is an allowance you're allowed to spend.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the delivery promise</h3>
+  <ul>
+    <li>A courier can promise &ldquo;next day, every time, no exceptions.&rdquo; To keep it, they need spare vans, spare drivers, spare depots — and even then a bridge closure defeats them.</li>
+    <li>Going from 99% to 99.9% on-time means buying a second depot. From 99.9% to 99.99% means a third. <b>Each nine costs more than the last</b>, while the customer's happiness barely moves — nobody notices the difference between one late parcel a year and one every ten years.</li>
+    <li>And a courier who promises perfection can never reroute, never try a faster van, never change anything — because every change risks the promise.</li>
+    <li>So they promise something achievable and keep the difference as room to manoeuvre. That room is the whole idea.</li>
+  </ul>
+
+  <h3>The four reasons perfection is wrong</h3>
+  <table class="tight">
+    <tr><th style="width:38mm">Reason</th><th>What it actually says</th></tr>
+    <tr><td><b>You can't reach it</b></td><td>Even with redundant components, automated health checking and fast failover, there is a <b>nonzero probability</b> that one or more components fail simultaneously — which puts availability under 100%.</td></tr>
+    <tr><td><b>Users wouldn't see it anyway</b></td><td>Even if your system were perfect, the chain of systems between you and your customers is <b>long and complex</b>, and any of it can fail. So as you go 99% → 99.9% → 99.99%, each extra nine costs more while the <b>marginal utility to your customers steadily approaches zero</b>.</td></tr>
+    <tr><td><b>You could never change</b></td><td>To hold perfection you can never update or improve. And <b>the number one source of outages is change</b> — new features, security patches, new hardware, scaling to meet demand. Sooner or later the service stagnates and customers leave, which is not great for anyone's bottom line.</td></tr>
+    <tr><td><b>It makes you purely reactive</b></td><td>At 100% you can do nothing but react to the sub-100% availability that is guaranteed to happen. Stated sharply: <b>reliability of 100% is not an engineering culture objective — it's an operations team objective.</b></td></tr>
+  </table>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Service level objective</b><br><small>SLO</small></td>
+      <td>A target level of reliability for the service's customers. Above it, almost all users should be happy; below it, they start complaining or leave.</td>
+      <td>97% availability. 90% of requests faster than 450 ms.</td>
+      <td>vs a <b>service level agreement</b> (SLA): an SLA is a <i>business contract</i> that comes into effect when users are so unhappy you have to compensate them. An SLO is an internal target you set before anyone is owed money.</td>
+    </tr>
+    <tr>
+      <td><b>Service level indicator</b><br><small>SLI</small></td>
+      <td>An indicator of the level of service you are providing — the thing you measure.</td>
+      <td>The proportion of HTTP requests that succeeded.</td>
+      <td>vs the <b>objective</b>: the indicator is the measurement, the objective is the target you hold it to. One indicator can carry several objectives at different thresholds.</td>
+    </tr>
+    <tr>
+      <td><b>Error budget</b></td>
+      <td><b>100% minus the SLO</b> — the quantity of unreliability you are permitted to spend in a period.</td>
+      <td>A 99.9% success-ratio objective on a service taking 3 million requests over four weeks gives a budget of <b>3,000 errors</b>. A single outage causing 1,500 of them costs <b>50% of the budget</b>.</td>
+      <td>vs <b>uptime</b> or a reporting metric: a budget is spendable. If nobody may act on its exhaustion it isn't a budget, it's a number on a dashboard.</td>
+    </tr>
+    <tr>
+      <td><b>Error budget policy</b></td>
+      <td>A written statement of what happens, and who does it, when the budget is exhausted.</td>
+      <td>Development gives top priority to reliability bugs; or focuses exclusively on reliability until back in objective; or a production freeze halts certain changes.</td>
+      <td>vs the <b>objective</b> itself: the objective says what &ldquo;good&rdquo; is; the policy is what gives it teeth. Getting the policy approved is also the best test of whether the objective is fit for purpose.</td>
+    </tr>
+    <tr>
+      <td><b>Reliability</b></td>
+      <td>How the service is performing with regard to <i>all</i> of its indicators.</td>
+      <td>Could mean availability, latency, or several at once.</td>
+      <td>vs <b>availability</b> alone, which is one indicator among many. Freshness, durability, correctness, quality and coverage all count as reliability too.</td>
+    </tr>
+  </table>
+
+  <div class="box tip">
+    <h4>Who owns the number</h4>
+    <p>Once the objective is below 100%, it must be <b>owned by someone empowered to make tradeoffs between feature velocity and reliability</b>. In a small organisation that may be the CTO; in a larger one it is normally the product owner or product manager. An objective owned by the people who merely operate the service is an objective nobody can trade against, which means it will lose every argument it has with a launch date.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 1 continued</div>
+
+  <h3>The four preconditions — without these, none of it works</h3>
+  <p>To adopt an error-budget-based approach, all four must hold:</p>
+  <ol>
+    <li>There are objectives that <b>all stakeholders have approved</b> as fit for the product.</li>
+    <li>The people responsible for meeting them <b>agree it is possible</b> to do so under normal circumstances.</li>
+    <li>The organisation has <b>committed to using the budget</b> for decision making and prioritising, formalised in an error budget policy.</li>
+    <li>There is a <b>process for refining</b> the objective.</li>
+  </ol>
+  <div class="box quote">
+    Otherwise, &ldquo;SLO compliance will simply be another KPI (key performance indicator) or reporting metric, rather than a decision-making tool.&rdquo;
+  </div>
+
+  <h3>Three places teams actually start from</h3>
+  <table class="tight">
+    <tr><th style="width:44mm">Maturity level</th><th>What it looks like</th></tr>
+    <tr><td><b>Greenfield</b></td><td>Nothing deployed yet. Nothing to measure, and no habits to unlearn.</td></tr>
+    <tr><td><b>Production, no objectives</b></td><td>Monitoring exists and notifies you when things go awry, but there are no formal objectives, no concept of an error budget, and <b>an unspoken goal of 100% uptime</b>.</td></tr>
+    <tr><td><b>An objective without teeth</b></td><td>A running deployment with an objective below 100%, but no common understanding of its importance or how to use it for continuous improvement. The number exists; nothing follows from it.</td></tr>
+  </table>
+
+  <div class="box tip">
+    <h4>Why this is a prioritisation tool, not a reporting one</h4>
+    <p>Engineers are scarce even at the largest organisations, so engineering time should go to the most important characteristics of the most important services. The budget makes that comparison arithmetic rather than rhetoric: given two candidate reliability projects — say <b>automating rollbacks</b> versus <b>moving to a replicated data store</b> — you estimate each one's impact on the error budget and fund the one that buys more. Day to day, the work of the people defending reliability is driven by the objectives: defending them in the short term, and keeping them defensible in the medium to long term.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — what an error budget <i>is not</i></h4>
+    <p><b>It is not</b> a licence to be careless, and it is not a measure of how much downtime you have &ldquo;left&rdquo; before someone is angry.<br>
+    <b>It is</b> a decision-making instrument: a quantity you can attribute to specific incidents and specific projects, so that arguments about what to fund become comparisons between numbers rather than between opinions. Its authority comes entirely from the fact that everyone agreed to it in advance.</p>
+  </div>
+
+  <h3>Anchor sketch — where the budget comes from</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = the node that matters most</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   "how reliable should this be?"
+              |
+     +--------+---------+
+     |                  |
+  100%                below 100%
+  cannot reach it          |
+  users can't see it       v
+  blocks all change   <span class="tk1">an SLO</span> -- a target someone OWNS
+  purely reactive          |
+                           v
+                    100% minus the SLO
+                           |
+                           v
+                 <span class="tks">THE ERROR BUDGET</span>
+                           |
+              +------------+------------+
+              |                         |
+        spent by accident         spent on purpose
+        outages, bad pushes       canaries, experiments
+              |                         |
+        costs you nothing         buys you information
+        but the outage                  |
+                                  (part 4)
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Name the four reasons the left branch is wrong, and say which one is about <i>your</i> system and which two are about things outside it.<br>
+      <span class="q">Q</span> What has to be true about the reversed node before it is a budget rather than a dashboard number?<br>
+      <span class="q">Q</span> Who must own the objective, and what specifically are they empowered to trade?
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 1 · expert phrasing, questions, matrix</div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We aim for no downtime at all.&rdquo;</td><td>&ldquo;That's an unspoken 100% target, which is unreachable, invisible to users behind a long dependency chain, and blocks every change — and change is the number one source of outages.&rdquo;</td></tr>
+    <tr><td>&ldquo;How much downtime are we allowed?&rdquo;</td><td>&ldquo;The error budget is 100% minus the objective, expressed in the same units as the indicator — so for a 99.9% success ratio over 3 million requests, 3,000 errors.&rdquo;</td></tr>
+    <tr><td>&ldquo;That outage was pretty bad.&rdquo;</td><td>&ldquo;That incident consumed 50% of the four-week error budget, which puts it ahead of everything else on the reliability backlog.&rdquo;</td></tr>
+    <tr><td>&ldquo;We have a target but nobody really uses it.&rdquo;</td><td>&ldquo;An objective without teeth. Without a committed error budget policy it's a KPI, not a decision-making tool.&rdquo;</td></tr>
+    <tr><td>&ldquo;Ops owns the reliability number.&rdquo;</td><td>&ldquo;It has to be owned by someone empowered to trade feature velocity against reliability — normally the product owner, or the CTO in a small organisation.&rdquo;</td></tr>
+    <tr><td>&ldquo;Should we do the rollback automation or the replicated store?&rdquo;</td><td>&ldquo;Estimate each one's impact on the error budget and fund the one that buys more of it back.&rdquo;</td></tr>
+    <tr><td>&ldquo;We promise 99.9% in the contract.&rdquo;</td><td>&ldquo;That's an SLA — a business contract with compensation attached. The internal objective should sit tighter than the agreement, so you notice before you owe anyone money.&rdquo;</td></tr>
+  </table>
+
+  <h3>Retrieval — cover the page first</h3>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A payments team has run at &ldquo;100% uptime, no exceptions&rdquo; for two years. They are proud of it, and they are genuinely good: last year they had eleven minutes of unplanned downtime. They also ship roughly once a quarter, because every release is a risk to the promise, and the on-call rota is exhausted.</p>
+    <p><b>(a)</b> Name the three distinct costs this target is imposing, mapping each to one of the reasons perfection is the wrong goal. <b>(b)</b> Explain why their excellent track record makes the problem harder to argue, not easier. <b>(c)</b> Name the first thing you'd establish — not the number itself — and say who has to own it and what they must be empowered to do.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>An analytics service publishes a 99.5% availability objective on a wiki. It is measured, charted monthly, and reported to the leadership team. Last quarter it came in at 98.8%. Nothing happened: no work was reprioritised, no release was held, and the next quarter's roadmap was unchanged.</p>
+    <p><b>(a)</b> Name what they have, precisely, and say what it is missing. <b>(b)</b> Of the four preconditions for an error-budget-based approach, identify which ones are unmet and why the failure of any one is sufficient. <b>(c)</b> Give the artefact you would create next, list three things it must specify, and name the near-miss fix — publishing the number more prominently — and why it changes nothing.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — is your objective actually doing anything?</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: has the organisation committed to act when the budget runs out? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No commitment<br><small>nothing follows from the number</small></div>
+      <div class="colh">Committed policy<br><small>named actions, named owners</small></div>
+
+      <div class="rowh">TARGET IS<br>100%<br><small>stated or unspoken</small></div>
+      <div class="cell"><b>The unspoken-perfection shop</b>
+        Monitoring notifies you when things go awry; no formal objective, no budget, and an unstated goal of never failing.<br>
+        <i>Move:</i> the first task isn't measurement, it's agreeing that a number below 100% is acceptable. Until then there is nothing to spend.</div>
+      <div class="cell"><b>Structurally impossible</b>
+        You cannot have a policy for exhausting a budget of zero. At 100% you can only ever react to the sub-100% that is guaranteed to happen.<br>
+        <i>Move:</i> recognise this cell as a contradiction, not a goal. It's an operations posture wearing an engineering label.</div>
+
+      <div class="rowh">TARGET IS<br>BELOW 100%</div>
+      <div class="cell"><b>An objective without teeth</b>
+        The number exists and is charted. Nobody has agreed what happens when it's missed, so nothing does.<br>
+        <i>Move:</i> write and get approval for the error budget policy. Approval is also the test — if stakeholders won't sign, the objective is wrong, not the policy.</div>
+      <div class="cell focus"><b>A budget you can spend</b>
+        All stakeholders approved it, the defenders agree it's achievable under normal conditions, the policy is committed, and there's a process for refining it.<br>
+        <i>Move:</i> now attribute incidents to budget consumed, fund projects by budget bought back, and spend the remainder deliberately — which is part 4.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the left column is where most organisations live, and both cells fail for the same reason — the number cannot cause anything to happen. Moving right is an organisational act, not a technical one; moving down is a cultural one.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>A target nobody may act on is a report, not an objective.</b> Before arguing about whether the number should be 99.9% or 99.95%, settle who is allowed to stop a release when it's missed. If the answer is nobody, the number is decoration whatever its value.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>What to measure, and how to get a first number</h2>
+    <p>Good events over total events, specification versus implementation, and rounding reality into an objective.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Measure reliability as a fraction: things that went well, divided by all the things.</li>
+      <li>That always gives you a number between 0 and 100, which makes everything downstream easier.</li>
+      <li>There's a difference between <i>what</i> you want to measure and <i>how</i> you actually measure it — and the how is where all the compromises hide.</li>
+      <li>Your first number doesn't have to be right. It has to exist, and it has to be improvable.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the bus route</h3>
+  <ul>
+    <li>You want to know if the bus route is any good. &ldquo;Buses that arrived within five minutes of schedule, divided by all scheduled buses&rdquo; — a fraction, 0 to 100%.</li>
+    <li>Now: <b>how do you count it?</b> The driver's log is free but misses buses that never left the depot. An inspector at one stop is more accurate but covers one stop. A GPS unit on every bus is best and costs the most.</li>
+    <li>Same question — &ldquo;are buses on time?&rdquo; — three different instruments, each with different <b>quality</b> (how well it reflects a passenger's experience), <b>coverage</b> (how many passengers it speaks for), and <b>cost</b>.</li>
+    <li>That gap between the question and the instrument is the single most important idea in this part.</li>
+  </ul>
+
+  <h3>The shape of an indicator</h3>
+  <ul>
+    <li>Treat the indicator as <b>the number of good events divided by the total number of events</b>. Examples:
+      <ul>
+        <li>Successful HTTP requests / total HTTP requests (a success rate).</li>
+        <li>gRPC calls that completed successfully in under 100 ms / total gRPC requests.</li>
+        <li>Search results that used the entire corpus / total search results, including those that degraded gracefully.</li>
+        <li>&ldquo;Stock check count&rdquo; requests from product searches that used stock data fresher than 10 minutes / total stock check requests.</li>
+        <li>&ldquo;Good user minutes&rdquo; by some extended list of criteria / total user minutes.</li>
+      </ul>
+    </li>
+    <li>Two properties make this shape worth insisting on:
+      <ul>
+        <li>It <b>ranges 0% to 100%</b>, where 0% means nothing works and 100% means nothing is broken. Intuitive, and it lends itself directly to a budget — the objective is a target percentage and the budget is 100% minus it.</li>
+        <li>Consistency <b>buys you tooling</b>. Alerting logic, analysis tools, budget calculation and reports can all expect the same three inputs: numerator, denominator, threshold.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>SLI specification</b></td>
+      <td>The assessment of service outcome you think matters to users, <b>independent of how it is measured</b>.</td>
+      <td>&ldquo;Ratio of home page requests that loaded in under 100 ms.&rdquo;</td>
+      <td>vs <b>implementation</b>: the specification is the question; the implementation is the instrument. One specification can have several implementations with genuinely different answers — which is why arguments about &ldquo;our availability number&rdquo; are usually arguments about implementation.</td>
+    </tr>
+    <tr>
+      <td><b>SLI implementation</b></td>
+      <td>The specification plus a concrete way to measure it.</td>
+      <td>The same ratio, measured from the latency column of the server log; or by probers running JavaScript in a browser in a VM; or by instrumentation in the page's own JavaScript reporting to a telemetry service.</td>
+      <td>Each carries its own blind spot. Logs <b>miss requests that never reach the backend</b>. Probers <b>catch unreachable-network errors but may miss issues affecting only a subset of users</b>. Client instrumentation captures experience most accurately but needs code changes and new infrastructure — which then has <b>its own reliability requirements</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Quality, coverage, cost</b></td>
+      <td>The three axes an implementation trades on: how accurately it captures one customer's experience; how well it captures <i>all</i> customers' experience; and what it costs to build.</td>
+      <td>Client-side instrumentation is high quality; a periodic prober is low coverage; server logs are cheap.</td>
+      <td>Quality and coverage are <b>different</b>: an instrument can perfectly capture the experience of the 2% of users it watches. Confusing them is how teams end up confident in a number that speaks for almost nobody.</td>
+    </tr>
+    <tr>
+      <td><b>Request-driven</b></td>
+      <td>A component where the user creates an event and expects a response.</td>
+      <td>An HTTP service behind a browser; an API for a mobile app.</td>
+      <td>Its indicators are <b>availability, latency, quality</b> — where quality means the proportion of responses served <i>undegraded</i>, which only matters if the service degrades gracefully rather than failing.</td>
+    </tr>
+    <tr>
+      <td><b>Pipeline</b></td>
+      <td>A system that takes records in, mutates them, and puts the output somewhere else.</td>
+      <td>Reading a relational database into a distributed hash table for serving; converting video formats; reading logs from many sources to generate reports; a monitoring system pulling metrics to generate time series and alerts.</td>
+      <td>Its indicators are <b>freshness, correctness, coverage</b>. Note the range: this might be a simple real-time process on one instance, or a multistage batch job taking many hours — both are pipelines.</td>
+    </tr>
+    <tr>
+      <td><b>Storage</b></td>
+      <td>A system that accepts data and makes it retrievable later.</td>
+      <td>Bytes, records, files, videos.</td>
+      <td>Its indicator is <b>durability</b> — and it carries a trap. If you hold a billion records over ten years but the user wants only today's, and today's are unavailable, <b>they are unhappy even though almost all their data is readable</b>. A durability number averaged over everything you store can be excellent and meaningless.</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 2 continued</div>
+
+  <h3>The worked example — a mobile phone game</h3>
+  <ul>
+    <li>The app on the phone talks to an <b>HTTP API</b> in the cloud, which writes state changes to <b>permanent storage</b>. A <b>pipeline</b> periodically runs over that data to generate league tables — high scores for today, this week, all time — writing to a separate league table store, served to both the mobile app and a website. Users upload custom <b>avatars</b>, used in-game and on the high-score site.</li>
+    <li>All three component types are present, so all seven indicator types are candidates. The guidance is to choose <b>five or fewer</b> indicator types representing the most critical functionality.</li>
+    <li><b>Availability and latency, API and web:</b> success is based on HTTP status code — 5XX counts against, everything else counts as successful. Candidate sources: application server logs, load balancer monitoring, black-box monitoring, client-side instrumentation. The example picks <b>load balancer monitoring</b>, for two reasons worth remembering together: the metrics were <i>already available</i>, and they are <i>closer to the user</i> than the application server's logs.</li>
+    <li><b>Pipeline freshness:</b> the pipeline records a <b>watermark</b> — the timestamp of when the data was updated. Two implementations: query the league table periodically counting fresh records against total, which treats every stale record as equally important regardless of how many users saw it; or have clients check the watermark on request and increment counters. The example picks the <b>client-side</b> version, because it correlates far more closely with user experience and is straightforward to add.</li>
+    <li><b>Pipeline coverage:</b> the pipeline exports how many records it <i>should</i> have processed and how many it <i>did</i>. Known blind spot: it <b>may miss records the pipeline never knew about</b> because of misconfiguration.</li>
+    <li><b>Pipeline correctness:</b> either inject data with known outputs and count how often output matches expectation, or compute correct output by a method distinct from the pipeline (likely more expensive, hence unsuitable for the pipeline itself) and sample input/output pairs. The example uses <b>manually curated data with known good outputs</b>, tested on every pipeline run — with the standing caveat that the curated data must be <b>representative of real-world data</b> or the indicator is representative of nothing.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>Multiple grades for one indicator</h4>
+    <p>A single threshold hides the tail. If 90% of requests return within 100 ms but the remaining 10% take ten seconds, many users are unhappy while the number looks fine. So set <b>several thresholds on the same indicator</b>: 90% of requests faster than 100 ms, <i>and</i> 99% faster than 400 ms. This applies to any indicator with a parameter that measures user unhappiness.</p>
+  </div>
+
+  <h3>From measurement to a first objective</h3>
+  <ul>
+    <li>Measure what the service actually does, then <b>round down to manageable numbers</b> — roughly two significant figures of availability, and up to 50 ms of latency. (50 ms because users are unlikely to perceive a 50 ms change; the right window depends on the service — a reporting service is not a real-time game.)</li>
+    <li>Over four weeks the example API showed: <b>3,663,253 total requests</b>; <b>3,557,865 successful (97.123%)</b>; <b>90th percentile latency 432 ms</b>; <b>99th percentile 891 ms</b>.</li>
+    <li>Rounded, that gives the proposed objectives and their budgets:</li>
+  </ul>
+  <table class="tight">
+    <tr><th style="width:56mm">Objective</th><th>Allowed failures over four weeks</th></tr>
+    <tr><td>97% availability</td><td>109,897</td></tr>
+    <tr><td>90% of requests faster than 450 ms</td><td>366,325</td></tr>
+    <tr><td>99% of requests faster than 900 ms</td><td>36,632</td></tr>
+  </table>
+  <ul>
+    <li>Note the deliberate consequence: <b>if you set the objective from actual measurements, by design you met it.</b> That is fine — the value is in what the distribution then tells you. Were there days in the past four weeks when the service missed it? Do those days correlate with real incidents? Was action taken, or should it have been?</li>
+    <li>On measuring latency: <b>it is better to count the slow requests than to approximate them with a histogram</b> — but if only histogram buckets are available, use them. Counting explicitly against configured thresholds is more accurate but needs more configuration, and makes changing the thresholds retroactively harder.</li>
+    <li>If you have no logs, metrics or historical performance at all, configure a source: for HTTP services a remote monitoring service doing a periodic ping or GET and reporting successes is a legitimate low-fidelity start.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — current performance as a starting point</h4>
+    <p><b>The standing advice is not to set an objective from current performance</b>, because it can commit you to unnecessarily strict targets.<br>
+    <b>But</b> current performance is a good place to start if you have nothing else and a real process for iterating. The trap runs the other way too: <b>don't let current performance limit you.</b> Customers come to expect the service to perform as it does, so if you currently return successes 99.999% of the time in under 10 ms, any significant regression from that baseline will make them unhappy — whatever the published objective says.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 2 · time windows, sketch, phrasing</div>
+
+  <h3>Choosing the time window</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Choice</th><th>What it buys</th><th>What it costs</th></tr>
+    <tr><td><b>Rolling window</b></td><td>Closer to user experience: if you have a large outage on the last day of a month, <b>your user doesn't suddenly forget about it on the first day of the next</b>.</td><td>Define it as an <b>integral number of weeks</b> so it always contains the same number of weekends — a 30-day window may hold four or five, and if weekend traffic differs your indicator moves for uninteresting reasons.</td></tr>
+    <tr><td><b>Calendar window</b></td><td>Closer to business planning and project work — evaluate quarterly to decide where the next quarter's headcount goes.</td><td>Introduces uncertainty: mid-quarter you cannot know how many requests remain, so decisions must speculate about how much budget you'll spend in the rest of the period.</td></tr>
+    <tr><td><b>Shorter windows</b></td><td>Faster decisions. Miss last week and small course corrections — prioritising the relevant bugs — can avoid violations in future weeks.</td><td>Too little data to justify anything large.</td></tr>
+    <tr><td><b>Longer windows</b></td><td>Strategic decisions: choosing between a high-availability distributed database, automating rollout and rollback, or deploying a duplicate stack in another zone.</td><td>Slow feedback. The rule of thumb: <b>the amount of data required is roughly commensurate with the amount of engineering work being proposed to fix it.</b></td></tr>
+  </table>
+  <p>The general-purpose recommendation: a <b>four-week rolling window</b>, complemented by weekly summaries for task prioritisation and quarterly summarised reports for project planning.</p>
+
+  <h3>Anchor sketch — one question, several instruments</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">        <span class="tk2">SLI SPECIFICATION</span>  "what outcome matters to users?"
+        e.g. ratio of home page loads under 100 ms
+                       |
+        one question, several instruments
+                       |
+     +-----------------+-----------------+
+     |                 |                 |
+ server logs      probers in a VM    client-side JS
+ cheap            medium             expensive
+ misses requests  catches network    most accurate, but
+ that never       failures, misses   needs code changes and
+ reach backend    subset issues      its own reliable infra
+     |                 |                 |
+     +-----------------+-----------------+
+                       |
+              each differs in
+        <span class="tks">QUALITY . COVERAGE . COST</span>
+                       |
+                       v
+        pick the cheapest one that is close
+        enough to the user -- then iterate
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Quality and coverage are different things. Give an instrument that is high on one and low on the other.<br>
+      <span class="q">Q</span> The worked example chose load balancer monitoring. Give <i>both</i> reasons, not just the obvious one.<br>
+      <span class="q">Q</span> What extra obligation does the most accurate instrument create that the other two don't?
+    </div>
+  </div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;How often does it work?&rdquo;</td><td>&ldquo;Express it as good events over total events, so it lands between 0 and 100% and the budget is just 100% minus the objective.&rdquo;</td></tr>
+    <tr><td>&ldquo;We measure it from the server logs.&rdquo;</td><td>&ldquo;That's one implementation of the specification. It's cheap, but it misses requests that never reached the backend, so it overstates availability.&rdquo;</td></tr>
+    <tr><td>&ldquo;Our monitoring covers everything.&rdquo;</td><td>&ldquo;Distinguish quality from coverage — an instrument can capture 2% of users perfectly. Which is it doing?&rdquo;</td></tr>
+    <tr><td>&ldquo;The average is fine.&rdquo;</td><td>&ldquo;Averages hide the tail. Set multiple grades on the same indicator — 90% under 100 ms and 99% under 400 ms.&rdquo;</td></tr>
+    <tr><td>&ldquo;Is the data up to date?&rdquo;</td><td>&ldquo;That's a freshness indicator. Have the pipeline write a watermark and let clients check it on read, so the measure is weighted by who actually saw stale data.&rdquo;</td></tr>
+    <tr><td>&ldquo;We hit our number, so we're fine.&rdquo;</td><td>&ldquo;We set it from measured performance, so by design we met it. The interesting question is which days missed it and whether they correlate with real incidents.&rdquo;</td></tr>
+    <tr><td>&ldquo;Let's measure it monthly.&rdquo;</td><td>&ldquo;Prefer a four-week rolling window — an integral number of weeks, so weekend traffic doesn't move the number for uninteresting reasons.&rdquo;</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 2 · questions and matrix</div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>A team reports 99.95% availability from application server logs. Support is receiving steady complaints that the site &ldquo;doesn't load&rdquo;, concentrated among mobile users on one carrier. Engineering cannot reproduce it and points at the dashboard.</p>
+    <p><b>(a)</b> Explain the discrepancy in terms of specification versus implementation, and name the specific blind spot. <b>(b)</b> Give two alternative implementations of the same specification and state what each would and would not catch. <b>(c)</b> Say which you'd adopt first and why, and name the extra obligation the most accurate option creates.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>A nightly job rebuilds a product recommendations table. The team proposes a single indicator: &ldquo;the proportion of nightly runs that completed without error&rdquo;, with an objective of 99%. Users complain that recommendations are sometimes days out of date, and occasionally plain wrong — but the job has completed successfully every night for a month.</p>
+    <p><b>(a)</b> Name the component type and the three indicator types appropriate to it, and say which the team has actually implemented. <b>(b)</b> For each of the two user complaints, name the missing indicator and describe a concrete implementation. <b>(c)</b> Name the blind spot the coverage implementation retains even when built correctly, and the standing caveat on the correctness one.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — choosing an instrument</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: what does it cost to build and run? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Cheap<br><small>already available, or nearly</small></div>
+      <div class="colh">Expensive<br><small>new code, new infrastructure</small></div>
+
+      <div class="rowh">FAR<br>FROM THE<br>USER</div>
+      <div class="cell"><b>Server-side logs</b>
+        Success and latency as the application saw it.<br>
+        <i>Move:</i> a legitimate first instrument — if logs exist and probers would take weeks, use the logs. Just state the blind spot out loud: requests that never reached the backend are invisible, so the number flatters you.</div>
+      <div class="cell"><b>Elaborate back-end telemetry</b>
+        Expensive to build, still measuring your side of the wire.<br>
+        <i>Move:</i> the worst trade on the grid. If you are spending real engineering effort, spend it moving <i>closer to the user</i>, not on more detail about a vantage point you already have.</div>
+
+      <div class="rowh">CLOSE<br>TO THE<br>USER</div>
+      <div class="cell focus"><b>Load balancer monitoring</b>
+        The example's choice, for two reasons at once: the metrics were already available, <i>and</i> they sit closer to the user than application logs.<br>
+        <i>Move:</i> look here first. The best first instrument is usually one you already own that happens to sit further out than where you were looking.</div>
+      <div class="cell"><b>Client-side instrumentation</b>
+        Probers running real JavaScript, or telemetry from the page itself.<br>
+        <i>Move:</i> highest quality, and the honest destination — but it needs code changes, new infrastructure, and that infrastructure has <b>its own reliability requirements</b>. Earn your way here; don't start here.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the vertical axis is quality, the horizontal is cost — and <b>coverage is a third axis this grid doesn't show</b>. A prober can be close to the user and cheap while speaking for almost nobody, so always ask the coverage question separately before trusting a cell.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Get something measured, then improve it.</b> Your first indicator does not have to be correct — it has to exist and to be attached to a feedback loop. Pick the aspect that is relevant and easy to measure, name its blind spot in writing, and iterate from there.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>Making it bite</h2>
+    <p>Agreement, the policy, improving coverage, and deciding with the budget instead of arguing.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>A number only matters if people agreed to it beforehand and agreed what happens when it's missed.</li>
+      <li>Getting that agreement is also the best test of whether the number is any good — if nobody will sign, it's wrong.</li>
+      <li>Check your number against reality: when users complained, did your measurement notice?</li>
+      <li>And when your measurement and your users disagree, one of them needs changing — usually the measurement.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the household budget</h3>
+  <ul>
+    <li>A household agrees to spend no more than a set amount each month. The number is easy. What makes it real is two other things: <b>everyone agreed it in advance</b>, and <b>everyone agreed what happens if it's blown</b> — no takeaways until next month.</li>
+    <li>The agreement is also the test. If one person refuses to sign because the number is impossible on their salary, the <i>number</i> is wrong, not the person.</li>
+    <li>And once a year you check it against reality: did the months you felt broke line up with the months you overspent? If they didn't, the budget is measuring the wrong thing.</li>
+  </ul>
+
+  <h3>Who has to agree, and what each is agreeing to</h3>
+  <table class="tight">
+    <tr><th style="width:38mm">Party</th><th>What they must agree</th><th>What their refusal tells you</th></tr>
+    <tr><td><b>Product managers</b></td><td>That this threshold is good enough for users — that performance below it is unacceptably low and worth spending engineering time to fix.</td><td>If they think users will suffer badly before the policy prompts anyone to act, <b>the objective isn't tight enough</b>.</td></tr>
+    <tr><td><b>Product developers</b></td><td>That if the budget is exhausted, they will take steps to reduce risk to users until the service is back in budget.</td><td>If the reliability work would push feature velocity below acceptable levels, they can argue to relax the objective — and the product manager must understand the trade, because <b>lowering the objective also lowers the number of situations the reliability team responds to</b>.</td></tr>
+    <tr><td><b>The team defending it</b></td><td>That the objective is defensible <b>without Herculean effort, excessive toil, and burnout</b> — all of which damage the long-term health of the team and the service.</td><td>If it isn't defensible, they can make a case for relaxing some objectives. This is a legitimate argument, not a failure of nerve.</td></tr>
+  </table>
+  <p>If all three parties will not agree to enforce the policy, iterate on the indicators and objectives until they will. Decide what you need to move forward: <b>more data, more resources, or a change to the indicator or the objective.</b></p>
+
+  <div class="box tip">
+    <h4>The policy is the test</h4>
+    <p>Getting the error budget policy approved by the product manager, the development team and the reliability team is <b>a good test for whether the objectives are fit for purpose</b>. Three different refusals point at three different defects, and each is informative. And if a service does exhaust its budget but not all stakeholders agree that enacting the policy is appropriate, that isn't an argument to have in the moment — <b>you return to the policy approval stage</b>.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Recall</b></td>
+      <td>The proportion of significantly user-impacting events that the indicator captures.</td>
+      <td>Users had a bad hour; did the indicator dip?</td>
+      <td>vs <b>precision</b>: recall is about missing real problems; precision is about raising false ones. They trade against each other, which is the whole difficulty.</td>
+    </tr>
+    <tr>
+      <td><b>Precision</b></td>
+      <td>The proportion of events captured by the indicator that were significantly user-impacting.</td>
+      <td>The indicator dipped; did anyone actually suffer?</td>
+      <td>The governing warning: <b>it is pointless to improve recall if you lower precision so far that the team must constantly respond to unimportant events.</b> An alert nobody believes is worse than no alert.</td>
+    </tr>
+    <tr>
+      <td><b>Aspirational objective</b></td>
+      <td>A tighter target measured and tracked alongside the current one, but <b>explicitly called out in the policy as not requiring action</b>.</td>
+      <td>You determine users need a tighter target, but reaching it will take months of product work.</td>
+      <td>vs simply <b>tightening the objective</b>: tightening now would leave you permanently out of budget and subject to the policy — a perpetual state of emergency. The aspirational form lets you track progress without crying wolf.</td>
+    </tr>
+    <tr>
+      <td><b>Critical user journey</b></td>
+      <td>A sequence of tasks that is a core part of a user's experience and an essential aspect of the service.</td>
+      <td>For online shopping: searching for a product; adding a product to a cart; completing a purchase.</td>
+      <td>These <b>almost certainly won't map to existing indicators</b> — each is multiple complex steps that can fail anywhere, and inferring success from logs is extremely difficult. (Did the user fail at step three, or get distracted by cat videos in another tab?) Their value: they improve <b>recall without affecting precision</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Bucketing</b></td>
+      <td>Adding labels to indicators and applying different objectives to different labels.</td>
+      <td>By tier: premium 99.99%, free 99.9%. By expected responsiveness: interactive requests that block page load, 90% within 100 ms; CSV downloads, 90% start within 5 s.</td>
+      <td>vs one objective for everything: not all requests are equal — a notification check from a mobile app matters, but not as much as an advertiser's billing request. Caveat on per-customer tracking: <b>low-volume customers land at either 100% or very low availability</b>, so individual misses are often uninteresting while aggregate patterns are a useful signal.</td>
+    </tr>
+    <tr>
+      <td><b>Critical dependency</b></td>
+      <td>A dependency whose unavailability means <i>your</i> service is also unavailable.</td>
+      <td>A component supporting a high-value interaction.</td>
+      <td>Its reliability guarantee must be <b>at least as high</b> as that of the dependent action, and the team running it owns its objective the same way you own the product's. If the component can't reach the level you need, you must engineer around it — a different component, or defences like caching, offline store-and-forward, graceful degradation.</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 3 continued</div>
+
+  <h3>Checking the number against reality</h3>
+  <ul>
+    <li>First you need a source of information about user satisfaction. The options are wide: <b>count outages discovered manually, posts on public forums, support tickets, calls to customer service</b>; attempt to measure sentiment on social media; add code to sample user happiness periodically; run face-to-face surveys. Start with something <b>cheap to collect</b> and iterate. Asking the product manager to fold reliability into their existing customer conversations about pricing and functionality is an excellent place to start.</li>
+    <li>Then correlate. Look at periods with a known outage — do they line up with steep drops in error budget? Look at times the indicator dipped — do they line up with known outages or a rise in support tickets? (If you're comfortable with statistics, <b>Spearman's rank correlation coefficient</b> quantifies this.)</li>
+    <li>The outliers are the interesting part. In the worked graph of tickets per day against budget lost, two points stand out: <b>one day with only 5 tickets where 10% of the budget was lost</b>, and <b>one day with 40 tickets where no budget was lost at all</b>. Both warrant closer investigation — the first is a precision problem, the second a recall problem.</li>
+    <li>If outages and ticket spikes aren't captured by any indicator, or you have dips and misses that don't map to user-facing issues, <b>your objective lacks coverage</b>. This is normal and expected. Indicators and objectives should change as the service changes.</li>
+  </ul>
+
+  <h3>Four moves when the objective lacks coverage</h3>
+  <table class="tight">
+    <tr><th style="width:40mm">Move</th><th>When</th><th>How</th></tr>
+    <tr><td><b>Change the objective</b></td><td>The indicator showed a problem but the objective didn't prompt anyone to notice or respond.</td><td>Take the indicator values during the periods of interest, calculate what objective <i>would</i> have triggered a notification then, apply it to historic indicators, and see what else it would have caught. For false-positive days, consider relaxing instead.</td></tr>
+    <tr><td><b>Change the implementation</b></td><td>Changing the objective in either direction produces too many false positives or false negatives.</td><td>Two directions only: move the measurement <b>closer to the user</b> (server → load balancer → client), or <b>improve coverage</b> so you capture more interactions (a simple GET → a health handler exercising more functionality → a test executing all the client-side JavaScript).</td></tr>
+    <tr><td><b>Institute an aspirational objective</b></td><td>You need a tighter target, but improving the product to meet it will take time.</td><td>Measure and track it alongside the current one, and say explicitly in the policy that it does not require action.</td></tr>
+    <tr><td><b>Iterate</b></td><td>Always.</td><td>Pick the option most likely to give the highest return. Especially in the first few rounds, <b>err on the side of quicker and cheaper</b> — that reduces uncertainty in your metrics and tells you whether you need the expensive ones at all.</td></tr>
+  </table>
+
+  <h3>Deciding with the budget</h3>
+  <ul>
+    <li><b>Size incidents by budget consumed.</b> A release causing 100% NullPointerExceptions for four hours before revert produced 14,066 errors — against a budget of 109,897, that single event used <b>13%</b>. A singly-homed state database failing, with 20 hours to restore from backups, caused an estimated 72,000 errors — <b>65%</b> of the budget.</li>
+    <li><b>Then compare classes of incident, not instances.</b> One server failure in five years, versus two or three bad releases needing rollback per year. On average, <b>bad pushes cost twice as much error budget as database failures</b>. The numbers say to address the release problem rather than investigate the server. That comparison is the entire point of the instrument.</li>
+    <li><b>In extremis</b>, a team can declare an emergency with high-level approval to deprioritise all external demands until exit criteria are met — typically that the service is within objective <i>and</i> that steps have been taken to reduce the chance of a repeat: improving monitoring, improving testing, removing dangerous dependencies, or rearchitecting to remove known failure types.</li>
+    <li><b>And in the happy case</b>: if the service runs flawlessly and needs little oversight, move it to a less hands-on tier of support. Keep incident response and high-level oversight; redirect the attention to systems that need it.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — two things the budget is honest about not knowing</h4>
+    <p><b>Shape.</b> The budget is an approximation of user satisfaction. A four-hour outage every 30 days probably produces fewer unhappy users than four separate one-hour outages, which in turn produces fewer than a constant 0.5% error rate — <b>but the budget treats all three the same</b>. Where that matters, you need thresholds tuned to the service.</p>
+    <p><b>Independence.</b> It is tempting to do arithmetic: a service at 99.9% in one zone, deployed in two zones, &ldquo;should&rdquo; give 99.9999%. That assumes the two are wholly independent, which is <b>almost never the case</b> — common dependencies, common failure domains, shared fate, global control planes. Unless every one is enumerated and accounted for, <b>any such calculation is deceptive</b>.</p>
+  </div>
+
+  <h3>Anchor sketch — when measurement and users disagree</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   users complained          the indicator dipped
+          |                          |
+          +------------+-------------+
+                       |
+              do the two line up?
+                       |
+        +--------------+--------------+
+        |                             |
+       yes                            no
+        |                             |
+   the objective            <span class="tks">THE OBJECTIVE LACKS COVERAGE</span>
+   is working                         |
+                        +-------------+-------------+
+                        |                           |
+             users hurt, no dip          dip, nobody hurt
+             a <span class="tk3">RECALL</span> problem            a <span class="tk3">PRECISION</span> problem
+                        |                           |
+                   tighten, or                  relax, or
+                   move measurement             the alert
+                   closer to the user           gets ignored
+                        |                           |
+                        +-------------+-------------+
+                                      |
+                        if neither direction works,
+                        fix the IMPLEMENTATION, not
+                        the number
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Define recall and precision in one line each, and say why improving one can make the system worse overall.<br>
+      <span class="q">Q</span> Name the two — and only two — directions in which an implementation can be improved.<br>
+      <span class="q">Q</span> You need a tighter target but can't meet it for six months. What do you do instead of tightening, and what does the policy have to say about it?
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 3 · phrasing, questions, matrix</div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;What do we do when we miss it?&rdquo;</td><td>&ldquo;That's the error budget policy — the specific actions taken on exhaustion and who takes them, approved in advance by product, development and the reliability team.&rdquo;</td></tr>
+    <tr><td>&ldquo;They won't sign off on the target.&rdquo;</td><td>&ldquo;Then the target is wrong, not the signatory. Which party is refusing tells you whether it's too loose, too tight, or undefendable without excessive toil.&rdquo;</td></tr>
+    <tr><td>&ldquo;Our alert didn't fire but users were angry.&rdquo;</td><td>&ldquo;A recall problem — the indicator failed to capture a user-impacting event. Tighten the objective or move the measurement closer to the user.&rdquo;</td></tr>
+    <tr><td>&ldquo;It keeps alerting on nothing.&rdquo;</td><td>&ldquo;A precision problem. And it's worse than it looks — chasing recall at the cost of precision produces alerts the team learns to ignore.&rdquo;</td></tr>
+    <tr><td>&ldquo;We want a tighter number but can't hit it yet.&rdquo;</td><td>&ldquo;Make it an aspirational objective — tracked alongside, explicitly excluded from the error budget policy, so you're not in permanent emergency.&rdquo;</td></tr>
+    <tr><td>&ldquo;Which reliability project should we fund?&rdquo;</td><td>&ldquo;Compare classes of incident by budget consumed. If bad pushes cost twice what database failures do, fund the release problem.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll just run it in two zones.&rdquo;</td><td>&ldquo;That multiplication assumes independence, which almost never holds — shared dependencies, shared failure domains, shared fate, global control planes.&rdquo;</td></tr>
+    <tr><td>&ldquo;The outage was someone else's fault.&rdquo;</td><td>&ldquo;There are two schools on dependency-caused misses. Freezing anyway makes users happier — and whichever you pick, record it in the documented error budget policy.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>A checkout service has met its 99.9% availability objective every month for a year. Support ticket volume has doubled over the same period, and the product manager reports that customers describe checkout as &ldquo;flaky&rdquo;. Investigation shows most complaints involve the payment step failing after the cart page loaded fine; each individual HTTP request in that flow succeeded.</p>
+    <p><b>(a)</b> Name the problem in the precision/recall vocabulary and say which one it is. <b>(b)</b> Explain why an objective composed of per-request availability can be met while a multi-step flow fails, and name the concept that addresses it. <b>(c)</b> Give the property of that concept that makes it especially attractive here, and name the practical difficulty of implementing it.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A team blows its error budget in week two of a four-week window because an upstream identity service — owned by another team, in another division — had a six-hour outage. Their own code performed perfectly throughout. The development lead argues that a feature freeze would be punishing them for someone else's failure.</p>
+    <p><b>(a)</b> State both positions on this fairly, and say which one the guidance favours and on what grounds. <b>(b)</b> Say where this decision should have been made and recorded, and why deciding it now is the wrong time. <b>(c)</b> Name the structural fix for the identity service's reliability, and two defensive measures if that fix isn't available.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — the decision matrix, collapsed</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: are customers actually satisfied? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Satisfaction HIGH</div>
+      <div class="colh">Satisfaction LOW</div>
+
+      <div class="rowh">OBJECTIVE<br>MET</div>
+      <div class="cell good"><b>It's working</b>
+        <i>Low toil:</i> relax release and deployment processes and increase velocity, or step back and move engineering attention to services that need it.<br>
+        <i>High toil:</i> if alerting is generating false positives, reduce sensitivity; otherwise temporarily loosen the objective (or offload the toil) and fix the product or improve automated fault mitigation.</div>
+      <div class="cell focus"><b>Your objective is lying to you</b>
+        You are passing a test your users are failing. Toil level doesn't change the answer here — high or low, the move is the same.<br>
+        <i>Move:</i> <b>tighten the objective.</b> Then check whether tightening alone is enough, or whether the implementation is measuring the wrong thing entirely.</div>
+
+      <div class="rowh">OBJECTIVE<br>MISSED</div>
+      <div class="cell"><b>Too strict</b>
+        You're failing a test your users don't care about. Again toil doesn't change the answer.<br>
+        <i>Move:</i> <b>loosen the objective.</b> Holding a number users don't feel burns credibility and engineering time at the same rate.</div>
+      <div class="cell"><b>Genuinely in trouble</b>
+        <i>Low toil:</i> increase alerting sensitivity — you're missing things you could be catching.<br>
+        <i>High toil:</i> offload the toil and fix the product, or improve automated fault mitigation. This is the cell where more engineering is actually the answer.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the diagonal cells, where the objective and the users <b>agree</b>, are the ones where toil decides what to do. The off-diagonal cells, where they <b>disagree</b>, have one answer regardless of toil — and the answer is always to change the number, because the number is the thing that's wrong.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>When your measurement and your users disagree, the measurement is the defect.</b> Users are the ground truth by definition — the objective exists to predict their happiness. So tighten, loosen, or move the instrument closer to them, and treat &ldquo;but we hit our number&rdquo; as a symptom rather than a defence.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>Spending the budget to buy information</h2>
+    <p>Canary and control, population and duration, metric selection — and the three things that look like canarying but aren't.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Show the new version to a small slice of real users first, and compare them against everyone else.</li>
+      <li>If it's broken, only that slice suffers — and you find out for a fraction of the cost.</li>
+      <li>The comparison has to be against people using the system <i>at the same time</i>, not against yesterday.</li>
+      <li>And you have to pick the right things to watch, or you'll either miss real breakage or cry wolf until everyone ignores you.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the coal mine</h3>
+  <ul>
+    <li>Miners carried a canary underground. The bird is smaller and breathes faster than a human, so it is <b>intoxicated by dangerous gases faster than its handlers</b> — the warning arrives while there is still time to act.</li>
+    <li>The bird isn't a test of the mine in general. It's a small, fast, <i>expendable</i> sample of the same air everyone else is breathing.</li>
+    <li>Two things make it work: the bird is in the <b>real</b> mine, not a model of one, and there are miners breathing the same air right now to compare it against.</li>
+    <li>Take either away and you have something else: a laboratory experiment, or yesterday's air quality reading.</li>
+  </ul>
+
+  <div class="box quote">
+    Canarying is &ldquo;a partial and time-limited deployment of a change in a service and its evaluation.&rdquo; The part receiving the change is <b>the canary</b>; the remainder is <b>the control</b>. Canarying is effectively an A/B testing process.
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Canary / control</b></td>
+      <td>The subset receiving the change, and the remainder that doesn't.</td>
+      <td>5% of production on the release candidate; 95% on the live version.</td>
+      <td>The canary is usually a much smaller subset of production, or affects a much smaller subset of users. The fraction of total load you run on the canary <b>should be proportional to the size of the canary population</b> — otherwise you're testing a different system, not a smaller one.</td>
+    </tr>
+    <tr>
+      <td><b>Before/after evaluation</b></td>
+      <td>Replace the old system entirely, then compare behaviour before and after the change.</td>
+      <td>A blue/green cutover evaluated by comparing this week to last.</td>
+      <td>Aptly called <b>&ldquo;a canary deployment in time-space&rdquo;</b> — you segment by time rather than by population. Risky because <b>time is one of the biggest sources of change in observed metrics</b>: release on Monday and you may be comparing a business day to a weekend, with users behaving completely differently. The degradation you see may have happened to the control too.</td>
+    </tr>
+    <tr>
+      <td><b>Gradual canary</b></td>
+      <td>Multiple stages of increasing population, rather than one evaluation.</td>
+      <td>A small first stage, then larger ones once it passes.</td>
+      <td>The point isn't just safety — it's <b>metric selection</b>. In the first stage you have no confidence, so you use only the clearest indications of a problem: application crashes, request failures. Later stages have enough population to make noisier metrics meaningful.</td>
+    </tr>
+    <tr>
+      <td><b>Blue/green deployment</b></td>
+      <td>Two instances: green serving traffic, blue ready to serve. Deploy to blue, then move traffic.</td>
+      <td>Cutover without downtime; rollback is a trivial reversal of the router change.</td>
+      <td>Costs <b>twice the resources</b>. And used as normally described, it is <b>a before/after canary</b>, with all that implies. It becomes a real A/B canary only if you run both simultaneously and <b>split traffic</b> — green as control, blue as canary, population controlled by the traffic split.</td>
+    </tr>
+    <tr>
+      <td><b>Artificial load generation</b></td>
+      <td>Driving the candidate with synthetic traffic instead of real users.</td>
+      <td>Load tests in QA, preproduction, or even production.</td>
+      <td>Not canarying by definition, though still useful. Good at <b>code coverage</b>, poor at <b>state coverage</b> — especially hard in mutable systems with caches, cookies and request affinity — and it may not model organic traffic shifts. Also genuinely dangerous in some systems: synthetic load on a billing system might send callouts to card providers and <b>actually charge customers</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Traffic teeing</b></td>
+      <td>Copy real traffic to both systems; production serves and responds, the canary serves the copy and discards the responses.</td>
+      <td>You can even compare canary responses to real ones for further analysis.</td>
+      <td>Representative traffic, but <b>more complicated to set up</b>, and it doesn't identify risk in stateful systems: if the canary and production share a cache, an artificially inflated hit rate <b>invalidates your performance measurements</b>.</td>
+    </tr>
+  </table>
+
+  <h3>Release engineering, the foundation underneath</h3>
+  <ul>
+    <li>Five principles: <b>reproducible builds</b> (same inputs, same artifacts, this week as last); <b>automated builds</b> (check in code, automation produces and uploads artifacts); <b>automated tests</b>; <b>automated deployments</b> (performed by computers, not humans); <b>small deployments</b> (artifacts contain small, self-contained changes).</li>
+    <li>What they buy: less operational load; enforced peer review and version control, since automation is code; consistent repeatable processes with fewer mistakes; and a pipeline you can <b>monitor and measure</b> — how long does a release take to reach production, how often are releases successful, what would catch defects earlier, what can be parallelised.</li>
+    <li>The virtuous cycle: automation lets you release more often → fewer changes bundled per artifact → <b>cheaper and easier rollback</b> → and bug fixes reach users faster.</li>
+    <li>A related lever: <b>separate components that change at different rates</b> — binaries, environments like the JVM, kernel and OS, libraries, service config and flags, feature and experiment config, user config. Feature flag frameworks let you separate feature launches from binary releases, so a binary carrying several features can enable them one at a time, and <b>selectively disable just the misbehaving ones</b> without waiting for the next build cycle.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 4 continued</div>
+
+  <h3>The arithmetic that justifies the whole practice</h3>
+  <ul>
+    <li>Take a release candidate that fails <b>20% of requests</b>. Deployed globally, you fail 20% of everything, immediately.</li>
+    <li>Deploy it to a <b>5% canary population</b> instead: 20% errors on 5% of traffic gives a <b>1% overall error rate</b>. Same defect, same detection and rollback time — a twentieth of the damage.</li>
+    <li>The general statement: <b>impact on the budget is directly proportional to the amount of traffic exposed to defects.</b> That is the sentence to remember.</li>
+    <li>But notice what the arithmetic hides — the errors become <b>hard to see</b>. At 1% overall the canary's failure may be indistinguishable from background noise, which is why metric breakdown by version matters (below).</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>The model's assumptions, stated honestly</h4>
+    <p>That calculation assumes <b>uniform load</b>; that you may spend your <i>entire</i> error budget on canaries; that only unavailability introduced by new releases counts, rather than actual availability; and a <b>100% failure rate as the worst case</b>, when real defects rarely affect all usage. It also allows overall availability to dip below the objective for the canary's duration.</p>
+    <p>&ldquo;Essentially, all models are wrong, but some are useful.&rdquo; Use the <b>simplest model that meets your technical and business objectives</b> — chasing technical correctness here leads to overinvestment in modelling, and for complex services to incessant tuning for no real benefit.</p>
+  </div>
+
+  <h3>Choosing population and duration</h3>
+  <ul>
+    <li><b>Development velocity sets the ceiling.</b> Release weekly and you can afford fairly long canaries. Release daily and a week-long canary is impossible. Deploy continuously — twenty times a day — and the duration must be significantly shorter.</li>
+    <li><b>Run one canary at a time.</b> Simultaneous canaries add significant mental effort to track system state, which becomes a real problem in exactly the nonstandard circumstances where reasoning quickly matters — and overlapping canaries risk <b>signal contamination</b>. The advice is strong: run only one.</li>
+    <li>Four dimensions to balance, and they can be <b>mutually at odds</b>:</li>
+  </ul>
+  <table class="tight">
+    <tr><th style="width:34mm">Dimension</th><th>What it demands</th></tr>
+    <tr><td><b>Size and duration</b></td><td>Big enough and long enough to be representative. Terminating after a handful of queries gives no useful signal for systems with diverse queries. <b>The higher the processing rate, the less time you need</b> to be confident the behaviour is attributable to the change rather than a random artifact.</td></tr>
+    <tr><td><b>Traffic volume</b></td><td>Enough traffic that the system has handled a representative sample <i>and</i> had a chance to react badly to it. <b>The more homogeneous the requests, the less volume you need.</b></td></tr>
+    <tr><td><b>Time of day</b></td><td>Performance defects typically manifest only under heavy load — resource contention, database write conflicts, locking in multithreaded applications. <b>Deploying off-peak likely won't trigger them.</b></td></tr>
+    <tr><td><b>Metrics to evaluate</b></td><td>Trivial metrics like query success evaluate quickly; something like queue depth may need more time or a larger population to give a clear signal.</td></tr>
+  </table>
+  <p>Once you have metrics from past canaries, you can choose parameters based on <b>typical canary evaluation failure rates</b> rather than hypothetical worst cases.</p>
+
+  <h3>Choosing metrics — where most canary processes go wrong</h3>
+  <ul>
+    <li><b>The metric must indicate problems.</b> Start from your indicators: good ones already have strong attribution to service health, and you've done the work. A failed user request is probably a problem — though be disciplined, since <b>a request can fail because the user asked for something unreasonable</b>, like a nonexistent URL.</li>
+    <li><b>More metrics is not better.</b> Each needs a defined notion of acceptable behaviour. Too strict and you get false positives — you'll believe a good canary is bad. Too loose and bad canaries go undetected. Getting it right is time-consuming and needs analysis, and expectations must be re-evaluated as the service evolves.</li>
+    <li>So <b>stack-rank metrics by how well they indicate user-perceivable problems</b> and take the top few — <b>perhaps no more than a dozen</b>. Beyond that, returns diminish and are outweighed by maintenance cost, or by the damage to trust in the release process when they aren't maintained.</li>
+    <li>For the example frontend service: candidate metrics include CPU usage, memory footprint, HTTP return codes, latency, correctness. The best are <b>HTTP return codes and latency</b>, because their degradation maps most closely to a problem that impacts users. <b>CPU usage is a poor choice</b> — increased resource usage doesn't necessarily impact the service, and produces a flaky, noisy canary process, which leads to the canary being <b>disabled or ignored by operators</b>, defeating the point of having one.</li>
+    <li>The tricky case: <b>HTTP 404</b>. It can mean the user followed a wrong URL — imagine a broken link shared on a popular discussion board — or that the server incorrectly stopped serving a resource. The workaround is to <b>exclude 400-level codes from canary evaluation</b> and add black-box monitoring testing for the presence of a particular URL, then feed that into the analysis. This isolates the canary process from odd user behaviour.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>Representative and attributable — the isolation problem</h4>
+    <ul style="margin-bottom:0">
+      <li>In a large population you will have <b>outliers</b>: oversubscribed machines, machines on different kernels with different performance characteristics, machines on an overloaded network segment. So <b>the difference between canary and control is as much a function of the two infrastructures as of the change you deployed.</b></li>
+      <li><b>Isolate the metric itself.</b> Whole-system CPU is poor — database load and log rotation move it too. Better: <b>CPU time spent by the process serving the request</b>. Better still: <b>CPU time serving the request over the window the process was actually scheduled on a CPU</b>. An oversubscribed neighbour is a real problem and monitoring should catch it, but it isn't caused by your change and shouldn't fail your canary.</li>
+      <li><b>Tie the metric back to indicators.</b> If a metric can change wildly with no impact on the service, it is unlikely to make a good canary metric.</li>
+      <li><b>Shared failure domains cut both ways.</b> A bad canary can negatively impact the control; bad system behaviour can make you misjudge the canary. Two consecutive requests from one client can cross the boundary — the canary's response changes the content of the second request, which lands on the control and alters <i>its</i> behaviour. So a stop signal <b>does not necessarily mean the canary is at fault</b>, and you should also use <b>absolute measures, such as defined objectives</b>, to confirm the system is operating correctly.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 4 continued</div>
+
+  <h3>What monitoring has to be able to do</h3>
+  <ul>
+    <li><b>Fine-grained breakdown.</b> A 5% canary at a 20% error rate shows up as 1% overall — potentially indistinguishable from other sources of error. Broken down <b>by population servicing the request</b>, the same data shows the release candidate serving the vast majority of errors while the live version sits at a low steady state. Monitoring that reasons well about a whole service <b>is not sufficient</b> to analyse a canary.</li>
+    <li><b>Matching intervals.</b> Canaries are time-limited by design, so an aggregated metric can wreck the evaluation. The failure runs: an unrelated event causes some errors; a canary deploys to 5% for 30 minutes; the system evaluates the <i>errors-per-hour</i> metric; the deployment is judged bad because errors-per-hour differs from the control. The metric was computed over an hour to judge a 30-minute deployment. <b>Make metric intervals the same as, or less than, the canary duration.</b></li>
+  </ul>
+
+  <h3>Canarying things that aren't request/response</h3>
+  <ul>
+    <li><b>Duration follows the work unit.</b> For interactive systems we assume processing takes seconds, far shorter than the canary. For rendering pipelines or video encoding it can take much longer, so the canary duration must <b>at minimum span a single work unit</b>.</li>
+    <li><b>Isolation gets harder.</b> Many pipelines have one work assigner and a fleet of workers; in multistage pipelines a unit is processed, returned to the pool, then picked up again. Ensure the workers processing a particular unit always come from <b>the same pool</b> — canary or control — or the signals get increasingly mixed.</li>
+    <li><b>Metrics get harder.</b> You may care about end-to-end time to process the unit (the analogue of latency) as well as the quality of the processing itself, which is entirely application-specific.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — what makes something a canary</h4>
+    <p><b>It is not</b> simply &ldquo;a careful rollout&rdquo;, and it is not any comparison that produces a graph.<br>
+    <b>It is</b> a <i>partial</i> and <i>time-limited</i> deployment evaluated against a <b>concurrent control</b> carrying <b>real traffic</b>. Remove the concurrency and you have before/after evaluation, where time itself is the biggest confounder. Remove the real traffic and you have load testing, which gives good code coverage and poor state coverage. Both are useful; neither tells you what a canary tells you.</p>
+  </div>
+
+  <h3>Anchor sketch — the canary decision chain</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <span class="node">boxed = a named node</span> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">  a release candidate
+         |
+         v
+  <span class="tk4">POPULATION</span> -- 5% of traffic, load proportional to population
+         |          impact on budget is proportional to
+         |          the traffic exposed to defects
+         v
+  <span class="tk4">DURATION</span> -- bounded above by release cadence
+         |         bounded below by: representative sample,
+         |         traffic volume, time of day, metric type
+         |         ONE canary at a time
+         v
+  <span class="tks">METRICS</span> -- start from your SLIs; stack-rank by
+         |        user-perceivable impact; no more than a dozen
+         |        good: HTTP codes, latency
+         |        bad:  whole-system CPU (noisy -> ignored)
+         v
+  <span class="tk4">COMPARISON</span> -- against a CONCURRENT control
+         |           broken down by version, not service-wide
+         |           metric interval <= canary duration
+         v
+     good / bad -> proceed, or pause and roll back
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Why is whole-system CPU a bad canary metric, and what is the failure mode of choosing it — not for the metric, but for the process?<br>
+      <span class="q">Q</span> Name the two ways a metric's <i>time interval</i> can ruin an otherwise sound canary.<br>
+      <span class="q">Q</span> Give the sentence that connects canary population size to the error budget.
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 4 · phrasing, questions, matrix</div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We'll roll it out to a few servers first.&rdquo;</td><td>&ldquo;A partial, time-limited deployment evaluated against a concurrent control — with the load fraction proportional to the canary population.&rdquo;</td></tr>
+    <tr><td>&ldquo;It only affects a few users if it's broken.&rdquo;</td><td>&ldquo;Impact on the error budget is directly proportional to the traffic exposed to defects — 20% errors on a 5% canary is a 1% overall rate.&rdquo;</td></tr>
+    <tr><td>&ldquo;We compared it to last week.&rdquo;</td><td>&ldquo;That's a before/after evaluation — a canary in time-space. Time is one of the biggest sources of change in observed metrics, so a Monday release compared to a weekend is mostly noise.&rdquo;</td></tr>
+    <tr><td>&ldquo;We watch CPU during the rollout.&rdquo;</td><td>&ldquo;Weak canary metric — resource usage doesn't necessarily impact users, and a noisy canary gets disabled or ignored, which defeats the process.&rdquo;</td></tr>
+    <tr><td>&ldquo;The dashboard didn't show anything.&rdquo;</td><td>&ldquo;Service-wide monitoring isn't sufficient. You need fine-grained breakdown by the population servicing the request, or a 5% canary disappears into the aggregate.&rdquo;</td></tr>
+    <tr><td>&ldquo;The canary looked bad so we reverted.&rdquo;</td><td>&ldquo;Right call — but note that a stop signal doesn't prove the canary is at fault. Shared failure domains mean the control can be affected too, so confirm against absolute measures like the objective.&rdquo;</td></tr>
+    <tr><td>&ldquo;We load-test in preproduction instead.&rdquo;</td><td>&ldquo;Good code coverage, poor state coverage — synthetic load struggles with caches, cookies and request affinity, and won't model organic traffic shifts.&rdquo;</td></tr>
+    <tr><td>&ldquo;We use blue/green, so we're covered.&rdquo;</td><td>&ldquo;Used as a cutover that's a before/after canary. Run blue and green simultaneously and split traffic and it becomes a real A/B canary.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>A team deploys twenty times a day. Their canary process runs each candidate at 2% of traffic for six hours, evaluating on error rate, p99 latency, memory footprint, host CPU, thread count, cache hit ratio, GC pause time, and open file descriptors. Canaries frequently fail; engineers have started re-running them until they pass.</p>
+    <p><b>(a)</b> Name the two parameter choices that are inconsistent with a twenty-a-day cadence, and say what each one breaks. <b>(b)</b> Diagnose the re-running behaviour: name the underlying metric problem, and explain why it is more dangerous than a canary that simply misses defects. <b>(c)</b> Give the selection principle you'd apply, and name which of their eight metrics you would keep.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>A video transcoding pipeline canaries a new encoder. The team deploys the candidate to 10% of workers, watches for twenty minutes, sees no change in the service-wide error rate, and promotes it. Two days later, complaints arrive about corrupted output on long files, and the metric charts from the canary window show nothing unusual.</p>
+    <p><b>(a)</b> Name the two errors specific to canarying a non-interactive system, and say what each one made invisible. <b>(b)</b> Explain why the service-wide error rate was the wrong signal, using the 5%/20% arithmetic to make the point. <b>(c)</b> Give the isolation requirement peculiar to multistage pipelines, and say what goes wrong without it.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — is this actually a canary?</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is the traffic real users, or synthetic? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Real user traffic</div>
+      <div class="colh">Synthetic traffic</div>
+
+      <div class="rowh">CONCURRENT<br>control<br><small>A and B running together</small></div>
+      <div class="cell focus"><b>A true canary</b>
+        Partial, time-limited, evaluated against the remainder of production carrying live traffic at the same moment.<br>
+        <i>Move:</i> this is the only cell that answers &ldquo;is this release safe for my users, now.&rdquo; Break metrics down by version, keep intervals inside the canary duration, and run one at a time.</div>
+      <div class="cell"><b>Teeing</b>
+        Copy real traffic to the candidate, which serves it and discards the responses.<br>
+        <i>Move:</i> useful when you can't expose users at all — but harder to set up, and worthless for stateful risk. A shared cache inflates the hit rate and invalidates the performance numbers.</div>
+
+      <div class="rowh">NO<br>concurrent<br>control<br><small>compared against another time</small></div>
+      <div class="cell"><b>Before/after</b>
+        The whole system is replaced and you compare to the previous period. A blue/green cutover lands here.<br>
+        <i>Move:</i> accept that time is the confounder — a Monday-versus-weekend comparison is mostly noise. If you must, keep the window short and compare like periods.</div>
+      <div class="cell"><b>Load testing</b>
+        Synthetic load in QA, preproduction, or production.<br>
+        <i>Move:</i> keep doing it — good code coverage — but don't call it a canary. Poor state coverage, and dangerous in mutable systems where synthetic traffic can charge real credit cards.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> only the top-left cell tells you about <i>this release, for these users, right now</i>. The other three are worth doing and answer different questions — the mistake is not doing them, it's believing they substitute for the first.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Buy information at a price you set.</b> The defect rate is not yours to choose, but the exposure is — and cost to your budget is directly proportional to the traffic you expose. Pick the smallest population that still gives a representative signal, watch the fewest metrics that map to real user harm, and compare against something running at the same moment.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONSOLIDATION ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch — the whole competency on one page</h2>
+  <p>Three named groups, in the order the story runs: <b>SET</b> &rarr; <b>ENFORCE</b> &rarr; <b>SPEND</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch nobreak" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b>
+      <span class="node">SET — pick a number below perfect</span>
+      <span class="node">ENFORCE — make it bite</span>
+      <span class="node">SPEND — buy information</span>
+      <span class="node nstar">reversed = the one node to remember</span>
+      <span class="q">Q = retrieval cue</span>
+    </div>
+
+<div class="tree"><span class="tk1">GROUP 1 - SET . a number below perfect</span>
+------------------------------------------------------------------
+   100% is wrong: unreachable . invisible . blocks change . reactive
+        |
+        +--> <span class="tk1">SLI</span>  good events / total events, 0-100%
+        |       specification (the question) vs implementation (the
+        |       instrument) -- quality . coverage . cost
+        +--> <span class="tk1">SLO</span>  the target, owned by someone who can trade
+        |       feature velocity against reliability
+        +--> <span class="tks">ERROR BUDGET = 100% - SLO</span>
+                                 |
+                                 v
+<span class="tk3">GROUP 2 - ENFORCE . or it is just a KPI</span>
+------------------------------------------------------------------
+   three parties must sign: product . developers . defenders
+   refusal by each tells you a different thing
+        |
+        +--> <span class="tk3">ERROR BUDGET POLICY</span>  what happens, and who does it
+        +--> check against reality: do dips match complaints?
+        |       miss real harm = <span class="tk3">RECALL</span> problem  -> tighten
+        |       false alarms    = <span class="tk3">PRECISION</span> problem -> relax
+        |       neither works   -> fix the IMPLEMENTATION
+        +--> decide: size incidents by budget consumed,
+                     fund the class that costs the most
+                                 |
+                                 v
+<span class="tk4">GROUP 3 - SPEND . deliberately, not accidentally</span>
+------------------------------------------------------------------
+   <span class="tk4">CANARY</span> vs <span class="tk4">CONTROL</span>, concurrent, on real traffic
+        20% errors on a 5% canary = 1% overall
+        budget impact is proportional to traffic exposed
+        |
+        +--> population . duration . ONE at a time
+        +--> metrics from your SLIs, ranked, at most a dozen
+        +--> break down BY VERSION; interval <= duration
+        +--> not a canary: before/after . load test . teeing
+</div>
+  </div>
+
+  <h3>The question per node — cover the right column</h3>
+
+  <h4>Group 1 — SET</h4>
+  <table class="tight">
+    <tr><th style="width:42mm">Node</th><th style="width:62mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Why not 100%</b></td><td>Give all four reasons.</td><td>You can't reach it even with redundancy and failover; users can't see it through a long dependency chain, so each nine costs more for near-zero marginal utility; you could never change, and change is the number one source of outages; and it leaves you purely reactive.</td></tr>
+    <tr><td><b>SLI shape</b></td><td>What form, and why that form?</td><td>Good events over total events. It lands 0–100%, makes the budget simply 100% minus the objective, and lets every tool expect numerator, denominator and threshold.</td></tr>
+    <tr><td><b>Specification vs implementation</b></td><td>What's the difference, and where do the compromises live?</td><td>The specification is the outcome that matters to users; the implementation is how you measure it. All the blind spots live in the implementation — logs miss requests that never arrived, probers miss subsets of users.</td></tr>
+    <tr><td><b>Quality vs coverage</b></td><td>Why aren't they the same?</td><td>Quality is how accurately you capture one customer's experience; coverage is how many customers you speak for. An instrument can be perfect about 2% of users.</td></tr>
+    <tr><td><b>Reversed: error budget</b></td><td>Why is this the node to remember?</td><td>It converts reliability from an opinion into a currency — spendable, attributable to incidents, comparable across projects. Everything in groups 2 and 3 is about protecting or spending it.</td></tr>
+    <tr><td><b>Ownership</b></td><td>Who owns the objective and why them?</td><td>Someone empowered to trade feature velocity against reliability — normally the product owner, or the CTO in a small organisation.</td></tr>
+  </table>
+
+  <h4>Group 2 — ENFORCE</h4>
+  <table class="tight">
+    <tr><th style="width:42mm">Node</th><th style="width:62mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>The three signatures</b></td><td>Who signs, and what does each refusal mean?</td><td>Product managers (refusal means it's too loose), developers (they must commit to acting on exhaustion), and the defending team (refusal means it isn't defensible without excessive toil and burnout).</td></tr>
+    <tr><td><b>Error budget policy</b></td><td>What makes it more than paperwork?</td><td>It names the actions and the owners, and getting it approved is itself the test of whether the objectives are fit for purpose.</td></tr>
+    <tr><td><b>Recall vs precision</b></td><td>Define both, and give the trap.</td><td>Recall is the share of user-impacting events you capture; precision is the share of captured events that were user-impacting. The trap: improving recall while destroying precision produces alerts the team learns to ignore.</td></tr>
+    <tr><td><b>Aspirational objective</b></td><td>When, and what does it avoid?</td><td>When you need a tighter target you can't yet meet. Tracked alongside but explicitly excluded from the policy, so you avoid a permanent state of emergency.</td></tr>
+    <tr><td><b>Sizing incidents</b></td><td>What does budget-consumed let you do that severity labels don't?</td><td>Compare classes: if bad pushes cost twice what database failures do, fund the release problem rather than the rarer, scarier one.</td></tr>
+    <tr><td><b>The independence fallacy</b></td><td>Why doesn't two zones give you six nines?</td><td>Because the multiplication assumes independence, and there are common dependencies, common failure domains, shared fate and global control planes.</td></tr>
+  </table>
+
+  <h4>Group 3 — SPEND</h4>
+  <table class="tight">
+    <tr><th style="width:42mm">Node</th><th style="width:62mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Canary and control</b></td><td>Define both, and the one sizing rule.</td><td>The canary is the subset receiving the change, the control the remainder. The fraction of load should be proportional to the size of the canary population.</td></tr>
+    <tr><td><b>The 5%/20% arithmetic</b></td><td>Do the sum and state the general rule.</td><td>20% errors on a 5% canary is 1% overall. Impact on the budget is directly proportional to the traffic exposed to defects.</td></tr>
+    <tr><td><b>One at a time</b></td><td>Why not run several?</td><td>Tracking system state gets much harder exactly when you need to reason quickly, and overlapping canaries risk signal contamination.</td></tr>
+    <tr><td><b>Metric selection</b></td><td>Where do you start, and how many?</td><td>Start from your indicators, stack-rank by user-perceivable impact, keep the top few — perhaps no more than a dozen.</td></tr>
+    <tr><td><b>The noisy-metric failure</b></td><td>What actually goes wrong with a bad metric like host CPU?</td><td>It makes the canary flaky, and a flaky canary gets disabled or ignored by operators — which defeats the point of having one at all.</td></tr>
+    <tr><td><b>Monitoring requirements</b></td><td>Two things monitoring must do.</td><td>Break metrics down by the population servicing the request, and use intervals no longer than the canary duration.</td></tr>
+    <tr><td><b>Not a canary</b></td><td>Name three near-misses and what each lacks.</td><td>Before/after (no concurrent control, time confounds it), load testing (synthetic, poor state coverage), teeing (real traffic but blind to stateful risk through shared caches).</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Section 6 continued · the transferable card</div>
+  <h2>Master 2&times;2 — the decision card you can carry to other problems</h2>
+  <p>This one isn't about software, which is the point. Two questions decide whether a setback teaches you anything: <b>did you choose it</b>, and <b>could you afford it</b>.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: could you afford it? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Within budget<br><small>you had room, and knew it</small></div>
+      <div class="colh">Beyond budget<br><small>no room, or you never measured</small></div>
+
+      <div class="rowh">FAILURE<br>CHOSEN<br><small>you picked the size and timing</small></div>
+      <div class="cell good"><b>Buying information</b>
+        A canary at 5%. A fire drill. A practice exam. A small deliberate loss taken while you're watching.<br>
+        <i>Move:</i> this is the only quadrant that reliably produces learning. Spend here on purpose — an unspent budget is not a saving, because something else will spend it for you.</div>
+      <div class="cell"><b>Gambling</b>
+        Deliberately degrading service to see what users tolerate, with no budget to absorb it.<br>
+        <i>Move:</i> don't. Experiment with reliability only when confident you have budget to burn — and treat deliberately worsening the customer experience as a line to cross very thoughtfully, if at all.</div>
+
+      <div class="rowh">FAILURE<br>IMPOSED<br><small>it happened to you</small></div>
+      <div class="cell"><b>Absorbed</b>
+        An outage that ate 13% of the budget. Survivable, and it still bought you data — which class of incident, and what it cost.<br>
+        <i>Move:</i> attribute it. An imposed failure you measure is half as wasteful as one you merely survive.</div>
+      <div class="cell focus"><b>Crisis</b>
+        Budget exhausted by events you didn't choose and can't absorb. Every option now is a reaction.<br>
+        <i>Move:</i> this is what the whole discipline exists to prevent. The policy that fires here — freeze, reprioritise, declare emergency — should have been agreed while everyone was calm, because nobody negotiates well from this cell.</div>
+    </div>
+    <div class="legend"><b>The move that matters:</b> you don't control the right-hand column directly — you control it in advance, by setting a budget honestly and not spending it all on accidents. And you control the row completely: choosing your failures is always available, and always cheaper than having them chosen for you.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Decide in advance how much failure you can afford, then spend it deliberately to learn something — because if you don't spend it, something else will.</b></p>
+    <p style="margin-top:6pt">Far outside software. A hospital budgets theatre time for training operations rather than learning on emergencies. An investor sizes a position so a loss is tuition, not ruin. A cyclist rides the descent in the rain on a quiet Sunday rather than discovering their braking limit in a race. In each case the total risk isn't reduced — it's <i>rescheduled</i> to a moment of your choosing, at a size you picked.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. LOOKUP ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>Objectives and budgets</h3>
+  <table class="tight">
+    <tr><th style="width:50mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Nobody will say what the reliability target is, but everyone acts as if it's perfection.</td><td>An unspoken 100% goal — the second maturity level.</td><td>Get agreement that a number below 100% is acceptable, before arguing about which number.</td></tr>
+    <tr><td>The target is published and charted, and missing it changes nothing.</td><td>An objective without teeth. It's a KPI, not a decision-making tool.</td><td>Write the error budget policy and get it approved by product, developers and the defending team.</td></tr>
+    <tr><td>The reliability number is owned by the people who operate the service.</td><td>Ownership sits with someone who can't trade feature velocity against reliability.</td><td>Move ownership to the product owner, or the CTO in a small organisation.</td></tr>
+    <tr><td>Dashboard is green; support tickets are climbing.</td><td>A recall problem — the indicator isn't capturing user-impacting events.</td><td>Tighten the objective, or move the measurement closer to the user. Check the correlation between tickets and budget loss.</td></tr>
+    <tr><td>The team has stopped believing the alerts.</td><td>A precision problem, probably created by chasing recall.</td><td>Relax the objective, or fix the implementation. An alert nobody believes is worse than none.</td></tr>
+    <tr><td>You need a tighter number but can't meet it for months.</td><td>Tightening now would mean permanent budget exhaustion.</td><td>Institute an aspirational objective — tracked alongside, explicitly excluded from the policy.</td></tr>
+    <tr><td>Availability measured from server logs looks far better than users report.</td><td>The implementation misses requests that never reached the backend.</td><td>Move to load balancer monitoring, black-box probes, or client-side instrumentation — and name the new blind spot too.</td></tr>
+    <tr><td>The latency number looks fine and users say it's slow.</td><td>A single threshold hiding the tail.</td><td>Add grades: 90% under one threshold and 99% under a looser one.</td></tr>
+    <tr><td>Your indicator swings for no apparent reason between months.</td><td>A calendar or 30-day window containing a varying number of weekends.</td><td>Use a rolling window of an integral number of weeks — four is the general-purpose recommendation.</td></tr>
+    <tr><td>&ldquo;Two zones gives us six nines.&rdquo;</td><td>The independence fallacy.</td><td>Enumerate common dependencies, failure domains, shared fate and global control planes before believing any such multiplication.</td></tr>
+    <tr><td>Budget blown by another team's outage; yours behaved perfectly.</td><td>A dependency-caused miss, with no pre-agreed answer.</td><td>Freezing anyway makes users happier. Whatever you choose, record it in the documented policy before it happens again.</td></tr>
+    <tr><td>Service runs flawlessly, needs almost no attention.</td><td>Met objective, low toil, high satisfaction.</td><td>Relax release processes and increase velocity, or move to a less hands-on support tier and redirect the attention.</td></tr>
+  </table>
+
+  <h3>Canarying</h3>
+  <table class="tight">
+    <tr><th style="width:50mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>A bad release reached everyone at once.</td><td>No canary — global deployment exposes 100% of traffic to the defect.</td><td>Deploy to a small population first; budget impact is proportional to traffic exposed.</td></tr>
+    <tr><td>The canary is running but you can't see its effect in the graphs.</td><td>Service-wide monitoring — a 5% canary at 20% errors reads as 1% overall.</td><td>Break metrics down by the population servicing the request.</td></tr>
+    <tr><td>The canary was judged bad, and nothing was actually wrong.</td><td>Metric interval longer than the canary duration, or a metric with high variance.</td><td>Make intervals no longer than the canary; drop metrics that can move without user impact.</td></tr>
+    <tr><td>Engineers re-run canaries until they pass.</td><td>Too many metrics, or thresholds too strict — a flaky process losing its authority.</td><td>Stack-rank by user-perceivable impact and keep the top few, perhaps no more than a dozen.</td></tr>
+    <tr><td>The canary looks bad but so does the control.</td><td>Imperfect isolation — shared failure domains, or cross-contamination between requests.</td><td>Don't assume the canary is at fault. Confirm against absolute measures such as the objective.</td></tr>
+    <tr><td>Canary passed off-peak; the defect appeared at peak.</td><td>Performance defects manifest under load — contention, write conflicts, locking.</td><td>Canary at a representative time of day, not just a convenient one.</td></tr>
+    <tr><td>Canarying a pipeline found nothing, then output was corrupt.</td><td>Canary duration shorter than a single work unit.</td><td>Span at least one work unit, and keep each unit's processing within one worker pool.</td></tr>
+    <tr><td>Several canaries in flight, and nobody can say what's deployed where.</td><td>Simultaneous canaries — mental load plus signal contamination.</td><td>Run one at a time.</td></tr>
+    <tr><td>&ldquo;We compared this week to last week.&rdquo;</td><td>Before/after evaluation — a canary in time-space.</td><td>Use a concurrent control. If you can't, keep the window short and compare like periods.</td></tr>
+    <tr><td>Synthetic load in preproduction found nothing; production broke.</td><td>Good code coverage, poor state coverage — caches, cookies, request affinity.</td><td>Keep the load tests, but don't treat them as a canary substitute.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. REFERENCE ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:36mm">Number</th><th>What it is</th><th>Why it matters in an argument</th></tr>
+    <tr><td><b>3,000 of 3,000,000</b></td><td>The error budget from a 99.9% objective over four weeks. A 1,500-error outage costs half of it.</td><td>The cleanest demonstration that a budget is a countable quantity you can attribute to a specific incident.</td></tr>
+    <tr><td><b>97.123% → 97%</b></td><td>Measured availability rounded to two significant figures to get a starting objective.</td><td>Shows the whole method: measure, round down, publish. Your first objective is derived, not debated.</td></tr>
+    <tr><td><b>432 ms / 891 ms</b></td><td>Measured 90th and 99th percentile latency, becoming objectives of 450 ms and 900 ms.</td><td>Two grades on one indicator — the concrete answer to &ldquo;the average looks fine.&rdquo;</td></tr>
+    <tr><td><b>50 ms</b></td><td>The rounding granularity for latency objectives.</td><td>Because users are unlikely to perceive a 50 ms change — though the right window differs between a reporting service and a real-time game.</td></tr>
+    <tr><td><b>109,897</b></td><td>Allowed failures under a 97% objective over four weeks.</td><td>The denominator that turns &ldquo;that was a bad outage&rdquo; into &ldquo;that was 13% of the quarter's budget.&rdquo;</td></tr>
+    <tr><td><b>13% and 65%</b></td><td>Budget consumed by a four-hour bad release (14,066 errors) and a 20-hour database restore (72,000 errors).</td><td>The pair that lets you rank incidents by cost rather than by how frightening they felt.</td></tr>
+    <tr><td><b>2×</b></td><td>Bad pushes cost roughly twice the error budget of database failures — two or three per year against one in five years.</td><td>The argument-ending comparison: fund the release problem, not the rarer, scarier one.</td></tr>
+    <tr><td><b>Four weeks, rolling</b></td><td>The general-purpose window, plus weekly summaries for tasks and quarterly for projects.</td><td>An integral number of weeks, so weekend traffic doesn't move the number for uninteresting reasons.</td></tr>
+    <tr><td><b>Five or fewer</b></td><td>Indicator types to choose for a service.</td><td>Stops the &ldquo;measure everything&rdquo; instinct that produces a dashboard nobody reads.</td></tr>
+    <tr><td><b>20% on 5% = 1%</b></td><td>Canary arithmetic: a candidate failing 20% of requests, deployed to 5% of traffic.</td><td>The single most useful number here — and it generalises: budget impact is directly proportional to traffic exposed.</td></tr>
+    <tr><td><b>No more than a dozen</b></td><td>Metrics to evaluate in a canary process.</td><td>Past that, returns are outweighed by maintenance cost and by lost trust when they aren't maintained.</td></tr>
+    <tr><td><b>One</b></td><td>Canary deployments in flight at any moment.</td><td>Simultaneous canaries add mental load exactly when reasoning must be fast, and risk signal contamination.</td></tr>
+    <tr><td><b>99.99% / 99.9%</b></td><td>Bucketed availability objectives for premium and free customer tiers.</td><td>Concrete proof that one objective for all requests is a choice, not a law.</td></tr>
+  </table>
+
+  <h3>Glossary — the terms you should be able to define cold</h3>
+  <table class="tight">
+    <tr><th style="width:42mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
+    <tr><td><b>SLI / SLO / SLA</b></td><td>Indicator = what you measure. Objective = the target you hold it to. Agreement = a business contract with compensation when users are unhappy enough to be owed something.</td></tr>
+    <tr><td><b>Error budget</b></td><td>100% minus the objective, in the indicator's own units. A budget only if someone may act on its exhaustion.</td></tr>
+    <tr><td><b>Error budget policy</b></td><td>The written actions and owners on exhaustion. Its approval is the test of whether the objective is fit for purpose.</td></tr>
+    <tr><td><b>SLI specification</b></td><td>The user-relevant outcome, independent of measurement. Distinct from the implementation, which is the instrument and carries the blind spots.</td></tr>
+    <tr><td><b>Quality / coverage / cost</b></td><td>How accurately one customer's experience is captured; how many customers are represented; what it costs to build. Quality and coverage are independent.</td></tr>
+    <tr><td><b>Request-driven / pipeline / storage</b></td><td>The three component types, with availability-latency-quality, freshness-correctness-coverage, and durability as their respective indicators.</td></tr>
+    <tr><td><b>Watermark</b></td><td>A timestamp the pipeline records for when data was updated — the basis of a freshness indicator, best checked by clients on read so it's weighted by who saw stale data.</td></tr>
+    <tr><td><b>Recall / precision</b></td><td>Share of user-impacting events captured; share of captured events that were user-impacting. They trade off, and destroying precision to chase recall produces ignored alerts.</td></tr>
+    <tr><td><b>Aspirational objective</b></td><td>A tighter target tracked alongside the live one, explicitly excluded from the policy so you avoid permanent emergency.</td></tr>
+    <tr><td><b>Critical user journey</b></td><td>A core multi-step task, like search → cart → purchase. Improves recall without affecting precision; hard to infer from logs.</td></tr>
+    <tr><td><b>Bucketing</b></td><td>Labelling indicators and applying different objectives per label — by customer tier, or by expected responsiveness.</td></tr>
+    <tr><td><b>Critical dependency</b></td><td>One whose unavailability makes your service unavailable. Its guarantee must be at least as high as the action depending on it.</td></tr>
+    <tr><td><b>Canary / control</b></td><td>The subset receiving the change and the remainder that doesn't, evaluated concurrently on real traffic. Load fraction proportional to population size.</td></tr>
+    <tr><td><b>Before/after evaluation</b></td><td>A canary in time-space. Time is the confounder — a Monday release compared to a weekend is mostly noise.</td></tr>
+    <tr><td><b>Gradual canary</b></td><td>Staged populations, so early stages use only the clearest problem signals and later ones can afford noisier metrics.</td></tr>
+    <tr><td><b>Blue/green</b></td><td>Two environments, one serving. A before/after canary unless you run both and split traffic, which makes it a true A/B.</td></tr>
+    <tr><td><b>Teeing</b></td><td>Copying real traffic to a candidate that discards its responses. Representative, but blind to stateful risk through shared caches.</td></tr>
+    <tr><td><b>Attribution</b></td><td>The property that a metric change is caused by the change you deployed, not by infrastructure differences between canary and control populations.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page ans">
+  <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the proud 100% team</h4>
+  <p><b>(a)</b> Three costs. <b>Quarterly releases</b> — holding perfection means you can never change, and change is the number one source of outages, so the promise is being paid for in stagnation. <b>An exhausted rota</b> — at 100% you can only ever react to the sub-100% that is guaranteed to happen, which is an operations posture rather than an engineering one. <b>Unbounded spend on reliability</b> — each additional nine costs more while the marginal utility to customers approaches zero, and users can't perceive it anyway through the chain of systems between you and them.</p>
+  <p><b>(b)</b> Because the record is evidence for the wrong proposition. Eleven minutes of downtime proves the target is <i>nearly</i> achievable, which makes it feel like a working policy rather than a cost. Nobody sees the counterfactual — the features not shipped, the engineers not sleeping, the improvements not attempted. Success at a bad target is the hardest kind of argument to win, because the damage is entirely in what didn't happen.</p>
+  <p><b>(c)</b> Not the number — <b>ownership</b>. The objective must be owned by someone empowered to trade feature velocity against reliability; in a small organisation the CTO, more usually the product owner or product manager. Until someone with that authority owns it, any number you pick will lose every argument it has with a launch date. Credit also for naming the accompanying precondition: agreement that a target below 100% is acceptable at all.</p>
+
+  <h4>Part 1 · Q2 — the 99.5% that nothing follows from</h4>
+  <p><b>(a)</b> They have an <b>objective without teeth</b> — the third maturity level. What's missing is a committed error budget policy, so the objective functions as a KPI or reporting metric rather than a decision-making tool.</p>
+  <p><b>(b)</b> Precondition 3 is plainly unmet: the organisation has not committed to using the budget for decision making and prioritising, formalised in a policy. Precondition 1 is almost certainly unmet too — a number published on a wiki is not evidence that all stakeholders <i>approved</i> it as fit for the product. Precondition 4, a process for refining the objective, shows no sign of existing either. Any single failure is sufficient because the preconditions are conjunctive: without all four you cannot adopt an error-budget-based approach, and compliance degrades to reporting.</p>
+  <p><b>(c)</b> An <b>error budget policy</b>, approved by the product manager, the development team and the team defending the service. It must specify at least: the actions taken when the budget is exhausted and <i>who</i> takes them; the authors, reviewers and approvers with approval and next-review dates; and a clear escalation path if there is disagreement about the calculation or whether the actions are appropriate. The near-miss fix — publishing the number more prominently — changes nothing, because visibility was never the constraint. Nobody was empowered to act, and a more visible number that still causes nothing to happen is just a better-lit dashboard.</p>
+
+  <h4>Part 2 · Q1 — 99.95% from the logs, complaints from one carrier</h4>
+  <p><b>(a)</b> The <b>specification</b> — the proportion of user requests that succeed — is probably right; the <b>implementation</b> is the problem. Server logs can only record requests that arrived, so requests that never reached the backend are invisible. A carrier-specific network problem produces exactly this signature: users fail, the log-derived number stays beautiful, and the two facts are not in conflict because they are measuring different populations.</p>
+  <p><b>(b)</b> <b>Black-box probers</b> executing JavaScript in a browser in a VM: these catch errors when requests can't reach your network, but may miss issues affecting only a subset of users — and a prober fleet that doesn't sit on that carrier will miss this one too. <b>Client-side instrumentation</b> in the page's own JavaScript reporting to a telemetry service: this captures the real user experience most accurately, including failures that never reach you. Load balancer monitoring is worth naming as the cheap intermediate — closer to the user than app logs, often already available — though it still won't see a request that never arrived.</p>
+  <p><b>(c)</b> Adopt <b>load balancer monitoring</b> first if you have it, because it is cheap and strictly better than logs, then work toward client-side instrumentation. The extra obligation of the most accurate option is that <b>the telemetry infrastructure has its own reliability requirements</b> — you now depend on a new system to know whether your system is working, and you must decide what you believe when it fails.</p>
+
+  <h4>Part 2 · Q2 — the nightly recommendations job</h4>
+  <p><b>(a)</b> It's a <b>pipeline</b>. Its three indicator types are <b>freshness, correctness and coverage</b>. What the team implemented is none of them cleanly — &ldquo;runs that completed without error&rdquo; is closest to an availability measure of the job itself, and it tells you the process exited zero, not that users got good data.</p>
+  <p><b>(b)</b> &ldquo;Days out of date&rdquo; is <b>freshness</b>: have the pipeline record a <b>watermark</b> with the timestamp of the last update, and have clients check it when they request data, incrementing one counter for the request and another when the data was fresher than the threshold. That weights the measure by who actually saw stale data. &ldquo;Plain wrong&rdquo; is <b>correctness</b>: either inject data with known outputs and count how often the output matches, or compute correct output by a separate, more expensive method and sample input/output pairs.</p>
+  <p><b>(c)</b> Coverage is measured by exporting the number of records the pipeline <i>should</i> have processed against the number it did — and its retained blind spot is that it <b>cannot count records it never knew about</b>, typically through misconfiguration. The standing caveat on correctness by curated test data is that the curated data must be <b>representative of real-world data</b>; if it isn't, the indicator is representative of nothing, however green it looks.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 3 · Q1 — checkout meets its number and feels flaky</h4>
+  <p><b>(a)</b> A <b>recall</b> problem: significantly user-impacting events are occurring and the indicator isn't capturing them. Precision is not the issue — nothing is alerting falsely; the instrument is silent when it should speak.</p>
+  <p><b>(b)</b> Because per-request availability measures individual HTTP requests, and a multi-step flow can fail while every constituent request succeeds — the payment step can return a well-formed response that doesn't complete a purchase, or the user can be dropped between steps. Aggregate per-request success is a poor proxy for &ldquo;did the user achieve their goal.&rdquo; The concept that addresses it is the <b>critical user journey</b>: a sequence of tasks that is a core part of the user's experience — for shopping, searching for a product, adding to a cart, completing a purchase.</p>
+  <p><b>(c)</b> The attractive property is that critical user journeys <b>improve recall without affecting precision</b> — you catch more real user harm without generating more false alarms, which is exactly the trade you normally can't get. The practical difficulty is measurement: these tasks almost certainly won't map to existing indicators, each involves multiple complex steps that can fail anywhere, and inferring success or failure from logs is extremely difficult — you cannot easily distinguish a user who failed at step three from one who simply got distracted and left. You'd measure it by joining distinct log events, advanced JavaScript probing, or client-side instrumentation.</p>
+
+  <h4>Part 3 · Q2 — someone else's outage, your budget</h4>
+  <p><b>(a)</b> Two schools of thought, and both are honest. <b>One:</b> your team shouldn't halt releases or divert to reliability work, because your system didn't cause the issue — punishing you for it is arbitrary and demoralising. <b>Two:</b> enact the freeze regardless of cause, to minimise the chance of further outages while the service is already degraded. The guidance favours the second, on a single ground: <b>it will make your users happier.</b> Users experienced an unreliable service; they neither know nor care which team owns the failing component, and stacking your own risk on top of a bad month is what they'd least want. Flexibility is allowed — depending on the nature of the outage and dependency, freezing may not be practical.</p>
+  <p><b>(b)</b> This belongs in the <b>documented error budget policy</b>, agreed in advance and recorded for posterity. Deciding now is the wrong time because the question has become a negotiation between people with immediate stakes in the answer — the development lead is arguing a position, not a principle. The general rule holds here: if a service exhausts its budget and stakeholders don't agree the policy should apply, you don't argue it in the moment, you return to the policy approval stage.</p>
+  <p><b>(c)</b> Structurally: the identity service is a <b>critical dependency</b> — its unavailability makes yours unavailable — so its reliability guarantee must be <b>at least as high</b> as the guarantee of the action depending on it, and the team running it must own that objective the way you own yours. If it can't reach that level, engineer around it: use a different component, or add defences. Two named defences: <b>caching</b> (so a short outage is invisible), and <b>graceful degradation</b> (serve a reduced experience rather than failing). Offline store-and-forward processing also earns credit.</p>
+
+  <h4>Part 4 · Q1 — twenty deploys a day, eight metrics, endless re-runs</h4>
+  <p><b>(a)</b> <b>Duration:</b> six hours is incompatible with twenty deployments a day. Canary duration must factor in development velocity, and with continuous deployment it has to be significantly shorter — otherwise canaries queue, or you're forced into simultaneous canaries, which add real mental load and risk signal contamination. Only one canary should be in flight at a time. <b>Population:</b> 2% is small enough that slower or noisier metrics may never produce a clear signal in the time available; representativeness depends on the canary being sizeable enough and running long enough, and they have squeezed both.</p>
+  <p><b>(b)</b> The re-running is a <b>false positive</b> problem: with eight metrics, several of which can move without any user impact — host CPU, memory footprint, thread count, cache hit ratio, file descriptors — the acceptable-behaviour definitions are collectively too strict, and canaries fail for reasons unrelated to the change. It is more dangerous than a canary that misses defects because it destroys the <b>authority of the process</b>: a flaky canary gets disabled or ignored by operators, which defeats the point of having one. A canary with poor recall still stops some bad releases; a canary nobody believes stops none, and has consumed the budget for building one.</p>
+  <p><b>(c)</b> Start from your <b>service level indicators</b> — good ones already have strong attribution to service health, and the work is done — then <b>stack-rank metrics by how well they indicate actual user-perceivable problems</b> and keep only the top few, perhaps no more than a dozen but here far fewer. Keep <b>error rate (HTTP return codes)</b> and <b>p99 latency</b>: degradation in either maps closely to real user harm. Drop host CPU, memory, threads, cache hit ratio and file descriptors as primary signals — an increase in resource usage doesn't necessarily impact the service. Credit for noting that whole-host CPU is doubly bad because it isn't isolated: other processes move it, so a better metric would be CPU time spent by the process serving the request.</p>
+
+  <h4>Part 4 · Q2 — the transcoding pipeline that passed</h4>
+  <p><b>(a)</b> <b>Duration shorter than a work unit:</b> twenty minutes cannot evaluate an encoder whose long-file work units take longer than that, so the failures that mattered had not finished — let alone been measured — when the canary was promoted. Canary duration must at minimum span the duration of a single work unit. <b>Metric selection wrong for the system:</b> they watched an error rate, but the relevant signals for a pipeline are <b>end-to-end time to process the work unit</b> and the <b>quality of the processing</b>, which is application-specific — corrupted output is a correctness failure that an error rate will never show, because the job succeeded.</p>
+  <p><b>(b)</b> Because service-wide aggregation dilutes the canary until it disappears. The standard illustration: a canary at 5% of the population running at a 20% error rate produces an overall error rate of just 1%, which may be indistinguishable from other sources of error. Here at 10% the dilution is smaller but the principle identical — and since the defect produced <i>no</i> errors at all, the aggregate was doubly useless. You must be able to perform <b>fine-grained breakdowns that differentiate metrics between the canary and control populations</b>. Monitoring that reasons well about an entire service is not sufficient to analyse a canary.</p>
+  <p><b>(c)</b> In multistage pipelines a work unit is processed by a worker, returned to the pool, then picked up for the next stage — possibly by a different worker. The requirement is that the workers processing a particular unit are <b>always pulled from the same pool</b>, canary or control. Without it the signals get increasingly mixed: a unit partly processed by each population produces a result attributable to neither, so you cannot tell whether the candidate caused what you're seeing.</p>
+
+  <div class="box tip nobreak" style="margin-top:14pt">
+    <h4>How to score yourself</h4>
+    <p>Two marks, both quick. <b>Completeness:</b> did you name every element, and — for this competency especially — did you say <i>who has to agree</i> and <i>what it costs</i>? Answers that describe a mechanism but skip the negotiation are half answers here. <b>Phrasing:</b> could you have said it in a review without hand-waving? If you wrote &ldquo;the monitoring is wrong&rdquo; where the key says &ldquo;the specification is right but the implementation can't see requests that never reached the backend,&rdquo; the idea is there and the mechanism isn't — and the mechanism is what changes anyone's mind.</p>
+  </div>
+</section>
+
+<!-- ============================== 10. WORKBOOK ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <table class="tight">
+    <tr>
+      <th style="width:56mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:26mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> The four reasons 100% is the wrong target</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> SLI / SLO / SLA — and who owns the objective</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Error budget: definition and the 3,000-of-3M example</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> The four preconditions, and what fails without them</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Good-over-total shape, and the two properties it buys</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Specification vs implementation; quality vs coverage vs cost</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> The three component types and their indicators</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> Freshness via watermark; coverage and correctness blind spots</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Rounding measurements into a starter objective</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> Rolling vs calendar windows; why integral weeks</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> The three signatures and what each refusal means</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Error budget policy — required contents</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Recall vs precision, and the trap between them</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> The four moves when the objective lacks coverage</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> Sizing incidents by budget; comparing classes not instances</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Critical user journeys; bucketing; the independence fallacy</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> The decision matrix — what toil does and doesn't decide</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> Canary and control; the 20%-on-5% arithmetic</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> Population and duration — the four dimensions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> Canary metric selection, and the noisy-metric failure mode</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> Isolation, attribution, and shared failure domains</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> Monitoring requirements: breakdown and interval</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> Before/after, blue/green, load testing, teeing</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> Master matrix — chosen vs imposed, affordable vs not</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, fifteen minutes, write the answers</h3>
+  <ol>
+    <li>Give all four reasons 100% is the wrong reliability target, and say which of them is about your own system and which are about things outside it.</li>
+    <li>Define an error budget, then compute one: a 99.9% success-ratio objective on a service taking 3 million requests over four weeks. What fraction does a single 1,500-error outage consume?</li>
+    <li>Explain the difference between an SLI specification and an SLI implementation, and give two implementations of the same specification with the blind spot of each.</li>
+    <li>Name the three component types, their indicator types, and the trap hidden in a durability number.</li>
+    <li>Your dashboard is green and support tickets are climbing. Name the problem in the recall/precision vocabulary, and give the two directions in which you can improve an implementation.</li>
+    <li>Who must sign off on an error budget policy, and what does a refusal from each party tell you about the objective?</li>
+    <li>You need a tighter objective but can't meet it for six months. What do you do, and what must the policy say about it?</li>
+    <li>A release candidate fails 20% of requests. Deployed to a 5% canary, what is the overall error rate — and state the general principle in one sentence.</li>
+    <li>Name three things that resemble canarying but aren't, and say what each one lacks.</li>
+    <li>Give two ways a metric's time interval can invalidate a canary evaluation, and the rule that prevents both.</li>
+  </ol>
+</section>
+
+</body>
+</html>
