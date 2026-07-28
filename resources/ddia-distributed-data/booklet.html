@@ -1,0 +1,1432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Distributed Data — Study Booklet</title>
+<style>
+:root{
+  --ink:#111111; --soft:#555555; --rule:#b4b4b4; --hair:#d9d9d9;
+  --fill:#f2f2f2; --fill2:#e6e6e6; --fill3:#dadada; --mid:#8c8c8c;
+}
+@page{ size:A4; margin:16mm 15mm 16mm 15mm; }
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+body{
+  font-family:"Charter","Georgia","Times New Roman",serif;
+  color:var(--ink); font-size:10.4pt; line-height:1.44; margin:0;
+}
+h1,h2,h3,h4,.ui{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+h1{font-size:23pt; line-height:1.12; margin:0 0 6pt; letter-spacing:-.4pt}
+h2{font-size:15pt; margin:0 0 4pt; letter-spacing:-.2pt}
+h3{font-size:11.6pt; margin:14pt 0 5pt; letter-spacing:-.1pt}
+h4{font-size:9.6pt; margin:10pt 0 4pt; text-transform:uppercase; letter-spacing:.9pt; color:var(--soft)}
+p{margin:0 0 6pt}
+ul,ol{margin:0 0 7pt; padding-left:17px}
+li{margin:0 0 3pt}
+li > ul{margin-top:3pt}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:var(--fill); padding:.5pt 3pt}
+small{font-size:8.6pt; color:var(--soft)}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.nobreak,.box,.qbox,.sketch,.matrix{break-inside:avoid; page-break-inside:avoid}
+
+/* ---------- cover ---------- */
+.cover{padding-top:24mm}
+.kicker{font-size:9pt; letter-spacing:2.4pt; text-transform:uppercase; color:var(--soft); margin-bottom:10pt}
+.cover .sub{font-size:13pt; color:var(--soft); margin:8pt 0 20pt; line-height:1.35}
+.cover .rule{height:3px; background:var(--ink); width:64px; margin:16pt 0}
+.meta{font-size:9.4pt; color:var(--soft); line-height:1.7}
+.chunkstrip{display:flex; gap:6px; margin:22pt 0 0}
+.chunkstrip div{flex:1; padding:8pt 9pt; background:var(--fill); border-left:3px solid var(--ink);
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
+.chunkstrip b{display:block; font-size:9.6pt; margin-bottom:2pt}
+.chunkstrip .num{display:block; font-size:15pt; font-weight:700; line-height:1; margin-bottom:4pt}
+
+/* ---------- part headers ---------- */
+.chunkhead{padding:11pt 13pt; margin:0 0 12pt; color:#fff; background:var(--ink);
+  display:flex; align-items:flex-start; gap:12pt}
+.chunkhead .big{font-family:Helvetica,Arial,sans-serif; font-size:30pt; font-weight:700; line-height:.92;
+  border:2px solid #fff; padding:2pt 8pt; flex:0 0 auto}
+.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase}
+.chunkhead h2{color:#fff; margin:3pt 0 0}
+.chunkhead p{margin:5pt 0 0; font-size:9.4pt}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--rule); padding:9pt 11pt; margin:0 0 9pt}
+.tenth{background:var(--fill); border:1px solid var(--rule); border-left:5px solid var(--ink)}
+.tenth h4{color:var(--ink)}
+.bound{background:#fafafa; border:1px solid var(--hair); border-left:5px solid var(--mid)}
+.quote{background:var(--fill); border:none; border-left:6px double var(--ink); font-style:italic; padding:8pt 11pt}
+.tip{background:#fff; border:1.5px solid var(--ink)}
+.qbox{border:1.5px solid var(--ink); padding:10pt 12pt; margin:0 0 8pt; background:#fff}
+.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--ink); font-weight:700}
+.qbox p{margin:4pt 0 0}
+.writeline{border-bottom:1px dotted var(--mid); height:15pt}
+.writelines{margin-top:8pt}
+
+/* ---------- tables ---------- */
+table{width:100%; border-collapse:collapse; margin:0 0 9pt; font-size:9.1pt}
+th,td{border:1px solid var(--hair); padding:4.5pt 6pt; text-align:left; vertical-align:top}
+th{background:var(--fill2); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--ink); font-weight:700}
+td b{font-weight:700}
+tr{break-inside:avoid}
+.tight td,.tight th{padding:3.5pt 5pt; font-size:8.8pt}
+
+/* ---------- 2x2 ---------- */
+.matrix{margin:6pt 0 10pt}
+.matrix .ylab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.2pt; text-transform:uppercase; color:var(--soft); margin-bottom:3pt}
+.grid2{display:grid; grid-template-columns:26mm 1fr 1fr; grid-template-rows:auto auto auto; gap:4px}
+.grid2 .corner{}
+.grid2 .colh,.grid2 .rowh{
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; font-weight:700; line-height:1.35;
+  background:var(--fill2); padding:6pt 7pt;
+}
+.grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
+.grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
+.grid2 .cell > b:first-child{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
+.cell.focus > b:first-child{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8; border-left:4px solid var(--mid)}
+.legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
+
+/* ---------- sketch ---------- */
+.sketch{border:1px solid var(--rule); padding:11pt 12pt; background:#fcfcfc; margin:0 0 9pt}
+.node{display:inline-block; padding:3pt 6pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt;
+  line-height:1.3; margin:2pt 0; border:1px solid var(--ink); background:var(--fill)}
+.n1,.n2,.n3,.n4{background:var(--fill)}
+.nstar{background:var(--ink); color:#fff; border:1px solid var(--ink); font-weight:700}
+.tree{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:8.6pt; line-height:1.7; white-space:pre}
+/* tokens used INSIDE .tree — weight and inversion only, so monospace alignment survives */
+.tree .tk1,.tree .tk2,.tree .tk3,.tree .tk4{font-weight:700}
+.tree .tks{font-weight:700; background:var(--ink); color:#fff}
+.q{color:var(--ink); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; font-weight:700}
+
+/* ---------- misc ---------- */
+.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt;
+  text-transform:uppercase; padding:2pt 6pt; background:var(--ink); color:#fff; margin-right:4pt; font-weight:700}
+.p1,.p2,.p3,.p4{background:var(--ink); color:#fff}
+.toc td{border:none; border-bottom:1px dotted var(--hair); padding:5pt 4pt}
+.toc td:last-child{text-align:right; color:var(--soft); font-family:Helvetica,Arial,sans-serif; font-size:8.6pt}
+.ans{font-size:9.2pt}
+.ans h4{margin-top:11pt}
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Distributed Data</h1>
+  <div class="rule"></div>
+  <div class="sub">What breaks when one machine becomes many. Encoding so versions can coexist, copying data, splitting data — and why every guarantee above is weaker than it looks.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>Data outlives code</b>Old and new versions read each other's data. Compatibility in both directions.</div>
+    <div><span class="num">2</span><b>Same data, many machines</b>Leaders, followers, lag, conflicts, quorums.</div>
+    <div><span class="num">3</span><b>Different data, many machines</b>Partition keys, skew, hot spots, rebalancing, routing.</div>
+    <div><span class="num">4</span><b>Nothing you're told is reliable</b>Partial failure, unreliable clocks, zombies, fencing.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — Data outlives code</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — Same data, many machines</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — Different data, many machines</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — Nothing you're told is reliable</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+  <div class="box bound">
+    <h4>One warning before you start</h4>
+    <p>This booklet teaches the load-bearing spine of a large subject, not all of it. Each part carries the mechanisms you will actually reason with under pressure — the compatibility directions, the three replication families, the sharding schemes and their failure shapes, and the impossibility results underneath all of them. Where a topic is named but not taught, that is deliberate and marked. If you finish able to recite the mechanisms but unable to say <i>what each one costs</i>, the booklet has failed.</p>
+  </div>
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Given a real design or incident (&ldquo;can we deploy this schema change?&rdquo;, &ldquo;why did that user see their own edit vanish?&rdquo;, &ldquo;one shard is at 90% CPU and the rest are idle&rdquo;, &ldquo;the node came back and corrupted the file&rdquo;), you can:</p>
+    <ol>
+      <li><b>Name the mechanism</b> — which compatibility direction, which replication family, which sharding scheme, which impossibility.</li>
+      <li><b>Locate the asymmetry</b>: which side is old and which is new, which node accepts writes, which key is hot, which observer can't tell slow from dead.</li>
+      <li><b>Prescribe the fix</b> and name the near-miss you rejected.</li>
+      <li><b>State the price.</b> Every one of these costs latency, availability, consistency, operational complexity, or the ability to change your mind later.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>A single machine is a comfortable lie: operations are deterministic, and a fault usually takes the whole thing down rather than leaving you half-working. The moment you have more than one machine, three things stop being true. <b>Code stops being uniform</b> — during any rolling upgrade, old and new versions run simultaneously and must read each other's data. <b>State stops being single</b> — you either keep copies of the same data (replication) or split different data across machines (sharding), and both introduce divergence. And <b>knowledge stops being available</b> — a node cannot tell a slow peer from a dead one, its clock cannot be trusted to order events, and it may itself be paused for a minute without noticing. Parts 1 to 3 build the machinery. Part 4 is the ground truth underneath, and it is the reason every guarantee in the first three parts is hedged.</p>
+
+  <div class="box tenth nobreak">
+    <h4>The whole thing for a smart 15-year-old</h4>
+    <ul>
+      <li>Data you save today gets read by programs written years from now — and by programs written years ago that are still running.</li>
+      <li>Once you have more than one computer, you either keep copies of everything everywhere, or you split it up. Both go wrong in their own way.</li>
+      <li>Copies drift apart. Splits go lopsided, and one popular item can ruin the whole scheme.</li>
+      <li>And you can never tell whether the other machine is broken or just slow. Not with a better timeout — <i>ever</i>.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>Data outlives code</b></td><td>Backward and forward compatibility; textual versus schema-based binary encodings; how Protocol Buffers and Avro each survive schema change; dataflow through databases, services and message brokers; why remote calls are not local calls.</td><td>The problem starts before you distribute anything: two versions of your own code must already share data. Everything later inherits this constraint.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>Same data, many machines</b></td><td>Single-leader, multi-leader and leaderless replication; synchronous versus asynchronous; failover and split brain; replication lag and its three anomalies; conflict handling; quorums.</td><td>The first and most common way to use many machines. It buys availability and read scale, and charges you in consistency.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Different data, many machines</b></td><td>Partition keys; key-range versus hash sharding; skew, hot shards and hot keys; rebalancing schemes; request routing; secondary indexes.</td><td>The second way, for when the data no longer fits. It answers a different problem from replication, and the two are almost always combined.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>Nothing you're told is reliable</b></td><td>Partial failure; unbounded network delay; time-of-day versus monotonic clocks; process pauses; the majority rule; leases, zombies and fencing tokens; Byzantine faults; system models.</td><td>The floor beneath the other three. Every hedge in parts 1–3 — &ldquo;eventually&rdquo;, &ldquo;probably up to date&rdquo;, &ldquo;assumed dead&rdquo; — is cashed out here.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;The major difference between a thing that might go wrong and a thing that cannot possibly go wrong is that when a thing that cannot possibly go wrong goes wrong, it usually turns out to be impossible to get at or repair.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>Data outlives code</h2>
+    <p>Compatibility in both directions, and the two ways a schema survives being changed.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>You save data today. Something reads it in five years — and something written five years ago is still running and reading it too.</li>
+      <li>So data has to be readable by code that is <i>newer</i> than it, and by code that is <i>older</i> than it.</li>
+      <li>The second one is the hard direction: the old program was written before the new format existed, and you can't go back and teach it.</li>
+      <li>Which is why you can add things to a format safely, but removing or renaming things is where people get hurt.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the recipe box</h3>
+  <ul>
+    <li>A family keeps recipes on index cards in one box. Your grandmother's cards are in the box. So are yours. So will your niece's be.</li>
+    <li>You must be able to read your grandmother's cards — she wrote them before you existed. That direction is <b>easy</b>, because you can look at an old card and work out what it means.</li>
+    <li>Your grandmother must be able to read <i>your</i> cards. That direction is <b>hard</b>, because she wrote her reading habits decades ago. If you invent a new field — &ldquo;air fryer temperature&rdquo; — she has to not choke on it, and crucially, she has to <b>copy it out unchanged</b> if she ever rewrites the card, or the information is lost for everyone after her.</li>
+    <li>The box is your database. The cards are records. The people are versions of your code, and they are all in the kitchen at the same time.</li>
+  </ul>
+
+  <div class="box quote">
+    &ldquo;A database generally allows any value to be updated at any time… you may have some values that were written five milliseconds ago and others that were written five years ago… This observation is sometimes summed up as <b>data outlives code</b>.&rdquo;
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Backward compatibility</b></td>
+      <td><b>Newer code can read data written by older code.</b></td>
+      <td>Your new release reads records written last year.</td>
+      <td>Normally the easy direction: the new code's authors knew the old format existed and could write for it. Confusing the two directions is the single most common error in this area — fix the phrasing by asking <i>whose code is doing the reading</i>.</td>
+    </tr>
+    <tr>
+      <td><b>Forward compatibility</b></td>
+      <td><b>Older code can read data written by newer code.</b></td>
+      <td>An instance that hasn't been upgraded yet reads a record written by one that has.</td>
+      <td>The hard direction, and the one rolling upgrades force on you: the old code was written before the new format existed. It cannot be taught, so the <i>format</i> must be designed so old readers can skip what they don't recognise — and must preserve it if they write the record back.</td>
+    </tr>
+    <tr>
+      <td><b>Rolling upgrade</b></td>
+      <td>Deploying a new version to a few nodes at a time, monitoring, and working through the fleet.</td>
+      <td>Also called a staged rollout.</td>
+      <td>It's what makes both compatibility directions <i>simultaneously</i> necessary. With client-side applications it's worse: you're at the mercy of the user, who may never install the update.</td>
+    </tr>
+    <tr>
+      <td><b>Field tag</b><br><small>Protocol Buffers</small></td>
+      <td>A number identifying a field in the encoded data, in place of its name.</td>
+      <td><code>string user_name = 1;</code> — the encoded record carries the tag <code>1</code>, never the name.</td>
+      <td>You can freely <b>change a field's name</b>, since the encoding never refers to names — but you can <b>never change or reuse its tag</b>, because that would make all existing data invalid. Reserve retired tags in the schema so nobody forgets.</td>
+    </tr>
+    <tr>
+      <td><b>Writer's / reader's schema</b><br><small>Avro</small></td>
+      <td>The schema used to encode, and the schema the reading application expects. Avro resolves the differences by matching fields <b>by name</b>.</td>
+      <td>The writer's schema must be identical to the one used for encoding; the reader's may be an older or newer version.</td>
+      <td>vs <b>Protocol Buffers</b>, where a single schema version does both jobs. Avro's consequence: the data itself identifies nothing — no field names, no types — so it can be decoded <i>only</i> with the writer's schema, which must be conveyed somehow.</td>
+    </tr>
+    <tr>
+      <td><b>Schema evolution</b></td>
+      <td>Changing a schema over time while keeping old data readable.</td>
+      <td>Adding a field; retiring a field; widening an integer.</td>
+      <td>It gives the flexibility of schemaless storage <i>plus</i> better guarantees and tooling. But keep the number of concurrent schema formats to a minimum, or operations get complicated.</td>
+    </tr>
+    <tr>
+      <td><b>Location transparency</b></td>
+      <td>The idea behind remote procedure calls: make a network call look like a local function call.</td>
+      <td>EJB, Java RMI, DCOM, CORBA, SOAP.</td>
+      <td>Convenient-seeming and <b>fundamentally flawed</b>. A local call is predictable and fails on parameters you control; a network call fails for reasons entirely outside your control, can <b>time out with no result at all</b> so you don't know whether it happened, may need deduplication because a retry can repeat an action that did succeed, and has wildly variable latency.</td>
+    </tr>
+  </table>
+
+  <h3>How each format survives change</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Change</th><th>Protocol Buffers</th><th>Avro</th></tr>
+    <tr><td><b>Add a field</b></td><td>Give it a <b>new tag</b>. Old code meets an unrecognised tag and skips it — the datatype annotation tells the parser how many bytes to skip, so it can also <i>preserve</i> the unknown field. That's forward compatibility. New code reading old data fills a default.</td><td>Only if the field <b>has a default value</b>. A reader on the new schema fills the default when the old writer omitted it.</td></tr>
+    <tr><td><b>Remove a field</b></td><td>Same concerns reversed. <b>Never reuse the tag number</b> — data containing it may still exist and must be ignored by new code.</td><td>Only if the field <b>has a default value</b>. Removing a field with no default breaks forward compatibility, because old readers expect it.</td></tr>
+    <tr><td><b>Rename a field</b></td><td>Free — the encoding carries tags, not names.</td><td>Possible via <b>aliases</b> in the reader's schema, which makes it <b>backward compatible but not forward compatible</b>.</td></tr>
+    <tr><td><b>Change a datatype</b></td><td>Sometimes, with a truncation risk: widening a 32-bit integer to 64-bit means new code reads old data fine (missing bits filled with zeros), but old code reading a large new value <b>truncates it</b> into its 32-bit variable.</td><td>Possible where Avro can convert the type. Adding a branch to a union is <b>backward but not forward</b> compatible.</td></tr>
+    <tr><td><b>Nullability</b></td><td>Absent fields are simply omitted.</td><td>Requires an explicit <b>union type</b> — <code>union { null, long, string }</code> — and <code>null</code> can be a default only if it is the <b>first branch</b>. More verbose, deliberately, to be explicit about what can be null.</td></tr>
+  </table>
+
+  <div class="box tip">
+    <h4>How the reader gets the writer's schema at all</h4>
+    <p>Avro's encoding contains no field names or type markers, so it's undecodable without the writer's schema — and including the whole schema per record would erase the space saving. Three answers, by context: a <b>large file of many records</b> puts the schema once at the start (Avro object container files); a <b>database of individually written records</b> stores a version number in each record and keeps a registry of schema versions (Confluent's schema registry for Kafka, LinkedIn's Espresso); <b>two processes on a connection</b> negotiate the schema at setup and use it for the connection's lifetime.</p>
+    <p>Keeping a registry is worth it regardless: it documents the schemas and lets you <b>check compatibility before anything is deployed</b>.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 1 continued</div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Textual formats (JSON, XML, CSV)</td><td>Human readability; no schema to distribute.</td><td>Size, and no compatibility checking. The binary JSON variants save little — 66 bytes against 81 for the same record — so it's unclear the loss of readability is worth it.</td><td>Interchange across organisations, or debugging.</td></tr>
+    <tr><td>Protocol Buffers</td><td>Compact (33 bytes for the same record). Field tags make add/remove safe and renames free. Code generation for statically typed languages.</td><td>Tags must be assigned and managed by hand; a reused tag silently corrupts meaning.</td><td>Service APIs and long-lived record formats where humans curate the schema.</td></tr>
+    <tr><td>Avro</td><td>Most compact of the three (32 bytes). No tag numbers, so it is <b>friendlier to dynamically generated schemas</b> — you can regenerate a schema from a relational schema on every export and readers still match by name.</td><td>The data is meaningless without the writer's schema, so you must build a way to convey it.</td><td>Bulk data exports and pipelines where schemas are generated, not curated.</td></tr>
+    <tr><td>A schema registry</td><td>Documentation that cannot drift, plus pre-deployment compatibility checks.</td><td>Another service in the path of decoding.</td><td>Any environment with more than a couple of writers.</td></tr>
+    <tr><td>RPC that hides the network</td><td>Familiar programming model.</td><td>It hides exactly what you must handle: unpredictable failure, timeouts with unknown outcome, the need for idempotence on retry, and variable latency.</td><td>Never uncritically. Treat every remote call as a remote call.</td></tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — what compatibility is <i>not</i></h4>
+    <p><b>It is not</b> a property of your database or your language. A schemaless store does not give it to you: the engine stops caring about structure, but your code still expects it.<br>
+    <b>It is</b> a relationship between <i>a process that encodes</i> and <i>a process that decodes</i> — which means it is always directional, and you must say which process is which before the word means anything.</p>
+  </div>
+
+  <h3>Anchor sketch — the two directions</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = the node that matters most</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">        during a rolling upgrade, BOTH are running
+                          |
+          +---------------+---------------+
+          |                               |
+     <span class="tk1">OLD CODE</span>                        <span class="tk1">NEW CODE</span>
+          |                               |
+   writes old data                 writes new data
+          |                               |
+          +------------> read by --------->
+          |         <span class="tk1">BACKWARD COMPATIBILITY</span>
+          |         new code reads old data
+          |         easy: the author knew the old format
+          |
+          <------------- read by <---------+
+                    <span class="tks">FORWARD COMPATIBILITY</span>
+                    old code reads new data
+                    hard: the author had never seen it
+                          |
+                    so the FORMAT must let old readers
+                    skip -- and PRESERVE -- what they
+                    do not recognise
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Say both definitions out loud without using the words &ldquo;forward&rdquo; or &ldquo;backward&rdquo; — only &ldquo;newer code&rdquo;, &ldquo;older code&rdquo;, and which one is reading.<br>
+      <span class="q">Q</span> Why can't the reversed direction be fixed by patching the old code?<br>
+      <span class="q">Q</span> What must an old reader do beyond <i>not crashing</i> on an unknown field, and what is lost if it doesn't?
+    </div>
+  </div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;The new version can still read the old records.&rdquo;</td><td>&ldquo;That's backward compatibility — newer code reading data written by older code. The harder one is forward compatibility, which a rolling upgrade forces on us.&rdquo;</td></tr>
+    <tr><td>&ldquo;Old instances choke on the new field.&rdquo;</td><td>&ldquo;A forward-compatibility break. The encoding needs to let unknown fields be skipped and preserved — that's what the tag plus datatype annotation buys us.&rdquo;</td></tr>
+    <tr><td>&ldquo;We renamed the column.&rdquo;</td><td>&ldquo;Free in Protocol Buffers, since the encoding carries tags not names. In Avro it needs a reader-schema alias, which is backward compatible but not forward compatible.&rdquo;</td></tr>
+    <tr><td>&ldquo;We can reuse that field number now nobody uses it.&rdquo;</td><td>&ldquo;Never. Data containing the old tag may still exist and must be ignored — reserve retired tags in the schema.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's schemaless so we don't have to worry.&rdquo;</td><td>&ldquo;Schemaless is a property of the engine, not the application. Our code still expects structure, and data outlives code.&rdquo;</td></tr>
+    <tr><td>&ldquo;The service call timed out.&rdquo;</td><td>&ldquo;So we don't know whether it happened. That's the outcome a local function call can't produce, and it's why retries need idempotence.&rdquo;</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 1 · questions and matrix</div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A team adds a <code>discount_code</code> field to an order record and deploys across a fleet in a rolling upgrade. Orders created by upgraded instances carry the field. Support later finds orders where the discount was applied at checkout but the field is missing from the stored record entirely — always orders that were later modified, never orders created and left alone.</p>
+    <p><b>(a)</b> Name the compatibility direction that broke and state it without using the words &ldquo;forward&rdquo; or &ldquo;backward&rdquo;. <b>(b)</b> Explain precisely why only <i>modified</i> orders lost the field. <b>(c)</b> Name the property the encoding must have to prevent this, and say why patching the old code is not the fix.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>A team dumps a relational database to files nightly for analytics. The relational schema changes every few weeks — columns added, occasionally renamed. They currently hand-maintain a Protocol Buffers schema for the dump and an engineer updates the tag mapping each time a column changes. It is error-prone and twice someone has reused a tag.</p>
+    <p><b>(a)</b> Name the format better suited to this job and the single structural property that makes it so. <b>(b)</b> Explain how a reader copes when the export's field set changes, and what it matches on. <b>(c)</b> Name the new obligation this format creates that Protocol Buffers does not, and give the mechanism appropriate to <i>this</i> use case.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — who is reading whose data</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: which version <i>wrote</i> the data? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Written by OLD code</div>
+      <div class="colh">Written by NEW code</div>
+
+      <div class="rowh">Read by<br>NEW code</div>
+      <div class="cell"><b>Backward compatibility</b>
+        The new release reads last year's records.<br>
+        <i>Move:</i> normally free — the new code's author knew the old format. In Protocol Buffers, missing fields get defaults; in Avro, the reader's schema supplies the default. Only fails if you removed something the new code needs.</div>
+      <div class="cell good"><b>Tomorrow. Fine.</b>
+        Both sides current.<br>
+        <i>Move:</i> nothing. This is the state you reach after the upgrade completes and after old data has been rewritten or aged out — which for a database may be never.</div>
+
+      <div class="rowh">Read by<br>OLD code</div>
+      <div class="cell good"><b>Yesterday. Fine.</b>
+        The baseline the other cells are measured against.<br>
+        <i>Move:</i> nothing.</div>
+      <div class="cell focus"><b>Forward compatibility</b>
+        A not-yet-upgraded instance reads a record written by an upgraded one — guaranteed to happen during every rolling upgrade.<br>
+        <i>Move:</i> the <i>format</i> must carry the fix, because the reading code is already deployed and cannot be taught. Old readers must skip unknown fields <b>and preserve them on rewrite</b>. Protocol Buffers: new tags, never reused. Avro: add or remove only fields that have a default.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the diagonal is free and the two off-diagonal cells are the whole subject. The top-left is usually solved by whoever writes the new code; the bottom-right cannot be, which is why it is the focus and why encodings are designed around it.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Name the reader before you say &ldquo;compatible&rdquo;.</b> Compatibility is a relationship between an encoder and a decoder, so it has a direction — and the direction you cannot fix by deploying is the one that determines what your format must do.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>Same data, many machines</h2>
+    <p>Leaders, followers, lag and its anomalies, conflicts, and quorums.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Keep copies of the data on several machines: closer to users, still working if one dies, and more machines to answer reads.</li>
+      <li>Copying data that never changes is trivial. All the difficulty is in copying <i>changes</i>.</li>
+      <li>Copies fall behind, so a reader can see an older version of the world — including one where their own edit hasn't happened yet.</li>
+      <li>And if more than one copy accepts changes, two people can change the same thing at once, and somebody has to decide who wins.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the fridge list</h3>
+  <ul>
+    <li>A shared shopping list lives on the fridge. One list, everyone writes on it, everyone reads it. No disagreement is possible — but you have to be in the kitchen.</li>
+    <li>So everyone photographs it. Now you can read it from the shop — but your photo is from this morning, and someone has added milk since. You're reading a <b>stale replica</b>.</li>
+    <li>Worse: you add bread to <i>your photo</i> while your flatmate adds bread to <i>theirs</i>. Now there are two lists that disagree, and nothing in the system knows which is right. That is what accepting writes in more than one place costs.</li>
+    <li>The three replication families are three answers to &ldquo;who is allowed to write on the fridge&rdquo;: exactly one machine, several machines, or no designated one at all.</li>
+  </ul>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Single-leader replication</b></td>
+      <td>One replica is the leader and takes all writes; it ships a change stream to the followers, which apply the writes <b>in the same order</b>. Clients may read from any replica.</td>
+      <td>PostgreSQL, MySQL, Oracle Data Guard, MongoDB, Kafka. Consensus algorithms like Raft also elect a single leader.</td>
+      <td>vs <b>multi-leader</b>: writes go to exactly one node, so ordering is decided in one place — which is what makes strong guarantees possible at all. If the database is sharded, <b>each shard has one leader</b>, and different shards may lead on different nodes.</td>
+    </tr>
+    <tr>
+      <td><b>Synchronous / asynchronous</b></td>
+      <td>Whether the leader waits for a follower's confirmation before reporting success.</td>
+      <td><b>Semisynchronous</b> in practice: one follower synchronous, the rest asynchronous, promoting another if the synchronous one stalls.</td>
+      <td>Making <i>all</i> followers synchronous is impracticable — any one node outage halts every write. Fully asynchronous means a write confirmed to the client <b>is not guaranteed durable</b> if the leader dies; the upside is the leader keeps working however far behind the followers fall.</td>
+    </tr>
+    <tr>
+      <td><b>Failover</b></td>
+      <td>Promoting a follower when the leader fails: detect, choose, reconfigure.</td>
+      <td>Detection is almost always <b>a timeout</b> — no response for, say, 30 seconds means assumed dead.</td>
+      <td>vs <b>catch-up recovery</b>, which is the easy follower-failure case: a follower reconnects and requests the changes it missed. Failover is the hard case, and every step of it can go wrong.</td>
+    </tr>
+    <tr>
+      <td><b>Split brain</b></td>
+      <td>Two nodes both believing they are the leader.</td>
+      <td>If both accept writes with no conflict resolution, data is likely lost or corrupted.</td>
+      <td>Guarding against it by limiting or shutting down old leaders is called <b>fencing</b> (part 4). Careless mechanisms can shut down <i>both</i> nodes — and by the time split brain is detected, corruption may already have happened.</td>
+    </tr>
+    <tr>
+      <td><b>Replication log</b></td>
+      <td>How the leader tells followers what changed. Three implementations.</td>
+      <td><b>Statement-based</b> (ship the SQL), <b>WAL shipping</b> (ship the storage engine's write-ahead log), <b>logical / row-based</b> (ship row-level change records — MySQL's binlog).</td>
+      <td>Statement-based breaks on nondeterminism — <code>NOW()</code>, <code>RAND()</code>, autoincrements, triggers. WAL shipping is <b>tightly coupled to the storage engine</b>, so leader and follower usually can't run different versions, which forbids zero-downtime upgrades. The logical log is decoupled, so it can stay backward compatible — and it's parseable by outside systems, which is <b>change data capture</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Eventual consistency</b></td>
+      <td>Stop writing, wait, and the followers catch up.</td>
+      <td>Normally under a second of lag; near capacity or during network trouble, seconds to minutes.</td>
+      <td>&ldquo;Eventually&rdquo; is <b>deliberately vague</b> — there is no limit on how far a replica can fall behind. And it is not a NoSQL property: an asynchronously replicated relational follower behaves exactly the same way.</td>
+    </tr>
+    <tr>
+      <td><b>Quorum</b><br><small>leaderless</small></td>
+      <td>With <i>n</i> replicas, a write must be confirmed by <i>w</i> nodes and a read must query <i>r</i>. If <b>w + r &gt; n</b>, the read and write sets overlap, so at least one node you read has the latest value.</td>
+      <td>n=3, w=2, r=2 tolerates one node down. n=5, w=3, r=3 tolerates two. Common choice: n odd, w = r = (n+1)/2.</td>
+      <td>Quorums <b>need not be majorities</b> — it matters only that the read and write sets overlap. And even with w + r &gt; n the guarantee is soft: concurrent reads and writes, failed writes that partially succeeded, restored-from-old-backup nodes, and rebalancing can all break it. Treat w and r as tuning the <i>probability</i> of staleness, not as absolutes.</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 2 continued</div>
+
+  <h3>The three anomalies of replication lag, and what each needs</h3>
+  <table class="tight">
+    <tr><th style="width:34mm">Anomaly</th><th style="width:52mm">What the user sees</th><th>The guarantee, and how to get it</th></tr>
+    <tr><td><b>Reading your own writes</b></td><td>You post a comment, the page reloads from a lagging follower, and your comment is gone. To you it looks like the data was lost.</td><td><b>Read-after-write consistency.</b> Read anything the user may have modified <i>from the leader</i> (simple rule: own profile from the leader, others' from a follower). If too much is user-editable, read from the leader for a minute after any write, or track the timestamp of the user's last write and only serve them replicas that have caught up to it. Cross-device makes it harder: the metadata must be centralised, and different devices may route to different regions.</td></tr>
+    <tr><td><b>Monotonic reads</b></td><td>You refresh and see a comment; you refresh again, are routed to a laggier replica, and it's gone. <b>Time appears to move backward.</b></td><td>Make each user always read from the <i>same</i> replica — for example, chosen by a hash of the user ID rather than at random.</td></tr>
+    <tr><td><b>Consistent prefix reads</b></td><td>You see an answer before the question it answers. A causal ordering is violated across shards.</td><td>Ensure causally related writes are written to the same shard — or track causality explicitly.</td></tr>
+  </table>
+
+  <div class="box quote">
+    A GitHub incident: an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter for primary keys, and because the new leader's counter lagged, it <b>reused primary keys</b> the old leader had already assigned. Those keys were also used in a Redis store, so the reuse caused inconsistency between the two — and <b>private data was disclosed to the wrong users</b>.
+  </div>
+  <p>That is what &ldquo;discarding the old leader's unreplicated writes&rdquo; means in practice, and it is why the most important thing in a failover is picking an up-to-date follower: with semisynchronous replication, the one the leader waited for; with asynchronous, the one with the highest log sequence number.</p>
+
+  <h3>When more than one node accepts writes</h3>
+  <ul>
+    <li><b>Multi-leader</b> is worth its complexity in three situations: <b>geo-distributed</b> deployments where every region should take local writes and hide the inter-region delay; <b>offline-capable clients</b>, where each device is a leader and replication lag may be hours or days; and <b>real-time collaboration</b>, where each browser tab holding a shared document is a replica. The libraries doing this are <b>sync engines</b>; an app that keeps working offline is <b>offline-first</b>, and one designed to keep working even if the vendor shuts down its services is <b>local-first</b>.</li>
+    <li>The price is stated bluntly by the source: the consistency multi-leader can achieve is <b>much weaker</b>. You cannot guarantee that a bank account won't go negative, or that a username is unique, because two leaders can each accept a write that is individually fine and jointly illegal. If you need such constraints you are better off with a single leader — this is a <b>fundamental limitation of distributed systems</b>, not a gap in any product.</li>
+    <li><b>Topologies</b> — circular, star, all-to-all — decide the paths writes take. Circular and star break if one node fails, since they route through it; all-to-all is more fault tolerant but lets messages <b>overtake each other</b>, so a replica can receive an update to a row before the insert that created it. Loops are prevented by tagging each write with the identifiers of the nodes it has passed through.</li>
+    <li><b>Leaderless</b> (Dynamo-style: Riak, Cassandra, ScyllaDB) abandons the leader entirely — clients write to several replicas at once, and there is <b>no such thing as failover</b>. Missed writes are repaired by <b>read repair</b> (a reading client notices a stale replica and writes the newer value back), <b>hinted handoff</b> (another replica holds writes on behalf of an absent one and delivers them later), and <b>anti-entropy</b> (a background process that copies missing data, in no particular order and possibly much later).</li>
+    <li>The structural advantage: a leaderless system <b>does not distinguish the normal case from the failure case</b>. There is no failover decision to get wrong, so one slow or absent replica barely affects response times — the client just uses the faster responses, a technique called <b>request hedging</b>. This is especially valuable against <b>gray failures</b>, where a node is not down but is degraded and unusually slow.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — replication is not backup</h4>
+    <p><b>It is not</b> a way to recover from mistakes. Replicas reflect writes from one node onto others as fast as they can, so if you accidentally delete data, <b>the deletion is faithfully propagated too</b>.<br>
+    <b>It is</b> a way to survive machines failing. Backups store <i>old snapshots</i> so you can go back in time — a different purpose, and complementary: backups are often part of setting up a new replica, and archiving replication logs can be part of a backup process.</p>
+  </div>
+
+  <h3>Anchor sketch — three answers to &ldquo;who may write?&rdquo;</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">                 who may accept a write?
+                          |
+       +------------------+------------------+
+       |                  |                  |
+ <span class="tk2">ONE NODE</span>          <span class="tk2">SEVERAL NODES</span>       <span class="tk2">NO DESIGNATED NODE</span>
+ single-leader       multi-leader        leaderless / quorum
+       |                  |                  |
+ order decided      conflicts are       w + r > n so the
+ in one place       unavoidable         read and write sets
+       |                  |              overlap
+ strong guarantees  weak guarantees          |
+ possible           no uniqueness,      no failover at all;
+       |            no "not negative"   normal and failure
+       |                  |             cases look the same
+       v                  v                  v
+ <span class="tks">ASYNC FOLLOWERS</span>   geo-distribution     read repair,
+ read scaling BUT   offline-first        hinted handoff,
+ stale reads and    collaboration        anti-entropy
+ lost writes on
+ failover
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Why is the reversed node the one you are most likely to be running without having chosen it?<br>
+      <span class="q">Q</span> Name the two constraints the middle branch structurally cannot enforce, and say why.<br>
+      <span class="q">Q</span> Give the quorum inequality, and one reason it can hold and still return a stale value.
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 2 · trade-offs, phrasing, questions, matrix</div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:34mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Synchronous follower</td><td>A guaranteed up-to-date copy on at least two nodes.</td><td>If the synchronous follower stalls, <b>all writes block</b> until it returns.</td><td>Durability matters more than write availability — and then only semisynchronously.</td></tr>
+    <tr><td>Fully asynchronous</td><td>The leader keeps accepting writes however far behind followers fall; read scaling works.</td><td>Confirmed writes can be <b>lost</b> on failover; readers see stale data.</td><td>Many followers, or geographically distributed ones. Which is most deployments.</td></tr>
+    <tr><td>Automatic failover</td><td>Recovery without waiting for a human.</td><td>Timeout choice is a trap: too long and recovery drags, too short and you get unnecessary failovers — and an unnecessary failover during a load spike <b>makes things worse</b>. Some teams deliberately prefer manual failover.</td><td>The failure rate justifies the risk, and fencing is in place.</td></tr>
+    <tr><td>Multi-leader</td><td>Local writes in every region; offline and collaborative apps become possible.</td><td>Conflicts, weak consistency, and it's often a <b>retrofitted feature</b> — autoincrementing keys, triggers and integrity constraints interact badly. Widely considered dangerous territory.</td><td>Geo-distribution, offline-first, or collaboration — where there is no alternative.</td></tr>
+    <tr><td>Leaderless with quorums</td><td>No failover; resilience to slow and gray-failing nodes; tunable staleness.</td><td>Weaker guarantees than they appear; harder to monitor, because with no fixed write order there is no simple lag metric.</td><td>You can tolerate eventual consistency and value availability under partial failure.</td></tr>
+    <tr><td>Bigger quorums</td><td>Lower staleness probability.</td><td>More responses to wait for, so a higher chance of hitting a slow replica. In practice quorums are seldom more than <b>four of seven or five of nine</b>.</td><td>Rarely worth pushing past those sizes.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;The copy was out of date.&rdquo;</td><td>&ldquo;Replication lag on an asynchronous follower — eventual consistency, with no upper bound on how far behind it can fall.&rdquo;</td></tr>
+    <tr><td>&ldquo;The user couldn't see their own comment.&rdquo;</td><td>&ldquo;A read-after-write violation. Route reads of anything the user may have modified to the leader, or track their last-write timestamp and only serve replicas that have caught up.&rdquo;</td></tr>
+    <tr><td>&ldquo;It showed up, then disappeared on refresh.&rdquo;</td><td>&ldquo;A monotonic reads violation — the second read hit a laggier replica. Pin each user to one replica, by hash of user ID.&rdquo;</td></tr>
+    <tr><td>&ldquo;We lost writes when it failed over.&rdquo;</td><td>&ldquo;Asynchronous replication means unreplicated writes are discarded on promotion — writes we'd confirmed to clients turn out not to have been durable.&rdquo;</td></tr>
+    <tr><td>&ldquo;Both nodes thought they were in charge.&rdquo;</td><td>&ldquo;Split brain. It needs fencing, and shutdown-based mechanisms can take out both nodes or act too late.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll let both regions accept writes.&rdquo;</td><td>&ldquo;Multi-leader. Accept that we can no longer guarantee uniqueness or non-negative balances — that's a fundamental limitation, not a product gap.&rdquo;</td></tr>
+    <tr><td>&ldquo;We write to two of three and read from two of three.&rdquo;</td><td>&ldquo;A quorum with w + r &gt; n, so the read and write sets overlap. It tunes staleness probability rather than guaranteeing freshness.&rdquo;</td></tr>
+    <tr><td>&ldquo;We have replicas, so we're covered if someone deletes something.&rdquo;</td><td>&ldquo;No — the deletion replicates too. Backups serve a different purpose: going back in time.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>A social app runs one leader and six asynchronous followers, load-balancing reads randomly. Users report three things: their own new posts sometimes vanish on the next page load; a friend's comment appears, then disappears on refresh, then reappears; and after a failover last month, roughly forty seconds of posts were gone permanently.</p>
+    <p><b>(a)</b> Name each of the three symptoms precisely. <b>(b)</b> Give the specific fix for each of the first two, and say why the fix for the second does not solve the first. <b>(c)</b> Explain the third and name the single most important decision during failover that limits it.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>A team wants users in three regions to get fast writes, so they propose a leader in each region replicating asynchronously to the others. The product requires that usernames be globally unique and that a prepaid balance can never go negative. An architect suggests &ldquo;we'll just add a uniqueness constraint and a check constraint&rdquo;.</p>
+    <p><b>(a)</b> Name the architecture and explain, mechanically, why both constraints are unenforceable under it. <b>(b)</b> Say whether this is a limitation of the database product, and justify the answer. <b>(c)</b> Give the two structural options, name one topology hazard they should know about regardless, and say which option you'd take.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — the replication design space</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does a write wait for other replicas before being confirmed? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Waits<br><small>synchronous</small></div>
+      <div class="colh">Doesn't wait<br><small>asynchronous</small></div>
+
+      <div class="rowh">ONE node<br>accepts<br>writes</div>
+      <div class="cell"><b>Semisynchronous leader</b>
+        One synchronous follower, the rest asynchronous; promote another if it stalls.<br>
+        <i>Move:</i> the durable choice — an up-to-date copy on at least two nodes. Price: if the synchronous follower stops responding, writes block until it returns, so never make them all synchronous.</div>
+      <div class="cell focus"><b>Asynchronous leader</b>
+        The overwhelmingly common deployment, and often not a deliberate choice.<br>
+        <i>Move:</i> accept that you have eventual consistency and handle its three anomalies explicitly, and accept that confirmed writes can be discarded on failover. Choose the most up-to-date follower when promoting.</div>
+
+      <div class="rowh">SEVERAL<br>nodes<br>accept<br>writes</div>
+      <div class="cell"><b>Degenerate</b>
+        Synchronous multi-leader: if a write to A must reach B before succeeding, an interruption between them blocks writes anyway.<br>
+        <i>Move:</i> recognise this collapses into single-leader — you have paid multi-leader's complexity for single-leader's behaviour. Pick one deliberately.</div>
+      <div class="cell"><b>Multi-leader and leaderless</b>
+        Geo-distribution, offline-first, collaboration; or Dynamo-style quorums with no leader at all.<br>
+        <i>Move:</i> conflict resolution is now <i>your</i> problem, and uniqueness and threshold constraints are off the table. In exchange you get local writes, no failover, and resilience to gray failure.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> going down buys availability and costs consistency; going right buys latency and costs durability. The bottom-left cell is the only one nobody should deliberately occupy — everywhere else is a real trade.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Count the places a write can be accepted.</b> One place means ordering is decided for you and strong guarantees are available. More than one means conflicts exist whether or not you have designed for them — and constraints that span records, like uniqueness, quietly stop being enforceable.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>Different data, many machines</h2>
+    <p>Partition keys, skew and hot spots, the sharding schemes, and what rebalancing costs.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>When the data no longer fits on one machine, split it up and put each piece somewhere different.</li>
+      <li>Splitting is easy. Splitting so that every machine gets a <i>fair share of the work</i> is the hard part.</li>
+      <li>One extremely popular item can land all the traffic on one machine while the others sit idle — and no clever splitting scheme fixes that by itself.</li>
+      <li>And you have to choose how to split before you know how people will use it. Changing your mind later is expensive.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the encyclopaedia</h3>
+  <ul>
+    <li>A printed encyclopaedia is split across twelve volumes by the first letters of the entry. To find <i>Tapir</i> you go straight to the right volume — no searching.</li>
+    <li>Notice the volumes aren't evenly lettered: volume 1 covers A–B, volume 12 covers T through Z. The <b>boundaries adapt to the data</b>, because words aren't evenly distributed across the alphabet.</li>
+    <li>Now imagine the entries were filed by <i>date added</i> instead. Every new entry goes into the last volume, so one volume is constantly in use and eleven sit on the shelf. That's a <b>hot shard</b>, and it's caused by the key, not the scheme.</li>
+    <li>The fix — hash the key first — makes every volume equally busy but destroys the thing that made the encyclopaedia useful: you can no longer fetch a range in one place.</li>
+  </ul>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Sharding</b><br><small>partitioning</small></td>
+      <td>Splitting data so each record lives on one shard, to spread data volume and write throughput across machines.</td>
+      <td>Usually combined with replication, so copies of each shard live on several nodes.</td>
+      <td>vs <b>replication</b>: replication copies the <i>same</i> data; sharding distributes <i>different</i> data. If read throughput is your only problem you may not need sharding at all — read scaling from part 2 may be enough. Also unrelated to a <b>network partition</b>, which is a network fault.</td>
+    </tr>
+    <tr>
+      <td><b>Partition key</b></td>
+      <td>The value that decides which shard a record goes to. All records with the same partition key land on the same shard.</td>
+      <td>The key in a key-value store; a column — not necessarily the primary key — in a relational model.</td>
+      <td>The choice matters permanently: access is fast if you know the shard, and an <b>inefficient search across all shards</b> if you don't. The sharding scheme is also difficult to change afterwards.</td>
+    </tr>
+    <tr>
+      <td><b>Skew · hot shard · hot key</b></td>
+      <td>Unfair distribution; a shard with disproportionate load; a single key with disproportionate load.</td>
+      <td>A celebrity's post drawing a storm of reads and writes to one key.</td>
+      <td>Skew is the condition, a hot shard is where it lands, a hot key is a cause you cannot hash away — <b>consistent hashing distributes keys uniformly, which is not the same as distributing load uniformly</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Key-range sharding</b></td>
+      <td>Each shard owns a contiguous range of partition keys; keys are stored sorted within a shard.</td>
+      <td>Bigtable, HBase, CockroachDB, FoundationDB, MongoDB's range option. Manual variant in Vitess.</td>
+      <td>Its advantage is <b>efficient range scans</b> — fetch a month of sensor readings in one query. Its matching weakness is a hot shard whenever writes cluster on nearby keys, which a timestamp key guarantees. The standard fix is to prefix the timestamp with something spreading, like a sensor ID — at the cost of needing a separate range query per sensor.</td>
+    </tr>
+    <tr>
+      <td><b>Hash sharding</b></td>
+      <td>Hash the partition key first, then assign by hash.</td>
+      <td>MongoDB uses MD5; Cassandra and ScyllaDB use Murmur3.</td>
+      <td>The hash need not be cryptographically strong, but it must be <b>stable across processes</b> — Java's <code>Object.hashCode()</code> and Ruby's <code>Object#hash</code> can differ between processes, which makes them unusable here. The cost of hashing is that <b>range queries over the partition key are no longer efficient</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Rebalancing</b></td>
+      <td>Moving data between nodes so load stays even as nodes are added or removed.</td>
+      <td>Fixed shard count, hash ranges, or splitting oversized shards.</td>
+      <td>Never use <b>hash mod N</b> over the node count: change N and most keys must move. The whole design problem is moving <i>as little data as possible</i>.</td>
+    </tr>
+    <tr>
+      <td><b>Consistent hashing</b></td>
+      <td>A hash function that keeps shards roughly equal <i>and</i> moves as few keys as possible when the shard count changes.</td>
+      <td>Cassandra and ScyllaDB's scheme, plus rendezvous hashing and jump consistent hashing.</td>
+      <td>The word <b>&ldquo;consistent&rdquo; here has nothing to do with replica consistency or ACID consistency</b> — it describes a key's tendency to stay in the same shard. This collision of vocabulary is a reliable source of confusion.</td>
+    </tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 3 continued</div>
+
+  <h3>The three ways to assign hashes to shards</h3>
+  <table class="tight">
+    <tr><th style="width:32mm">Scheme</th><th>How it works</th><th>What it costs</th></tr>
+    <tr><td><b>Hash mod N</b></td><td><code>hash(key) % number_of_nodes</code>.</td><td><b>Don't.</b> Add a fourth node to three and most keys move — hugely inefficient rebalancing for no benefit.</td></tr>
+    <tr><td><b>Fixed number of shards</b></td><td>Create far more shards than nodes and assign several to each — 1,000 shards over 10 nodes is 100 each. Adding a node reassigns whole shards; the key-to-shard mapping never changes.</td><td>Only entire shards move, which is cheap. But you must guess the count up front: you can never have more nodes than shards, and getting it wrong means an <b>expensive resharding</b>. Shard size grows with the dataset, so a fixed count suits a predictable total size. Pick a number divisible by many factors.</td></tr>
+    <tr><td><b>Hash-range sharding</b></td><td>Give each shard a contiguous <i>range of hash values</i>. Shards split when too big or too hot, so the count adapts.</td><td>Splitting is still expensive, but happens on demand. Used by YugabyteDB and DynamoDB; Cassandra and ScyllaDB use a variant with random boundaries and several ranges per node — <b>16 per node by default in Cassandra, 256 in ScyllaDB</b> — so imbalances even out.</td></tr>
+  </table>
+
+  <div class="box tip">
+    <h4>Hot keys: the problem hashing cannot solve</h4>
+    <p>Uniformly distributed keys do not mean uniformly distributed <i>load</i>. If one key is genuinely hot, a range-based scheme can at least isolate it — put it in a shard by itself, perhaps on a dedicated machine.</p>
+    <p>At the application level, the standard trick is to <b>add a random number to the key</b>: two random digits split writes across 100 keys. But be honest about what it buys. Reads must now query all 100 keys and combine the results, so <b>only the write load is split — the read volume is unchanged</b>. It needs bookkeeping to track which keys are split, and load shifts over time: a viral post is hot for days and then isn't, and some keys are hot for reads while others are hot for writes.</p>
+  </div>
+
+  <h3>Rebalancing: automatic or manual?</h3>
+  <ul>
+    <li>Fully automatic rebalancing means less operational work and enables autoscaling — cloud databases advertise adding and removing shards within minutes.</li>
+    <li>But rebalancing is <b>expensive</b>: it reroutes requests and moves large amounts of data. Done carelessly it overloads the network or the nodes. And the system must keep serving writes throughout — near maximum write throughput, the splitting process <b>may not keep up with incoming writes at all</b>.</li>
+    <li>The genuinely dangerous interaction is with automatic failure detection. A node is overloaded and slow; the others conclude it is dead and rebalance load away from it; that <b>adds</b> load to everyone else and the network; more nodes are then falsely suspected. This is a <b>cascading failure</b> caused entirely by the automation.</li>
+    <li>Hence a human in the loop is often worth the slowness — and manual rebalancing lets you pre-emptively prepare for a known event, like a holiday sale or a ticket release.</li>
+  </ul>
+
+  <h3>Secondary indexes and multitenancy — two things sharding makes harder</h3>
+  <ul>
+    <li>Sharding works well for key-value data. It is harder for relational data, where you may want to search by a <b>secondary index</b> or join records that live on different shards. A write may also need to update related records in several shards, which requires a <b>distributed transaction</b> — available in some databases, but usually much slower than single-node transactions and capable of becoming a system-wide bottleneck.</li>
+    <li><b>Multitenancy</b> is a common non-scalability reason to shard: give each tenant a shard, or group small tenants together. It buys <b>resource isolation</b> (one tenant's expensive query doesn't hurt others), <b>permission isolation</b> (a bug in access control is less likely to cross tenants when the data is physically separate), <b>per-tenant backup and restore</b>, straightforward <b>GDPR-style export and deletion</b>, <b>data residency</b>, and <b>gradual schema rollout</b> one tenant at a time. Extended to services as well as storage, it becomes a <b>cell-based architecture</b>, where a fault stays inside its cell.</li>
+    <li>The catches: it assumes each tenant fits on one node (if not, you must shard within the tenant too), many small tenants make per-tenant shards wasteful, and any feature that joins data <i>across</i> tenants becomes hard.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — sharding is not the default answer to &ldquo;we need to scale&rdquo;</h4>
+    <p><b>It is not</b> a lightweight tuning step. It adds real complexity: a partition key you must choose before you understand the workload and can barely change later, cross-shard queries that are slow, and cross-shard writes that need distributed transactions.<br>
+    <b>It is</b> a heavyweight solution mostly relevant at large scale. Replication is useful at every scale; sharding earns its place only when data volume or write throughput genuinely exceeds one machine — and a single machine can do a great deal.</p>
+  </div>
+
+  <h3>Anchor sketch — choosing a scheme</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">                    a partition key
+                          |
+          +---------------+---------------+
+          |                               |
+    <span class="tk3">KEY RANGE</span>                        <span class="tk3">HASH OF KEY</span>
+    shard owns a span                 shard owns a span
+    of key values                     of hash values
+          |                               |
+    + range scans work              + load spreads evenly
+    - <span class="tks">writes to nearby keys</span>        - range scans over the
+      <span class="tks">-> HOT SHARD</span>                  partition key are gone
+          |                               |
+    fix: prefix the key             fix: make the partition key
+    with something spreading        only the FIRST column, and
+    (sensor id + timestamp)         range-scan the later ones
+          |                               |
+          +---------------+---------------+
+                          |
+              hot KEY? neither helps.
+              isolate it, or split it with a
+              random suffix -- which splits
+              WRITES only, never reads
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Why does hashing solve a hot <i>shard</i> but not a hot <i>key</i>?<br>
+      <span class="q">Q</span> The random-suffix trick splits writes across 100 keys. What happens to the read load, and what bookkeeping does it force?<br>
+      <span class="q">Q</span> Name the one rebalancing scheme you should never use, and the specific reason.
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 3 · phrasing, questions, matrix</div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;One server is doing all the work.&rdquo;</td><td>&ldquo;A hot shard — the workload is skewed. Is it the scheme putting nearby keys together, or a genuinely hot key?&rdquo;</td></tr>
+    <tr><td>&ldquo;We split by timestamp.&rdquo;</td><td>&ldquo;Then all current writes land on one shard. Prefix the key with something spreading and accept a separate range query per prefix.&rdquo;</td></tr>
+    <tr><td>&ldquo;We hash the key across the nodes.&rdquo;</td><td>&ldquo;Not mod N over the node count — change N and most keys move. Use a fixed shard count, or hash ranges that split on demand.&rdquo;</td></tr>
+    <tr><td>&ldquo;Consistent hashing keeps the data consistent.&rdquo;</td><td>&ldquo;Different sense of the word — it means keys tend to stay in the same shard when the shard count changes. Nothing to do with replica or ACID consistency.&rdquo;</td></tr>
+    <tr><td>&ldquo;One customer is huge.&rdquo;</td><td>&ldquo;Then per-tenant sharding breaks its own assumption and you need to shard within that tenant.&rdquo;</td></tr>
+    <tr><td>&ldquo;The cluster rebalanced itself and everything got worse.&rdquo;</td><td>&ldquo;Automatic rebalancing interacting with automatic failure detection — an overloaded node was declared dead, and moving its load made the rest worse. A cascading failure caused by the automation.&rdquo;</td></tr>
+    <tr><td>&ldquo;That query has to check every shard.&rdquo;</td><td>&ldquo;It doesn't use the partition key, so it's a scatter-gather. That's the cost of the key choice — and secondary indexes are where sharding stops being cheap.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>A fleet-tracking system stores position pings keyed by timestamp, sharded by key range across twelve nodes. The main query is &ldquo;all pings in the last hour&rdquo;. One node runs at 95% CPU while the other eleven idle. An engineer proposes switching to hash sharding on the timestamp.</p>
+    <p><b>(a)</b> Explain the current hot shard mechanically, and say whether the scheme or the key is at fault. <b>(b)</b> State exactly what the proposed fix would break, and why that matters given their main query. <b>(c)</b> Give the better fix, and name the query cost it imposes.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A marketplace shards orders by <code>buyer_id</code> using a fixed 256-shard scheme over 16 nodes. A single institutional buyer now generates 40% of all writes. Someone suggests raising the shard count to 4,096 to spread the load. Separately, the cluster recently &ldquo;healed itself&rdquo; during a traffic spike and the outage got worse for twenty minutes.</p>
+    <p><b>(a)</b> Explain why raising the shard count will not help, using the right term for the problem. <b>(b)</b> Give the two available responses, and state precisely what the application-level one does and does not reduce. <b>(c)</b> Explain the self-healing incident, and say what you would change about the rebalancing policy.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — picking a sharding scheme</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: do writes cluster on nearby partition keys? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Writes spread out</div>
+      <div class="colh">Writes cluster<br><small>timestamps, sequential IDs</small></div>
+
+      <div class="rowh">You NEED<br>range scans<br>on the<br>partition key</div>
+      <div class="cell good"><b>Key range, comfortably</b>
+        Sorted within each shard, so scans are cheap and boundaries adapt to the data.<br>
+        <i>Move:</i> use key-range sharding and let the database split shards as they grow — HBase's default trigger is a shard reaching 10 GB.</div>
+      <div class="cell focus"><b>The real tension</b>
+        You want ordered access <i>and</i> your writes all land at one end of the order. Range scans demand the very layout that creates the hot shard.<br>
+        <i>Move:</i> don't hash the whole key — that would destroy the scans you need. Make the partition key a <b>compound</b>: something spreading first, the sequential value second. You keep range scans <i>within</i> each prefix and pay by issuing one query per prefix.</div>
+
+      <div class="rowh">You DON'T<br>need range<br>scans</div>
+      <div class="cell"><b>Hash, easiest case</b>
+        Nothing pulls in either direction.<br>
+        <i>Move:</i> hash sharding. Use a hash that's stable across processes — not Java's <code>Object.hashCode()</code>.</div>
+      <div class="cell"><b>Hash, and it earns its keep</b>
+        Hashing is precisely what turns clustered keys into an even spread.<br>
+        <i>Move:</i> hash sharding, ideally hash-<i>range</i> so shards can split on demand rather than fixing the count up front.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the top-right is the only genuinely hard cell, and it is hard because the two requirements are in direct opposition. Note what no cell contains: a <b>hot key</b>. That is a workload property, not a scheme property, and it must be handled separately by isolating or splitting the key.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>The partition key is a bet on the workload, placed before you have seen it.</b> Choose it for how the data will be <i>read</i> and <i>written</i>, not for how it is naturally identified — and remember that no scheme spreads a single hot key, because the unevenness is in the traffic, not the layout.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>Nothing you're told is reliable</h2>
+    <p>Partial failure, unbounded delay, untrustworthy clocks, zombies — and the fence that saves you.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>One computer either works or crashes. Many computers can be half-broken, and you can't tell which half.</li>
+      <li>You send a message and get nothing back. Was it lost? Is the machine dead? Did the reply get lost? <b>You cannot tell.</b></li>
+      <li>Not with a better timeout, not with a faster network — ever. All you can do is guess, and design so a wrong guess doesn't destroy anything.</li>
+      <li>You can't even trust your own clock, or trust that your own program hasn't been frozen for a minute without noticing.</li>
+    </ul>
+  </div>
+
+  <h3>Start with the letter</h3>
+  <ul>
+    <li>You post a letter asking a question and hear nothing for a fortnight. What happened? Your letter was lost; or it arrived and they're away; or they've died; or they replied and <i>their</i> letter was lost; or it's all just slow.</li>
+    <li>From your side, every one of these looks <b>identical</b>: no reply. You cannot distinguish them, and no amount of waiting turns a guess into knowledge — waiting longer only trades one error for another.</li>
+    <li>So you set a rule: no reply in three weeks, assume they're not coming. That rule is a <b>timeout</b>, and it is a <i>decision</i>, not a discovery.</li>
+    <li>Now the dangerous part. Suppose you assume they're gone and give their job to someone else — and then the original person turns up, having been ill, with no idea they were replaced. Two people now believe they hold the same job. That is the entire safety problem of distributed systems.</li>
+  </ul>
+
+  <div class="box quote">
+    &ldquo;In my limited experience I've dealt with long-lived network partitions in a single data center, PDU failures, switch failures, accidental power cycles of whole racks, whole-DC backbone failures, and a hypoglycemic driver smashing his Ford pickup truck into a DC's HVAC system. And I'm not even an ops guy.&rdquo;
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Partial failure</b></td>
+      <td>Some parts of the system are broken unpredictably while others work fine.</td>
+      <td>An operation involving several nodes sometimes works and sometimes doesn't — and you may not even know whether it succeeded.</td>
+      <td>vs a <b>single-computer fault</b>, which is deliberately designed to be all-or-nothing: computers prefer to crash outright rather than return a wrong result. Partial failure's defining property is <b>nondeterminism</b>, and that is what makes distributed systems hard.</td>
+    </tr>
+    <tr>
+      <td><b>Unbounded delay</b></td>
+      <td>An asynchronous packet network gives no guarantee about when — or whether — a message arrives.</td>
+      <td>Round-trip times of several minutes have been observed at high percentiles across cloud regions; even within one datacentre a topology reconfiguration can delay packets by more than a minute.</td>
+      <td>vs a hypothetical <b>synchronous</b> network with a maximum delay <i>d</i> and a maximum handling time <i>r</i>, where 2<i>d</i> + <i>r</i> would be a correct timeout. Real systems have neither guarantee, which is exactly why no timeout is correct.</td>
+    </tr>
+    <tr>
+      <td><b>Time-of-day clock</b></td>
+      <td>Calendar time, synchronised by NTP, comparable across machines.</td>
+      <td><code>clock_gettime(CLOCK_REALTIME)</code>, <code>System.currentTimeMillis</code>.</td>
+      <td>vs a <b>monotonic clock</b>: time-of-day can be <b>forcibly reset and jump backward</b>, which makes it unsuitable for measuring elapsed time. Its absolute value is meaningful; a monotonic clock's is not.</td>
+    </tr>
+    <tr>
+      <td><b>Monotonic clock</b></td>
+      <td>Always moves forward; good for durations.</td>
+      <td><code>CLOCK_MONOTONIC</code>, <code>System.nanoTime</code>. Resolution usually microseconds or better.</td>
+      <td>Its absolute value is meaningless — perhaps nanoseconds since boot — so <b>comparing monotonic values across two computers is nonsense</b>. NTP may <i>slew</i> its rate by up to 0.05% but cannot make it jump.</td>
+    </tr>
+    <tr>
+      <td><b>Process pause</b></td>
+      <td>A running thread stops for an arbitrary time without knowing it did.</td>
+      <td>A garbage collection pause; a VM paused for tens of milliseconds while another VM uses the core.</td>
+      <td>The dangerous consequence: on resuming, the code has <b>no idea time has passed</b> and continues as though nothing happened — including acting on a lease that has since expired.</td>
+    </tr>
+    <tr>
+      <td><b>Lease · zombie</b></td>
+      <td>A lock that times out and can be reassigned. A zombie is a former holder that hasn't found out it lost the lease.</td>
+      <td>Used to ensure only one leader per shard, or one writer per file.</td>
+      <td>You <b>cannot rule zombies out</b> — a pause or a delayed message will always be possible — so the goal is not to prevent them but to ensure they can do no damage.</td>
+    </tr>
+    <tr>
+      <td><b>Fencing token</b></td>
+      <td>A number the lock service returns with every grant, increasing each time. Every write must carry it, and the storage service rejects any token lower than one it has already accepted.</td>
+      <td>Client 1 holds token 33 and pauses; client 2 acquires token 34 and writes; client 1 wakes and writes with 33, and the storage service <b>rejects it</b>.</td>
+      <td>vs <b>shutting the zombie down</b> (&ldquo;STONITH&rdquo;), which is not effective: it can't stop an already-delayed message, and by the time you detect the zombie the damage may be done. Fencing is permanent, unlike optimistic concurrency control, which can be retried. Called <i>sequencers</i> in Chubby, <i>epoch numbers</i> in Kafka.</td>
+    </tr>
+    <tr>
+      <td><b>Byzantine fault</b></td>
+      <td>A node that <b>lies</b> — sends arbitrary, faulty or contradictory responses.</td>
+      <td>Casting two contradictory votes in one election.</td>
+      <td>vs the assumption made almost everywhere else, that nodes are <b>unreliable but honest</b>: slow, absent, or out of date, but truthful when they do respond. Byzantine tolerance matters in aerospace and among mutually untrusting parties; in a normal datacentre it is impractically expensive and unnecessary.</td>
+    </tr>
+  </table>
+
+  <h3>Why you cannot tell slow from dead</h3>
+  <ul>
+    <li>Send a request and get no response. The possibilities are: the request was lost; it is queued and will be delivered later; the node failed; the node is paused but will resume; the node processed it and the <i>response</i> was lost; or the response is merely delayed. <b>These are indistinguishable.</b> The only information you have is that you haven't received a reply.</li>
+    <li>TCP doesn't rescue you. It retransmits and reorders, but it can't tell whether the outbound packet or the acknowledgment was lost, and it can't plug a cable back in. Worse: if a connection closes with an error you have <b>no way of knowing how much data the remote node actually processed</b>, and an acknowledgment only proves the remote <i>kernel</i> received it — the application may have crashed before handling it. <b>If you need to be sure, you need a positive response from the application itself.</b></li>
+    <li>So you use a timeout — and a timeout is a bet with a cost on both sides. Too long, and users wait through an outage. Too short, and you declare live nodes dead: an action may be performed <b>twice</b>, and transferring a slow node's load onto its peers can <b>cascade</b> until everything stops.</li>
+    <li>Network faults are not rare enough to ignore. One study of a medium-sized datacentre found <b>about 12 network faults per month</b>, half disconnecting a single machine and half a whole rack. Redundant networking gear helps less than you'd hope, because it doesn't guard against <b>human error</b>, a major cause of outages.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>Clocks are worse than they look, and fail silently</h4>
+    <ul style="margin-bottom:0">
+      <li><b>Drift.</b> Google assumes up to <b>200 ppm</b> for its servers — about <b>6 ms</b> of drift for a clock resynchronised every 30 seconds, or <b>17 seconds</b> for one resynchronised daily.</li>
+      <li><b>Sync quality.</b> A minimum error of about <b>35 ms</b> is achievable over the internet, with occasional spikes to around a second. Some public NTP servers are simply wrong, off by hours.</li>
+      <li><b>Jumps.</b> A clock too far from its NTP server may be forcibly reset, so applications watching it see time <b>go backward</b>. Leap seconds have crashed many large systems.</li>
+      <li><b>Silence is the real danger.</b> A defective CPU or misconfigured network breaks loudly. A defective quartz clock or a misconfigured NTP client lets everything <i>seem</i> to work while drifting further from reality — so the result is <b>silent, subtle data loss rather than a dramatic crash</b>. Monitor clock offsets and evict any node that drifts too far.</li>
+      <li>High accuracy is buyable if you must: MiFID II obliges high-frequency trading funds to stay within <b>100 microseconds</b> of UTC, using GPS receivers, atomic clocks and PTP.</li>
+    </ul>
+  </div>
+
+  <h3>Ordering by timestamp: the trap this sets</h3>
+  <ul>
+    <li>Client A writes <code>x = 1</code> on node 1; it replicates to node 3; client B increments to <code>x = 2</code> on node 3; both replicate to node 2. Clock skew between node 1 and node 3 is under 3 ms — better than you can usually expect.</li>
+    <li>Yet <code>x = 1</code> carries timestamp <b>42.004</b> and <code>x = 2</code> carries <b>42.003</b>. B's write is <i>causally later</i> but has the <i>earlier</i> timestamp. Under <b>last write wins</b>, node 2 keeps <code>x = 1</code> and <b>the increment is silently lost</b>.</li>
+    <li>Three consequences worth memorising: writes can <b>mysteriously disappear</b>, because a node with a lagging clock cannot overwrite a faster node's values until the skew has elapsed; LWW <b>cannot distinguish</b> genuinely concurrent writes from sequential ones, which is what version vectors are for; and two nodes can generate <b>identical timestamps</b> at millisecond resolution, needing a tiebreaker that itself can violate causality.</li>
+  </ul>
+
+  <h3>What you can rely on instead</h3>
+  <ul>
+    <li><b>The majority.</b> A node cannot trust its own judgment — it may be semi-disconnected, receiving everything while all its outgoing messages are dropped, protesting &ldquo;I'm not dead!&rdquo; to nobody. So decisions, <i>including the decision that a node is dead</i>, are made by quorum. A majority is safe because <b>there cannot be two conflicting majorities at once</b>, and it tolerates a minority failing: one of three, two of five.</li>
+    <li><b>Fencing tokens.</b> Since zombies cannot be prevented, make their writes harmless. A monotonically increasing token on every grant, carried on every write, and rejected by the storage service if lower than one already seen. A client that has just acquired a lease should write immediately, which fences off any zombie. If your storage supports a conditional write — S3's conditional writes, Azure's conditional headers, Google Cloud Storage's request preconditions — that is enough on its own for a single service.</li>
+    <li><b>An explicit system model.</b> State your assumptions and design to them. On timing: <b>synchronous</b> (bounded delay, pauses and clock error — unrealistic), <b>partially synchronous</b> (well behaved <i>most</i> of the time, with occasional arbitrary violations), <b>asynchronous</b> (no timing assumptions at all, not even a clock — very restrictive). On nodes: <b>crash-stop</b>, <b>crash-recovery</b> (with stable storage surviving, in-memory state lost), <b>degraded / gray failure</b> (a limping node still passing health checks while doing no real work), and <b>Byzantine</b>. For real systems, <b>partially synchronous with crash-recovery faults</b> is generally the most useful.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — a timeout does not detect anything</h4>
+    <p><b>It is not</b> a measurement. No timeout can distinguish a dead node from a slow one, because the network has no upper bound on delay and the node has no upper bound on its own pauses.<br>
+    <b>It is</b> a decision to stop waiting and act on a guess — chosen experimentally by measuring the distribution of round-trip times, and traded off between declaring live nodes dead and waiting too long on dead ones. Design so that <b>being wrong is survivable</b>, which is what fencing tokens and quorums are for.</p>
+  </div>
+
+  <h3>Anchor sketch — what you know versus what is true</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   you send a request. no reply arrives.
+                    |
+       possible worlds, all identical to you:
+       request lost . queued . node dead .
+       node paused . reply lost . reply delayed
+                    |
+                    v
+              <span class="tk4">A TIMEOUT</span> -- a decision, not a discovery
+                    |
+        +-----------+-----------+
+        |                       |
+   too long                 too short
+   users wait through       live nodes declared dead
+   an outage                     |
+                          +------+------+
+                          |             |
+                   action done      load moves to
+                   TWICE            peers -> cascade
+                          |
+                          v
+                   <span class="tks">THE ZOMBIE</span>
+                   still believes it holds the lease
+                          |
+              cannot be prevented -- pauses and
+              delayed messages always possible
+                          |
+                          v
+                   <span class="tk4">FENCING TOKEN</span>
+                   monotonically increasing, carried on
+                   every write, lower ones rejected
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give three of the six indistinguishable worlds, and say what a longer timeout would change about them.<br>
+      <span class="q">Q</span> Why is shutting a zombie down not a solution, even when it works?<br>
+      <span class="q">Q</span> A quorum declares a healthy node dead. What must that node do, and why is a majority safe?
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="kicker">Part 4 · phrasing, questions, matrix</div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;The server didn't respond, so it's down.&rdquo;</td><td>&ldquo;We can't conclude that. No reply is consistent with a lost request, a queued request, a pause, a lost reply or a delayed reply — they're indistinguishable in an asynchronous network.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll tune the timeout properly.&rdquo;</td><td>&ldquo;There's no correct value — delays are unbounded. Measure the round-trip distribution, pick experimentally, and design so a wrong guess is survivable.&rdquo;</td></tr>
+    <tr><td>&ldquo;We timestamp writes to see which is newer.&rdquo;</td><td>&ldquo;That's last-write-wins on time-of-day clocks. A causally later write can carry an earlier timestamp and be silently dropped — you need version vectors to track causality.&rdquo;</td></tr>
+    <tr><td>&ldquo;We measure how long it took with the system clock.&rdquo;</td><td>&ldquo;Use a monotonic clock for durations. Time-of-day can be reset and jump backward.&rdquo;</td></tr>
+    <tr><td>&ldquo;The node came back and overwrote everything.&rdquo;</td><td>&ldquo;A zombie acting on an expired lease. Fencing tokens make its writes rejectable rather than trying to prevent it existing.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's still responding to health checks so it's fine.&rdquo;</td><td>&ldquo;That's a gray failure — a limping node passing health checks while too slow to do real work. Harder to handle than a clean crash.&rdquo;</td></tr>
+    <tr><td>&ldquo;The node knows it's still the leader.&rdquo;</td><td>&ldquo;A node can't trust its own judgment. If a quorum declares it dead it must step down — and there can't be two conflicting majorities at once.&rdquo;</td></tr>
+    <tr><td>&ldquo;What if a node sends bad data on purpose?&rdquo;</td><td>&ldquo;That's a Byzantine fault. We assume nodes are unreliable but honest; Byzantine tolerance is for aerospace and untrusting parties, and it's impractically expensive here.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>A job scheduler uses a lock service so that exactly one worker processes each input file. A worker acquires the lock, begins writing output, suffers a two-minute garbage collection pause, and resumes. Meanwhile the lease expired, a second worker acquired it and wrote its own output. The file is now corrupt. The team proposes reducing GC pauses and doubling the lease duration.</p>
+    <p><b>(a)</b> Name what the first worker became and explain why the proposed fix cannot eliminate the problem. <b>(b)</b> Name the mechanism that does solve it, describe precisely how it rejects the stale write, and say what a client should do immediately on acquiring a lease. <b>(c)</b> Name the popular alternative approach and give two reasons it is ineffective.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>A multi-region key-value store resolves conflicts by last-write-wins on the client's time-of-day timestamp. An engineer reports that a small number of updates &ldquo;never take effect&rdquo; — the write returns success, and a later read shows the old value. It correlates loosely with one region. Clocks are NTP-synchronised and skew is measured at under 5 ms.</p>
+    <p><b>(a)</b> Explain the mechanism, and why sub-5 ms skew does not make it safe. <b>(b)</b> Name the second, distinct defect of last-write-wins that this system also has, and the mechanism that addresses it. <b>(c)</b> Say why this class of fault is especially dangerous operationally, compared with a node that crashes.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — what you believe against what is true</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is the node actually working? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">It is working</div>
+      <div class="colh">It is genuinely dead</div>
+
+      <div class="rowh">You believe<br>it is ALIVE</div>
+      <div class="cell good"><b>Correct, and lucky</b>
+        The normal case. Note it's a belief, not knowledge — you infer it from recent replies.<br>
+        <i>Move:</i> nothing, but don't mistake this for certainty. A gray failure lives here too: still answering health checks, too slow to do real work.</div>
+      <div class="cell"><b>You are waiting on a corpse</b>
+        Requests hang, and no failover starts because nobody has decided it is dead.<br>
+        <i>Move:</i> this is what timeouts are <i>for</i>. Too long a timeout parks you here, so users experience the outage in full.</div>
+
+      <div class="rowh">You believe<br>it is DEAD</div>
+      <div class="cell focus"><b>The zombie</b>
+        A pause, a semi-disconnection, or an over-eager timeout. The node keeps acting on a lease it no longer holds — and does not know time has passed.<br>
+        <i>Move:</i> you cannot prevent this, so make it harmless. <b>Fencing tokens</b> on every write; decisions by <b>quorum</b>, which the node must obey even feeling perfectly healthy. Beware: an action may now happen <b>twice</b>, and its load moving to peers can cascade.</div>
+      <div class="cell"><b>Correct, and handled</b>
+        Detection worked, failover proceeds.<br>
+        <i>Move:</i> promote the most up-to-date replica, and make sure the old node is fenced before it can return.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the diagonal is what you hope for and cannot verify. The two off-diagonal cells are the two ways a timeout is wrong, and they trade directly against each other — every millisecond you shorten it moves risk from the top-right to the bottom-left. The bottom-left is worse, because it corrupts rather than delays.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Design for being wrong, not for being right.</b> You will misjudge which nodes are alive, your clocks will disagree, and your own process will be paused without noticing. None of that is fixable — so put the effort into making a wrong guess survivable: fence the writes, decide by majority, and never let a timestamp decide who wins.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONSOLIDATION ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch — the whole competency on one page</h2>
+  <p>Three named groups, in the order the story runs: <b>SHARE</b> &rarr; <b>SPREAD</b> &rarr; <b>DOUBT</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch nobreak" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b>
+      <span class="node">SHARE — versions must read each other</span>
+      <span class="node">SPREAD — copy it, or split it</span>
+      <span class="node">DOUBT — what you cannot know</span>
+      <span class="node nstar">reversed = the one node to remember</span>
+      <span class="q">Q = retrieval cue</span>
+    </div>
+
+<div class="tree"><span class="tk1">GROUP 1 - SHARE . data outlives code</span>
+------------------------------------------------------------------
+   rolling upgrade -> old and new code run at the same time
+        |
+        +--> <span class="tk1">BACKWARD</span>  new code reads old data   (easy)
+        +--> <span class="tks">FORWARD</span>   old code reads new data   (hard: the
+        |              reader is already deployed and cannot be taught,
+        |              so the FORMAT must let it skip AND preserve)
+        +--> protobuf: tags, never reused . avro: defaults, match by name
+                                 |
+                                 v
+<span class="tk2">GROUP 2 - SPREAD . one machine becomes many</span>
+------------------------------------------------------------------
+   <span class="tk2">REPLICATION</span> - same data, many machines
+        one leader     -> ordering decided in one place, strong
+                          guarantees possible; async = stale reads
+                          + writes lost on failover
+        many leaders   -> conflicts; no uniqueness, no "not negative"
+        no leader      -> quorum w + r > n; no failover at all
+        |
+   <span class="tk2">SHARDING</span> - different data, many machines
+        key range -> range scans, but clustered writes = HOT SHARD
+        hash      -> even spread, but no range scans
+        hot KEY   -> neither helps; isolate or split (writes only)
+                                 |
+                                 v
+<span class="tk4">GROUP 3 - DOUBT . the floor under all of it</span>
+------------------------------------------------------------------
+   no reply is consistent with SIX different worlds
+        a timeout is a decision, never a discovery
+        clocks drift, jump backward, and fail SILENTLY
+        your own process can pause for a minute unnoticed
+        |
+        +--> so: decide by MAJORITY (there cannot be two)
+        +--> and: <span class="tk4">FENCE</span> the writes, because zombies cannot
+                  be prevented -- only made harmless
+</div>
+  </div>
+
+  <h3>The question per node — cover the right column</h3>
+
+  <h4>Group 1 — SHARE</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Data outlives code</b></td><td>What does it actually mean for a deployment?</td><td>You can replace every running process in minutes, but five-year-old records stay in their original encoding unless you rewrite them — so old formats persist indefinitely.</td></tr>
+    <tr><td><b>Backward compatibility</b></td><td>State it without the word &ldquo;backward&rdquo;.</td><td>Newer code can read data written by older code. Usually easy, because the new code's author knew the old format existed.</td></tr>
+    <tr><td><b>Reversed: forward compatibility</b></td><td>Why is this the node to remember?</td><td>Older code reading newer data. Every rolling upgrade forces it, and it can't be fixed by deploying, because the reader is already running — so the format must carry the solution.</td></tr>
+    <tr><td><b>Field tags vs field names</b></td><td>What can you change freely in each format?</td><td>Protocol Buffers: rename freely, never reuse a tag. Avro: matches by name, so add or remove only fields that have a default.</td></tr>
+    <tr><td><b>RPC's flaw</b></td><td>What outcome does a network call have that a local call cannot?</td><td>Returning nothing at all, so you don't know whether it happened — which is why retries need idempotence.</td></tr>
+  </table>
+
+  <h4>Group 2 — SPREAD</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Replication vs sharding</b></td><td>One line each.</td><td>Replication keeps the same data on many machines; sharding puts different data on different machines. Almost always combined.</td></tr>
+    <tr><td><b>Replication vs backup</b></td><td>Why isn't one a substitute for the other?</td><td>Replication propagates your accidental deletion faithfully. Backups store old snapshots so you can go back in time.</td></tr>
+    <tr><td><b>The three lag anomalies</b></td><td>Name them and their fixes.</td><td>Read-your-writes (read from the leader, or track the user's last-write timestamp); monotonic reads (pin the user to one replica); consistent prefix (keep causally related writes together).</td></tr>
+    <tr><td><b>Multi-leader's hard limit</b></td><td>What can it never enforce, and is that the product's fault?</td><td>Uniqueness and threshold constraints like a non-negative balance — two leaders can each accept a write that is individually fine. It's a fundamental limitation of distributed systems.</td></tr>
+    <tr><td><b>Quorums</b></td><td>Give the inequality and one reason it isn't a guarantee.</td><td>w + r &gt; n makes the read and write sets overlap. It still fails under concurrent reads and writes, partially-succeeded writes, restored-from-backup nodes, and rebalancing.</td></tr>
+    <tr><td><b>Hot shard vs hot key</b></td><td>Which does hashing fix?</td><td>Only the hot shard. A hot key is a workload property — hashing distributes keys uniformly, not load.</td></tr>
+    <tr><td><b>Hash mod N</b></td><td>Why is it the one scheme never to use?</td><td>Changing the node count moves most keys, for no benefit. Use a fixed shard count or hash ranges instead.</td></tr>
+  </table>
+
+  <h4>Group 3 — DOUBT</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Partial failure</b></td><td>What makes it different from a single-machine fault?</td><td>Nondeterminism: parts break while others work, and the same operation may succeed or fail unpredictably — you may not even know which.</td></tr>
+    <tr><td><b>The six worlds</b></td><td>What can a missing reply mean?</td><td>Request lost, request queued, node dead, node paused, reply lost, reply delayed — indistinguishable from where you stand.</td></tr>
+    <tr><td><b>Timeout</b></td><td>What is it, precisely?</td><td>A decision to stop waiting and act on a guess. Never a measurement, because delay is unbounded.</td></tr>
+    <tr><td><b>Time-of-day vs monotonic</b></td><td>Which for what, and why?</td><td>Monotonic for durations — it can't jump backward, but its absolute value is meaningless and incomparable across machines. Time-of-day for calendar time, and it can be reset.</td></tr>
+    <tr><td><b>Timestamp ordering</b></td><td>What goes wrong under 3 ms of skew?</td><td>A causally later write can carry an earlier timestamp; last-write-wins then drops it silently, losing the increment.</td></tr>
+    <tr><td><b>Reversed: the zombie</b></td><td>Why can't you prevent it, and what do you do instead?</td><td>Pauses and delayed messages are always possible. Make its writes harmless with fencing tokens, and decide by quorum.</td></tr>
+    <tr><td><b>The majority</b></td><td>Why is it safe?</td><td>There cannot be two conflicting majorities at once, and it tolerates a minority failing — one of three, two of five.</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Section 6 continued · the transferable card</div>
+  <h2>Master 2&times;2 — the decision card you can carry to other problems</h2>
+  <p>This one isn't about databases, which is the point. Two questions decide the character of any system with more than one participant — a company, a federation, a family, a fleet of machines.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: must the holders agree before anyone can act? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes, agree first<br><small>coordination before action</small></div>
+      <div class="colh">No, reconcile later<br><small>act locally, sort it out after</small></div>
+
+      <div class="rowh">ONE place<br>holds the<br>truth</div>
+      <div class="cell"><b>Simple and constrained</b>
+        One leader, one decision-maker, one master copy. Ordering is decided for you, so strong guarantees are cheap.<br>
+        <i>Move:</i> take this whenever you can afford it. Its costs are honest and visible — a bottleneck, a single point of failure, and everyone waiting on one place.</div>
+      <div class="cell"><b>Fast but stale</b>
+        One authority, but readers work from copies that lag. Asynchronous followers; a team acting on last week's brief.<br>
+        <i>Move:</i> name the anomalies you've accepted rather than discovering them in production — someone will act on information that is already out of date, including their own.</div>
+
+      <div class="rowh">MANY<br>places hold<br>the truth</div>
+      <div class="cell"><b>Correct but blocking</b>
+        Quorums, consensus, sign-off by committee. Correct, and it stops entirely when enough participants are unreachable.<br>
+        <i>Move:</i> use it for the few decisions that genuinely must not diverge, and keep the quorum small — waiting on more participants raises the odds of waiting on a slow one.</div>
+      <div class="cell focus"><b>Available, and divergent</b>
+        Multi-leader, offline-first, autonomous regional offices, everyone editing their own copy.<br>
+        <i>Move:</i> most systems end up here <i>without choosing it</i>. Conflict resolution is now your job, and certain guarantees — uniqueness, &ldquo;never below zero&rdquo; — are simply off the table. Decide deliberately, and design the merge before you need it.</div>
+    </div>
+    <div class="legend"><b>The move that matters:</b> you can rarely change how many places hold the truth — geography, org charts and offline devices decide that for you. You can almost always choose the column, and choosing &ldquo;agree first&rdquo; for everything is how systems and organisations grind to a halt. Pick the handful of decisions that must not diverge; let the rest reconcile.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Decide where the truth lives and whether it must agree right now — every other property is a consequence of those two answers.</b></p>
+    <p style="margin-top:6pt">It travels well. A company with regional offices choosing between head-office sign-off and local autonomy is picking a column. A shared document that works offline has already picked the bottom-right and owes you a merge strategy. A hospital's records across sites, a bank's ledger across branches, a family calendar across phones — all the same two questions, and in each case the interesting failures are the ones people didn't realise they had chosen.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. LOOKUP ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>Encoding and replication</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Fields written by upgraded instances vanish after an old instance touches the record.</td><td>A forward-compatibility break — the old reader dropped what it didn't recognise.</td><td>The format must let old readers skip <i>and preserve</i> unknown fields. New tags in Protocol Buffers; defaults in Avro.</td></tr>
+    <tr><td>Old records fail to decode after a release.</td><td>Backward-compatibility break — usually a removed or renamed field.</td><td>Restore the default, or the reader-schema alias. Check compatibility in a registry <i>before</i> deploying.</td></tr>
+    <tr><td>Two different meanings for the same field number.</td><td>A reused Protocol Buffers tag.</td><td>Never reuse tags; reserve retired ones in the schema.</td></tr>
+    <tr><td>A retry charged the customer twice.</td><td>A network call that timed out with an unknown outcome, retried without idempotence.</td><td>Build deduplication into the protocol. Assume every remote call may have succeeded invisibly.</td></tr>
+    <tr><td>User posts something, reloads, and it's gone.</td><td>Read-after-write violation on a lagging follower.</td><td>Read anything the user may have modified from the leader, or track their last-write timestamp and serve only caught-up replicas.</td></tr>
+    <tr><td>Content appears, disappears, reappears on refresh.</td><td>Monotonic reads violation — successive reads hitting replicas with different lag.</td><td>Pin each user to one replica, chosen by hash of user ID rather than at random.</td></tr>
+    <tr><td>An answer appears before the question.</td><td>Consistent prefix violation across shards.</td><td>Keep causally related writes on the same shard, or track causality explicitly.</td></tr>
+    <tr><td>Confirmed writes vanished after a failover.</td><td>Asynchronous replication — unreplicated writes were discarded on promotion.</td><td>Promote the most up-to-date follower: the synchronous one, or the highest log sequence number. Consider semisynchronous replication.</td></tr>
+    <tr><td>Two nodes both accepting writes as leader.</td><td>Split brain.</td><td>Fencing. And be aware that shutdown-based mechanisms can disable both nodes, or act after corruption.</td></tr>
+    <tr><td>A leader-and-follower pair can't be upgraded independently.</td><td>WAL shipping — the replication log is coupled to the storage engine's format.</td><td>Move to a logical (row-based) replication log, which also enables change data capture.</td></tr>
+    <tr><td>Followers diverge subtly from the leader.</td><td>Statement-based replication meeting nondeterminism — <code>NOW()</code>, <code>RAND()</code>, autoincrements, triggers.</td><td>Row-based logical replication, or make statements strictly deterministic.</td></tr>
+  </table>
+
+  <h3>Sharding and distributed reality</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>One node saturated, the rest idle.</td><td>A hot shard from skew — often a sequential partition key.</td><td>Compound the key so something spreading comes first; or split the shard; or isolate it.</td></tr>
+    <tr><td>Still hot after re-sharding and rehashing.</td><td>A hot <i>key</i>, not a hot shard.</td><td>Isolate it, possibly on its own machine, or add a random suffix — knowing that only writes are split, not reads.</td></tr>
+    <tr><td>Adding a node moved almost all the data.</td><td>Hash mod N over the node count.</td><td>Fixed shard count with many shards per node, or hash-range sharding that splits on demand.</td></tr>
+    <tr><td>You need more nodes than you have shards.</td><td>A fixed shard count chosen too low.</td><td>An expensive resharding. Next time choose a number divisible by many factors, or use hash ranges.</td></tr>
+    <tr><td>Range queries got slow after a sharding change.</td><td>Hashing destroyed the ordering the scans relied on.</td><td>Make only the first column the partition key and range-scan the later ones, so scans stay within a shard.</td></tr>
+    <tr><td>The cluster rebalanced during a spike and the outage worsened.</td><td>Automatic rebalancing plus automatic failure detection — an overloaded node judged dead.</td><td>Put a human in the loop; rebalance pre-emptively before known events instead.</td></tr>
+    <tr><td>A node was declared dead but was healthy.</td><td>Timeout too short, or an asymmetric fault where its outgoing messages were dropped.</td><td>Decide by quorum, and fence — a node must obey a majority verdict even feeling perfectly well.</td></tr>
+    <tr><td>A returning node corrupted data.</td><td>A zombie acting on an expired lease after a pause.</td><td>Fencing tokens on every write, rejected below the highest seen. Write immediately on acquiring a lease.</td></tr>
+    <tr><td>Some writes silently never take effect.</td><td>Last-write-wins with clock skew — a lagging clock cannot overwrite a faster node's value.</td><td>Stop ordering by wall clock. Track causality with version vectors.</td></tr>
+    <tr><td>Timeouts and odd behaviour with no obvious cause.</td><td>Clock drift going unnoticed, or a limping node passing health checks.</td><td>Monitor clock offsets and evict drifting nodes. Treat gray failure as its own case, not as &ldquo;up&rdquo;.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. REFERENCE ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:32mm">Number</th><th>What it is</th><th>Why it matters in an argument</th></tr>
+    <tr><td><b>81 / 66 / 33 / 32 bytes</b></td><td>The same record as textual JSON, binary JSON, Protocol Buffers, and Avro.</td><td>Binary JSON saves almost nothing for a real loss of readability; the schema-based formats halve it. That's the actual case for a schema.</td></tr>
+    <tr><td><b>w + r &gt; n</b></td><td>The quorum condition.</td><td>The one inequality in this competency. n=3, w=2, r=2 tolerates one node down; n=5, w=3, r=3 tolerates two.</td></tr>
+    <tr><td><b>4 of 7, 5 of 9</b></td><td>The practical ceiling on quorum sizes.</td><td>Bigger quorums lower staleness but raise the chance of waiting on a slow replica. Past this, you're buying latency.</td></tr>
+    <tr><td><b>~30 seconds</b></td><td>A typical failover detection timeout.</td><td>Anchors the trade: longer means slow recovery, shorter means unnecessary failovers that make a struggling system worse.</td></tr>
+    <tr><td><b>1,000 shards / 10 nodes</b></td><td>The fixed-shard-count scheme: 100 shards per node.</td><td>Shows why only whole shards move on rebalance — and why you can never have more nodes than shards.</td></tr>
+    <tr><td><b>10 GB</b></td><td>HBase's default shard-split trigger.</td><td>Makes &ldquo;shards split automatically&rdquo; concrete, and shows splits can also be triggered by write throughput alone.</td></tr>
+    <tr><td><b>16 and 256</b></td><td>Hash ranges per node — Cassandra's default and ScyllaDB's.</td><td>Several ranges per node is how random boundaries even out into a fair share.</td></tr>
+    <tr><td><b>100 keys, writes only</b></td><td>Adding two random digits to a hot key.</td><td>The honest half of the trick: reads must now query all 100 and the read volume is unchanged.</td></tr>
+    <tr><td><b>~12 per month</b></td><td>Network faults in a medium-sized datacentre — half isolating one machine, half a whole rack.</td><td>Ends &ldquo;our network is reliable&rdquo;. Redundant gear helps less than expected, because it doesn't prevent human error.</td></tr>
+    <tr><td><b>200 ppm</b></td><td>Google's assumed clock drift: ~6 ms if resynchronised every 30 s, ~17 s if resynchronised daily.</td><td>Puts a number on how far clocks separate — and 17 seconds is far larger than most timestamp-ordering schemes assume.</td></tr>
+    <tr><td><b>~35 ms</b></td><td>The minimum achievable NTP error over the internet, with spikes near a second.</td><td>Anyone proposing to order events by wall clock needs to hear this first.</td></tr>
+    <tr><td><b>42.004 vs 42.003</b></td><td>The causally-later write carrying the earlier timestamp, under 3 ms of skew.</td><td>The concrete demonstration that last-write-wins loses data even when clocks are better than you'd expect.</td></tr>
+    <tr><td><b>100 microseconds</b></td><td>MiFID II's clock accuracy obligation for high-frequency trading.</td><td>Proof that good clock sync is buyable — with GPS, atomic clocks and PTP — if you actually need it.</td></tr>
+    <tr><td><b>More than two-thirds</b></td><td>The supermajority most Byzantine-fault-tolerant algorithms need.</td><td>Why Byzantine tolerance is impractical in ordinary datacentres, and why it can't protect you from a bug deployed to every node.</td></tr>
+  </table>
+
+  <h3>Glossary — the terms you should be able to define cold</h3>
+  <table class="tight">
+    <tr><th style="width:40mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
+    <tr><td><b>Backward / forward compatibility</b></td><td>Newer code reads older data / older code reads newer data. Always name the reader; the second is the hard one because the reader is already deployed.</td></tr>
+    <tr><td><b>Schema evolution</b></td><td>Changing a schema while old data stays readable. Gives schemaless flexibility with better guarantees and tooling.</td></tr>
+    <tr><td><b>Field tag vs field name</b></td><td>Protocol Buffers identifies fields by number, so renames are free and tags are permanent. Avro matches by name, so defaults are what make add and remove safe.</td></tr>
+    <tr><td><b>Writer's / reader's schema</b></td><td>Avro decodes with both: the writer's must be identical to the encoder's; the reader's may be older or newer.</td></tr>
+    <tr><td><b>Replication vs sharding</b></td><td>Same data on many machines / different data on different machines. Nearly always used together.</td></tr>
+    <tr><td><b>Replication log</b></td><td>Statement-based (breaks on nondeterminism), WAL shipping (couples the versions), or logical row-based (decoupled, and the basis of change data capture).</td></tr>
+    <tr><td><b>Eventual consistency</b></td><td>Stop writing and the replicas converge. &ldquo;Eventually&rdquo; is deliberately vague — there is no bound on lag.</td></tr>
+    <tr><td><b>Read-after-write / monotonic reads / consistent prefix</b></td><td>See your own writes / never see time move backward / never see an effect before its cause.</td></tr>
+    <tr><td><b>Split brain</b></td><td>Two nodes both believing they lead. Handled by fencing, not by hoping.</td></tr>
+    <tr><td><b>Quorum</b></td><td>w + r &gt; n so the read and write sets overlap. Need not be a majority; not an absolute guarantee.</td></tr>
+    <tr><td><b>Read repair / hinted handoff / anti-entropy</b></td><td>Three leaderless catch-up mechanisms: fix on read, hold writes for an absent replica, or reconcile in the background.</td></tr>
+    <tr><td><b>Sloppy quorum</b></td><td>Accepting writes on any reachable replica when the usual ones are unreachable. Availability at the cost of the overlap guarantee.</td></tr>
+    <tr><td><b>Partition key</b></td><td>The value deciding a record's shard. Chosen early, changed painfully.</td></tr>
+    <tr><td><b>Skew / hot shard / hot key</b></td><td>Unfair distribution / where it lands / the single key causing it. Hashing fixes the second, never the third.</td></tr>
+    <tr><td><b>Consistent hashing</b></td><td>Keys stay put when the shard count changes. Nothing to do with replica or ACID consistency.</td></tr>
+    <tr><td><b>Partial failure</b></td><td>Some parts broken, others fine, nondeterministically. The defining difficulty of distributed systems.</td></tr>
+    <tr><td><b>Time-of-day vs monotonic clock</b></td><td>Calendar time, resettable and comparable across machines / always-forward, meaningless in absolute terms, for durations only.</td></tr>
+    <tr><td><b>Gray failure</b></td><td>A limping node: still answering health checks, too slow to do real work. Harder to handle than a clean crash.</td></tr>
+    <tr><td><b>Lease / zombie / fencing token</b></td><td>A lock that expires / a former holder that doesn't know / the increasing number that makes the zombie's writes rejectable.</td></tr>
+    <tr><td><b>Byzantine fault</b></td><td>A node that lies. Elsewhere we assume nodes are unreliable but honest.</td></tr>
+    <tr><td><b>System model</b></td><td>Your stated assumptions. Partially synchronous with crash-recovery faults is the useful one for real systems.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page ans">
+  <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the vanishing discount code</h4>
+  <p><b>(a)</b> <b>Forward compatibility</b> broke. Stated without the word: <i>older code could not correctly read data written by newer code</i> — specifically, instances not yet upgraded encountered a field that did not exist when they were written.</p>
+  <p><b>(b)</b> Because reading alone is harmless here; the damage happens on <b>rewrite</b>. An old instance reads the record, doesn't recognise <code>discount_code</code>, drops it from its in-memory representation, and then writes the record back <b>without the field</b>. Orders that were created and never touched again keep the field, because no old instance ever rewrote them. That asymmetry — only modified records lose data — is the fingerprint of this fault.</p>
+  <p><b>(c)</b> The encoding must let an old reader <b>skip an unrecognised field and preserve it</b> when writing the record back. In Protocol Buffers the datatype annotation on each field tells the parser how many bytes to skip, which is what makes preservation possible; in Avro the equivalent discipline is that fields are added with defaults and resolved by name. Patching the old code is not the fix because <b>the old code is already deployed and running</b> — that is what makes this the hard direction. Even if you patch it now, the whole point of the property is that it must hold for readers you cannot reach mid-upgrade.</p>
+
+  <h4>Part 1 · Q2 — the nightly relational dump</h4>
+  <p><b>(a)</b> <b>Avro</b>, and the structural property is that its schema contains <b>no tag numbers</b> — fields are identified by name. That is precisely why it is friendlier to <b>dynamically generated schemas</b>: you can generate an Avro schema from the relational schema on every run, one record per table and one field per column, and the export process need pay no attention to the schema having changed.</p>
+  <p><b>(b)</b> The reader resolves the <b>writer's schema against the reader's schema</b>, matching fields <b>by name</b>. A field present in the writer's schema but absent from the reader's is ignored; a field the reader expects but the writer's schema lacks is filled from the <b>default declared in the reader's schema</b>. Field order does not matter. With Protocol Buffers this same job would require an administrator to maintain the column-to-tag mapping by hand and be very careful never to reuse a tag — exactly the failure they have already hit twice.</p>
+  <p><b>(c)</b> The new obligation is conveying the writer's schema, since Avro-encoded data identifies neither field names nor types and is undecodable without it. For this use case — <b>a large file containing many records all encoded with the same schema</b> — the right mechanism is an <b>Avro object container file</b>, which includes the schema once at the beginning of the file. (Credit for naming the other two mechanisms and rejecting them: a per-record version number plus a schema registry suits a database of individually-written records; connection-time negotiation suits two processes on a network connection.)</p>
+
+  <h4>Part 2 · Q1 — the social app with six followers</h4>
+  <p><b>(a)</b> Posts vanishing after you create them is a <b>read-after-write (read-your-writes) violation</b>. A comment appearing, disappearing and reappearing is a <b>monotonic reads violation</b> — successive reads are served by replicas with different lag, so the user sees time move backward. The forty seconds lost at failover is <b>discarded unreplicated writes</b> under asynchronous replication.</p>
+  <p><b>(b)</b> For read-after-write: read anything the user may have modified <b>from the leader</b> — for a social app the simple rule is own profile and own posts from the leader, everyone else's from a follower. If too much is user-editable, read from the leader for a period after each write, or have the client remember the timestamp of its last write and serve it only replicas that have caught up past it. For monotonic reads: make each user always read from <b>the same replica</b>, chosen deterministically, for example by a hash of the user ID rather than at random. Pinning does <b>not</b> solve read-after-write, because the replica a user is pinned to can still lag behind their own most recent write — consistency of <i>which</i> replica is not the same as freshness of <i>that</i> replica.</p>
+  <p><b>(c)</b> At failover a follower is promoted; with asynchronous replication it may not have received the old leader's most recent writes, and the standard resolution is to <b>discard</b> them — so writes confirmed to clients turn out not to have been durable. The decision that limits the damage is <b>choosing the most up-to-date follower</b>: with semisynchronous replication, the follower the leader waited on; with asynchronous, the one with the highest log sequence number. Losing a fraction of a second may be tolerable; promoting a replica days behind would be catastrophic. Credit for naming the GitHub incident's shape — a lagging promoted leader reusing autoincrement primary keys, causing inconsistency with an external store and disclosing private data to the wrong users.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 2 · Q2 — three regional leaders and two constraints</h4>
+  <p><b>(a)</b> It is <b>multi-leader replication</b> with asynchronous replication between regions. Neither constraint is enforceable because each leader validates against <b>only its own local state</b> at the time of the write. Two users can register the same username in two regions simultaneously: each write passes the uniqueness check locally, both succeed, and the conflict only surfaces when the writes replicate — after both clients have been told they succeeded. The balance case is the same shape: two withdrawals in different regions can each leave a non-negative balance individually while together taking the account below zero. The constraint spans writes that were never evaluated together.</p>
+  <p><b>(b)</b> <b>No</b> — this is not a product limitation. It is a <b>fundamental limitation of distributed systems</b>: if two nodes can accept writes without coordinating, no amount of engineering in the database will let them enforce a constraint that depends on both writes being seen together. Switching vendors will not help. Credit for noting that multi-leader is often a retrofitted feature, so autoincrementing keys, triggers and integrity constraints also interact badly — but that is a separate, weaker point.</p>
+  <p><b>(c)</b> Two structural options. Either <b>use a single leader</b> for the data carrying these constraints, accepting cross-region write latency for those operations — possibly while keeping other data multi-leader. Or <b>drop the constraints as hard guarantees</b> and handle violations after the fact: detect duplicate usernames and force a rename, allow the balance to go negative and reconcile. The topology hazard to know regardless: in an <b>all-to-all</b> topology, replication messages can <b>overtake one another</b>, so a replica may receive an update to a row before the insert that created it — a causality problem that timestamps cannot fix and that needs version vectors. I would take the single-leader option for the constrained data: the constraints are stated as product requirements, and the honest cost is latency on those specific writes rather than a class of bug that surfaces as duplicate accounts and negative balances.</p>
+
+  <h4>Part 3 · Q1 — pings keyed by timestamp</h4>
+  <p><b>(a)</b> With key-range sharding on a timestamp, shards correspond to contiguous ranges of time. All <b>current</b> writes therefore land in the shard owning the present range, while every other shard holds only historical data and takes no write traffic. The <b>key is at fault, not the scheme</b>: key-range sharding is behaving exactly as designed, and it is the monotonically increasing partition key that concentrates the writes.</p>
+  <p><b>(b)</b> Hashing the timestamp would spread the writes evenly, but it would <b>destroy range scans over the partition key</b>, because keys that are adjacent in time would be scattered across every shard. Their main query is &ldquo;all pings in the last hour&rdquo; — precisely a range scan over the partition key — so the proposed fix would turn their single most important query into a scatter-gather across all twelve nodes. It trades a hot shard for a slow system.</p>
+  <p><b>(c)</b> Make the partition key <b>compound</b>, with something spreading first and the timestamp second — vehicle ID then timestamp. Writes then distribute across shards by vehicle while remaining sorted by time <i>within</i> each vehicle. The cost is that a query spanning all vehicles for a time range now needs a <b>separate range query per vehicle</b>, whose results must be combined. Credit for noting the general principle: keep the partition key's first component spreading and range-scan the later components, so scans stay within a shard.</p>
+
+  <h4>Part 3 · Q2 — the institutional buyer and the self-healing cluster</h4>
+  <p><b>(a)</b> Because this is a <b>hot key</b>, not a hot shard. All that buyer's orders share one <code>buyer_id</code>, so they hash to one value and land in one shard no matter how many shards exist. Raising the count from 256 to 4,096 subdivides everything <i>except</i> the thing causing the problem — and it costs an expensive resharding, since every shard must be split and rewritten. Consistent hashing distributes <b>keys</b> uniformly, which is not the same as distributing <b>load</b> uniformly.</p>
+  <p><b>(b)</b> Either <b>isolate</b> the hot key — a range-based scheme can put an individual hot key in a shard by itself, potentially on a dedicated machine — or <b>split it at the application level</b> by appending a random suffix, so two digits spread the writes across 100 keys. Be precise about what the second buys: it splits the <b>write</b> load only. Reads must now query all 100 keys and combine the results, so the <b>read volume against that data is unchanged</b>. It also needs bookkeeping to record which keys are split, and a process for promoting a normal key to a split one, since applying it to every key would be pure overhead.</p>
+  <p><b>(c)</b> The incident is <b>automatic rebalancing interacting with automatic failure detection</b>. A node was overloaded by the spike and became slow; its peers concluded it was dead and rebalanced its shards away; moving that data added load to the network and the remaining nodes, making <i>them</i> slow, and risking further false suspicions — a cascading failure caused entirely by the automation. I would put <b>a human in the loop</b> for rebalancing, accepting that it is slower in exchange for avoiding operational surprises, and <b>rebalance pre-emptively</b> ahead of known traffic events rather than reactively during them.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 4 · Q1 — the paused worker and the corrupted file</h4>
+  <p><b>(a)</b> The first worker became a <b>zombie</b> — a former leaseholder that has not yet discovered it lost the lease and continues acting as though it still holds it, with no awareness that time has passed. The proposed fix cannot eliminate the problem because it only makes the window smaller, never zero: garbage collection pauses can be reduced but not abolished, and the same failure arises with <b>no pause at all</b> if a write request is merely <b>delayed in the network</b> and arrives after the lease has been reassigned — packets can be delayed by a minute or more. Any fix based on making the timing better is fighting an unbounded quantity.</p>
+  <p><b>(b)</b> <b>Fencing tokens.</b> The lock service returns a number with every grant that <b>increases each time a lease is issued</b>. Every write to the storage service must carry the client's current token, and the storage service <b>remembers the highest token it has processed and rejects any write carrying a lower one</b>. So worker 1 holds token 33, pauses, and worker 2 acquires 34 and writes; when worker 1 wakes and writes with 33, the service rejects it because it has already accepted 34. On acquiring a lease a client should <b>immediately make a write</b>, because once that write completes any earlier zombie is fenced off. Credit for noting that a conditional-write or compare-and-set facility — S3's conditional writes, Azure's conditional headers, Google Cloud Storage's request preconditions — achieves the same effect for a single storage service.</p>
+  <p><b>(c)</b> The popular alternative is <b>shutting the zombie down</b> — disconnecting it from the network, stopping the VM, or powering the machine off, sometimes called STONITH. It is ineffective for two reasons: it <b>does not protect against a delayed write already in flight</b> from a client that has since crashed, and <b>by the time the zombie is detected and shut down the damage may already be done</b>. A third acceptable answer: badly designed shutdown mechanisms can result in all the nodes shutting one another down.</p>
+
+  <h4>Part 4 · Q2 — writes that never take effect</h4>
+  <p><b>(a)</b> Under <b>last-write-wins</b> the replica keeps whichever value carries the greatest timestamp and discards the rest. A node whose clock lags is therefore <b>unable to overwrite a value previously written by a node with a faster clock</b> until the skew between them has elapsed. The write is accepted and acknowledged, then silently discarded during conflict resolution — no error is reported to the application, which is why it looks like the write &ldquo;never took effect&rdquo;. Sub-5 ms skew does not make this safe because <b>safety here is not a function of how small the skew is</b>: the worked example loses an increment with skew under 3 ms, since what matters is whether the causally-later write happens to receive a smaller timestamp, and any positive skew makes that possible. Correlating with one region is the expected fingerprint of one group of clocks running slightly slow.</p>
+  <p><b>(b)</b> The second defect is that last-write-wins <b>cannot distinguish genuinely concurrent writes from sequential ones</b> — writes that occurred in quick succession, where the second causally depends on the first, are treated identically to writes where neither writer knew about the other. The mechanism that addresses it is <b>version vectors</b>, which track causality explicitly rather than inferring it from time. (A third defect worth credit: two nodes can generate the same timestamp at millisecond resolution, needing a tiebreaker that can itself violate causality.)</p>
+  <p><b>(c)</b> Because <b>clock faults fail silently</b>. A defective CPU or a misconfigured network breaks loudly and gets fixed quickly; a drifting quartz clock or a misconfigured NTP client lets everything appear to work while diverging further from reality, so the result is <b>silent, subtle data loss rather than a dramatic crash</b>. Nobody is paged, nothing appears in a dashboard, and the loss is discovered — if ever — long afterwards by a user. The operational implication is that you must <b>monitor clock offsets across the cluster and evict any node whose clock drifts too far</b>, because the system will not tell you.</p>
+
+  <div class="box tip nobreak" style="margin-top:14pt">
+    <h4>How to score yourself</h4>
+    <p>Two marks, both quick. <b>Completeness:</b> did you name every element, and — for this competency especially — did you get the <i>direction</i> right? Which code is reading, which node accepts writes, which key is hot, who believes what about whom. Direction errors are the characteristic failure here and matter more than a missing term. <b>Phrasing:</b> could you have said it in a design review without hand-waving? If you wrote &ldquo;the old version broke&rdquo; where the key says &ldquo;an old reader dropped the unrecognised field when it rewrote the record&rdquo;, the idea is there and the mechanism isn't — and the mechanism is what changes anyone's mind.</p>
+  </div>
+</section>
+
+<!-- ============================== 10. WORKBOOK ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <table class="tight">
+    <tr>
+      <th style="width:58mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:24mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> Backward vs forward compatibility — stated without the words</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> Why forward compatibility can't be fixed by deploying</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Protobuf tags vs Avro names — what each lets you change</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> How a reader obtains the writer's schema — three contexts</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Why a remote call is not a local call — four differences</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Single vs multi vs leaderless — who accepts writes</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> Synchronous, asynchronous, semisynchronous — and their costs</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> The three replication log implementations and their traps</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> The three lag anomalies and their fixes</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> Failover: what goes wrong, and the one decision that matters</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> What multi-leader structurally cannot enforce</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Quorums: w + r &gt; n, and why it isn't a guarantee</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Read repair, hinted handoff, anti-entropy</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Replication is not backup</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> Key-range vs hash sharding — what each buys and breaks</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Hot shard vs hot key — which hashing fixes</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> The three hash-to-shard schemes, and why not mod N</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> The random-suffix trick and exactly what it doesn't reduce</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> Automatic rebalancing plus failure detection = cascade</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> The six worlds behind a missing reply</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> Time-of-day vs monotonic clocks</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> Why last-write-wins loses data at 3 ms of skew</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> Zombies and fencing tokens — and why STONITH fails</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> The majority rule, and why it is safe</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>25 ·</b> System models — timing and node failure</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>26 ·</b> Master matrix — where truth lives × must it agree now</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twenty minutes, write the answers</h3>
+  <ol>
+    <li>Define backward and forward compatibility without using either word, and say which one a rolling upgrade forces on you and why it cannot be fixed by deploying a patch.</li>
+    <li>An old instance reads a record containing a field it has never heard of, then writes the record back. What must the encoding guarantee, and what is lost if it doesn't?</li>
+    <li>Name the three replication log implementations, and give the specific defect of each that the others avoid.</li>
+    <li>A user posts a comment and it vanishes on reload; another user sees a comment appear, vanish and reappear. Name both anomalies and give the fix for each, then say why one fix doesn't solve the other.</li>
+    <li>State the quorum condition, work out what n=5, w=3, r=3 tolerates, and give two reasons the condition can hold while a read still returns a stale value.</li>
+    <li>Why can a multi-leader system not guarantee unique usernames? Is this the database's fault?</li>
+    <li>A table sharded by timestamp has one saturated node. Explain the mechanism, say whether the key or the scheme is at fault, and give the fix along with the query cost it imposes.</li>
+    <li>Explain why hashing fixes a hot shard but not a hot key, and state precisely what the random-suffix workaround does and does not reduce.</li>
+    <li>You send a request and receive no reply. List at least four distinct things that may have happened, and say what a longer timeout would tell you about which one it was.</li>
+    <li>A client pauses for two minutes, its lease expires, another client takes over, and the first wakes up and writes. Name what it has become, why you cannot prevent it, and the mechanism that makes its write harmless.</li>
+  </ol>
+</section>
+
+</body>
+</html>

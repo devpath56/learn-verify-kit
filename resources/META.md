@@ -18,7 +18,7 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 1 | Stability Antipatterns & Stability Patterns | `release-it-ch4-5/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 4 "Stability Antipatterns" (pp. 31–90), Ch. 5 "Stability Patterns" (pp. 91–125). The Pragmatic Bookshelf. | Built · 18 questions registered |
 | 2 | Design for Deployment & Chaos Engineering | `release-it-ch13-17/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 13 "Design for Deployment" (pp. 241–262), Ch. 17 "Chaos Engineering" (pp. 325–336). The Pragmatic Bookshelf. | Built · 18 questions registered |
 | 3 | Service Level Objectives & Canarying Releases | `sre-slo-canary/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 2 "Implementing SLOs" by Steven Thurgood and David Ferguson with Alex Hidalgo and Betsy Beyer (pp. 17–42), Ch. 16 "Canarying Releases" by Alec Warner and Štěpán Davidovič with Alex Hidalgo, Betsy Beyer, Kyle Smith and Matt Duftler (pp. 335–351). | Built · 18 questions registered |
-| 4 | *unassigned* | — | — | Awaiting source |
+| 4 | Distributed Data — Encoding, Replication, Sharding, Unreliability | `ddia-distributed-data/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 5 "Encoding and Evolution", Ch. 6 "Replication", Ch. 7 "Sharding", Ch. 9 "The Trouble with Distributed Systems". | Built · 18 questions registered |
 | 5 | *unassigned* | — | — | Awaiting source |
 | 6 | *unassigned* | — | — | Awaiting source |
 | 7 | *unassigned* | — | — | Awaiting source |
@@ -28,6 +28,19 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 4
+
+Cited within the source chapters and named in the booklet's teaching: Apache Thrift, Protocol Buffers
+and Apache Avro as the binary encoding formats compared; MessagePack as the binary-JSON family;
+MySQL's binlog as the logical replication log; Amazon's Dynamo paper as
+the origin of leaderless quorums; Riak and Cassandra as Dynamo-style stores; Chubby
+(*sequencers*) and Kafka (*epoch numbers*) as the fencing-token implementations; ZooKeeper and etcd as
+lock and lease services; HBase, MongoDB and Cassandra as the sharding examples; Kyle Kingsbury's
+network-partition catalogue; the datacentre network-fault study behind the twelve-faults-a-month
+figure; the GitHub incident of a lagging promoted leader reusing autoincrement primary keys; NTP and
+the time-of-day versus monotonic clock APIs; and the Byzantine Generals problem as the origin of the
+term.
 
 ### Works referenced inside competency 3
 
@@ -136,4 +149,12 @@ least one code, and each code points at the exact artefact to reread.
 - **Competency 3's printed final quiz also has no answers in the booklet**, by the same deliberate
   choice as competencies 1 and 2: the ten ideals are frozen in `competency-progress.json` so the
   questions are gradeable, but they are not printed, which keeps the offline quiz honest.
-- Competencies 4–13 are unassigned pending sources.
+- **Competency 4's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–3: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 4's source is four chapters, not two.** The booklet teaches the load-bearing spine of
+  each chapter rather than its full contents; the booklet says so in its own "One warning before you
+  start" without naming the source. Material deliberately left out includes the detailed byte-level
+  encodings, dataflow through message brokers and services beyond the RPC boundary, request routing
+  implementations, and the formal system-model proofs.
+- Competencies 5–13 are unassigned pending sources.
