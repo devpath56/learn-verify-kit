@@ -83,10 +83,10 @@ tr{break-inside:avoid}
 }
 .grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
 .grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
-.grid2 .cell b{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.grid2 .cell > b:first-child{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
 .cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
-.cell.focus b{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
-.cell.good{background:#f8f8f8}
+.cell.focus > b:first-child{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8; border-left:4px solid var(--mid)}
 .legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
 
 /* ---------- sketch ---------- */
@@ -191,7 +191,7 @@ tr{break-inside:avoid}
   </div>
 
   <h3>The core model in one paragraph</h3>
-  <p>Perfect reliability is unbuyable and, past a point, unwanted: each extra nine costs more while its value to the customer approaches zero, and a system that can never change is a system that dies slowly. So you pick a target below 100%, and the gap between that target and perfection becomes a <b>budget</b> — a quantity of unreliability you are permitted to spend. That single move converts an argument about opinions into an argument about arithmetic: how much did this outage cost, is this project worth more than that one, may we ship today. And once unreliability is a currency, the interesting question stops being how to avoid spending it and becomes <b>how to spend it well</b> — which is what canarying is. A canary buys information about a release at a deliberately small, bounded price.</p>
+  <p>Perfect reliability is unbuyable and, past a point, unwanted: each extra nine costs more while its value to the customer approaches zero, and a system that can never change dies slowly. So you pick a target below 100%, and the gap between it and perfection becomes a <b>budget</b> — a quantity of unreliability you may spend. That converts an argument about opinions into arithmetic: what did this outage cost, is this project worth more than that one, may we ship today. And once unreliability is a currency, the question stops being how to avoid spending it and becomes <b>how to spend it well</b> — which is what canarying is: information about a release, bought at a small bounded price.</p>
 
   <div class="box tenth nobreak">
     <h4>The whole thing for a smart 15-year-old</h4>
@@ -206,10 +206,10 @@ tr{break-inside:avoid}
   <h3>The four parts, and why they're in this order</h3>
   <table>
     <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:52mm">Why here</th></tr>
-    <tr><td><span class="pill p1">1</span><b>Why 100% is wrong</b></td><td>The four reasons perfection is the wrong target; the error budget that falls out of a sub-100% objective; who has to own it; the preconditions without which none of this works.</td><td>Every other move depends on accepting a number below perfection. Until that is settled, there is no budget and nothing to spend.</td></tr>
-    <tr><td><span class="pill p2">2</span><b>What to measure</b></td><td>Indicators as good-over-total ratios; specification versus implementation; the three component types and their indicators; the worked example; rounding real measurements into a first objective; time windows.</td><td>A budget is only as honest as the measurement behind it. Get the indicator wrong and every later decision is confidently wrong.</td></tr>
-    <tr><td><span class="pill p3">3</span><b>Making it bite</b></td><td>Stakeholder agreement, the error budget policy, documentation, improving coverage, recall and precision, aspirational objectives, and the decision matrix.</td><td>An objective nobody acts on is a reporting metric. This part is what turns a number into a decision-making tool.</td></tr>
-    <tr><td><span class="pill p4">4</span><b>Spending it to learn</b></td><td>Release engineering principles, canary and control, population and duration, metric selection, isolation, monitoring requirements, and the three things that resemble canarying but aren't.</td><td>With a budget that bites, the last question is how to spend it deliberately rather than lose it accidentally. A canary is the cheapest information you can buy.</td></tr>
+    <tr><td><span class="pill p1">1</span><b>Why 100% is wrong</b></td><td>The four reasons perfection is wrong; the budget that falls out of a sub-100% objective; who owns it; the preconditions without which none of this works.</td><td>Everything else depends on accepting a number below perfection. Until that's settled there is no budget and nothing to spend.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>What to measure</b></td><td>Indicators as good-over-total ratios; specification versus implementation; the three component types; the worked example; rounding measurements into a first objective; time windows.</td><td>A budget is only as honest as the measurement behind it. Get the indicator wrong and every later decision is confidently wrong.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Making it bite</b></td><td>Stakeholder agreement, the error budget policy, improving coverage, recall and precision, aspirational objectives, and the decision matrix.</td><td>An objective nobody acts on is a reporting metric. This part turns a number into a decision-making tool.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>Spending it to learn</b></td><td>Release engineering principles, canary and control, population and duration, metric selection, isolation, monitoring requirements, and the three things that resemble canarying but aren't.</td><td>With a budget that bites, the last question is how to spend it deliberately rather than lose it by accident. A canary is the cheapest information you can buy.</td></tr>
   </table>
 
   <div class="box quote">
@@ -279,7 +279,7 @@ tr{break-inside:avoid}
     <tr>
       <td><b>Error budget policy</b></td>
       <td>A written statement of what happens, and who does it, when the budget is exhausted.</td>
-      <td>Development gives top priority to reliability bugs; or focuses exclusively on reliability until back in objective; or a production freeze halts certain changes.</td>
+      <td>Development gives top priority to reliability bugs from the past four weeks; or focuses exclusively on reliability until back in objective; or a production freeze halts certain changes.</td>
       <td>vs the <b>objective</b> itself: the objective says what &ldquo;good&rdquo; is; the policy is what gives it teeth. Getting the policy approved is also the best test of whether the objective is fit for purpose.</td>
     </tr>
     <tr>
@@ -358,7 +358,7 @@ tr{break-inside:avoid}
                                   (part 4)
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
-      <span class="q">Q</span> Name the four reasons the left branch is wrong, and say which one is about <i>your</i> system and which two are about things outside it.<br>
+      <span class="q">Q</span> Name the four reasons the left branch is wrong, and sort them: which is about <i>your</i> system, which is about the chain outside it, and which two are about your organisation's behaviour?<br>
       <span class="q">Q</span> What has to be true about the reversed node before it is a budget rather than a dashboard number?<br>
       <span class="q">Q</span> Who must own the objective, and what specifically are they empowered to trade?
     </div>
@@ -562,7 +562,7 @@ tr{break-inside:avoid}
   <div class="box bound nobreak">
     <h4>Concept boundary — current performance as a starting point</h4>
     <p><b>The standing advice is not to set an objective from current performance</b>, because it can commit you to unnecessarily strict targets.<br>
-    <b>But</b> current performance is a good place to start if you have nothing else and a real process for iterating. The trap runs the other way too: <b>don't let current performance limit you.</b> Customers come to expect the service to perform as it does, so if you currently return successes 99.999% of the time in under 10 ms, any significant regression from that baseline will make them unhappy — whatever the published objective says.</p>
+    <b>But</b> current performance is a good place to start if you have nothing else and a real process for iterating. The trap runs the other way too: <b>don't let current performance limit you.</b> Customers come to expect the service to perform as it does, so if you currently return successes 99.999% of the time in under 10 ms, any significant regression from that baseline may make them unhappy — whatever the published objective says.</p>
   </div>
 </section>
 
@@ -639,7 +639,7 @@ tr{break-inside:avoid}
   <div class="qbox nobreak">
     <div class="lab">Part 2 · Question 2</div>
     <p>A nightly job rebuilds a product recommendations table. The team proposes a single indicator: &ldquo;the proportion of nightly runs that completed without error&rdquo;, with an objective of 99%. Users complain that recommendations are sometimes days out of date, and occasionally plain wrong — but the job has completed successfully every night for a month.</p>
-    <p><b>(a)</b> Name the component type and the three indicator types appropriate to it, and say which the team has actually implemented. <b>(b)</b> For each of the two user complaints, name the missing indicator and describe a concrete implementation. <b>(c)</b> Name the blind spot the coverage implementation retains even when built correctly, and the standing caveat on the correctness one.</p>
+    <p><b>(a)</b> Name the component type and the three indicator types appropriate to it, and say which the team has actually implemented. <b>(b)</b> For each of the two user complaints, name the missing indicator and describe a concrete implementation. <b>(c)</b> Name the blind spot the coverage implementation retains even when built correctly, the standing caveat on the correctness one, and say why simply tightening the existing &ldquo;runs completed without error&rdquo; objective would fix neither complaint.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -745,7 +745,7 @@ tr{break-inside:avoid}
       <td><b>Critical user journey</b></td>
       <td>A sequence of tasks that is a core part of a user's experience and an essential aspect of the service.</td>
       <td>For online shopping: searching for a product; adding a product to a cart; completing a purchase.</td>
-      <td>These <b>almost certainly won't map to existing indicators</b> — each is multiple complex steps that can fail anywhere, and inferring success from logs is extremely difficult. (Did the user fail at step three, or get distracted by cat videos in another tab?) Their value: they improve <b>recall without affecting precision</b>.</td>
+      <td>These <b>almost certainly won't map well to existing indicators</b> — each is multiple complex steps that can fail anywhere, and inferring success from logs is extremely difficult. (Did the user fail at step three, or get distracted by cat videos in another tab?) Their value: they improve <b>recall without affecting precision</b>.</td>
     </tr>
     <tr>
       <td><b>Bucketing</b></td>
@@ -853,7 +853,7 @@ tr{break-inside:avoid}
   <div class="qbox nobreak">
     <div class="lab">Part 3 · Question 1</div>
     <p>A checkout service has met its 99.9% availability objective every month for a year. Support ticket volume has doubled over the same period, and the product manager reports that customers describe checkout as &ldquo;flaky&rdquo;. Investigation shows most complaints involve the payment step failing after the cart page loaded fine; each individual HTTP request in that flow succeeded.</p>
-    <p><b>(a)</b> Name the problem in the precision/recall vocabulary and say which one it is. <b>(b)</b> Explain why an objective composed of per-request availability can be met while a multi-step flow fails, and name the concept that addresses it. <b>(c)</b> Give the property of that concept that makes it especially attractive here, and name the practical difficulty of implementing it.</p>
+    <p><b>(a)</b> Name the problem in the precision/recall vocabulary and say which one it is. <b>(b)</b> Explain why an objective composed of per-request availability can be met while a multi-step flow fails, and name the concept that addresses it. <b>(c)</b> Give the property of that concept that makes it especially attractive here, name the practical difficulty of implementing it, and say why the near-miss fix — tightening the existing per-request objective — would not catch these failures.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -947,7 +947,7 @@ tr{break-inside:avoid}
       <td><b>Before/after evaluation</b></td>
       <td>Replace the old system entirely, then compare behaviour before and after the change.</td>
       <td>A blue/green cutover evaluated by comparing this week to last.</td>
-      <td>Aptly called <b>&ldquo;a canary deployment in time-space&rdquo;</b> — you segment by time rather than by population. Risky because <b>time is one of the biggest sources of change in observed metrics</b>: release on Monday and you may be comparing a business day to a weekend, with users behaving completely differently. The degradation you see may have happened to the control too.</td>
+      <td>One might call it <b>&ldquo;a canary deployment in time-space&rdquo;</b> — you segment by time rather than by population. Risky because <b>time is one of the biggest sources of change in observed metrics</b>: release on Monday and you may be comparing a business day to a weekend, with users behaving completely differently. The degradation you see may have happened to the control too.</td>
     </tr>
     <tr>
       <td><b>Gradual canary</b></td>
@@ -1086,7 +1086,7 @@ tr{break-inside:avoid}
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Why is whole-system CPU a bad canary metric, and what is the failure mode of choosing it — not for the metric, but for the process?<br>
-      <span class="q">Q</span> Name the two ways a metric's <i>time interval</i> can ruin an otherwise sound canary.<br>
+      <span class="q">Q</span> Give the mechanism by which a metric's <i>time interval</i> can ruin an otherwise sound canary, and the rule that prevents it.<br>
       <span class="q">Q</span> Give the sentence that connects canary population size to the error budget.
     </div>
   </div>
@@ -1120,7 +1120,7 @@ tr{break-inside:avoid}
   <div class="qbox nobreak">
     <div class="lab">Part 4 · Question 2</div>
     <p>A video transcoding pipeline canaries a new encoder. The team deploys the candidate to 10% of workers, watches for twenty minutes, sees no change in the service-wide error rate, and promotes it. Two days later, complaints arrive about corrupted output on long files, and the metric charts from the canary window show nothing unusual.</p>
-    <p><b>(a)</b> Name the two errors specific to canarying a non-interactive system, and say what each one made invisible. <b>(b)</b> Explain why the service-wide error rate was the wrong signal, using the 5%/20% arithmetic to make the point. <b>(c)</b> Give the isolation requirement peculiar to multistage pipelines, and say what goes wrong without it.</p>
+    <p><b>(a)</b> Name the two errors specific to canarying a non-interactive system, and say what each one made invisible. <b>(b)</b> Explain why the service-wide error rate was the wrong signal, using the 5%/20% arithmetic to make the point. <b>(c)</b> Give the isolation requirement peculiar to multistage pipelines and what goes wrong without it, then say why simply enlarging the canary population — the obvious response to &ldquo;we saw nothing&rdquo; — would not have helped.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -1128,11 +1128,11 @@ tr{break-inside:avoid}
 
   <h3>2&times;2 — is this actually a canary?</h3>
   <div class="matrix nobreak">
-    <div class="ylab">Columns: is the traffic real users, or synthetic? &rarr;</div>
+    <div class="ylab">Columns: do real users receive the responses? &rarr;</div>
     <div class="grid2">
       <div class="corner"></div>
-      <div class="colh">Real user traffic</div>
-      <div class="colh">Synthetic traffic</div>
+      <div class="colh">Yes<br><small>the candidate actually serves someone</small></div>
+      <div class="colh">No<br><small>responses discarded, or the traffic is synthetic</small></div>
 
       <div class="rowh">CONCURRENT<br>control<br><small>A and B running together</small></div>
       <div class="cell focus"><b>A true canary</b>
@@ -1140,7 +1140,7 @@ tr{break-inside:avoid}
         <i>Move:</i> this is the only cell that answers &ldquo;is this release safe for my users, now.&rdquo; Break metrics down by version, keep intervals inside the canary duration, and run one at a time.</div>
       <div class="cell"><b>Teeing</b>
         Copy real traffic to the candidate, which serves it and discards the responses.<br>
-        <i>Move:</i> useful when you can't expose users at all — but harder to set up, and worthless for stateful risk. A shared cache inflates the hit rate and invalidates the performance numbers.</div>
+        <i>Move:</i> real traffic, but nobody is served by the candidate — so it's safe, harder to set up, and worthless for stateful risk. A shared cache inflates the hit rate and invalidates the performance numbers.</div>
 
       <div class="rowh">NO<br>concurrent<br>control<br><small>compared against another time</small></div>
       <div class="cell"><b>Before/after</b>
@@ -1150,7 +1150,7 @@ tr{break-inside:avoid}
         Synthetic load in QA, preproduction, or production.<br>
         <i>Move:</i> keep doing it — good code coverage — but don't call it a canary. Poor state coverage, and dangerous in mutable systems where synthetic traffic can charge real credit cards.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> only the top-left cell tells you about <i>this release, for these users, right now</i>. The other three are worth doing and answer different questions — the mistake is not doing them, it's believing they substitute for the first.</div>
+    <div class="legend"><b>Read it as:</b> only the top-left cell tells you about <i>this release, for these users, right now</i> — a concurrent control, and real users actually receiving the candidate's answers. The other three are worth doing and answer different questions; the mistake is not doing them, it's believing they substitute for the first.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -1326,6 +1326,30 @@ tr{break-inside:avoid}
     <tr><td>&ldquo;We compared this week to last week.&rdquo;</td><td>Before/after evaluation — a canary in time-space.</td><td>Use a concurrent control. If you can't, keep the window short and compare like periods.</td></tr>
     <tr><td>Synthetic load in preproduction found nothing; production broke.</td><td>Good code coverage, poor state coverage — caches, cookies, request affinity.</td><td>Keep the load tests, but don't treat them as a canary substitute.</td></tr>
   </table>
+
+  <div class="box bound nobreak">
+    <h4>The mapping in the other direction — what each move protects you from</h4>
+    <table class="tight" style="margin:5pt 0 0">
+      <tr><th style="width:52mm">Move</th><th>What it protects you from</th></tr>
+      <tr><td>An objective below 100%</td><td>Unbounded spend on extra nines nobody perceives; the change freeze perfection imposes; a purely reactive posture.</td></tr>
+      <tr><td>Error budget</td><td>Reliability arguments that can't be settled, and an inability to rank either incidents or candidate projects.</td></tr>
+      <tr><td>Error budget policy</td><td>An objective that changes nobody's behaviour — a KPI wearing a decision-maker's clothes.</td></tr>
+      <tr><td>Good-over-total indicator shape</td><td>Bespoke tooling per metric, and a scale nobody can reason about or turn into a budget.</td></tr>
+      <tr><td>Moving the implementation closer to the user</td><td>Confident numbers that speak for the wrong population — availability that can't see requests which never arrived.</td></tr>
+      <tr><td>Multiple grades on one indicator</td><td>A healthy-looking figure hiding an unhappy tail.</td></tr>
+      <tr><td>Watermark checked by clients</td><td>Freshness weighted by records rather than by how many users actually saw stale data.</td></tr>
+      <tr><td>Rolling window of integral weeks</td><td>Indicator movement caused by how many weekends a period contained.</td></tr>
+      <tr><td>Aspirational objective</td><td>Permanent budget exhaustion, and a policy that fires so often it stops being enforced.</td></tr>
+      <tr><td>Critical user journeys</td><td>Per-request success that passes while the user's actual task fails.</td></tr>
+      <tr><td>Bucketing</td><td>One objective averaging premium against free, and interactive against batch.</td></tr>
+      <tr><td>Canarying at all</td><td>A defect reaching 100% of traffic at once.</td></tr>
+      <tr><td>A small canary population</td><td>Budget loss, which is directly proportional to the traffic exposed to the defect.</td></tr>
+      <tr><td>One canary at a time</td><td>Signal contamination, and an unreasonable mental load exactly when you need to reason fast.</td></tr>
+      <tr><td>Breakdown by version</td><td>A 5% canary disappearing into a 1% aggregate that looks like ordinary noise.</td></tr>
+      <tr><td>Metric interval no longer than the canary</td><td>Pre-canary contamination condemning a perfectly good release.</td></tr>
+      <tr><td>A concurrent control</td><td>Time itself confounding the comparison — Monday judged against a weekend.</td></tr>
+    </table>
+  </div>
 </section>
 
 <!-- ============================== 8. REFERENCE ============================== -->
@@ -1396,7 +1420,7 @@ tr{break-inside:avoid}
   <h4>Part 2 · Q2 — the nightly recommendations job</h4>
   <p><b>(a)</b> It's a <b>pipeline</b>. Its three indicator types are <b>freshness, correctness and coverage</b>. What the team implemented is none of them cleanly — &ldquo;runs that completed without error&rdquo; is closest to an availability measure of the job itself, and it tells you the process exited zero, not that users got good data.</p>
   <p><b>(b)</b> &ldquo;Days out of date&rdquo; is <b>freshness</b>: have the pipeline record a <b>watermark</b> with the timestamp of the last update, and have clients check it when they request data, incrementing one counter for the request and another when the data was fresher than the threshold. That weights the measure by who actually saw stale data. &ldquo;Plain wrong&rdquo; is <b>correctness</b>: either inject data with known outputs and count how often the output matches, or compute correct output by a separate, more expensive method and sample input/output pairs.</p>
-  <p><b>(c)</b> Coverage is measured by exporting the number of records the pipeline <i>should</i> have processed against the number it did — and its retained blind spot is that it <b>cannot count records it never knew about</b>, typically through misconfiguration. The standing caveat on correctness by curated test data is that the curated data must be <b>representative of real-world data</b>; if it isn't, the indicator is representative of nothing, however green it looks.</p>
+  <p><b>(c)</b> Coverage is measured by exporting the number of records the pipeline <i>should</i> have processed against the number it did — and its retained blind spot is that it <b>cannot count records it never knew about</b>, typically through misconfiguration. The standing caveat on correctness by curated test data is that the curated data must be <b>representative of real-world data</b>; if it isn't, the indicator is representative of nothing, however green it looks. And the near-miss fix fails for a structural reason: <b>tightening the existing objective changes nothing</b>, because &ldquo;runs completed without error&rdquo; measures the job's exit status, not the data. It has been passing at 100% for a month while both complaints were true, so no threshold on that indicator can ever surface staleness or wrongness — you need different indicators, not a stricter one.</p>
 </section>
 
 <section class="page ans">
@@ -1405,7 +1429,7 @@ tr{break-inside:avoid}
   <h4>Part 3 · Q1 — checkout meets its number and feels flaky</h4>
   <p><b>(a)</b> A <b>recall</b> problem: significantly user-impacting events are occurring and the indicator isn't capturing them. Precision is not the issue — nothing is alerting falsely; the instrument is silent when it should speak.</p>
   <p><b>(b)</b> Because per-request availability measures individual HTTP requests, and a multi-step flow can fail while every constituent request succeeds — the payment step can return a well-formed response that doesn't complete a purchase, or the user can be dropped between steps. Aggregate per-request success is a poor proxy for &ldquo;did the user achieve their goal.&rdquo; The concept that addresses it is the <b>critical user journey</b>: a sequence of tasks that is a core part of the user's experience — for shopping, searching for a product, adding to a cart, completing a purchase.</p>
-  <p><b>(c)</b> The attractive property is that critical user journeys <b>improve recall without affecting precision</b> — you catch more real user harm without generating more false alarms, which is exactly the trade you normally can't get. The practical difficulty is measurement: these tasks almost certainly won't map to existing indicators, each involves multiple complex steps that can fail anywhere, and inferring success or failure from logs is extremely difficult — you cannot easily distinguish a user who failed at step three from one who simply got distracted and left. You'd measure it by joining distinct log events, advanced JavaScript probing, or client-side instrumentation.</p>
+  <p><b>(c)</b> The attractive property is that critical user journeys <b>improve recall without affecting precision</b> — you catch more real user harm without generating more false alarms, which is exactly the trade you normally can't get. The practical difficulty is measurement: these tasks almost certainly won't map to existing indicators, each involves multiple complex steps that can fail anywhere, and inferring success or failure from logs is extremely difficult — you cannot easily distinguish a user who failed at step three from one who simply got distracted and left. You'd measure it by joining distinct log events, advanced JavaScript probing, or client-side instrumentation. The near-miss fix — <b>tightening the per-request availability objective</b> — cannot work here: every individual request in the flow already succeeded, so an indicator sitting at 100% for these journeys will still sit at 100% however strict the target. The failure happens <i>between</i> requests, and no threshold on a per-request measure reaches it.</p>
 
   <h4>Part 3 · Q2 — someone else's outage, your budget</h4>
   <p><b>(a)</b> Two schools of thought, and both are honest. <b>One:</b> your team shouldn't halt releases or divert to reliability work, because your system didn't cause the issue — punishing you for it is arbitrary and demoralising. <b>Two:</b> enact the freeze regardless of cause, to minimise the chance of further outages while the service is already degraded. The guidance favours the second, on a single ground: <b>it will make your users happier.</b> Users experienced an unreliable service; they neither know nor care which team owns the failing component, and stacking your own risk on top of a bad month is what they'd least want. Flexibility is allowed — depending on the nature of the outage and dependency, freezing may not be practical.</p>
@@ -1420,7 +1444,7 @@ tr{break-inside:avoid}
   <h4>Part 4 · Q2 — the transcoding pipeline that passed</h4>
   <p><b>(a)</b> <b>Duration shorter than a work unit:</b> twenty minutes cannot evaluate an encoder whose long-file work units take longer than that, so the failures that mattered had not finished — let alone been measured — when the canary was promoted. Canary duration must at minimum span the duration of a single work unit. <b>Metric selection wrong for the system:</b> they watched an error rate, but the relevant signals for a pipeline are <b>end-to-end time to process the work unit</b> and the <b>quality of the processing</b>, which is application-specific — corrupted output is a correctness failure that an error rate will never show, because the job succeeded.</p>
   <p><b>(b)</b> Because service-wide aggregation dilutes the canary until it disappears. The standard illustration: a canary at 5% of the population running at a 20% error rate produces an overall error rate of just 1%, which may be indistinguishable from other sources of error. Here at 10% the dilution is smaller but the principle identical — and since the defect produced <i>no</i> errors at all, the aggregate was doubly useless. You must be able to perform <b>fine-grained breakdowns that differentiate metrics between the canary and control populations</b>. Monitoring that reasons well about an entire service is not sufficient to analyse a canary.</p>
-  <p><b>(c)</b> In multistage pipelines a work unit is processed by a worker, returned to the pool, then picked up for the next stage — possibly by a different worker. The requirement is that the workers processing a particular unit are <b>always pulled from the same pool</b>, canary or control. Without it the signals get increasingly mixed: a unit partly processed by each population produces a result attributable to neither, so you cannot tell whether the candidate caused what you're seeing.</p>
+  <p><b>(c)</b> In multistage pipelines a work unit is processed by a worker, returned to the pool, then picked up for the next stage — possibly by a different worker. The requirement is that the workers processing a particular unit are <b>always pulled from the same pool</b>, canary or control. Without it the signals get increasingly mixed: a unit partly processed by each population produces a result attributable to neither, so you cannot tell whether the candidate caused what you're seeing. And the obvious response to &ldquo;we saw nothing&rdquo; — <b>enlarging the canary population</b> — would not have helped, because neither cause was a sample-size problem. The duration was shorter than a work unit, so the relevant work hadn't finished no matter how many workers ran it; and the metric watched cannot see output that is corrupt but successful, at any population. More workers would have produced more unmeasured corruption, which is not a signal.</p>
 
   <div class="box tip nobreak" style="margin-top:14pt">
     <h4>How to score yourself</h4>
@@ -1467,7 +1491,7 @@ tr{break-inside:avoid}
 
   <h3>Final quiz — no notes, fifteen minutes, write the answers</h3>
   <ol>
-    <li>Give all four reasons 100% is the wrong reliability target, and say which of them is about your own system and which are about things outside it.</li>
+    <li>Give all four reasons 100% is the wrong reliability target, then sort them: one is about your own system, one about the chain between you and the user, and two about how your organisation ends up behaving. Which is which?</li>
     <li>Define an error budget, then compute one: a 99.9% success-ratio objective on a service taking 3 million requests over four weeks. What fraction does a single 1,500-error outage consume?</li>
     <li>Explain the difference between an SLI specification and an SLI implementation, and give two implementations of the same specification with the blind spot of each.</li>
     <li>Name the three component types, their indicator types, and the trap hidden in a durability number.</li>
@@ -1476,7 +1500,7 @@ tr{break-inside:avoid}
     <li>You need a tighter objective but can't meet it for six months. What do you do, and what must the policy say about it?</li>
     <li>A release candidate fails 20% of requests. Deployed to a 5% canary, what is the overall error rate — and state the general principle in one sentence.</li>
     <li>Name three things that resemble canarying but aren't, and say what each one lacks.</li>
-    <li>Give two ways a metric's time interval can invalidate a canary evaluation, and the rule that prevents both.</li>
+    <li>Walk through the timeline by which an aggregated metric wrongly condemns a good canary, and give the one-line rule that prevents it.</li>
   </ol>
 </section>
 

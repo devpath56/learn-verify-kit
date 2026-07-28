@@ -83,10 +83,10 @@ tr{break-inside:avoid}
 }
 .grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
 .grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
-.grid2 .cell b{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.grid2 .cell > b:first-child{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
 .cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
-.cell.focus b{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
-.cell.good{background:#f8f8f8}
+.cell.focus > b:first-child{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8; border-left:4px solid var(--mid)}
 .legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
 
 /* ---------- sketch ---------- */
