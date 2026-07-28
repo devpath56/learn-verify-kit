@@ -96,10 +96,10 @@
   <h3>The four parts, and why they're in this order</h3>
   <table>
     <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
-    <tr><td><span class="pill p1">1</span><b>Latency is the ceiling</b></td><td>Latency versus bandwidth; the four components of delay; the speed of light in fibre and the refractive index; last-mile latency; bufferbloat; bandwidth in the core versus at the edge; why one of the two is solvable and the other is not.</td><td>The floor everything else is built on. Without it, every optimisation in parts 2 to 4 looks arbitrary.</td></tr>
-    <tr><td><span class="pill p2">2</span><b>What HTTP/1.x makes you do</b></td><td>Keepalive and the <i>(N−1) × RTT</i> saving; pipelining and why it failed; head-of-line blocking; six connections per host and self-inflicted denial of service; domain sharding; protocol overhead and cookies; concatenation, spriting and inlining.</td><td>One missing protocol feature — multiplexing — generates every technique here. Seeing them as workarounds rather than best practices is the point.</td></tr>
-    <tr><td><span class="pill p3">3</span><b>Push, cheaply</b></td><td>The EventSource API; the event-stream wire format; what the browser handles for you, including automatic reconnect and last-seen message tracking; recovery strategies on the server; the two hard limits.</td><td>The first answer to &ldquo;the server has something for me&rdquo; that doesn't cost a round trip per update — and it is an ordinary HTTP response, so almost nothing has to change.</td></tr>
-    <tr><td><span class="pill p4">4</span><b>The full socket</b></td><td>The WebSocket API; the HTTP Upgrade handshake; frames versus messages and the binary framing layer; masking; subprotocol negotiation and extensions; head-of-line blocking again; proxies and timeouts; what you give up.</td><td>The most capable transport and the most expensive one. It only makes sense once you know exactly what parts 2 and 3 were buying you for free.</td></tr>
+    <tr><td><span class="pill p1">1</span><b>Latency is the ceiling</b></td><td>Latency versus bandwidth; the four components of delay; the speed of light in fibre; last-mile latency; bufferbloat; bandwidth in the core versus at the edge; why one is solvable and the other is not.</td><td>The floor everything else is built on. Without it, every optimisation in parts 2 to 4 looks arbitrary.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>What HTTP/1.x makes you do</b></td><td>Keepalive and the <i>(N−1) × RTT</i> saving; pipelining and why it failed; head-of-line blocking; six connections per host and self-inflicted denial of service; domain sharding; protocol overhead; bundling and inlining.</td><td>One missing protocol feature — multiplexing — generates every technique here. Seeing them as workarounds rather than best practices is the point.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Push, cheaply</b></td><td>The EventSource API; the event-stream wire format; what the browser handles for you, including reconnect and last-seen message tracking; server-side recovery; the two hard limits.</td><td>The first answer to &ldquo;the server has something for me&rdquo; that doesn't cost a round trip per update — and it is an ordinary HTTP response, so almost nothing has to change.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>The full socket</b></td><td>The WebSocket API; the HTTP Upgrade handshake; frames versus messages; masking; subprotocol negotiation and extensions; head-of-line blocking again; proxies and timeouts; what you give up.</td><td>The most capable transport and the most expensive one. It only makes sense once you know exactly what parts 2 and 3 were buying you for free.</td></tr>
   </table>
 
   <div class="box quote">
@@ -196,7 +196,7 @@
 
   <div class="box tip">
     <h4>The numbers that make it a human problem</h4>
-    <p>Most people reliably report perceptible <b>lag</b> once a delay over <b>100–200 ms</b> is introduced. Past <b>300 ms</b> the interaction is described as sluggish. At <b>1,000 ms</b> many users have already performed a mental context switch — a daydream, or the next task. Set that against a 160 ms round trip to Sydney under ideal conditions and the budget becomes obvious: applications need to respond within hundreds of milliseconds, and the network does not leave much room for error.</p>
+    <p>Most people reliably report perceptible <b>lag</b> once a delay over <b>100–200 ms</b> is introduced. Past <b>300 ms</b> the interaction is often reported as sluggish. At <b>1,000 ms</b> many users have already performed a mental context switch — a daydream, or the next task. Set that against a 160 ms round trip to Sydney under ideal conditions and the budget becomes obvious: applications need to respond within hundreds of milliseconds, and the network does not leave much room for error.</p>
   </div>
 
   <div class="box bound nobreak">
@@ -309,11 +309,11 @@
       <div class="cell focus"><b>Propagation</b>
         Distance divided by signal speed. In fibre, about 200,000 km per second.<br>
         <i>Move:</i> there is exactly one lever, and it is not money — <b>shorten the distance</b>. That is what a CDN buys. Everything else in this booklet exists because this number cannot be reduced any other way.</div>
-      <div class="cell"><b>The real path, not the great circle</b>
-        Longer routes mean more hops, and every extra hop brings its own processing, transmission and queue.<br>
-        <i>Move:</i> this is why the 160 ms great-circle figure for New York to Sydney is 200–300 ms in practice. Never quote the physics number as the expected number.</div>
+      <div class="cell"><b>Queuing, once per hop of the real path</b>
+        A long route passes through many routers, and under load each one contributes its own queue.<br>
+        <i>Move:</i> keep the two effects separate. A longer route multiplies the <i>per-hop</i> delays whether the network is busy or not — which is most of why the 160 ms great-circle figure for New York to Sydney is 200–300 ms in practice — and load then adds a queue at every one of those hops. Never quote the physics number as the expected number.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the left column is what you get on a quiet network and the right is what load adds. The bottom-left is the focus because it is the only cell where spending money on capacity changes nothing at all — and it is usually the cell you are actually stuck in.</div>
+    <div class="legend"><b>Read it as:</b> the left column is what you get on a quiet network; the right is what load adds on top, once in a short path and once per hop in a long one. The bottom-left is the focus because it is the only cell where spending money on capacity changes nothing at all — and it is usually the cell you are actually stuck in.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -386,7 +386,7 @@
       <td><b>Domain sharding</b></td>
       <td>Splitting resources across several hostnames so the browser's per-host limit applies several times.</td>
       <td>Shards are often CNAME records pointing at the same server: limits are enforced per <b>hostname</b>, not per IP address.</td>
-      <td>vs a free win. Each new hostname costs a DNS lookup, more sockets on both sides, and manual management of where resources live. Overused, it produces many connections that never escape TCP slow-start. There is <b>no formula</b> for the right number — it depends on the page and on each client's bandwidth and latency.</td>
+      <td>vs a free win. Each new hostname costs a DNS lookup, more sockets on both sides, and manual management of where resources live. Overused, it produces many connections that never escape TCP slow-start, and the costs are <b>higher again over HTTPS</b> because each new connection also pays a TLS handshake. There is <b>no formula</b> for the right number — it depends on the page and on each client's bandwidth and latency.</td>
     </tr>
     <tr>
       <td><b>Protocol overhead</b></td>
@@ -464,11 +464,11 @@
         and the 7th request simply waits -- which a
         long-lived stream will happily occupy forever
         |
-   so you SHARD the domain for more
+   so you <span class="tk2">SHARD</span> the domain for more
         every shard = a DNS lookup + a fresh slow-start
         no formula exists. hurts high-latency clients most.
         |
-   so you CONCATENATE, SPRITE and INLINE
+   so you <span class="tk2">CONCATENATE, SPRITE and INLINE</span>
         = pipelining moved up into your application
         costs: cache granularity, memory, delayed execution
                           |
@@ -650,7 +650,7 @@
 
   <div class="box tip">
     <h4>Two deployment realities worth knowing before you ship it</h4>
-    <p><b>Intermediaries.</b> Proxies and firewalls that are not stream-aware may <b>buffer</b> the event stream, which turns into increased latency or an outright broken connection. The reliable answer is to deliver the stream over TLS, so nothing in the middle is in a position to buffer it.</p>
+    <p><b>Intermediaries.</b> Proxies and firewalls that are not stream-aware may <b>buffer</b> the event stream, which turns into increased latency or an outright broken connection. If you hit that, delivering the stream over TLS is the answer worth considering first, because nothing in the middle is then in a position to buffer it.</p>
     <p><b>Batteries.</b> Real-time push, exactly like polling, can be expensive on a handset. Batch messages so the radio is woken less often, and do not add application-level keepalives you do not need — the connection is not dropped simply because the radio has gone idle.</p>
   </div>
 
@@ -716,7 +716,7 @@
     <tr><td>Assigning event IDs</td><td>The client tells you where it left off, so you can retransmit what it missed.</td><td>You must implement and size a server-side cache, and decide how far back to keep.</td><td>Lost messages actually matter. If they don't, skip IDs entirely — it is a supported choice, not laziness.</td></tr>
     <tr><td>Base64 over the stream</td><td>Binary data through a text-only transport.</td><td><b>33%</b> byte expansion, and the asset can never be cached because it was streamed.</td><td>Rarely. Prefer the notification-then-fetch pattern, or a WebSocket.</td></tr>
     <tr><td>Notification then fetch</td><td>Caching, compression and every other HTTP service, on the asset itself.</td><td>One extra round trip per asset.</td><td>Whenever the pushed thing is large, binary, or worth caching.</td></tr>
-    <tr><td>Streaming over TLS</td><td>Intermediaries can no longer buffer or mangle the stream.</td><td>Handshake cost on connect, and certificate management.</td><td>Any real deployment. Buffering middleboxes are the classic SSE failure.</td></tr>
+    <tr><td>Streaming over TLS</td><td>Intermediaries can no longer buffer or mangle the stream.</td><td>Handshake cost on connect, and certificate management.</td><td>Whenever buffering or broken streams appear in production. It is the standard first thing to try.</td></tr>
   </table>
 
   <h3>Say it so you understand it &rarr; say it like an expert</h3>
@@ -759,7 +759,7 @@
       <div class="rowh">Only the<br>SERVER<br>needs to<br>send</div>
       <div class="cell focus"><b>Server-Sent Events</b>
         Notifications, feeds, progress, live figures — anything the server knows first and expresses as text.<br>
-        <i>Move:</i> take it. About 5 bytes of overhead per message, gzip works on the whole stream, and the browser gives you parsing, reconnect and last-ID tracking for nothing. The cost is one of your six connections per host, and no way to talk back.</div>
+        <i>Move:</i> take it. As little as 5 bytes of overhead per message, gzip works on the whole stream, and the browser gives you parsing, reconnect and last-ID tracking for nothing. The cost is one of your six connections per host, and no way to talk back.</div>
       <div class="cell"><b>SSE as a doorbell</b>
         The push announces that a binary asset exists; an ordinary request goes and gets it.<br>
         <i>Move:</i> pay the extra round trip. In exchange the asset is cacheable by the browser and any intermediary, gets transfer encoding, and does not cost you the 33% that base64 would.</div>
@@ -856,8 +856,8 @@
     <tr>
       <td><b>Protocol extensions</b></td>
       <td>New opcodes and data fields that extend the framing layer itself, negotiated in the handshake, invisible to application code.</td>
-      <td>Two were developed: <b>multiplexing</b>, adding a channel ID so several logical connections share one TCP connection; and <b>compression</b>.</td>
-      <td>vs something you can rely on. As of the material here, multiplexing was in no popular browser, and compression support was limited to an older <b>per-frame</b> revision — suboptimal for large messages split across frames, and slated for deprecation in favour of per-message compression that was still experimental. Until that lands, compression is your application's job.</td>
+      <td>Two official extensions were <b>in development</b>: <b>multiplexing</b>, adding a channel ID so several logical connections share one TCP connection; and <b>compression</b>.</td>
+      <td>vs something you can rely on. As things stood, multiplexing was in no popular browser, and compression support was limited to an older <b>per-frame</b> revision — suboptimal for large messages split across frames, and slated for deprecation in favour of per-message compression that was still experimental. Until that lands, compression is your application's job.</td>
     </tr>
     <tr>
       <td><b>Head-of-line blocking</b> (again)</td>
@@ -910,7 +910,7 @@
             your code never sees frames: onmessage fires
             when the WHOLE message has arrived.
                           |
-   GAINED   both directions, any time, text AND binary
+   <span class="tk4">GAINED</span>   both directions, any time, text AND binary
             2-10 bytes per server frame, 6-14 from the
             client, vs 500-800 + cookies for HTTP 1.x
             (all of it on 60-100 bytes of IP/TCP/TLS)
@@ -994,7 +994,7 @@
       <div class="rowh">Nothing in<br>the middle<br>NEEDS to<br>read it</div>
       <div class="cell"><b>Server-Sent Events</b>
         Text updates the server knows first and nobody else needs to interpret.<br>
-        <i>Move:</i> one long-lived HTTP response, about 5 bytes a message, and the browser handles parsing, reconnection and last-ID tracking. Cheaper than a socket in every sense that matters here.</div>
+        <i>Move:</i> one long-lived HTTP response, as little as 5 bytes a message, and the browser handles parsing, reconnection and last-ID tracking. Cheaper than a socket in every sense that matters here.</div>
       <div class="cell"><b>WebSocket, properly used</b>
         Control traffic, cursor positions, game state, custom binary protocols.<br>
         <i>Move:</i> take it, and accept the bill knowingly — no caching, no automatic compression, no metadata, and head-of-line blocking you now manage yourself through message sizes and the buffered amount.</div>
@@ -1024,7 +1024,7 @@
     </div>
 <div class="tree"><span class="tk1">GROUP 1 - FLOOR . the two numbers, and their economics</span>
 ------------------------------------------------------------------
-   BANDWIDTH  throughput. more fibre, more links, better
+   <span class="tk1">BANDWIDTH</span>  throughput. more fibre, more links, better
               multiplexing. a money problem, and improving.
    <span class="tks">LATENCY</span>    time to arrive. four delays:
         propagation  distance / signal speed. fibre is
@@ -1196,7 +1196,7 @@
     <tr><td>Inlining under a kilobyte or two</td><td>The request entirely, for resources smaller than their own HTTP overhead.</td><td>Reuse across pages. An inlined asset cannot be cached separately, so it ships with every page that inlines it.</td></tr>
     <tr><td>Gzip on text assets</td><td>Transferred bytes — typically a 60–80% reduction for one configuration flag.</td><td>Round trips, and anything already compressed. It is a bytes lever, not a latency lever.</td></tr>
     <tr><td>Cache headers and revalidation</td><td>The request itself — the only technique here that costs nothing anywhere else.</td><td>The first visit, and anything genuinely dynamic. Also nothing, if the resource is inlined into a document.</td></tr>
-    <tr><td>Server-Sent Events</td><td>Queuing latency on server-to-client text, at about 5 bytes a message, with reconnection handled for you.</td><td>Propagation latency, client-to-server data, binary payloads, and one of your six connections per host.</td></tr>
+    <tr><td>Server-Sent Events</td><td>Queuing latency on server-to-client text, at as little as 5 bytes a message, with reconnection handled for you.</td><td>Propagation latency, client-to-server data, binary payloads, and one of your six connections per host.</td></tr>
     <tr><td>Event IDs on a stream</td><td>The client's ignorance of where it left off — it will tell you on reconnect.</td><td>The replay itself. Without a server-side cache the ID is reported and nothing is resent.</td></tr>
     <tr><td>A WebSocket</td><td>Queuing latency in <i>both</i> directions, per-message overhead, and the text-only limit.</td><td>Caching, compression, metadata, and head-of-line blocking — which returns, now driven by your own message sizes.</td></tr>
     <tr><td>The secure scheme for a socket or stream</td><td>Intermediaries that buffer, modify, or refuse to upgrade the connection.</td><td>Idle timeouts. Anything in the path can still drop a quiet TCP connection, including your own infrastructure.</td></tr>
@@ -1215,7 +1215,7 @@
     <tr><td><b>~200,000 km/s</b></td><td>The speed of light in optical fibre — a refractive index of about 1.5, against 299,792 km/s in a vacuum. Real fibre is 1.4 to 1.6.</td><td>The single most useful number here. It converts any distance into a floor nobody can negotiate below.</td></tr>
     <tr><td><b>56 ms · 160 ms</b></td><td>Round trip in fibre along the great circle: New York to London (5,585 km) and New York to Sydney (15,993 km).</td><td>Two anchors. Quote them when someone proposes a design that needs several round trips per interaction.</td></tr>
     <tr><td><b>200–300 ms</b></td><td>The <i>actual</i> New York to Sydney round trip over existing networks, against 160 ms on the great circle.</td><td>The gap between physics and cables. Never quote the theoretical number as the expected one.</td></tr>
-    <tr><td><b>100–200 · 300 · 1,000 ms</b></td><td>Perceptible lag · described as sluggish · the user has mentally moved on.</td><td>Turns a latency budget into a product requirement, which is the only form anyone acts on.</td></tr>
+    <tr><td><b>100–200 · 300 · 1,000 ms</b></td><td>Perceptible lag · often reported as sluggish · many users have already made a mental context switch.</td><td>Turns a latency budget into a product requirement, which is the only form anyone acts on.</td></tr>
     <tr><td><b>18 · 26 · 44 ms</b></td><td>Peak-hour last-mile latency for fibre-to-the-home, cable and DSL in one regulator's measurements.</td><td>Tens of milliseconds before the packet reaches the provider's core. Budget for the last mile, not just the ocean.</td></tr>
     <tr><td><b>~30%</b></td><td>The most that better materials and faster routers can improve latency, given we are within ~1.5× of light speed.</td><td>Ends the &ldquo;the network will get faster&rdquo; argument for latency, while leaving it open for bandwidth.</td></tr>
     <tr><td><b>10 s vs 0.1 s</b></td><td>Time to put a 10 Mb file on the wire over 1 Mbps and over 100 Mbps.</td><td>The cleanest demonstration that transmission delay is about link rate and has nothing to do with distance.</td></tr>
@@ -1226,7 +1226,7 @@
     <tr><td><b>500–800 bytes</b></td><td>HTTP metadata on every browser-initiated request, before cookies, always plain text.</td><td>Set against a 15-character JSON body wrapped in 352 bytes of headers — 96% overhead — it makes the case for trimming headers and cookies.</td></tr>
     <tr><td><b>60–80%</b></td><td>Typical size reduction from gzip on text assets.</td><td>The highest benefit-to-effort ratio available: usually a configuration flag.</td></tr>
     <tr><td><b>33%</b></td><td>Byte expansion from base64 encoding, which turns bytes into ASCII at a 4/3 ratio.</td><td>The tax on inlining binary assets and on pushing binary through a text-only stream.</td></tr>
-    <tr><td><b>1–2 KB · 30–50 KB</b></td><td>Rule-of-thumb ceiling for inlining a resource · target size for a compressed script bundle.</td><td>Two thresholds that settle most bundling arguments without further measurement.</td></tr>
+    <tr><td><b>1–2 KB · 30–50 KB</b></td><td>Rule-of-thumb ceiling for inlining a resource · a good range to target for a compressed script bundle, from one team's tests.</td><td>Two starting points for a bundling argument. Neither is an ideal size — results vary with the number and type of scripts, so measure.</td></tr>
     <tr><td><b>1.83 MB</b></td><td>Memory for an 800 × 600 decoded image: width × height × 4 bytes, held whole.</td><td>Why spriting can be the thing that kills the app on an older handset, regardless of the file's size on disk.</td></tr>
     <tr><td><b>~5 bytes</b></td><td>Minimum per-message overhead of an SSE event.</td><td>The reason a text stream is cheaper than anything built on repeated requests.</td></tr>
     <tr><td><b>2–3 seconds</b></td><td>The recommended and commonly implemented default SSE reconnect delay, overridable by the server.</td><td>Tells you roughly how large a replay gap to expect, and therefore how far back the server cache must reach.</td></tr>
@@ -1338,7 +1338,7 @@
   <h2>Spaced-review tracker</h2>
   <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
 
-  <style>#trk td,#trk th{padding:2.3pt 5pt; font-size:8.1pt} #quiz .writeline{height:13pt} #quiz li{margin-bottom:2pt}</style>
+  <style>#trk td,#trk th{padding:2.3pt 5pt; font-size:8.1pt} #quiz .writeline{height:13pt} #quiz li{margin-bottom:2pt} #quiz{padding-left:22pt}</style>
   <table class="tight" id="trk">
     <tr>
       <th style="width:58mm">Item</th>

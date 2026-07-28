@@ -220,4 +220,9 @@ least one code, and each code points at the exact artefact to reread.
 - **Competency 6's source is four chapters spanning two parts of its book**, joined here on a causal
   spine rather than presented in book order. The booklet says nothing about that; the ordering is
   1, 11, 16, 17 as the source presents them, and no chapter is abridged.
+- **Competency 6 teaches one mechanism its supplied chapters defer.** Chapter 1 says bufferbloat
+  "breaks TCP's congestion avoidance mechanisms" and postpones the explanation to a chapter not
+  supplied; the booklet explains it — loss is TCP's congestion signal, so hiding drops removes the
+  backoff. The claim is correct and load-bearing for two registered questions, but it is not traceable
+  to the four chapters provided. Recorded here rather than removed.
 - Competencies 7–13 are unassigned pending sources.
