@@ -3,8 +3,8 @@
   "what_this_is": "Answer-level log for the printed competency booklets. One file for the whole 13-competency set. Questions are asked ONLY from the banks below, never invented. Separate from the repo-root progress.json, which logs concepts taught in conversation.",
   "set": {
     "size": 13,
-    "registered": 7,
-    "remaining": 6
+    "registered": 8,
+    "remaining": 5
   },
   "bank_scope": "applied + quiz only — the 8 three-part applied cases and the 10 final-quiz questions per booklet (18). Concept-sketch node questions stay in the printed booklet as self-test cues but are not tracked.",
   "conventions": {
@@ -35,7 +35,7 @@
     "phrasing": "had it, couldn't say it in expert terms - go back to the plain/expert table"
   },
   "set_rollup": {
-    "untested": 126,
+    "untested": 144,
     "shaky": 0,
     "comfortable": 0,
     "gaps": {
@@ -1926,6 +1926,269 @@
           "retired_because": "the question asked for \"four anti-methods\"; the source names three, and the ad hoc checklist is a method rather than an anti-method"
         }
       ]
+    },
+    {
+      "id": "sysperf-benchmarking",
+      "index": 8,
+      "title": "Benchmarking — What the Number Is, How It Lies, Which Kind, and Active Analysis",
+      "booklet": "resources/sysperf-benchmarking/",
+      "registered": "2026-07-28",
+      "parts": [
+        "What the number actually is",
+        "The sixteen ways it lies",
+        "Choosing the kind",
+        "Analyse it while it runs"
+      ],
+      "rollup": {
+        "untested": 18,
+        "shaky": 0,
+        "comfortable": 0,
+        "gaps": {
+          "name": 0,
+          "mechanism": 0,
+          "boundary": 0,
+          "price": 0,
+          "phrasing": 0
+        },
+        "weakest": null
+      },
+      "questions": [
+        {
+          "id": "sysperf-benchmarking.p1q1",
+          "type": "applied",
+          "where": "Part 1 · Question 1",
+          "prompt": "A team is choosing between two managed database offerings. An engineer runs a load tool against both for ten minutes each, produces a slide showing one is 1.8× faster, and circulates it. Asked what limited each run, they say the tool reported no errors and both machines “looked busy”. The slide is scheduled for a purchasing decision on Friday. The team's performance specialist is offered a slot on Thursday to “review the numbers”. (a) Name the four things that must be understood about any benchmark result, and say which of them this exercise has established. (b) Explain why the Thursday review slot is the wrong intervention, in terms of what evidence still exists by then. (c) Name the additional quantity that this particular purpose requires, say how it is defined, and give two further questions you would put to the engineer before Friday.",
+          "ideal": "(a) The four are: what is being tested; what the limiting factor or factors are; any perturbations that might affect the results; and what conclusions may be drawn. This exercise has established none of them. The tool's name is standing in for the first, “looked busy” is not a limiting factor — the resource sweep offers only two outcomes, something at 100% or a system not driven to its limit, and neither has been shown — nothing was checked for perturbations, and the conclusion (1.8×) has been drawn without any of the three that would license it. “No errors reported” is worth something but is not one of the four. (b) Because three of the four questions can only be answered from the system while the load is applied, and by Thursday the machines are idle. This is the staffing mistake in its usual form: junior staff execute the benchmarks and performance experts are brought in to explain the results afterwards. The correction is scheduling rather than skill — engage the expert during the run, so they can analyse the live system with drill-down to quantify the limiter. If Thursday is genuinely all there is, the useful output is a list of the assumptions nobody had time to check, published with the result as a to-do list for verification. (c) The purpose here is a purchase, so the required extra quantity is the price/performance ratio, where price can be quantified as the five-year capital cost of the equipment. Further questions worth putting: what was the limiting factor in each run; what was the configuration of each system, and does either resemble what we would actually buy and run; was the workload representative of ours, and how was that established; how long did each run last and how many times was it repeated; what were the success and failure counts; is this an average or a peak, and what is the distribution.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p1q2",
+          "type": "applied",
+          "where": "Part 1 · Question 2",
+          "prompt": "Two results land on your desk on the same morning. The first says: “Storage cluster: 1.4 million operations per second.” The second describes a transfer of a fixed payload between two hosts, states the record and packet sizes, reports the elapsed time and derived throughput, notes that the sending host was CPU saturated while the receiver had roughly a third of its capacity idle, and breaks the system time down across five kernel components, none dominant. (a) Say what the second result does that the first does not, mapping each to one of the four questions. (b) Explain why the observation about the sending host changes what the throughput figure is a claim about. (c) The first result's author says the second is “overkill for a headline number”. Give the strongest version of their case, then say what you would still require before quoting the 1.4 million figure anywhere.",
+          "ideal": "(a) The second result answers the four questions and the first answers none. What is being tested: the second states the payload size, the record size and the packet size, precisely enough to reproduce; the first says only “operations”. What the limiting factor is: the second says the sending host was CPU saturated while the receiver had roughly a third idle; the first offers nothing. Perturbations: the second's decomposition of system time across five components, none dominant, shows that nothing unexpected was consuming the machine; the first gives no basis to check. What may be concluded: the second stops at what the measurement supports and draws no wider claim; the first's single number is already a claim about a cluster. (b) Because a saturated sender makes the throughput a statement about that machine's processor, not about the network or the receiving system. The same wire and the same receiver with a faster sender would give a different figure, so the number cannot be quoted as a property of the link or of the pair. Naming the limiter is what converts a measurement into a claim with a subject. (c) The strongest version of their case: a headline figure exists to be compared with other headline figures, decomposition costs analyst time that a purchasing conversation will not read, and if the cluster genuinely served 1.4 million operations then it did so regardless of where the kernel time went. What you would still require before quoting it: what the operations actually were and at what size; what limited the run, established by observing the system rather than asserted; whether any component was at 100%, since if none was the figure is a floor rather than a ceiling; the error and timeout counts; the duration and the number of repeats with their variation; and the configuration, so the reader knows what machine the number is about. Absent those, the honest form is the number plus an explicit list of the assumptions nobody checked.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p2q1",
+          "type": "applied",
+          "where": "Part 2 · Question 1",
+          "prompt": "A team evaluates two message brokers. The load tool is run for 20 seconds against each; broker A reports 3× the throughput of broker B and is chosen. Later, in production, A is slower. Investigation finds four things: the tool ran as a single process on one client machine; broker B had been configured to acknowledge writes durably while A had not; roughly 8% of B's requests had returned errors that the tool counted as completed operations; and the nightly index rebuild had been running on the B host for the last six seconds of its run. The engineer's summary slide had said only “A: 240k msg/s, B: 80k msg/s”. (a) Name each of the four named failures at work here, and say for each whether it made the measurement wrong or the claim wrong. (b) Two of these four have a stated remedy that costs almost nothing; give both remedies and the specific rule of thumb attached to one of them. (c) The slide itself commits a fifth failure independent of the four. Name it and state what the slide should have carried instead.",
+          "ideal": "(a) Four named failures. Complex benchmark tools, in its specific form benchmarking the benchmark: a single-process client means the reported result may be the tool's own ceiling rather than either broker's — measurement wrong. Changing multiple factors: one broker acknowledged writes durably and the other did not, so the two runs differ in more than the product — measurement wrong. Ignoring errors: roughly 8% of B's requests errored and were counted as completed operations, and errors perform differently from normal operations and skew the result — measurement wrong. Ignoring perturbations: an index rebuild ran on the B host through the last six seconds of a twenty-second run — measurement wrong. All four are in the accidental-measurement quadrant, which is where ten of the sixteen live. (b) Two near-free remedies. For perturbations: make the runs longer — minutes instead of seconds — with the rule that a benchmark's duration should not be shorter than one second, then run it several times and examine the standard deviation, which should be as small as possible. For errors: check the operation success/fail ratio before reading any throughput figure; the checklist puts this as “did it error?” and “did it even happen?”. (c) The slide commits numbers without analysis: bare results with no analytical detail, which is a sign the author has assumed they are trustworthy and final. Every benchmark number should be accompanied by a description of the limit encountered and the analysis performed. Failing that, the slide should have carried the list of assumptions nobody had time to check — that the tool is not the bottleneck, that the two configurations are equivalent, that the operations succeeded, that nothing else was running — which then becomes the verification to-do list if the decision turns out to matter.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p2q2",
+          "type": "applied",
+          "where": "Part 2 · Question 2",
+          "prompt": "Your company's product must win a customer evaluation consisting of four separate benchmarks; the customer will buy only if you win all four. Your engineers believe you are genuinely a coin-flip against the incumbent on each. Marketing proposes three responses: (i) commission an outside firm quickly and cheaply to produce a comparison against the incumbent; (ii) add a configuration switch that detects the evaluation's access pattern and pre-fetches for it; (iii) skip benchmarks entirely and sell on features. (a) Compute your probability of winning all four, and state the summarised rule this illustrates. (b) Take each of the three proposals in turn, name the failure it corresponds to, and give the specific reason it backfires — for (ii), say what mechanism the industry-standard bodies introduced against it and what price rule accompanies it. (c) Name the failure that proposal (iii) itself commits, and describe the one intervention that genuinely improves the odds.",
+          "ideal": "(a) 0.5 × 0.5 × 0.5 × 0.5 = 0.0625, so 6.25% — about one chance in sixteen. The rule is the benchmark paradox: “if your product's chances of winning a benchmark are 50/50, you'll usually lose”, because customers who want to be sure run several and expect you to win them all, and the more benchmarks the worse the chances. (b) Proposal (i) is benchmarking the competition, and in its cheap-third-party form it is also the misleading benchmarks variant where several firms are engaged not for expertise but for a fast inexpensive result and the best is kept. It backfires because customers use a product for months and tune it, while you have days — so you can only produce untuned and therefore unrealistic results, and the competitor's customers, who are the target of the exercise, will recognise them, costing your company credibility with exactly the people it was trying to impress. Proposal (ii) is a benchmark special: engineering the product to score on the benchmark while disregarding actual customer performance. The industry bodies answered it with specification rather than argument — an anti-benchmark-special clause prohibiting all implementations that improve benchmark results but not real-world performance or pricing — and accompanied it with a price requirement that the total price be within 2% of what a customer would actually pay, closing the parallel trick of quoting deep discounts nobody would receive. (c) Proposal (iii) commits the pitfall that ignoring benchmarks is itself a benchmarking failure. The intervention that genuinely improves the odds is to stop being a coin flip and to make sure your own results are the best your product can honestly produce — the friendly-fire remedy: test the top-performing system and configuration, drive it to its true limit and be able to say what the bottleneck was, benchmark the current version on the best available equipment, and share the results with engineering before publication so they can spot what was misconfigured or left off.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p3q1",
+          "type": "applied",
+          "where": "Part 3 · Question 1",
+          "prompt": "A team is replacing an object storage tier. The new tier has slower spinning media but four times the memory for metadata and small-object caching. They plan to capture a week of production traffic at the block device layer and replay it against the new tier, on the grounds that this is “as close to production as we can get without risking production”. A colleague suggests instead measuring the production request mix and driving a synthetic workload from it, and separately running a small set of narrow tests. (a) Predict the result of the replay plan and explain the mechanism, naming the level at which the trace was captured and why that matters here. (b) Name the general property of replay that makes it disappointing even when the capture level is right. (c) For the colleague's narrow tests, specify the two multiplying factors that must be applied to each test, and say what setting of each you would use to answer the question “does the extra memory help?”",
+          "ideal": "(a) It will show a regression, and the regression will be an artefact. The trace was captured at the block device layer, which means it records the requests the old system's cache failed to absorb. Replaying those against the new tier asks its slower spinning media to service, from disk, precisely the traffic the new tier's four-times-larger cache was bought to absorb — so the new tier is measured on its weakest component with its strongest one bypassed. The real production workload would have improved, returning largely from cache, which replaying device-level events cannot simulate. It is the storage-upgrade case exactly: 10K rpm disks replaced by 7,200 rpm disks with sixteen times the file system cache, a replay that showed a regression, and a lost sale; it is a case of testing the wrong thing. (b) Even at the right level, a replay disappoints because a recording cannot react: when the server's characteristics and delivered latency change, the captured client workload is unlikely to respond naturally to those differences, which may prove no better than a simulated workload — and when too much faith is placed in it, worse. Subtle timing effects can also disturb it. (c) Every micro-benchmark test is multiplied by working set size and thread count. Working set much smaller than main memory caches entirely, so the file system software is what you investigate; much larger than main memory minimises cache and drives the test toward disk I/O. Thread count, assuming a small working set: single-threaded tests file system performance at the current CPU clock speed; enough threads to saturate all CPUs tests the maximum of system, file system and CPUs together. To answer “does the extra memory help?” you need both settings of the working set on both tiers, and in particular a working set sized to fit the new tier's memory but not the old tier's — that is the cell where the extra cache is the only thing that differs. Run single-threaded to attribute the result to the software path and saturating to establish the ceiling.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p3q2",
+          "type": "applied",
+          "where": "Part 3 · Question 2",
+          "prompt": "Your team maintains an internal benchmark written six years ago to imitate the then-current API traffic of your service. Traffic has since shifted heavily toward a batch endpoint that did not exist when the benchmark was written. A proposal to rewrite it is resisted: two years of published quarterly results use the current version, and rewriting would break the trend line. Separately, a vendor offers you results from an independent body's suite instead. (a) Name the kind of benchmark your internal one is, and the specific weakness of that kind that this situation is an instance of. (b) State plainly what is being traded against what in the resistance to rewriting, and say what you would do with the two years of results either way. (c) Give three things an independent body's result offers that your internal benchmark does not, and the one question you must answer before the vendor's result is usable at all — including the method that answers it.",
+          "ideal": "(a) It is a simulation, also called a macro-benchmark: a benchmark imitating a customer application workload, normally built from workload characterization of the production environment. The weakness this is an instance of is that customer usage patterns change over time, so simulations require updating and adjusting to stay relevant — and there is resistance to that when published results based on the older version would no longer be usable for comparison with the new one. (b) What is being traded is comparability against relevance: two years of quarterly results form a series that only holds together while the benchmark is unchanged, and the benchmark is only worth running while it resembles the traffic. Either way, keep the two years and relabel them as measurements of the old workload — they remain valid for comparison with each other and invalid as statements about current performance. Do not plot old and new on one line; start a new series and say plainly which property you chose. (c) An independent body's suite offers: tests that are well defined and documented and must be executed under guidelines so results are as intended; full disclosure of the configured environment, which may be audited, and depending on the body either price/performance or a component and tuning list; and results that already exist for a variety of vendors and products, so you can compare without running anything. The question you must answer first is whether it resembles your production workload — for a current workload that is decided by workload characterization, measuring the real makeup of your traffic and comparing it against what the suite exercises.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p4q1",
+          "type": "applied",
+          "where": "Part 4 · Question 1",
+          "prompt": "A colleague reports that a new caching layer sustains 400,000 reads per second of 4 Kbyte objects, measured from a bank of client machines across a single 10 Gbit/s network interface into the cache server. They add that the run lasted 30 seconds, the client CPUs were at 40%, the server CPUs were at 55%, and no component reached saturation. They would like to publish the figure. (a) Perform the check that this result invites, showing the arithmetic, and state your conclusion. (b) Give the most likely explanation for a result of this shape, and name the check that would have caught it during the run. (c) Independently of the arithmetic, the sentence “no component reached saturation” is itself a finding. Say what it establishes about the figure, using the disjunction that the resource sweep provides, and give the checklist question that puts the same point in three words.",
+          "ideal": "(a) The sanity check: 400,000 operations per second × 4 Kbytes = 1,600,000 Kbytes/s, which is about 1.6 Gbytes/s, or roughly 12.8 Gbit/s — before protocol headers — over a single 10 Gbit/s interface. That exceeds the known limit of the link, so the result is not merely doubtful, it is impossible, and the conclusion is that the figure is bogus. No further debate is needed; the arithmetic settles it. (b) The likely explanation is that the benchmark tested client caching and never drove the entire workload to the server, which is what results of this shape usually mean. During the run this would have been caught by observing the server — counting the operations actually arriving there and comparing them with what the clients reported — which is active benchmarking rather than reading the client's summary. (c) “No component reached saturation” is a finding in its own right, because the resource sweep offers exactly two outcomes: either some hardware or software component has reached 100% utilization, or you are not driving the system to its limit. Since nothing did, the second holds, so the figure is a floor rather than a ceiling and no limiting factor has been established — meaning the result cannot honestly be quoted at all. The checklist puts the same point in three words: “Why not double?”",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.p4q2",
+          "type": "applied",
+          "where": "Part 4 · Question 2",
+          "prompt": "You have four hours of exclusive access to a shared, heavily contended reference system next month; five other teams want the same slot. Your task is to establish whether a proposed configuration change improves throughput, and to produce a figure that survives scrutiny. You are told the change “should be about 15% — run it before and after and take the difference”. (a) Name the analysis approach this access pattern forces you into, give its three phases, and say precisely what it can and cannot establish. (b) Explain why a single before-and-after pair is insufficient for a change of this size, naming the two properties you must understand to make sense of a pair of results. (c) Describe what you would do during the four hours, beyond running the two configurations, and why that work has to happen then rather than afterwards. (d) Give three of the six checklist questions you would answer before circulating any figure, and what each one would take.",
+          "ideal": "(a) Statistical analysis, which is the approach used where access to a large-scale system is both time-limited and expensive and many teams — sales, marketing, support, engineering, quality — want the same machine. Its three phases: selection of the benchmark tool, its configuration and the system performance metrics to capture; execution of the benchmark, collecting a large dataset of results and metrics; and interpretation of the data with statistical analysis, producing a report. It can establish consistency, variation, error margins and full distributions. It cannot establish what was actually measured — that evidence exists only while the load is applied, which is active benchmarking's job. (b) Because when benchmarking for code changes or non-regression testing it is crucial to understand the variation and the error margins in order to make sense of a pair of results. A claimed 15% difference means nothing if run-to-run variation is of the same order, and a single before-and-after pair contains no information about that variation at all. (c) During the four hours, beyond running the two configurations: analyse the system while the load is applied — confirm the benchmark is testing what it claims, sweep resources for utilization, saturation and errors until either something is at 100% or you accept the system was not driven to its limit, and profile both target and benchmark software to see whether anything unexpected is limiting it. Also collect as much performance data as the collection overhead allows, including variation, full distributions and error margins, so forensic analysis is possible afterwards; a script that dumps every available counter before, during and after each run is the standard form. It has to happen then because the machine is not yours next month, because the metrics are expensive enough that a problem found later means redoing them, and because what was measured is unrecoverable once the load stops. (d) Three of the six, with what each requires: Why not double? — needs the limiter, established by the resource sweep and profiling during the run. Does it reproduce? — needs repeated runs and their standard deviation, which is also what makes the pair of results interpretable. Did it error? — needs the operation success/fail ratio, since errors perform differently from normal operations and a high error rate skews the result. (Equally acceptable: did it break limits?, needing the arithmetic against known component limits; does it matter?, needing workload characterization of production; did it even happen?, needing confirmation at the target that the work arrived.)",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z01",
+          "type": "quiz",
+          "where": "Final quiz · 1",
+          "prompt": "State what a benchmark result is a fact about and what it is not, give the six qualities of a good benchmark and the additional quantity needed before a purchase, and say how that quantity's price component is defined.",
+          "ideal": "A benchmark result is a fact about how fast this system ran this particular benchmark, under these particular conditions. It is not a fact about your system or a prediction of your production performance: a benchmark reports only the speed at which the system executed it, and the work of interpreting that and of judging how far it carries over to your own environment is left entirely to you. The six qualities of a good benchmark are that it is repeatable, so comparisons are possible; observable, so performance can be analysed and understood; portable, so it can be run on competitors and across releases; easily presented, so everyone understands the results; realistic, so measurements reflect what customers experience; and runnable, so developers can test changes quickly. Where systems are being compared with an intent to purchase, a seventh is required — the price/performance ratio — with price quantified as the equipment's capital cost across five years. Observable is worth singling out, because a benchmark that cannot be watched while it runs cannot be analysed at all.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z02",
+          "type": "quiz",
+          "where": "Final quiz · 2",
+          "prompt": "Give the four things that must be understood about any benchmark result, say how they are best served, and explain what specifically is lost by bringing in a performance expert after the run has completed.",
+          "ideal": "What the test actually exercises; which factor or factors are limiting it; which perturbations could be disturbing the figure; and which conclusions the measurement will support. Answering them calls for deep familiarity with three things at once: the behaviour of the benchmark software, the way the system responds to it, and the relationship between the figure and the environment it is meant to describe. Given the benchmark tool and access to the system, they are best answered by analysing the system's performance during the run itself, drilling down far enough to explain and put numbers on whatever is limiting it. Bringing the expert in afterwards is a common mistake in which junior staff execute the benchmarks and performance experts are asked to explain the results once the run has completed. What is lost is the evidence itself: once the machine is idle, there is nothing left to observe, so three of the four questions can no longer be answered, and the fourth — what may be concluded — is only safe once the first three are. The correction is one of scheduling rather than skill: engage the expert during the run. Where there is no access at all, two further questions arise: what the system environment was and how it was configured.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z03",
+          "type": "quiz",
+          "where": "Final quiz · 3",
+          "prompt": "State the casual benchmarking formula in its A/B/C form, give the standard example with the reason the discrepancy is so large, and say why a correctly functioning tool does not save you from it.",
+          "ideal": "Casual benchmarking is the fire-and-forget approach, and the formula is: you benchmark A, but actually measure B, and conclude you have measured C. The standard example is the many tools that claim or imply they report the performance of disks, when what they exercise is the file system. The discrepancy can be orders of magnitude, because file systems employ caching and buffering to substitute disk I/O with memory I/O, so the number you get describes memory speed rather than device speed. A correctly functioning tool does not save you, because the tool may be behaving exactly as designed and testing the file system faithfully while your conclusions about the disks are still wildly incorrect — the defect is in the inference, not in the software. Doing benchmarking well requires rigour to check what is actually measured, and an understanding of what was tested in order to form valid conclusions. This is particularly hard for a beginner, who has no instinct for whether a number is suspicious: a thermometer reading a thousand degrees would be obviously wrong, but benchmark numbers are unfamiliar and carry no such signal.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z04",
+          "type": "quiz",
+          "where": "Final quiz · 4",
+          "prompt": "Explain what should accompany every benchmark number, what to publish instead when there is no time for analysis, and give the summarised rule about how long a result deserves before you trust it.",
+          "ideal": "Any benchmark figure ought to travel with two companions: a statement of the limit that was reached, and an account of the analysis done to establish it. Bare results provided with no analytical detail can be a sign that the author is inexperienced and has assumed the results are trustworthy and final, when this is usually just the beginning of an investigation — an investigation that often finds the results were wrong or confusing. Where there is genuinely no time for careful analysis, the thing to publish instead is a list of the assumptions you have not had time to check, included with the results: that the benchmark tool is not buggy, that the disk I/O test actually measures disk I/O, that the tool drove disk I/O to its limit as intended, and that this type of I/O is relevant for this application. That list then becomes a to-do list for further verification if the result is later deemed important enough to spend more effort on. The summarised rule is that if you have spent less than a week studying a benchmark result, it is probably wrong.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z05",
+          "type": "quiz",
+          "where": "Final quiz · 5",
+          "prompt": "Distinguish ignoring variance from ignoring perturbations: define each, give an example, and give the specific remedy for each — including the minimum run duration and the statistic to check across repeats.",
+          "ideal": "Ignoring variance is a failure to reproduce the variation in the workload you are simulating. Benchmark tools, especially micro-benchmarks, often apply a steady and consistent workload based on the average of a series of measurements of real-world characteristics. The example is a disk workload found to average 500 reads and 50 writes per second, which a tool then simulates either at those rates or at the 10:1 ratio so that higher rates can be tested. That erases the fact that the rate and the mix vary and that some types occur orthogonally: writes may arrive in bursts every 10 seconds from asynchronous write-back flushing while synchronous reads are steady, and those bursts can cause real production issues, such as queueing the reads, that a steady average never reproduces. One possible remedy is for the benchmark to use a Markov model, reflecting the probability that a write will be followed by another write. Ignoring perturbations is a failure to consider external activity affecting the results: a timed system activity such as a backup executing during the run, monitoring agents collecting statistics once per minute, or, in the cloud, unseen tenants on the same host system. The remedy is to make runs longer — minutes instead of seconds — with the rule that the duration of a benchmark should not be shorter than one second, since short tests can be unusually perturbed by device interrupts pinning the thread during interrupt service routines, by scheduling decisions in the kernel that delay migrating queued threads in order to preserve CPU affinity, and by the warmth of the CPU caches. Repeat the test several times and inspect the standard deviation across the repeats, aiming for it to be as small as it can be; also collect the distribution of operation latency, not just the total runtime, so outliers can be seen and their details recorded.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z06",
+          "type": "quiz",
+          "where": "Final quiz · 6",
+          "prompt": "State the benchmark paradox and its arithmetic, then explain why benchmarking a competitor is self-defeating and what would have to be done to do it honestly.",
+          "ideal": "The benchmark paradox is that where a product has an even chance of winning any one benchmark, it will usually lose overall. The arithmetic is that customers buying on performance often want to be really sure, which means running not one benchmark but several and wanting the product to win them all; at a 50% probability each, the probability of winning three is 0.5 times 0.5 times 0.5, which is 0.125, or 12.5%. The more benchmarks, with the requirement of winning them all, the worse the chances — and ignoring benchmarks in response is itself a benchmarking pitfall. Benchmarking a competitor is self-defeating because customers do not evaluate a product for five minutes — they live with it for months, analysing and tuning as they go and shaking out the worst issues within the first few weeks. You do not have weeks to spend analysing and tuning a competitor, so in the time available you can only gather untuned and therefore unrealistic results — and your competitor's customers, who are the target of the marketing activity, may well recognise untuned results when they are posted, and the effect is that your company forfeits credibility with precisely the audience the exercise was meant to win over. To do it honestly you would have to spend serious time tuning their product: analysing its performance with the usual techniques, searching out best practices, customer forums and bug databases, possibly bringing in outside expertise, and then making the same effort for your own product before finally running the head-to-head benchmarks.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z07",
+          "type": "quiz",
+          "where": "Final quiz · 7",
+          "prompt": "Define a benchmark special, say when the term came into use and over what, and give the two specification changes the industry body introduced in response.",
+          "ideal": "A benchmark special is when a vendor studies a popular or industry benchmark and then engineers the product so that it scores well on that benchmark, while disregarding actual customer performance; it is also called optimising for the benchmark. The term came into use in 1993, with the TPC-A benchmark: a consulting firm charged that a database vendor had added a special option, discrete transactions, to its software for the sole purpose of inflating its results, and claimed this violated the spirit of the TPC because it was something a typical customer would not use. The vendor rejected the accusation, arguing with some justification that it had followed the letter of the law in the benchmark specifications, and that since benchmark specials were not addressed there it was unfair to accuse them of violating anything. The two changes introduced in response were an anti-benchmark-special clause, prohibiting every such implementation that lifts benchmark scores without lifting real-world performance or pricing; and, because the focus is price/performance and the parallel trick is to base results on deep discounts no customer would actually get, a price requirement that the total price must be within 2% of the price a customer would pay for the configuration. These were addressed many years ago, and you should not necessarily expect benchmark specials today.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z08",
+          "type": "quiz",
+          "where": "Final quiz · 8",
+          "prompt": "Describe the design of a micro-benchmark set: the five sample file system tests with the intent of each, and the two factors every test is multiplied by, with what each setting of each factor tests.",
+          "ideal": "Designing a file system micro-benchmark means choosing the attributes to test — sequential or random I/O, I/O size, and direction — and then multiplying them out. The five sample tests and their intents are: sequential 512-byte reads, to test maximum realistic IOPS, using more and smaller I/O; sequential 1-Mbyte reads, to test maximum read throughput, using fewer and larger I/O so less time is spent on I/O initialization; sequential 1-Mbyte writes, to test maximum write throughput; random 512-byte reads, to test the effect of random I/O; and random 512-byte writes, to test the effect of rewrites. All of these are then multiplied by two additional factors. The first is working set size, the size of the data being accessed: much smaller than main memory, so that the data caches entirely in the file system cache and the performance of the file system software can be investigated; or much larger than main memory, to minimise the effect of the file system cache and drive the benchmark toward testing disk I/O. The second is thread count, assuming a small working set size: single-threaded, to test file system performance based on the current CPU clock speed; or multithreaded sufficiently to saturate all CPUs, to test the maximum performance of the system, the file system and the CPUs. These multiply quickly into a large matrix of tests, and statistical analysis techniques can be used to reduce the required set. Note also that focusing on top speeds is sunny day performance testing, and that cloudy or rainy day testing — contention, perturbations and workload variance — should be considered too.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z09",
+          "type": "quiz",
+          "where": "Final quiz · 9",
+          "prompt": "Compare simulation and replay: what each is, what each buys you, and what went wrong in the storage-upgrade case — naming the level of capture and the component whose improvement it hid.",
+          "ideal": "A simulation, sometimes called a macro-benchmark, imitates a customer application workload, and may be based on workload characterization of the production environment to determine the characteristics to simulate — for example a file-server workload composed of reads at 40%, writes at 7%, getattr at 19% and readdir at 1%. It buys you results that resemble how clients will perform with the real workload, if not closely then at least closely enough to be useful, and it can encompass many factors that would be time-consuming to investigate with micro-benchmarks and it can also capture interactions between parts of the system that are intricate enough for a narrow test to overlook entirely. It may be stateless, where each request is unrelated to the previous one and the type of each operation is chosen randomly according to measured probability, or stateful, where each request depends on client state and is better simulated with a Markov model. Its problems are that it can ignore variance, and that it ages as customer usage patterns change. A replay attempts to replay a trace log to the target, testing performance with the actual captured client operations, which sounds as good as testing in production. What it buys is real operations rather than a synthesised mix; the difficulty is that once the server's characteristics and the latency it delivers have changed, the recorded client traffic will not react to the difference the way a live client would, which can leave it no better than a synthesised workload — and worse, when too much faith is placed in it. In the storage-upgrade case, a customer's production workload was traced and replayed on new hardware, performance was worse and the sale was lost. The trace had been captured at the disk I/O level; the old system housed 10K rpm disks and the new one slower 7,200 rpm disks, but the new system also provided sixteen times the amount of file system cache along with faster processors. The component whose improvement the replay hid was therefore the file system cache: the actual production workload would have shown improved performance because it would have returned largely from cache, which replaying disk events did not simulate. It is a case of testing the wrong thing.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sysperf-benchmarking.z10",
+          "type": "quiz",
+          "where": "Final quiz · 10",
+          "prompt": "Give the four steps of passive benchmarking and define active benchmarking, then describe the case study that showed a “hard drive” benchmark testing no disk at all — the sanity check that started it, the layers checked, and the conclusion.",
+          "ideal": "Passive benchmarking is the fire-and-forget strategy in which the benchmark is executed and then ignored until it has completed, the main objective being the collection of benchmark data; it is described as its own anti-methodology for comparison with active benchmarking. Its four steps are: pick a benchmark tool; run it with a variety of options; make a slide deck of the results; and hand the slides to management. Active benchmarking means analysing performance while the benchmark is running — not just after it is done — using observability tools, so that you can confirm the benchmark tests what it says it tests, understand what that is, and identify the true limiters of the system under test or of the benchmark itself. In the case study, a micro-benchmark suite whose documentation described it as a program to test hard drive performance reported 739 Kbytes per second on its first sequential-output per-character test. The sanity check was that if the test genuinely performed one I/O per character, the machine would have to be sustaining 739,000 I/O every second, which was implausible for disks. Checking disk statistics during the run showed no disk I/O reported at all. Tracing block events showed no block I/O issued and none completed, but buffers being dirtied. Cache statistics confirmed a workload of dirties — writes into the file system cache — with a 100% hit ratio and no misses. Counting calls at the virtual file system layer showed 1,176,936 writes against 13 reads, and a histogram of the size argument put 668,839 of those writes at one byte each. The conclusion was that the first test performs single-byte writes to the file system, which are absorbed by the file system cache, so it exercises no disk I/O at all despite what the tool's description implies; the option advertised as disabling write buffering did not in fact synchronise after each write, and the direct-I/O option failed outright, so there was no way to perform a per-character disk write test at all.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        }
+      ],
+      "retired": []
     }
   ]
 }

@@ -22,12 +22,42 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 5 | Transactions — Isolation Levels, Serializability, Atomic Commit | `ddia-transactions/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 8 "Transactions". | Built · 18 questions registered |
 | 6 | Browser Networking — Latency, HTTP/1.x, Server-Sent Events, WebSocket | `hpbn-browser-networking/` | Ilya Grigorik, *High Performance Browser Networking*, O'Reilly — Ch. 1 "Primer on Latency and Bandwidth", Ch. 11 "HTTP 1.X", Ch. 16 "Server-Sent Events (SSE)", Ch. 17 "WebSocket". | Built · 18 questions registered |
 | 7 | Performance Methodology — Concepts, Perspectives, Methods, Statistics | `sysperf-methodology/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 2 "Methodologies". | Built · 18 questions registered |
-| 8 | *unassigned* | — | — | Awaiting source |
+| 8 | Benchmarking — What the Number Is, How It Lies, Which Kind, and Active Analysis | `sysperf-benchmarking/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 12 "Benchmarking". | Built · 18 questions registered |
 | 9 | *unassigned* | — | — | Awaiting source |
 | 10 | *unassigned* | — | — | Awaiting source |
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 8
+
+Cited within the source chapter and named or described in the booklet's teaching: the Transaction
+Processing Performance Council (TPC) and its benchmarks TPC-C, TPC-DS, TPC-E, TPC-H, TPC-VMS, TPCx-HS
+and TPCx-V, together with the TPC history page account of the 1993 TPC-A dispute — The Standish Group's
+charge that Oracle's discrete transactions option was a benchmark special, Oracle's reply, and the
+anti-benchmark-special and 2% pricing clauses that followed; the Standard Performance Evaluation
+Corporation (SPEC) and its SPEC Cloud IaaS 2018, SPEC CPU 2017, SPECjEnterprise 2018 Web Profile,
+SPECsfs2014 and SPECvirt_sc2013 suites; Jim Gray and co-authors for the 1985 paper "A Measure of
+Transaction Processing Power", its Sort, Scan and DebitCredit benchmarks and the TPS measure, and
+David DeWitt's account of Gray's role in the founding of TPC; the Whetstone (1972) and Dhrystone (1984)
+CPU benchmarks; the bonnie++ micro-benchmark suite and Russell Coker's description of it, together with
+Roch Bourbonnais's article "Decoding Bonnie++"; the observability tools used in the case studies —
+iostat, bpftrace, cachestat, strace and perf-style CPU profiling with flame graphs; the micro-benchmark
+tools listed by resource type — SysBench, lmbench, fio, hdparm, dd and iperf; the load generators wrk,
+siege and hey; Avishay Traeger and co-authors for "Most popular benchmarks are flawed"; Bart Smaalders
+for the warning about optimising for a benchmark that does not resemble customer workloads; Raj Jain
+for the Markov-model treatment of stateful workloads and for the statistical texts, alongside Neil
+Gunther's; ZFS I/O throttling as the resource control found by CPU profiling, and the Sun ZFS Storage
+Appliance as the system whose limits were found by the ramping-load method; the Perl randread.pl load
+generator printed in full in the source; Linux /proc counters, sar(1) and tar(1)'s zero-sized-file
+problem; and MIPS and FLOPS as cross-vendor measures.
+
+The booklet names **TPC and SPEC as organisations and their suites by name**, because industry-standard
+benchmarking is the subject of a whole section and those names are durable and searchable. It names
+**no individual tools** — the case-study benchmark, the observability tools, the micro-benchmark tools
+and the load generators are all described by what they do. That is the fastest-decaying part of the
+chapter, and the analysis is transferable without it. This differs deliberately from competency 7,
+which named nothing at all; the line is drawn at whether the name is the subject or the instrument.
 
 ### Works referenced inside competency 7
 
@@ -260,4 +290,18 @@ least one code, and each code points at the exact artefact to reread.
   than corrected in place, because the bank convention is unconditional — a materially changed
   question gets a new id. Recording the reason here so the two entries in `retired` are not mistaken
   for a change of standard.
-- Competencies 8–13 are unassigned pending sources.
+- **Competency 8 also carries the scoped style block** introduced in competency 5, as competencies 6
+  and 7 do — with one addition: the whole-competency concept sketch in section 6 is explicitly allowed
+  to break across pages, because it is taller than one page and the shared `page-break-inside: avoid`
+  rule was stranding its heading on an otherwise empty page.
+- **Competency 8's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–7.
+- **Competency 8 names two organisations and their benchmark suites, and no tools.** The reasoning and
+  the full list of what was left unnamed are recorded above, under works referenced. It is a different
+  line from competency 7's, drawn deliberately.
+- **Competency 8's orphan check found a page the character count could not see.** A page carrying only
+  two ruled write-lines extracts as zero characters, so it registered as an empty page rather than as a
+  spilled question; it was found by rendering the page to an image. This is the same hole in decision
+  I5 recorded when competency 4 was built, and it is still open: the check counts extracted text, so a
+  page of pure write-lines reads as empty and a stranded heading reads as fine.
+- Competencies 9–13 are unassigned pending sources.

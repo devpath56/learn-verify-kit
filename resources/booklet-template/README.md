@@ -48,3 +48,4 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../ddia-transactions/` — the fifth.
 `../hpbn-browser-networking/` — the sixth.
 `../sysperf-methodology/` — the seventh.
+`../sysperf-benchmarking/` — the eighth.
