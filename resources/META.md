@@ -253,4 +253,11 @@ least one code, and each code points at the exact artefact to reread.
   many — observability tools, monitoring platforms, cloud providers, orchestrators — and the booklet
   teaches the methodology generically instead, since the method is the transferable part and the tool
   list is the fastest-decaying part of the chapter. All of those names are recorded above.
+- **Competency 7 retired two questions the day it was registered.** `p4q2` reused the source's own
+  worked example, so its first part tested recognition rather than retrieval; `z03` asked for "four
+  anti-methods" where the source names three, the fourth being a legitimate method. Both were caught
+  in review before any attempt existed. They were retired and reissued as `p4q2b` and `z03b` rather
+  than corrected in place, because the bank convention is unconditional — a materially changed
+  question gets a new id. Recording the reason here so the two entries in `retired` are not mistaken
+  for a change of standard.
 - Competencies 8–13 are unassigned pending sources.

@@ -10,7 +10,7 @@
 
   <div class="chunkstrip">
     <div><span class="num">1</span><b>The words decide the measurement</b>Latency, utilization's two meanings, saturation, caching, the knee point.</div>
-    <div><span class="num">2</span><b>Where you stand decides what you see</b>Two perspectives, four anti-methods, and the three that replace them.</div>
+    <div><span class="num">2</span><b>Where you stand decides what you see</b>Two perspectives, three anti-methods, and the procedures that replace them.</div>
     <div><span class="num">3</span><b>The methods worth running</b>USE, RED, workload characterization, drill-down, latency analysis, and the ones people skip.</div>
     <div><span class="num">4</span><b>The numbers will lie to you</b>Scalability models, queueing theory, averages, distributions, outliers.</div>
   </div>
@@ -80,7 +80,7 @@
   </div>
 
   <h3>The core model in one paragraph</h3>
-  <p>You can learn every metric a system emits and still be unable to fix anything, because the hard part is not the definitions — it is the procedure for moving from signals to solutions. That procedure has four layers. <b>Vocabulary comes first</b>, because a word with two meanings will send you to the wrong place: utilization means two different things, and one of them stops being a warning exactly when you need it. <b>Then posture</b>: analysis can start from the resources or from the requests, and the perspective you inherit from whatever documentation you read is not the only one. <b>Then method</b>: a small number of procedures — check every resource, check every service, characterise the input, split the latency in half — that tell you where to start and what to do next, as opposed to the anti-methods, whose common signature is a hypothesis with no data behind it. <b>Then the numbers</b>, which are the last place you can still fool yourself: averages that describe nothing that happened, intervals that hide the seconds that mattered, and a mean response time that has already doubled at 60% utilization.</p>
+  <p>You can learn every metric a system emits and still be unable to fix anything, because the hard part is not the definitions — it is the procedure for moving from signals to solutions. That procedure has four layers. <b>Vocabulary comes first</b>, because a word with two meanings will send you to the wrong place: utilization means two different things, and one of them stops being a warning exactly when you need it. <b>Then posture</b>: analysis can start from the resources or from the requests, and the perspective you inherit from whatever documentation you read is not the only one. <b>Then method</b>: a small number of procedures — check every resource, check every service, characterise the input, split the latency in half — that tell you where to start and what to do next, as opposed to the anti-methods, whose common signature is a hypothesis with no data behind it. <b>Then the numbers</b>, which are the last place you can still fool yourself: averages that describe nothing that happened, intervals that hide the seconds that mattered, and a mean response time that has already doubled once utilization passes 60%.</p>
 
   <div class="box tenth nobreak">
     <h4>Tenth-grader version — the whole thing at once</h4>
@@ -97,9 +97,9 @@
   <table>
     <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
     <tr><td><span class="pill p1">1</span><b>The words decide the measurement</b></td><td>Latency, response time and service time; utilization's two incompatible definitions; saturation; throughput and IOPS; the knee point and scalability profiles; caching, hit ratios and warmth; load versus architecture; where tuning pays; when to stop.</td><td>Every later part depends on these being unambiguous. A term with two meanings quietly redirects an entire investigation.</td></tr>
-    <tr><td><span class="pill p2">2</span><b>Where you stand decides what you see</b></td><td>Resource analysis versus workload analysis; the four anti-methods and the tell they share; the problem statement; the scientific method; the diagnosis cycle; the tools method and its blind spot.</td><td>Before choosing a method you have to notice you were standing somewhere — and that the bad methods are not stupid, just untethered from data.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>Where you stand decides what you see</b></td><td>Resource analysis versus workload analysis; the three anti-methods and the tell they share; the ad hoc checklist; the problem statement; the scientific method; the diagnosis cycle; the tools method and its blind spot.</td><td>Before choosing a method you have to notice you were standing somewhere — and that the bad methods are not stupid, just untethered from data.</td></tr>
     <tr><td><span class="pill p3">3</span><b>The methods worth running</b></td><td>USE and RED; workload characterization; drill-down analysis and Five Whys; latency analysis; event tracing; baseline statistics; static performance tuning; cache tuning; micro-benchmarking; the performance mantras.</td><td>The working core. Each is a small procedure that answers &ldquo;where do I start&rdquo; for a different shape of problem.</td></tr>
-    <tr><td><span class="pill p4">4</span><b>The numbers will lie to you</b></td><td>Scalability profiles; Amdahl's Law and the Universal Scalability Law; queueing theory, Little's Law and M/D/1 at 60%; resource limits and factor analysis; quantifying gains; averages, percentiles, coefficient of variation; multimodal distributions and outliers; monitoring patterns and visualizations.</td><td>The last place to go wrong. Having found something and measured it, this is where you decide whether the measurement means what you think.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>The numbers will lie to you</b></td><td>Scalability profiles; Amdahl's Law and the Universal Scalability Law; queueing theory, Little's Law and M/D/1 past 60%; resource limits and factor analysis; quantifying gains; averages, percentiles, coefficient of variation; multimodal distributions and outliers; monitoring patterns and visualizations.</td><td>The last place to go wrong. Having found something and measured it, this is where you decide whether the measurement means what you think.</td></tr>
   </table>
 
   <div class="box quote">
@@ -147,7 +147,7 @@
       <td><b>Why convert to latency</b></td>
       <td>Latency is a time, so different problems can be compared, ranked, and their speedups predicted.</td>
       <td>Choosing between 100 network operations and 50 disk operations is a hard question with many factors. Choosing between <b>100 ms of network I/O</b> and <b>50 ms of disk I/O</b> is not.</td>
-      <td>vs <b>IOPS or throughput</b>, which cannot be compared across components and cannot be used to calculate a predicted speedup. Where you can convert a metric to time, do — it is what makes prioritisation possible at all.</td>
+      <td>vs <b>IOPS or throughput</b>, which cannot <i>accurately</i> be compared across components or used to calculate a predicted speedup. Where you can convert a metric to time, do — it is what makes prioritisation possible at all.</td>
     </tr>
     <tr>
       <td><b>Utilization (time-based)</b></td>
@@ -164,7 +164,7 @@
     <tr>
       <td><b>Saturation</b></td>
       <td>The degree to which more work is requested of a resource than it can process. Also called <b>pressure</b>.</td>
-      <td>Begins at 100% <i>capacity-based</i> utilization, and increases linearly with load beyond it. Measured as a wait-queue length, or as time spent waiting.</td>
+      <td>Begins at 100% <i>capacity-based</i> utilization, and in the idealised picture increases linearly with load beyond it. Measured as a wait-queue length, or as time spent waiting.</td>
       <td>vs utilization, which is about busyness. <b>Any degree of saturation is a performance issue</b>, because it is time spent waiting — that is latency by another name. Under the time-based definition, queueing may begin well before 100%, or not at 100% at all, depending on how much parallel work the resource accepts.</td>
     </tr>
     <tr>
@@ -303,7 +303,7 @@
         <i>Move:</i> do not treat this as a bottleneck on the strength of the utilization figure alone. It is the cell that makes &ldquo;100%&rdquo; a bad alarm, and it is why you check saturation before concluding anything.</div>
       <div class="cell focus"><b>Saturation begins here</b>
         100% capacity-based utilization: work arrives that cannot be serviced and starts to queue.<br>
-        <i>Move:</i> this is the real bottleneck, and the metric that proves it is a <b>wait queue</b>, not a percentage. Any non-zero saturation is a problem, because queueing is latency. Beyond this point, saturation grows linearly with load while utilization cannot report anything new.</div>
+        <i>Move:</i> this is the real bottleneck, and the metric that proves it is a <b>wait queue</b>, not a percentage. Any non-zero saturation is a problem, because queueing is latency. Beyond this point, saturation keeps growing with load — roughly linearly, in the idealised picture — while utilization cannot report anything new.</div>
 
       <div class="rowh">NOT BUSY</div>
       <div class="cell good"><b>Idle, and fine</b>
@@ -329,7 +329,7 @@
     <div>
     <div class="n">Part 2 of 4</div>
     <h2>Where you stand decides what you see</h2>
-    <p>Two perspectives, four anti-methods with one shared tell, and the three procedures that replace them.</p>
+    <p>Two perspectives, three anti-methods with one shared tell, and the procedures that replace them.</p>
     </div>
   </div>
 
@@ -392,7 +392,7 @@
       <td><b>Problem statement</b></td>
       <td>Six questions asked before anything else, which is why it should be <b>the first method you attempt</b> on a new issue.</td>
       <td>What makes you think there is a problem? Has it ever performed well? What changed recently — software, hardware, load? Can it be expressed as latency or runtime? Does it affect others? What is the environment, with versions and configuration?</td>
-      <td>vs starting with tools. Asking and answering these often points straight at the cause: issues get solved this way without logging in to a server or looking at a single metric.</td>
+      <td>vs starting with tools. Asking and answering these often points straight at the cause: performance issues have been solved this way alone, over the phone, without logging in to a server or looking at a single metric.</td>
     </tr>
     <tr>
       <td><b>Scientific method</b></td>
@@ -422,7 +422,7 @@
 
   <div class="box bound nobreak">
     <h4>Concept boundary — the anti-methods are not stupid, they are untethered</h4>
-    <p><b>What they have in common</b> is not laziness. It is that the hypothesis arrives <i>before</i> the data, or without any data at all — which is stated explicitly as the identifying feature of blame-someone-else and is equally true of the other three.<br>
+    <p><b>What the three anti-methods have in common</b> is not laziness. It is that the hypothesis arrives <i>before</i> the data, or without any data at all — which is stated explicitly as the identifying feature of blame-someone-else and is equally true of the other two. The ad hoc checklist is deliberately not among them: it is a real method, and its weakness is decay rather than untetheredness.<br>
     <b>What separates the good methods</b> is not sophistication either. The problem statement is six questions and no tools; the diagnosis cycle is four words. What they share is that <b>data comes first and the finding gets quantified</b>, which is what lets you rule things out, rank what you found, and know when to stop.<br>
     <b>The test to apply to yourself:</b> what did I observe before I formed this theory, and how big is the thing I think I have found?</p>
   </div>
@@ -440,7 +440,7 @@
              available documentation teaches the first,
              which is why people think it is the only one.
                           |
-   the four ANTI-METHODS, and the tell they share
+   the three ANTI-METHODS, and the tell they share
         <span class="tk2">STREETLIGHT</span>     you run the tools you know, because
              that is where the light is. it may find an
              issue -- but not necessarily THE issue.
@@ -450,15 +450,16 @@
         <span class="tk2">BLAME SOMEONE ELSE</span>  redirect to a team you are
              not on. the tell: A HYPOTHESIS WITH NO DATA
              BEHIND IT. ask for the screenshots.
-        <span class="tk2">AD HOC CHECKLIST</span>  fast and genuinely valuable --
-             and a point-in-time recommendation that
-             decays, skewed to easily documented fixes.
-        +--> all four: the theory arrives before the data
+        +--> all three: the theory arrives before the data
+        (the AD HOC CHECKLIST is NOT one of them: it is a
+         real method, fast and genuinely valuable -- but a
+         point-in-time recommendation that decays, and
+         skewed to easily documented fixes.)
                           |
    what to do instead, in order
         1  <span class="tks">PROBLEM STATEMENT</span>  six questions, asked FIRST.
-             issues get solved this way without logging in
-             to anything.
+             issues HAVE been solved this way
+             without logging in to anything.
         2  <span class="tk2">SCIENTIFIC METHOD</span>  question . hypothesis .
              prediction . test . analysis. ruling things
              OUT is a result. reverse a failed change
@@ -469,7 +470,7 @@
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Name the two perspectives, who typically uses each, and the metrics each favours.<br>
-      <span class="q">Q</span> What single feature identifies all four anti-methods?<br>
+      <span class="q">Q</span> Name the three anti-methods, and the single feature that identifies all of them.<br>
       <span class="q">Q</span> Give the six problem-statement questions, and say why this method comes first.
     </div>
   </div>
@@ -523,7 +524,7 @@
       <div class="colh">From a tool you have</div>
       <div class="colh">From a question you need answered</div>
 
-      <div class="rowh">Theory<br>came<br>BEFORE<br>the data</div>
+      <div class="rowh">NOTHING<br>was<br>observed<br>first</div>
       <div class="cell"><b>Streetlight</b>
         You open what you know and look for something odd. Sometimes it works.<br>
         <i>Move:</i> notice that a finding here is unranked — you cannot tell an issue from <i>the</i> issue, because nothing in the approach quantifies what it found against the size of the problem.</div>
@@ -539,7 +540,7 @@
         Six questions first. Then question, hypothesis, prediction, test, analysis — or the tighter loop of hypothesis to instrumentation to data and back.<br>
         <i>Move:</i> start here on every issue. Enumerate the questions <b>before</b> looking for tools, so that a question you cannot answer becomes a recorded known-unknown rather than an invisible gap. Ruling things out counts as progress.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the row is the one that separates method from anti-method — every cell in the top row shares the same defect, and it is not effort or intelligence. The column decides how complete your view can be: a tool-first approach is bounded by your toolbox, and the danger is that the boundary is invisible from where you are standing.</div>
+    <div class="legend"><b>Read it as:</b> the row is the one that separates method from anti-method — in every cell of the top row the step was taken with nothing observed behind it, whether that is a theory with no evidence or no theory at all. The column decides how complete your view can be: a tool-first approach is bounded by your toolbox, and the danger is that the boundary is invisible from where you are standing.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -594,13 +595,13 @@
       <td><b>USE on software and limits</b></td>
       <td>The same three questions applied to software resources and to imposed caps.</td>
       <td>A lock: utilization is time held, saturation is threads queued on it. A thread pool: utilization is time busy, saturation is requests waiting. Process, thread and file-descriptor capacity: usage, waiting on allocation, and allocation failures.</td>
-      <td>Also applies to <b>resource controls</b>: a tenant's memory usage against its cap is capacity utilization, and limit-imposed allocation errors or swapping are saturation — <b>even when the host system is not under memory pressure</b>. And for a service architecture, utilization can be average CPU across the cluster, saturation approximated as the gap between the 99th percentile latency and the average, errors as request errors.</td>
+      <td>Also applies to <b>resource controls</b>: a tenant's memory usage against its cap is capacity utilization, and limit-imposed allocation errors or swapping are saturation — <b>even when the host system is not under memory pressure</b>. And for a service architecture, utilization can be average CPU across the cluster, saturation approximated as the gap between the 99th percentile latency and the average — on the assumption that the 99th is saturation-driven — and errors as request errors.</td>
     </tr>
     <tr>
       <td><b>The RED method</b></td>
       <td>For <b>every service</b>, check the <b>request rate, errors and duration</b>. Aimed at services, from the user's point of view.</td>
       <td>Draw the service architecture and make sure all three are monitored for each service. For duration, consider distribution statistics as well as the average.</td>
-      <td>vs USE, and the two are complementary rather than competing: <b>USE for machine health, RED for user health</b>. RED's distinctive contribution is the request rate, which separates load from architecture: <b>duration up with rate flat points at the service itself; both up points at the load</b>.</td>
+      <td>vs USE, and the two are complementary rather than competing: <b>USE for machine health, RED for user health</b>. RED's distinctive contribution is the request rate, which separates load from architecture: <b>duration up with rate flat points at the service itself; both up means the problem may be one of load</b>.</td>
     </tr>
     <tr>
       <td><b>Workload characterization</b></td>
@@ -642,7 +643,7 @@
       <td><b>Micro-benchmarking</b></td>
       <td>Testing simple, artificial workloads, measuring the time for a large number of operations and calculating the average.</td>
       <td>System call time; file system reads from a cached file across sizes from one byte to a megabyte; network throughput between endpoints across socket buffer sizes. Note the second dimension in each — vary something.</td>
-      <td>vs macro-benchmarking, which simulates a real-world workload and is complex to conduct and to understand. With fewer factors in play, micro-benchmarks are easier to reason about — and a throughput test can expose an external bottleneck that would otherwise be very hard to spot. You may use a benchmark tool, or a load generator plus separate observability; either is fine, and cross-checking with a second tool is safest.</td>
+      <td>vs macro-benchmarking, which simulates a real-world workload and is complex to conduct and to understand. With fewer factors in play, micro-benchmarks are easier to reason about — and a <b>network</b> throughput test in particular can identify external network bottlenecks that would otherwise be difficult to spot, by examining the transport counters during a production workload. You may use a benchmark tool, or a load generator plus separate observability; either is fine, and cross-checking with a second tool is safest.</td>
     </tr>
   </table>
 
@@ -723,7 +724,7 @@
     <tr><td>Workload characterization</td><td>The chance to <b>eliminate</b> work rather than speed it up — the largest wins available.</td><td>Effort spent on the input rather than the system, which finds nothing if the load is genuinely reasonable.</td><td>When the architecture looks sound, or before designing a simulation benchmark.</td></tr>
     <tr><td>Event tracing</td><td>Detail that summaries destroy, including outliers and the events that caused them.</td><td>Volume, and the overhead of collection — which can perturb the thing you are measuring.</td><td>When a summary looks fine and users disagree, or when you need per-event attribution.</td></tr>
     <tr><td>Baseline statistics</td><td>An answer to &ldquo;is this normal?&rdquo; for metrics no dashboard covers, and before/after evidence for changes.</td><td>Storage, discipline, and care with tracing overhead so the baseline does not disturb production.</td><td>Routinely, and always immediately before and after a change.</td></tr>
-    <tr><td>Micro-benchmarking</td><td>Few factors, easy to conduct and to interpret, and able to expose external bottlenecks that are otherwise hard to see.</td><td>An artificial workload, which may not represent production at all.</td><td>To isolate one component's behaviour, or to test a system with no production load yet.</td></tr>
+    <tr><td>Micro-benchmarking</td><td>Few factors, easy to conduct and to interpret; a network throughput test in particular can identify external network bottlenecks that are otherwise hard to see.</td><td>An artificial workload, which may not represent production at all.</td><td>To isolate one component's behaviour, or to test a system with no production load yet.</td></tr>
   </table>
 
   <h3>Say it so you understand it &rarr; say it like an expert</h3>
@@ -756,13 +757,13 @@
     </div>
   </div>
 
-  <h3>2&times;2 — what you are looking at, and whether load is applied</h3>
+  <h3>2&times;2 — what you are looking at, and whether the load is real</h3>
   <div class="matrix nobreak">
-    <div class="ylab">Columns: is the system under load while you look? &rarr;</div>
+    <div class="ylab">Columns: is <i>real</i> load being applied while you look? &rarr;</div>
     <div class="grid2">
       <div class="corner"></div>
-      <div class="colh">Yes — dynamic performance</div>
-      <div class="colh">No — the system at rest</div>
+      <div class="colh">Yes — production load, dynamic performance</div>
+      <div class="colh">No — at rest, or load you supplied yourself</div>
 
       <div class="rowh">You are<br>looking at<br>RESOURCES</div>
       <div class="cell"><b>The USE method</b>
@@ -778,9 +779,9 @@
         <i>Move:</i> read the rate first, because it separates load from architecture before you have done any real work. Then look for load that should not exist at all.</div>
       <div class="cell"><b>Micro-benchmarking</b>
         You supply an artificial workload to a system that has no real one, vary one dimension, and measure.<br>
-        <i>Move:</i> use it to isolate a single component, or to size something that has no production traffic yet. Remember what you have bought: fewer factors and therefore a clearer answer to a question that may not be the one production is asking.</div>
+        <i>Move:</i> use it to isolate a single component, or to size something that has no production traffic yet. Note the difference from the cell above it: static tuning applies <i>no</i> load, whereas here you apply an artificial one. Remember what you have bought — fewer factors and therefore a clearer answer to a question that may not be the one production is asking.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the left column is where all the famous methods live and where all the attention goes. The right column costs almost nothing and is skipped almost always — and a configuration fault found there would have survived every dynamic method in the left column, quietly, for as long as nobody looked.</div>
+    <div class="legend"><b>Read it as:</b> the left column is where all the famous methods live and where all the attention goes. The right column is the one you reach for when production traffic is not available to you — or, in the focus cell, when you deliberately take it away. A configuration fault found at rest would have survived every dynamic method in the left column, quietly, for as long as nobody looked.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -804,16 +805,16 @@
     <h4>Tenth-grader version</h4>
     <ul>
       <li>Systems don't slow down gradually. They scale fine, then bend, then get worse — and there are only a few shapes that bend can take.</li>
-      <li>Queues have maths. A disk that's busy 60% of the time already answers twice as slowly as an idle one.</li>
+      <li>Queues have maths. A disk busy much past 60% of the time already answers about twice as slowly as an idle one.</li>
       <li>An average is a single number standing in for a lot of numbers. Sometimes there's nothing in the middle for it to stand for.</li>
-      <li>If half your requests take 1 millisecond and half take 7, the average is 3.3 — and nothing that happened took 3.3.</li>
+      <li>If some requests take under a millisecond and the rest take about 7, the average can come out at 3.3 — and nothing that happened took 3.3.</li>
       <li>So whenever someone says &ldquo;the average is fine&rdquo;, the right question is: what did the whole distribution look like?</li>
     </ul>
   </div>
 
   <div class="box">
     <h4>The everyday version</h4>
-    <p>A river with an average depth of six inches. You can walk it, obviously. Except the average is made of a wide shallow bank and a narrow deep channel, and the man in the proverb drowned in it. Now consider a single-lane toll booth. When it is idle you are through immediately; when it is busy 60% of the time you wait, on average, twice as long as when it was empty — not 60% longer, twice. And if someone tells you the booths ran at 40% utilization across the whole day, you still cannot say whether anyone queued, because the whole day contains a rush hour in which they were certainly at 100%.</p>
+    <p>A river with an average depth of six inches. You can walk it, obviously. Except the average is made of a wide shallow bank and a narrow deep channel, and the man in the proverb drowned in it. Now consider a single-lane toll booth. When it is idle you are through immediately; once it is busy rather more than 60% of the time you wait, on average, twice as long as when it was empty — not 60% longer, twice. And if someone tells you the booths ran at 40% utilization across the whole day, you still cannot say whether anyone queued, because the whole day contains a rush hour in which they were certainly at 100%.</p>
   </div>
 
   <h3>The terms, each with its look-alike</h3>
@@ -850,7 +851,7 @@
       <td>An extended form adds buffers, population size and service discipline. In queueing theory the service centres are usually called <i>servers</i>, which is not the same word you use for a machine.</td>
     </tr>
     <tr>
-      <td><b>M/D/1 at 60%</b></td>
+      <td><b>M/D/1 past 60%</b></td>
       <td><b>r = s(2 − ρ) / 2(1 − ρ)</b>, where r is response time, s is service time and ρ is utilization.</td>
       <td>Past <b>60% utilization the mean response time has doubled</b>. By <b>80% it has tripled</b>. An idle rotational disk might serve I/O in about 1 ms; under load that can approach 10 ms.</td>
       <td>Why disk utilization is a problem well before 100%: it is a queueing system whose requests typically <b>cannot be interrupted</b> and must wait their turn. CPUs differ — higher-priority work can preempt. And this model is the <i>best</i> case: variation in service time drives the mean higher, and the 90th and 99th percentiles degrade much faster than the mean beyond 60%.</td>
@@ -943,8 +944,8 @@
    <span class="tk4">QUEUEING THEORY</span>
         Little's Law   L = (lambda)W
         Kendall        A/S/m : arrivals / service / servers
-        M/D/1 at 60% utilization: mean response time has
-             DOUBLED. at 80%, TRIPLED. and that is the BEST
+        M/D/1: BEYOND 60% utilization the mean response time
+             has DOUBLED. by 80%, TRIPLED. and that is the BEST
              case -- percentiles degrade much faster.
         +--> which is why disk utilization is a problem long
              before 100%: its requests cannot be interrupted.
@@ -970,7 +971,7 @@
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Give both scalability formulas and say what each extra parameter represents.<br>
-      <span class="q">Q</span> What has happened to mean response time at 60% utilization, and why does it matter more for disks than CPUs?<br>
+      <span class="q">Q</span> What has happened to mean response time beyond 60% utilization, and why does it matter more for disks than CPUs?<br>
       <span class="q">Q</span> Why is a mean of 3.3 ms worse than useless for a bimodal distribution?
     </div>
   </div>
@@ -990,7 +991,7 @@
   <table class="tight">
     <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
     <tr><td>&ldquo;Average latency is 3 ms, that's fine.&rdquo;</td><td>&ldquo;What's the distribution? If it's bimodal the mean sits between the modes and describes nothing that happened. Show me a histogram or a heat map.&rdquo;</td></tr>
-    <tr><td>&ldquo;The disk is only 60% utilized.&rdquo;</td><td>&ldquo;Then its mean response time has already doubled. Disk requests can't be preempted, so queueing bites long before 100% — unlike CPUs.&rdquo;</td></tr>
+    <tr><td>&ldquo;The disk is only 60% utilized.&rdquo;</td><td>&ldquo;Past 60% its mean response time has already doubled. Disk requests can't be preempted, so queueing bites long before 100% — unlike CPUs.&rdquo;</td></tr>
     <tr><td>&ldquo;It never goes above 80%.&rdquo;</td><td>&ldquo;Over what interval? A five-minute average will hide seconds at 100%, and seconds are enough to produce saturation.&rdquo;</td></tr>
     <tr><td>&ldquo;It stops scaling past eight threads.&rdquo;</td><td>&ldquo;That's a knee point. Is it contention or coherence? Fit Amdahl and then the USL — if the coherency term is doing work, adding capacity will make it worse.&rdquo;</td></tr>
     <tr><td>&ldquo;Standard deviation is 50.&rdquo;</td><td>&ldquo;Relative to what mean? On its own it says nothing. As a coefficient of variation it's one number I can compare.&rdquo;</td></tr>
@@ -1009,7 +1010,7 @@
 
   <div class="qbox nobreak">
     <div class="lab">Part 4 · Question 2</div>
-    <p>A service handles 1,000 requests/s. It runs on 16 CPUs averaging 40% utilization, and CPU is the busiest resource. Marketing expects a campaign to triple traffic. An architect proposes doubling the instance count and, separately, claims the system &ldquo;scales linearly, so twice the machines means twice the throughput&rdquo;. A previous scaling test showed throughput rising to a peak at eight instances and then <i>falling</i> as more were added.</p>
+    <p>A service handles 2,000 requests/s. It runs on 24 CPUs averaging 45% utilization, and CPU is the busiest resource. Marketing expects a campaign to triple traffic. An architect proposes doubling the instance count and, separately, claims the system &ldquo;scales linearly, so twice the machines means twice the throughput&rdquo;. A previous scaling test showed throughput rising to a peak at eight instances and then <i>falling</i> as more were added.</p>
     <p><b>(a)</b> Compute the request rate at which CPU saturates, showing the arithmetic, and state two reasons the figure is optimistic. <b>(b)</b> Name the scalability profile the previous test shows, say which of the two models is needed to describe it and why, and say what that implies for the doubling proposal. <b>(c)</b> Say what you would measure before the campaign and name the method that would let you compose the cheapest configuration that meets the requirement.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
@@ -1066,7 +1067,7 @@
 <div class="tree"><span class="tk1">GROUP 1 - WORDS . the terms decide the measurement</span>
 ------------------------------------------------------------------
    LATENCY is the wait; RESPONSE TIME is wait + service +
-        transfer. the word covers both, so qualify it.
+        transfer -- the word covers both, so qualify it. and
         convert other metrics TO time: only time can be
         ranked and turned into a predicted speedup.
    UTILIZATION has two definitions
@@ -1083,9 +1084,9 @@
    RESOURCE ANALYSIS bottom-up | WORKLOAD ANALYSIS top-down
         the documentation teaches the first. that is why
         people think it is the only one.
-   the four ANTI-METHODS: streetlight . random change .
-        blame someone else . ad hoc checklist
-        the shared tell: THE THEORY ARRIVED BEFORE THE DATA
+   three ANTI-METHODS: streetlight . random change . blame
+        someone else. the tell: NOTHING WAS OBSERVED FIRST.
+        (the ad hoc checklist is a real method that decays)
    instead, in order:
         <span class="tks">PROBLEM STATEMENT</span>  six questions, no tools, first
         SCIENTIFIC METHOD  ruling things OUT is a result
@@ -1094,21 +1095,20 @@
 <span class="tk4">GROUP 3 - METHOD AND NUMBER . run one, then distrust it</span>
 ------------------------------------------------------------------
    USE  every RESOURCE: utilization, saturation, errors
-        errors first, saturation next, utilization last
+        errors first, saturation next, utilization last.
         iterate over resources, NOT tools -> unanswerable
-        questions become recorded known-unknowns
+        questions become recorded known-unknowns.
    RED  every SERVICE: rate, errors, duration
         USE = machine health. RED = user health.
         rate flat + duration up = architecture; both = load
    WORKLOAD CHARACTERIZATION who . why . what . how changing
    LATENCY ANALYSIS  split in two, follow the larger half
    STATIC TUNING  check the config with NO load. skipped.
-   then the numbers:
-        M/D/1 at 60% utilization -> response time DOUBLED
+   the numbers:
+        M/D/1 BEYOND 60% utilization -> response time DOUBLED
         Amdahl a = seriality;  USL adds b = coherency
         a MEAN on bimodal data describes nothing real
-        -> always ask: what is the DISTRIBUTION, and over
-           what INTERVAL?
+        -> always ask: what DISTRIBUTION, over what INTERVAL?
 </div>
   </div>
 
@@ -1143,11 +1143,11 @@
     <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
     <tr><td><b>USE</b></td><td>Three metrics, the order, and the reason.</td><td>Utilization, saturation, errors — checked errors first (objective, quick to rule out), saturation second (any amount matters), utilization last.</td></tr>
     <tr><td><b>USE vs the tools method</b></td><td>What is the structural difference?</td><td>USE iterates over resources and then looks for tools, so an unanswerable question becomes a recorded known-unknown instead of an invisible gap.</td></tr>
-    <tr><td><b>RED</b></td><td>What does the request rate tell you?</td><td>Duration up with rate flat points at the architecture; both up points at the load. That distinction is available before any deep analysis.</td></tr>
+    <tr><td><b>RED</b></td><td>What does the request rate tell you?</td><td>Duration up with rate flat points at the architecture; both up means the problem may be one of load. That distinction is available before any deep analysis.</td></tr>
     <tr><td><b>Workload characterization</b></td><td>The four questions, and why ask when you know?</td><td>Who, why, what, how changing. Because you may be wrong — the classic finding is that the clients are not who you assumed.</td></tr>
     <tr><td><b>Static performance tuning</b></td><td>What makes it distinctive?</td><td>It runs with no load applied, checking the configured architecture rather than dynamic behaviour. Easy to do, easy to forget.</td></tr>
-    <tr><td><b>M/D/1 at 60%</b></td><td>What has happened, and why does it hit disks harder?</td><td>Mean response time has doubled; by 80% it has tripled. Disk requests cannot be interrupted, whereas higher-priority work can preempt on a CPU.</td></tr>
-    <tr><td><b>Reversed: multimodal</b></td><td>Why is this the node to remember?</td><td>A mean between two modes is not central tendency but nearly its opposite, so every summary computed from it describes a system that does not exist.</td></tr>
+    <tr><td><b>M/D/1 past 60%</b></td><td>What has happened, and why does it hit disks harder?</td><td>Mean response time has doubled; by 80% it has tripled. Disk requests cannot be interrupted, whereas higher-priority work can preempt on a CPU.</td></tr>
+    <tr><td><b>Multimodal</b></td><td>Why is this the number to distrust above all others?</td><td>A mean between two modes is not central tendency but nearly its opposite, so every summary computed from it describes a system that does not exist.</td></tr>
   </table>
 </section>
 
@@ -1214,7 +1214,7 @@
     <tr><td>Users are affected but utilization never exceeds 80%.</td><td>The averaging interval is hiding short bursts at 100%.</td><td>Shorten the interval, or check saturation directly. Seconds at 100% are enough to produce queueing.</td></tr>
     <tr><td>A queue exists but every resource looks lightly loaded.</td><td>A resource control or a software limit rather than a physical one.</td><td>Apply the same three questions to the cap: usage against limit, limit-imposed errors or throttling, allocation failures — even when the host is calm.</td></tr>
     <tr><td>Request duration rose; request rate is flat.</td><td>An architecture problem — the service itself.</td><td>Investigate how the work is done: contention, a single-threaded path, a degraded component.</td></tr>
-    <tr><td>Request duration and request rate both rose.</td><td>A load problem.</td><td>Characterise the workload — who, why, what, how changing — then eliminate, throttle, or add capacity.</td></tr>
+    <tr><td>Request duration and request rate both rose.</td><td>Possibly a load problem — the rate is a clue, not a verdict.</td><td>Characterise the workload — who, why, what, how changing — then eliminate, throttle, or add capacity.</td></tr>
     <tr><td>The architecture is sound and the system is still slow.</td><td>More load than it can reasonably handle.</td><td>Workload characterization. The best wins come from eliminating work that should not exist.</td></tr>
     <tr><td>Errors are non-zero but everything &ldquo;works&rdquo;.</td><td>Recoverable failures — retries, or a failed device in a redundant pool.</td><td>Investigate anyway. They degrade performance while going unnoticed, which is why USE checks them first.</td></tr>
     <tr><td>The metric you want does not exist.</td><td>A known-unknown.</td><td>Write it down. Enumerating what you cannot measure is a result, and it is exactly what a tool-first approach would have concealed.</td></tr>
@@ -1233,7 +1233,7 @@
     <tr><td>Mean and median disagree substantially.</td><td>Outliers, or a skewed distribution.</td><td>Outliers shift the mean and leave the median; investigate the tail with percentiles and by tracing individual events.</td></tr>
     <tr><td>A scatter plot has become a solid block.</td><td>The visual density limit, plus the cost of collecting every point.</td><td>Switch to a heat map: quantise both axes into buckets, which scales from one system to thousands.</td></tr>
     <tr><td>One request was very slow for no visible reason.</td><td>A latency outlier caused by preceding events.</td><td>Trace the sequence. An event at the tail of a queue is slow because of what was ahead of it.</td></tr>
-    <tr><td>Disk response time is far worse than the device spec.</td><td>Queueing — at 60% utilization the mean has already doubled.</td><td>Reduce utilization or the arrival rate. Do not expect a disk to behave like a CPU; its requests cannot be preempted.</td></tr>
+    <tr><td>Disk response time is far worse than the device spec.</td><td>Queueing — beyond 60% utilization the mean has already doubled.</td><td>Reduce utilization or the arrival rate. Do not expect a disk to behave like a CPU; its requests cannot be preempted.</td></tr>
     <tr><td>Throughput peaks and then falls as you add capacity.</td><td>Coherency overhead beyond the knee point.</td><td>Fit the Universal Scalability Law; if the coherency term is doing real work, adding capacity makes it worse.</td></tr>
     <tr><td>Throughput flattens but does not fall.</td><td>Contention — the serial fraction dominating.</td><td>Fit Amdahl's Law for the seriality parameter, and attack the serial component.</td></tr>
     <tr><td>An average of transfer rates looks too high.</td><td>The arithmetic mean applied to rates.</td><td>Use the harmonic mean. For improvements that compound across layers, use the geometric mean.</td></tr>
@@ -1254,7 +1254,7 @@
     <tr><td>Event tracing</td><td>Detail destroyed by summaries, including outliers and the events that caused them.</td><td>Cheapness. Collection has overhead, and the observer effect is real.</td></tr>
     <tr><td>Static performance tuning</td><td>Configuration faults that every dynamic method will step straight past.</td><td>Anything about behaviour under load — by definition, since it runs with none applied.</td></tr>
     <tr><td>Baseline statistics</td><td>&ldquo;Is this normal?&rdquo; for the many metrics no dashboard covers.</td><td>Problems that were already present when the baseline was taken.</td></tr>
-    <tr><td>Micro-benchmarking</td><td>Complexity — fewer factors, so the result is interpretable; and external bottlenecks that are otherwise hard to see.</td><td>Representativeness. The workload is artificial and may not be the question production is asking.</td></tr>
+    <tr><td>Micro-benchmarking</td><td>Complexity — fewer factors, so the result is interpretable; and, for a network throughput test, external network bottlenecks.</td><td>Representativeness. The workload is artificial and may not be the question production is asking.</td></tr>
     <tr><td>Percentiles in an agreement</td><td>The slow tail being hidden by an average.</td><td>Multimodality. Percentiles still assume a well-behaved distribution.</td></tr>
     <tr><td>A heat map</td><td>The scatter plot's density limit and data volume, at any scale.</td><td>Individual events — quantisation is the price of the scale.</td></tr>
     <tr><td>Fitting Amdahl or the USL</td><td>Guessing at a scalability profile, and gives a parameter you can compare.</td><td>Limiters you did not include. A model contains only what you thought of, which is why testing at scale finds more.</td></tr>
@@ -1278,13 +1278,13 @@
     <tr><td><b>12% vs 66%</b></td><td>A finding worth 12% of CPU when a 3× slowdown needs explaining; 66% would have accounted for it.</td><td>The concrete form of &ldquo;an issue, not the issue&rdquo;, and the reason a finding has to be sized before you stop.</td></tr>
     <tr><td><b>U = B/T</b></td><td>Time-based utilization: busy time over the observation period.</td><td>The formal definition behind &ldquo;percent busy&rdquo;, and the one your tools are actually reporting.</td></tr>
     <tr><td><b>~30 combinations</b></td><td>The approximate number of resource-and-metric pairs a USE checklist produces for a server.</td><td>Sets expectations: it is a real piece of work, some entries are hard and some impossible — and the easy ones catch most issues.</td></tr>
-    <tr><td><b>60% → doubled</b></td><td>M/D/1 mean response time against utilization: doubled at 60%, tripled at 80%, from r = s(2 − ρ)/2(1 − ρ).</td><td>The number that ends &ldquo;it's only 60% utilized&rdquo;. And it is the best case — percentiles degrade much faster.</td></tr>
+    <tr><td><b>Beyond 60% → doubled</b></td><td>M/D/1 mean response time against utilization: doubled beyond 60%, tripled by 80%, from r = s(2 − ρ)/2(1 − ρ).</td><td>The number that ends &ldquo;it's only 60% utilized&rdquo;. And it is the best case — percentiles degrade much faster.</td></tr>
     <tr><td><b>1 ms → 10 ms</b></td><td>An idle rotational disk's service time against the same disk under load.</td><td>Makes the queueing result concrete for the resource where it bites hardest.</td></tr>
     <tr><td><b>L = λW</b></td><td>Little's Law: requests in the system equals arrival rate times time in the system.</td><td>The one identity worth memorising from queueing theory; it relates the three quantities you can usually measure.</td></tr>
     <tr><td><b>α and β</b></td><td>Amdahl: C(N) = N/(1 + α(N−1)). USL: C(N) = N/(1 + α(N−1) + βN(N−1)).</td><td>α is seriality, β is coherency, and β = 0 collapses one into the other — which is the cleanest way to remember both.</td></tr>
     <tr><td><b>0.64% per request</b></td><td>16 CPUs at 40% serving 1,000 requests/s, giving a projected ceiling of 2,500 requests/s.</td><td>A complete capacity extrapolation in two lines of arithmetic — and a reminder that it is a best case from one data point.</td></tr>
     <tr><td><b>256 → 10 tests</b></td><td>Exhaustive testing of eight binary factors, against factor analysis.</td><td>The reason factor analysis exists, and the size of the saving.</td></tr>
-    <tr><td><b>1.04 GB/s</b></td><td>2 GB/s maximum × (1 − 0.30) × (1 − 0.25) after dropping to two processors and one network card, against a 1 GB/s requirement.</td><td>Shows the composition arithmetic — and a margin thin enough to prove why the final retest is not optional.</td></tr>
+    <tr><td><b>1.04 GB/s</b></td><td>Approximately 2 GB/s maximum × (1 − 0.30) × (1 − 0.25), after dropping to two processors and one network card, against a 1 GB/s requirement.</td><td>Shows the composition arithmetic — and a margin thin enough to prove why the final retest is not optional.</td></tr>
     <tr><td><b>10 ms → 1.01 ms</b></td><td>A request with 9 ms of disk I/O, cached in memory at around 10 μs: roughly a 9× gain.</td><td>The template for quantifying a fix by observation, before spending anything on trying it.</td></tr>
     <tr><td><b>11.1 MB/s</b></td><td>800 MB, the first 100 at 50 MB/s and the rest at 10 MB/s: 800/(100/50 + 700/10).</td><td>The harmonic mean in one line, and proof that averaging rates arithmetically gives the wrong answer.</td></tr>
     <tr><td><b>CoV 25%</b></td><td>A standard deviation of 50 against a mean of 200.</td><td>Shows why a deviation alone says nothing, and gives the single number that can be compared across metrics.</td></tr>
@@ -1298,7 +1298,7 @@
   <h3>Glossary — the terms you should be able to define cold</h3>
   <table class="tight">
     <tr><th style="width:40mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
-    <tr><td><b>IOPS / throughput</b></td><td>I/O operations per second / the rate of work, as data volume or operations depending on context. Neither can be compared across components; time can.</td></tr>
+    <tr><td><b>IOPS / throughput</b></td><td>I/O operations per second / the rate of work, as data volume or operations depending on context. Neither can accurately be compared across components; time can.</td></tr>
     <tr><td><b>Latency / response time</b></td><td>Time spent waiting to be serviced / the whole operation including service and transfer. The word &ldquo;latency&rdquo; is used for both, so qualify it.</td></tr>
     <tr><td><b>Utilization, time-based</b></td><td>U = B/T, busy time over the interval. What tools report, and better named percent busy.</td></tr>
     <tr><td><b>Utilization, capacity-based</b></td><td>The fraction of deliverable throughput in use. 100% busy is not 100% capacity.</td></tr>
@@ -1383,7 +1383,7 @@
   <p><b>(c)</b> Ask for <b>the full distribution and a shorter interval</b> rather than three summary numbers — and specifically for saturation (queue length) alongside utilization. The visualization is a <b>heat map</b>: it quantises both axes into buckets and colours by event count, which solves the two problems of a scatter plot at this scale — the visual density limit, where dense points merge into a wall of paint, and the volume of data that must be collected and processed for every event. It shows one system or thousands the same way, makes a bimodal distribution immediately legible, and leaves high-latency outliers visible as isolated blocks high in the map.</p>
 
   <h4>Part 4 · Q2 — the campaign and the scaling claim</h4>
-  <p><b>(a)</b> CPU per request = total CPU% ÷ requests = <b>16 × 40% ÷ 1,000 = 0.64% CPU per request</b>. Maximum requests/s = 100% × 16 CPUs ÷ 0.64 = <b>1,600 ÷ 0.64 = 2,500 requests/s</b>. Two reasons it is optimistic: it is a <b>rough best-case estimate</b> — some other limiting factor may be encountered before requests reach that rate — and it rests on <b>a single data point</b>, one throughput figure against one utilization figure, where monitoring over time would give several pairs and a much better extrapolation. Also creditable: long before 100% the queueing effects of the previous question apply; and a tripling of traffic to 3,000 requests/s exceeds the estimate anyway.</p>
+  <p><b>(a)</b> CPU per request = total CPU% ÷ requests = <b>24 × 45% ÷ 2,000 = 1,080 ÷ 2,000 = 0.54% CPU per request</b>. Maximum requests/s = 100% × 24 CPUs ÷ 0.54 = <b>2,400 ÷ 0.54 ≈ 4,440 requests/s</b>. Two reasons it is optimistic: it is a <b>rough best-case estimate</b> — some other limiting factor may be encountered before requests reach that rate — and it rests on <b>a single data point</b>, one throughput figure against one utilization figure, where monitoring over time would give several pairs and a much better extrapolation. Also creditable: long before 100% the queueing effects of the previous question apply; and a tripling of traffic to 6,000 requests/s exceeds the estimate by a wide margin anyway.</p>
   <p><b>(b)</b> Throughput rising to a peak and then <b>falling</b> as instances are added is the <b>coherence</b> profile — the tax of maintaining coherency, including propagating changes, has begun to outweigh the benefit of scaling. Amdahl's Law of Scalability models <b>contention</b> only, C(N) = N/(1 + α(N−1)), which flattens but does not decline; you need the <b>Universal Scalability Law</b>, C(N) = N/(1 + α(N−1) + βN(N−1)), whose β term is coherency delay — and note that with β = 0 the USL becomes Amdahl. The implication for the proposal is direct and uncomfortable: the system does not scale linearly, and past the peak <b>adding instances reduces throughput</b>, so doubling the count may deliver less capacity than they have now, not twice as much.</p>
   <p><b>(c)</b> Measure across a <b>range of N</b> — by observation over time or experimentally with micro-benchmarking or a load generator — and fit the model by regression to obtain α and β, then plot the data against the model, because a deviation is itself informative: either the model is wrong or your understanding of the system's real scalability is. Also collect multiple throughput-and-utilization pairs to firm up the resource-limit extrapolation. The method for composing the cheapest configuration that still meets the requirement is <b>factor analysis</b>: test at maximum, change one factor at a time and attribute a percentage drop and a cost saving to each, then choose the combination that meets the target — eight binary factors need about ten tests rather than 256 — and <b>retest the chosen configuration</b>, since components can behave differently together than their individual measurements predict.</p>
 
@@ -1416,7 +1416,7 @@
     <tr><td><b>9 ·</b> The three reasons to stop analysis</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>10 ·</b> Known-knowns, known- and unknown-unknowns</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>11 ·</b> Resource vs workload analysis</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td><b>12 ·</b> The four anti-methods and their shared tell</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> The three anti-methods, their tell, and the checklist</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>13 ·</b> The six problem-statement questions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>14 ·</b> Scientific method, and the negative test</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>15 ·</b> The tools method's invisible boundary</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1432,7 +1432,7 @@
     <tr><td><b>25 ·</b> The seven performance mantras, in order</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>26 ·</b> The five scalability profiles</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>27 ·</b> Amdahl and the USL, and what α and β mean</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td><b>28 ·</b> M/D/1 at 60%, and why disks suffer more</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>28 ·</b> M/D/1 past 60%, and why disks suffer more</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>29 ·</b> Resource limit extrapolation, and factor analysis</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>30 ·</b> Which mean: arithmetic, geometric, harmonic</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td><b>31 ·</b> Multimodal distributions and outliers</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1443,13 +1443,13 @@
   <ol id="quiz">
     <li>Give both definitions of utilization, the example that separates them, and say which metric decides whether a busy resource is actually a bottleneck.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>Explain why converting a performance metric to latency is worth doing, and name two things it makes possible that a rate metric does not.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
-    <li>Name the four anti-methods, give the feature they all share, and say what you should ask someone who has redirected an issue to another team.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name the three anti-methods, give the feature they all share, say why the ad hoc checklist is not one of them, and say what you should ask someone who has redirected an issue to another team.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>Give the six problem-statement questions and say why this method should come before any tool.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>State the USE method, give its three metrics in the order they should be checked with the reason for that order, and say what it does differently from the tools method.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>State the RED method and explain precisely how the request rate distinguishes a load problem from an architecture problem.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>Give workload characterization's four questions, and say why they should be asked even when you are confident of the answers.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>Name the method that runs with no load applied, give its four questions, and say why it is the one people skip.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
-    <li>Give both scalability formulas, say what each parameter represents, and state what has happened to mean response time at 60% utilization under M/D/1 — and why that matters more for disks than for CPUs.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give both scalability formulas, say what each parameter represents, and state what has happened to mean response time beyond 60% utilization under M/D/1 — and why that matters more for disks than for CPUs.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
     <li>Explain why a mean can be worse than useless for a bimodal distribution, name two other statistics that also fail there, and give the only reliable alternative.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
   </ol>
 </section>
