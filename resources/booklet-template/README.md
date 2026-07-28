@@ -49,3 +49,14 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../hpbn-browser-networking/` — the sixth.
 `../sysperf-methodology/` — the seventh.
 `../sysperf-benchmarking/` — the eighth.
+
+## Checking a rendered booklet
+
+```sh
+python3 check-pages.py ../<folder>/<Booklet>.pdf
+```
+
+Rasterises every page and flags any whose ink stops above 45% of the page height — the orphan check
+required by decision I5. It catches what counting extracted characters cannot: a page holding only
+ruled write-lines, and a page holding only a heading.
+

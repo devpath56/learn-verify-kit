@@ -39,9 +39,11 @@ those names are durable. Everything left unnamed is recorded in `../META.md`.
 
 Like competencies 5, 6 and 7, this booklet carries one scoped `<style>` block inside `body.html`,
 reducing the monospace sketch size, tightening the tracker and final quiz, and suppressing the page
-break after the last section. It adds one rule of its own: the section 6 concept sketch is allowed to
-break across pages, because it is taller than a page and the shared no-break rule would otherwise
-strand its heading. Competencies 1–4 take all their styling from the shared block.
+break after the last section. It adds three rules of its own: the section 6 concept sketch is allowed
+to break across pages, because it is taller than a page and the shared no-break rule would otherwise
+strand its heading; `h3` never breaks away from what follows it, so a sub-heading can no longer be the
+last thing on a page; and the part 3 sketch sets its own slightly smaller monospace size so it fits on
+the page below the concept-boundary box. Competencies 1–4 take all their styling from the shared block.
 
 ## Printing
 
@@ -59,7 +61,8 @@ chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
 ## Being questioned on this
 
 18 questions — the 8 applied cases and the 10 final-quiz questions — are registered in
-`../competency-progress.json`, each with its ideal answer frozen inline. Say **"drill me"** or
+`../competency-progress.json`, each with its ideal answer frozen inline. Two more sit in `retired`:
+they were replaced in review, before any attempt existed, and the reasons are in `../META.md`. Say **"drill me"** or
 "quiz me on benchmarking" whenever you want them; there is no schedule. Offline answers can be handed
 over a whole part at a time.
 

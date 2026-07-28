@@ -1,5 +1,5 @@
 <body>
-<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} #bigmap{break-inside:auto; page-break-inside:auto}</style>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} #bigmap{break-inside:auto; page-break-inside:auto} h3{break-after:avoid; page-break-after:avoid} #p3map .tree{font-size:7.5pt; line-height:1.5}</style>
 
 <!-- ============================== COVER ============================== -->
 <section class="page cover">
@@ -82,7 +82,7 @@
   <h3>The core model in one paragraph</h3>
   <p>A benchmark result is not a fact about your system. It is a fact about <b>how fast the system ran that benchmark</b>, and everything that makes it useful — or worthless — is in the gap between those two statements. The gap has three sources. First, the test may not measure what its name says: tools that claim to test disks routinely test the file system cache instead, and the difference is orders of magnitude. Second, the run may not have reached the thing you meant to measure: it may have been limited by the benchmark software, by an unrelated congested component, by a configuration you did not check, or by errors that returned instantly and were counted as successes. Third, the result may be true and still misleading, because the price, the configuration, or the fact that the product was engineered specifically to score well on this test were left out. The defence against all three is the same and is simple to state: <b>analyse the system while the benchmark is still running</b>. Everything else in these pages is either a catalogue of what goes wrong when you don't, or a technique for doing it well.</p>
 
-  <div class="box tenth nobreak">
+  <div class="box tenth nobreak" style="break-before:page; page-break-before:always">
     <h4>Tenth-grader version — the whole thing at once</h4>
     <ul>
       <li>A benchmark measures how fast your computer does <i>the thing the benchmark does</i>. That may not be the thing you care about.</li>
@@ -121,7 +121,7 @@
   <div class="box tenth nobreak">
     <h4>Tenth-grader version</h4>
     <ul>
-      <li>People run benchmarks for about six different reasons, and the reason changes what a good answer looks like.</li>
+      <li>People run benchmarks for seven different reasons, and the reason changes what a good answer looks like.</li>
       <li>A good benchmark can be repeated, watched while it runs, moved to another machine, explained to your boss, and finished quickly — and it has to resemble something real.</li>
       <li>Before you quote a number you need four things: what was tested, what stopped it going faster, what else might have interfered, and what you're actually allowed to conclude.</li>
       <li>The most common way to get all four wrong is to run the test, walk away, and ask an expert to explain the numbers afterwards.</li>
@@ -145,7 +145,7 @@
     </tr>
     <tr>
       <td><b>The reasons</b></td>
-      <td>Six or seven distinct purposes, and the purpose decides what a good result even looks like.</td>
+      <td>Seven distinct purposes, and the purpose decides what a good result even looks like.</td>
       <td><b>System design</b> — comparing systems or components, often for a purchase decision. <b>Proofs of concept</b> — testing under load before committing. <b>Tuning</b> — finding parameters worth investigating with the real workload. <b>Development</b> — non-regression testing, and driving a product to its limit to find where engineering effort pays. <b>Capacity planning</b> — finding limits directly, or data for modelling. <b>Troubleshooting</b> — verifying a component can still reach maximum performance.</td>
       <td>And <b>marketing</b> — determining maximum product performance for promotional use, sometimes called <i>benchmarketing</i>. It is on the list because it is real, not because it is illegitimate; but a result produced for it answers a different question from one produced for capacity planning.</td>
     </tr>
@@ -165,7 +165,7 @@
       <td><b>The staffing mistake</b></td>
       <td>Having junior staff execute the benchmarks and then bringing in performance experts to explain the results <b>after</b> the run has completed.</td>
       <td>Described as a common mistake, and it is a structural one rather than a personal failing.</td>
-      <td>The correction is scheduling, not skill: engage the experts <b>during</b> the benchmark, so they can analyse the system while it is still running. Once the run has finished, the evidence needed to answer three of the four questions no longer exists.</td>
+      <td>The correction is scheduling, not skill: engage the experts <b>during</b> the benchmark, so they can analyse the system while it is still running. Once the run has finished, most of the evidence needed to answer three of the four questions is gone with it.</td>
     </tr>
     <tr>
       <td><b>Custom benchmark software</b></td>
@@ -220,8 +220,8 @@
         3  what perturbations might affect it?
         4  what conclusions may actually be drawn?
         +--> best answered by analysing the system WHILE
-             the benchmark runs. afterwards, the evidence
-             for three of the four no longer exists.
+             the benchmark runs. afterwards, most of the
+             evidence for three of the four is gone.
         +--> if you have no access at all, add: what is the
              environment, and how is it configured?
                           |
@@ -268,8 +268,8 @@
 
   <div class="qbox nobreak">
     <div class="lab">Part 1 · Question 2</div>
-    <p>Two results land on your desk on the same morning. The first says: &ldquo;Storage cluster: 1.4 million operations per second.&rdquo; The second describes a transfer of a fixed payload between two hosts, states the record and packet sizes, reports the elapsed time and derived throughput, notes that the sending host was CPU saturated while the receiver had roughly a third of its capacity idle, and breaks the system time down across five kernel components, none dominant.</p>
-    <p><b>(a)</b> Say what the second result does that the first does not, mapping each to one of the four questions. <b>(b)</b> Explain why the observation about the sending host changes what the throughput figure is a claim <i>about</i>. <b>(c)</b> The first result's author says the second is &ldquo;overkill for a headline number&rdquo;. Give the strongest version of their case, then say what you would still require before quoting the 1.4 million figure anywhere.</p>
+    <p>Two results land on your desk on the same morning. The first says: &ldquo;Storage cluster: 1.4 million operations per second.&rdquo; The second reports a four-hour soak test of an internal message bus. It states the payload size and the batch size, gives the sustained rate and the total volume moved, notes that the producer host's network interface sat at 96% of line rate for the whole run while the consumer host's processors never went above 40%, breaks the producer's processor time down across serialisation, compression, the network stack and the application's own bookkeeping with no single part dominant, and then stops.</p>
+    <p><b>(a)</b> Say what the second result does that the first does not, mapping each of its elements to one of the four questions. <b>(b)</b> Explain why the observation about the producer's network interface changes what the sustained-rate figure is a claim <i>about</i>. <b>(c)</b> The first result's author says the second is &ldquo;overkill for a headline number&rdquo;. Give the strongest version of their case, then say what you would still require before quoting the 1.4 million figure anywhere.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -289,7 +289,7 @@
         <i>Move:</i> analyse during the run, with drill-down to quantify the limiter. Ideally configure the benchmark to sit in steady state so analysis can continue for hours. As a bonus, this is the best possible practice for your observability tools: a known load, and a chance to see how it appears.</div>
       <div class="cell"><b>The structural mistake</b>
         Juniors execute; the expert is booked to explain the numbers afterwards.<br>
-        <i>Move:</i> recognise that this is a scheduling failure, not a skills gap. Once the machine is idle, three of the four questions have no evidence left. If you are already here, list the assumptions you could not check and publish them <i>with</i> the result — that list becomes the to-do for verification if the result turns out to matter.</div>
+        <i>Move:</i> recognise that this is a scheduling failure, not a skills gap. Once the machine is idle, most of the evidence for three of the four questions is gone. If you are already here, list the assumptions you could not check and publish them <i>with</i> the result — that list becomes the to-do for verification if the result turns out to matter.</div>
 
       <div class="rowh">SOMEONE<br>ELSE ran it</div>
       <div class="cell"><b>Rare, and worth taking</b>
@@ -385,7 +385,7 @@
       <td><b>9 · Ignoring perturbations</b></td>
       <td>External activity affecting the result: a timed system backup, monitoring agents collecting once per minute, or — in the cloud — unseen tenants on the same host.</td>
       <td>The strategy for ironing them out is <b>longer runs — minutes instead of seconds</b>. As a rule, <b>a benchmark should not be shorter than one second.</b> Run it several times and examine the <b>standard deviation</b>; it should be as small as possible.</td>
-      <td>Short tests are unusually perturbed by device interrupts pinning the thread during service routines, kernel scheduling decisions that wait before migrating queued threads to preserve CPU affinity, and CPU cache warmth effects. Also collect the <b>distribution of operation latency</b> — not just total runtime — so outliers can be seen and recorded.</td>
+      <td>Short tests <b>might be</b> unusually perturbed by device interrupts pinning the thread during service routines, by kernel scheduling decisions that wait before migrating queued threads to preserve CPU affinity, and by CPU cache warmth effects. Also collect the <b>distribution of operation latency</b> — not just total runtime — so outliers can be seen and recorded.</td>
     </tr>
     <tr>
       <td><b>10 · Changing multiple factors</b></td>
@@ -427,7 +427,7 @@
       <td><b>16 · Cheating</b></td>
       <td>Sharing fake results.</td>
       <td>Described as either rare or nonexistent: no case of purely made-up numbers being shared, <b>even in the most bloodthirsty of benchmarking battles</b>.</td>
-      <td>vs everything above it. This is the failure people imagine when they distrust benchmarks, and it is the least likely one they will meet. Suspecting fraud is almost always a way of not doing the analysis that would find the real cause.</td>
+      <td>vs everything above it. This is the failure people imagine when they distrust benchmarks, and it is the least likely one they will meet. Suspecting fraud is usually a way of not doing the analysis that would find the real cause.</td>
     </tr>
   </table>
 
@@ -488,7 +488,7 @@
   <table class="tight">
     <tr><th style="width:38mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
     <tr><td>Publishing a result with the unchecked assumptions listed</td><td>An honest result now, plus a ready-made verification to-do list if it turns out to matter.</td><td>It looks less authoritative than a bare number, and some readers will discount it for that.</td><td>Whenever you do not have time for the analysis — which is most of the time.</td></tr>
-    <tr><td>Longer runs (minutes, not seconds)</td><td>Perturbations average out; interrupts, scheduling decisions and cache-warmth effects stop dominating.</td><td>Wall-clock time, multiplied by every cell of your test matrix.</td><td>Always &mdash; the floor is one second, and the working target is minutes.</td></tr>
+    <tr><td>Longer runs (minutes, not seconds)</td><td>Perturbations average out, and interrupts, scheduling decisions and cache-warmth effects stop being able to dominate a short run.</td><td>Wall-clock time, multiplied by every cell of your test matrix.</td><td>Always &mdash; the floor is one second, and the working target is minutes.</td></tr>
     <tr><td>Simulating variance with a Markov model instead of steady average rates</td><td>Reproduces bursts, which is where real production issues live.</td><td>A more complex benchmark, which then has to be analysed itself.</td><td>Where the real workload is bursty and the burst is the thing that hurts &mdash; write flushes queueing reads.</td></tr>
     <tr><td>Testing many instances and taking the median</td><td>Protection against one unusually fast or slow machine.</td><td>More runs, more cost, more analysis.</td><td>On-demand environments, where the machine underneath you is not a constant.</td></tr>
     <tr><td>Benchmarking a competitor at all</td><td>Marketing gets the comparison it asked for.</td><td>Untuned results, and credibility lost with exactly the audience you wanted.</td><td>Only after serious tuning effort on their product <i>and</i> the equivalent on yours.</td></tr>
@@ -519,7 +519,7 @@
   <div class="qbox nobreak">
     <div class="lab">Part 2 · Question 2</div>
     <p>Your company's product must win a customer evaluation consisting of four separate benchmarks; the customer will buy only if you win all four. Your engineers believe you are genuinely a coin-flip against the incumbent on each. Marketing proposes three responses: (i) commission an outside firm quickly and cheaply to produce a comparison against the incumbent; (ii) add a configuration switch that detects the evaluation's access pattern and pre-fetches for it; (iii) skip benchmarks entirely and sell on features.</p>
-    <p><b>(a)</b> Compute your probability of winning all four, and state the summarised rule this illustrates. <b>(b)</b> Take each of the three proposals in turn, name the failure it corresponds to, and give the specific reason it backfires — for (ii), say what mechanism the industry-standard bodies introduced against it and what price rule accompanies it. <b>(c)</b> Name the failure that proposal (iii) itself commits, and describe the one intervention that genuinely improves the odds.</p>
+    <p><b>(a)</b> Compute your probability of winning all four, and state the summarised rule this illustrates. <b>(b)</b> Take each of the three proposals in turn, name the failure it corresponds to, and give the specific reason it backfires — for (ii), say which body introduced a mechanism against it, what that mechanism is, and what price rule accompanies it. <b>(c)</b> Name the failure that proposal (iii) itself commits, and describe the one intervention that genuinely improves the odds.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -539,7 +539,7 @@
         <i>Move:</i> analyse the system while the benchmark runs. Nearly every cell entry here is detectable live and undetectable afterwards. This is the quadrant your own work lands in, which is why it is the one to guard.</div>
       <div class="cell"><b>Cheating &mdash; and it barely happens</b>
         Sharing fake results: rare or nonexistent, with no observed case of purely made-up numbers even in the fiercest benchmarking battles.<br>
-        <i>Move:</i> stop suspecting it. Reaching for fraud as an explanation is almost always a way of avoiding the analysis that would find the real cause &mdash; which will be somewhere in the cell to the left.</div>
+        <i>Move:</i> stop suspecting it. Reaching for fraud as an explanation is usually a way of avoiding the analysis that would find the real cause &mdash; which will almost certainly be somewhere in the cell to the left.</div>
 
       <div class="rowh">THE CLAIM<br>is wrong,<br>the number<br>isn't</div>
       <div class="cell"><b>Incomplete, not dishonest</b>
@@ -547,9 +547,9 @@
         <i>Move:</i> ask what was left out, and supply it in your own work &mdash; the limiter, the analysis, and the assumptions you couldn't check.</div>
       <div class="cell"><b>Lying by omission</b>
         Price withheld on an unbuyable custom configuration; &ldquo;2&times; faster&rdquo; generalised to a whole product line; several cheap third parties commissioned and the best result kept; and benchmark specials &mdash; engineering the product to score on the test.<br>
-        <i>Move:</i> read the fine print for system, disks, interfaces and configuration; treat the figure as an upper bound. Note that the industry bodies answered specials with rules, not argument: an anti-special clause, and total price within 2% of what a customer would pay.</div>
+        <i>Move:</i> read the fine print for system, disks, interfaces and configuration; treat the figure as an upper bound. Note that the transaction-processing body answered specials with rules rather than argument: an anti-special clause, and total price within 2% of what a customer would pay.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the row tells you which remedy applies &mdash; measurement errors are fixed by observing the run, claim errors by demanding what was omitted. The column tells you where to look first: the accidental column holds all but three of the sixteen, and the two deliberate cells are the explanations people reach for far too early.</div>
+    <div class="legend"><b>Read it as:</b> the row tells you which remedy applies &mdash; measurement errors are fixed by observing the run, claim errors by demanding what was omitted. The column tells you where to look first: thirteen of the sixteen sit on the left. One failure, <b>misleading results</b>, appears in both columns and is meant to &mdash; it can come from information that was unintentionally limited or from information that was deliberately withheld, and the number is correct either way.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -611,7 +611,7 @@
       <td><b>Simulation</b><br>(macro-benchmark)</td>
       <td>Imitating a customer application workload, often based on <b>workload characterization</b> of the production environment to decide what to simulate.</td>
       <td>A production file-server workload found to be composed of reads 40%, writes 7%, getattr 19%, readdir 1%, and so on. Other characteristics can be measured and simulated too.</td>
-      <td>vs a micro-benchmark: a simulation can encompass many factors that would be time-consuming to investigate one at a time, and can include the effects of <b>complex system interactions that micro-benchmarks may miss altogether</b>. Results resemble how clients will perform with the real workload — if not closely, at least closely enough to be useful.</td>
+      <td>vs a micro-benchmark: a simulation can encompass many factors that would be time-consuming to investigate one at a time, and can include the effects of <b>complex system interactions that micro-benchmarks may miss altogether</b>. It can produce results that resemble how clients will perform with the real workload — if not closely, at least closely enough to be useful.</td>
     </tr>
     <tr>
       <td><b>Stateless vs stateful simulation</b></td>
@@ -628,13 +628,13 @@
     <tr>
       <td><b>Replay</b></td>
       <td>Capturing a trace log and replaying it at the target, testing performance with the actual captured client operations. Sounds ideal — as good as testing in production.</td>
-      <td>It is problematic: when characteristics and delivered latency change on the server, <b>the captured client workload is unlikely to respond naturally to those differences</b>, which may prove no better than a simulated workload. When too much faith is placed in it, things get worse.</td>
+      <td>It is problematic: when characteristics and delivered latency change on the server, <b>the captured client workload is unlikely to respond naturally to those differences</b>, which may prove no better than a simulated workload. When too much faith is placed in it, things can get worse.</td>
       <td>The worked case: a storage upgrade evaluated by replaying the production trace on new hardware. Performance was worse and the sale was lost. The replay operated at the <b>disk I/O</b> level; the old system had 10K rpm disks and the new one slower 7,200 rpm disks — but <b>16 times</b> the file system cache and faster processors. The real workload would have improved, returning largely from cache, which replaying disk events never simulated.</td>
     </tr>
     <tr>
       <td><b>Industry-standard benchmarks</b></td>
       <td>Benchmarks from <b>independent organisations</b> aiming to be fair and relevant — usually a collection of micro-benchmarks and workload simulations, well defined, documented, and executed under guidelines so results are as intended.</td>
-      <td>Vendors may participate, usually for a fee, which provides the software to execute the benchmark. A result usually requires <b>full disclosure of the configured environment</b>, which may be audited.</td>
+      <td>Vendors may participate, usually for a fee, which provides the software to execute the benchmark. A result <b>usually</b> requires full disclosure of the configured environment, which <b>may</b> be audited.</td>
       <td>vs running your own. For the customer these save a lot of time, since results may already exist for many vendors and products. <b>Your task becomes finding the benchmark that most closely resembles your future or current production workload</b> — and for a current one, that is decided by workload characterization.</td>
     </tr>
     <tr>
@@ -660,49 +660,43 @@
   </div>
 
   <h3>Anchor sketch — the spectrum, and the matrix underneath it</h3>
-  <div class="sketch nobreak">
+  <div class="sketch nobreak" id="p3map">
     <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named kind</b> &nbsp; <span class="node nstar">reversed = the kind whose artificiality is a feature</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
 <div class="tree">   ARTIFICIAL <---------------------------------> REAL
-   easy to analyse                 hard to analyse
-   easy to root-cause              includes interactions
-   obviously not reality           mistakable for reality
+   easy to analyse, easy to        hard to analyse, includes
+   root-cause, obviously           interactions, mistakable
+   not reality                     for reality
         |               |          |            |
   <span class="tks">MICRO-BENCHMARK</span>  <span class="tk1">SIMULATION</span>   <span class="tk1">REPLAY</span>   the production
                    (macro-)               workload itself
         |               |          |
-        |               |          +-- a recording cannot
-        |               |              REACT. change the
-        |               |              server and the trace
-        |               |              issues what it always
-        |               |              issued.
-        |               |              case: disk-level replay,
-        |               |              10K -> 7,200 rpm but
-        |               |              16x the cache. real
-        |               |              workload would have
-        |               |              improved. sale lost.
+        |               |          +-- a recording cannot REACT.
+        |               |              change the server and the trace
+        |               |              issues what it always issued.
+        |               |              case: disk-level replay, 10K ->
+        |               |              7,200 rpm but 16x cache. sale lost.
         |               +-- built FROM workload characterization
         |                   stateless: each request independent
-        |                   stateful : depends on the previous
-        |                              -> Markov model
-        |                   ages: 1972 and 1984 CPU benchmarks
-        |                         simulate THOSE eras
+        |                   stateful : depends on the previous, so
+        |                              use a Markov model
+        |                   and it AGES: the 1972 and 1984 CPU
+        |                   benchmarks simulate THOSE eras
         +-- design = tests x working set x threads
-              5 tests: seq 512B read / seq 1M read /
-                       seq 1M write / rand 512B read /
-                       rand 512B write
+              5 tests: seq 512B read / seq 1M read / seq 1M
+                       write / rand 512B read / rand 512B write
               working set  << RAM -> tests the FILE SYSTEM
-                           >> RAM -> tests the DISKS
-              threads      single   -> fs at this clock speed
+                           >> RAM -> drives it TOWARD disk
+              threads      single -> fs at this clock speed
                            saturate -> system max
               then: sunny day (top speed) AND cloudy day
                     (contention, perturbation, variance)
                           |
    <span class="tk1">INDUSTRY STANDARDS</span>  someone else already ran it
-        independent bodies . defined, documented, guideline-
-        bound . vendors pay to participate . full disclosure
-        of the environment, and it may be audited
+        independent bodies . defined, documented, guideline-bound
+        vendors MAY take part, usually for a fee . usually full
+        disclosure of the environment, and it may be audited
         your job shrinks to: WHICH one resembles my workload?
-        (answer that by workload characterization)
+        (workload characterization answers that)
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Give the two multipliers applied to every micro-benchmark test, and what each setting of each one tests.<br>
@@ -777,12 +771,12 @@
         Minimal cache, maximum concurrency: the closest a micro-benchmark gets to a storage-device limit.<br>
         <i>Move:</i> this is where the disk numbers people quote should have come from. Expect it to be the slowest and most expensive cell to run &mdash; large data to stage, and long runs.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the row decides <i>which component</i> you are measuring, and the column decides <i>whose limit</i> you find. Every one of the five sample tests &mdash; sequential 512-byte reads, sequential 1 MB reads and writes, random 512-byte reads and writes &mdash; multiplies out across all four cells, which is how a short list of tests becomes a large matrix, and why statistical technique is used to cut it back down.</div>
+    <div class="legend"><b>Read it as:</b> the row decides <i>which component</i> you are measuring, and the column decides <i>whose limit</i> you find. Every one of the five sample tests &mdash; sequential 512-byte reads, sequential 1 MB reads and writes, random 512-byte reads and writes &mdash; multiplies out across all four cells, which is how a short list of tests becomes a large matrix — and statistical analysis techniques can be used to cut the required set back down.</div>
   </div>
 
   <div class="box tip nobreak">
     <h4>Carry-out rule from this part</h4>
-    <p><b>Pick the kind from the question, not from the tool you have.</b> If the question is &ldquo;why is this component slow?&rdquo;, a micro-benchmark answers it and a realistic workload obscures it. If the question is &ldquo;what will customers experience?&rdquo;, a simulation answers it and a micro-benchmark cannot. If the question is &ldquo;should we buy A or B?&rdquo;, someone has probably already run an audited, fully disclosed benchmark, and your remaining job is to work out which of theirs resembles you.</p>
+    <p><b>Pick the kind from the question, not from the tool you have.</b> If the question is &ldquo;why is this component slow?&rdquo;, a micro-benchmark answers it and a realistic workload obscures it. If the question is &ldquo;what will customers experience?&rdquo;, a simulation answers it and a micro-benchmark cannot. If the question is &ldquo;should we buy A or B?&rdquo;, someone has probably already run a defined benchmark whose environment is usually fully disclosed and may have been audited, and your remaining job is to work out which of theirs resembles you.</p>
   </div>
 </section>
 
@@ -921,22 +915,16 @@
    run in steady state so analysis can go on for hours.
                           |
         +---- CASE STUDY: a "hard drive" benchmark
-        |       739 KB/s "per character" would mean
-        |       739,000 IOPS  -> implausible
-        |       disk stats ......... no disk I/O
-        |       block tracing ...... none issued, none
-        |                            completed; buffers
-        |                            dirtied (808,225)
-        |       cache stats ........ pure dirties, no misses
-        |       VFS layer .......... 1,176,936 writes
-        |                            668,839 of them 1 BYTE
-        |       verdict: a 1-byte FILE SYSTEM write into
-        |                cache. no disk involved.
+        |       739 KB/s per CHARACTER would mean 739,000
+        |       IOPS -> implausible. so walk down the stack:
+        |       disk stats > block layer > cache > VFS.
+        |       verdict: 1,176,936 writes, 668,839 of them
+        |       1 BYTE, into the file system cache.
+        |       no disk involved at all.
         |
-        +---- <span class="tk1">CPU PROFILING</span> . disk test, disks not busy,
-        |       kernel CPU present -> check anyway ->
-        |       62.17% of samples in an I/O THROTTLE.
-        |       a default on the new box, not the old.
+        +---- <span class="tk1">CPU PROFILING</span> . disks not busy, kernel CPU
+        |       present -> check anyway -> 62.17% of samples
+        |       in an I/O THROTTLE, a default on the new box.
         |
         +---- <span class="tk1">RESOURCE SWEEP</span> (utilization/saturation/errors)
         |       ensures a limit is FOUND. either something
@@ -958,9 +946,9 @@
         |       1,000,000+ IOPS @ 50 ms <- not this
         |
         +---- <span class="tk1">SANITY CHECK</span> . arithmetic beats argument.
-        |       50,000 x 8 KB = 400,000 KB/s = >3.2 Gb/s
-        |       on a 1 Gb/s link. (practical ceiling ~119
-        |       MB/s.) usually means the CLIENT cached it.
+        |       50,000 x 8 KB = 400,000 KB/s = >3.2 Gb/s on a
+        |       1 Gb/s link (real ceiling ~119 MB/s). usually
+        |       means the CLIENT cached it.
         |
         +---- <span class="tk1">STATISTICAL ANALYSIS</span> . the RESULTS, afterwards.
                 for expensive contended hardware. tells you
@@ -1057,13 +1045,13 @@
 <!-- ============================== 6. CONCEPT SKETCH ============================== -->
 <section class="page">
   <div class="kicker">Section 6</div>
-  <h2>Concept sketch — the whole competency on one page</h2>
+  <h2>Concept sketch — the whole competency, end to end</h2>
   <p>Four named groups, in the order the story runs: <b>THE NUMBER</b> &rarr; <b>THE LIES</b> &rarr; <b>THE KIND</b> &rarr; <b>THE HABIT</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
 
   <div class="sketch" id="bigmap" style="padding:13pt">
     <div class="legend" style="margin-bottom:9pt">
       <b>Legend:</b> <b>bold = a group heading</b> &nbsp;
-      <span class="node nstar">reversed = the one node to remember</span> &nbsp;
+      <span class="node nstar">reversed = the one group to remember</span> &nbsp;
       <span class="q">Q = retrieval cue</span><br>
       <span style="font-size:8.4pt">The four groups run in order: <b>THE NUMBER</b> — what a result is ·
       <b>THE LIES</b> — how it goes wrong · <b>THE KIND</b> — what to run · <b>THE HABIT</b> — how to catch it.</span>
@@ -1084,7 +1072,7 @@
         <span class="q">Q</span> which quality is load-bearing for group 4, and why?
    THE FOUR QUESTIONS  what is tested . what is the limiting
         factor . what perturbations . what may be concluded
-        <span class="q">Q</span> which three stop being answerable once the run ends?
+        <span class="q">Q</span> which three lose most of their evidence when the run ends?
 
 <span class="tk1">GROUP 2 - THE LIES . sixteen of them, sorted two ways</span>
 ------------------------------------------------------------------
@@ -1138,11 +1126,8 @@
         <span class="q">Q</span> which one is the limiter question in disguise?
 </div>
   </div>
-</section>
 
-<!-- ============================== 6b. MASTER 2x2 ============================== -->
-<section class="page">
-  <div class="kicker">Section 6 continued · the transferable card</div>
+  <div class="kicker" style="margin-top:16pt">Section 6 continued · the transferable card</div>
   <h2>Master 2&times;2 — the decision card you can carry to other problems</h2>
   <p>Two questions decide whether a number is evidence or decoration, and the second is the one almost everybody skips.</p>
 
@@ -1172,9 +1157,10 @@
     <div class="legend"><b>Read it as:</b> the row is the question people skip and the column is the question they think they have answered. The card generalises well beyond benchmarking &mdash; any measurement handed to you can be interrogated with the same pair, <i>what exactly did you measure</i> and <i>what stopped it going higher</i>, and a number that cannot answer both is not yet evidence.</div>
   </div>
 
-  <div class="box tip nobreak">
-    <h4>The thumb rule</h4>
-    <p><b>Before you believe a number, ask what it actually measured and what stopped it going higher.</b> If the answer to the first is &ldquo;whatever the tool is called&rdquo;, and to the second is &ldquo;nothing in particular&rdquo;, you are holding a slide, not a result.</p>
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Before you believe a number, ask what it actually measured and what stopped it going higher.</b></p>
+    <p style="margin-top:6pt">If the answer to the first is &ldquo;whatever the tool is called&rdquo; and to the second is &ldquo;nothing in particular&rdquo;, you are holding a slide, not a result. It travels intact. A drug trial reporting an improvement without saying what was scored, or which arm ran short of participants; a school league table whose measure is exam passes and whose limiter is who was permitted to sit them; a fuel-economy sticker measured on a rolling road at a fixed temperature, limited by the test cycle rather than by the engine. In all three the number is real, and useless until you can name the thing measured and the thing that capped it.</p>
   </div>
 </section>
 
@@ -1319,16 +1305,16 @@
   <div class="ans"><p>(a) The four are: what is being tested; what the limiting factor or factors are; any perturbations that might affect the results; and what conclusions may be drawn. This exercise has established none of them. The tool's name is standing in for the first, &ldquo;looked busy&rdquo; is not a limiting factor — the resource sweep offers only two outcomes, something at 100% or a system not driven to its limit, and neither has been shown — nothing was checked for perturbations, and the conclusion (1.8&times;) has been drawn without any of the three that would license it. &ldquo;No errors reported&rdquo; is worth something but is not one of the four. (b) Because three of the four questions can only be answered from the system while the load is applied, and by Thursday the machines are idle. This is the staffing mistake in its usual form: junior staff execute the benchmarks and performance experts are brought in to explain the results afterwards. The correction is scheduling rather than skill — engage the expert <i>during</i> the run, so they can analyse the live system with drill-down to quantify the limiter. If Thursday is genuinely all there is, the useful output is a list of the assumptions nobody had time to check, published with the result as a to-do list for verification. (c) The purpose here is a purchase, so the required extra quantity is the <b>price/performance ratio</b>, where price can be quantified as the five-year capital cost of the equipment. Further questions worth putting: what was the limiting factor in each run; what was the configuration of each system, and does either resemble what we would actually buy and run; was the workload representative of ours, and how was that established; how long did each run last and how many times was it repeated; what were the success and failure counts; is this an average or a peak, and what is the distribution.</p></div>
 
   <h4>Part 1 · Q2 — the bare figure and the decomposed one</h4>
-  <div class="ans"><p>(a) The second result answers the four questions and the first answers none. <i>What is being tested</i>: the second states the payload size, the record size and the packet size, precisely enough to reproduce; the first says only &ldquo;operations&rdquo;. <i>What the limiting factor is</i>: the second says the sending host was CPU saturated while the receiver had roughly a third idle; the first offers nothing. <i>Perturbations</i>: the second's decomposition of system time across five components, none dominant, shows that nothing unexpected was consuming the machine; the first gives no basis to check. <i>What may be concluded</i>: the second stops at what the measurement supports and draws no wider claim; the first's single number is already a claim about a cluster. (b) Because a saturated sender makes the throughput a statement about <b>that machine's processor</b>, not about the network or the receiving system. The same wire and the same receiver with a faster sender would give a different figure, so the number cannot be quoted as a property of the link or of the pair. Naming the limiter is what converts a measurement into a claim with a subject. (c) The strongest version of their case: a headline figure exists to be compared with other headline figures, decomposition costs analyst time that a purchasing conversation will not read, and if the cluster genuinely served 1.4 million operations then it did so regardless of where the kernel time went. What you would still require before quoting it: what the operations actually were and at what size; what limited the run, established by observing the system rather than asserted; whether any component was at 100%, since if none was the figure is a floor rather than a ceiling; the error and timeout counts; the duration and the number of repeats with their variation; and the configuration, so the reader knows what machine the number is about. Absent those, the honest form is the number plus an explicit list of the assumptions nobody checked.</p></div>
+  <div class="ans"><p>(a) The second result answers the four questions and the first answers none. <i>What is being tested</i>: the second states the payload size, the batch size and the volume moved, precisely enough to reproduce; the first says only &ldquo;operations&rdquo;, which could be anything of any size. <i>What the limiting factor is</i>: the second names it — the producer's network interface at 96% of line rate throughout, with the consumer's processors never above 40%, so one component was at its limit and the other plainly was not; the first offers nothing. <i>Perturbations</i>: the second's decomposition of producer processor time across four named areas, none dominant, shows nothing unexpected was consuming the machine during the run; the first gives no basis on which to check. <i>What may be concluded</i>: the second stops at what the measurement supports and draws no wider claim; the first's single number is already a claim about a whole cluster. (b) Because a network interface at 96% of line rate makes the sustained rate a statement about <b>that link</b>, not about the message bus. The same software on the same hosts behind a faster interface would give a different figure, so the number cannot be quoted as a property of the bus, of the consumer, or of the pair — and for the bus it is a floor rather than a ceiling. Naming the limiter is what converts a measurement into a claim with a subject. (c) The strongest version of their case: a headline figure exists to be compared with other headline figures, decomposition costs analyst time that a purchasing conversation will not read, and if the cluster genuinely served 1.4 million operations then it did so regardless of where the processor time went. What you would still require before quoting it: what the operations actually were and at what size; what limited the run, established by observing the system rather than asserted; whether any component reached 100%, since if none did the figure is a floor rather than a ceiling; the error and timeout counts; the duration and the number of repeats with their variation; and the configuration, so the reader knows which machine the number is about. Absent those, the honest form is the number plus an explicit list of the assumptions nobody checked.</p></div>
 
   <h4>Part 2 · Q1 — the two brokers</h4>
-  <div class="ans"><p>(a) Four named failures. <b>Complex benchmark tools</b>, in its specific form <i>benchmarking the benchmark</i>: a single-process client means the reported result may be the tool's own ceiling rather than either broker's — measurement wrong. <b>Changing multiple factors</b>: one broker acknowledged writes durably and the other did not, so the two runs differ in more than the product — measurement wrong. <b>Ignoring errors</b>: roughly 8% of B's requests errored and were counted as completed operations, and errors perform differently from normal operations and skew the result — measurement wrong. <b>Ignoring perturbations</b>: an index rebuild ran on the B host through the last six seconds of a twenty-second run — measurement wrong. All four are in the accidental-measurement quadrant, which is where ten of the sixteen live. (b) Two near-free remedies. For perturbations: make the runs longer — minutes instead of seconds — with the rule that a benchmark's duration should not be shorter than one second, then run it several times and examine the standard deviation, which should be as small as possible. For errors: check the operation success/fail ratio before reading any throughput figure; the checklist puts this as &ldquo;did it error?&rdquo; and &ldquo;did it even happen?&rdquo;. (c) The slide commits <b>numbers without analysis</b>: bare results with no analytical detail, which is a sign the author has assumed they are trustworthy and final. Every benchmark number should be accompanied by a description of the limit encountered and the analysis performed. Failing that, the slide should have carried the list of assumptions nobody had time to check — that the tool is not the bottleneck, that the two configurations are equivalent, that the operations succeeded, that nothing else was running — which then becomes the verification to-do list if the decision turns out to matter.</p></div>
+  <div class="ans"><p>(a) Four named failures. <b>Complex benchmark tools</b>, in its specific form <i>benchmarking the benchmark</i>: a single-process client means the reported result may be the tool's own ceiling rather than either broker's — measurement wrong. <b>Changing multiple factors</b>: one broker acknowledged writes durably and the other did not, so the two runs differ in more than the product — measurement wrong. <b>Ignoring errors</b>: roughly 8% of B's requests errored and were counted as completed operations, and errors perform differently from normal operations and skew the result — measurement wrong. <b>Ignoring perturbations</b>: an index rebuild ran on the B host through the last six seconds of a twenty-second run — measurement wrong. All four are in the accidental-measurement quadrant, which is where ten of the sixteen live. (b) Two near-free remedies. For perturbations: make the runs longer — minutes instead of seconds — with the rule that a benchmark's duration should not be shorter than one second, then run it several times and examine the standard deviation, which should be as small as possible. For errors: check the operation success/fail ratio before reading any throughput figure; the checklist puts this as &ldquo;did it error?&rdquo; and &ldquo;did it even happen?&rdquo;. (c) The slide commits <b>numbers without analysis</b>: bare results with no analytical detail, which can be a sign that the author is inexperienced and has assumed they are trustworthy and final. Every benchmark number should be accompanied by a description of the limit encountered and the analysis performed. Failing that, the slide should have carried the list of assumptions nobody had time to check — that the tool is not the bottleneck, that the two configurations are equivalent, that the operations succeeded, that nothing else was running — which then becomes the verification to-do list if the decision turns out to matter.</p></div>
 
   <h4>Part 2 · Q2 — four benchmarks and three proposals</h4>
-  <div class="ans"><p>(a) 0.5 &times; 0.5 &times; 0.5 &times; 0.5 = 0.0625, so <b>6.25%</b> — about one chance in sixteen. The rule is the benchmark paradox: &ldquo;if your product's chances of winning a benchmark are 50/50, you'll usually lose&rdquo;, because customers who want to be sure run several and expect you to win them all, and the more benchmarks the worse the chances. (b) Proposal (i) is <b>benchmarking the competition</b>, and in its cheap-third-party form it is also the <b>misleading benchmarks</b> variant where several firms are engaged not for expertise but for a fast inexpensive result and the best is kept. It backfires because customers use a product for months and tune it, while you have days — so you can only produce untuned and therefore unrealistic results, and the competitor's customers, who are the target of the exercise, will recognise them, costing your company credibility with exactly the people it was trying to impress. Proposal (ii) is a <b>benchmark special</b>: engineering the product to score on the benchmark while disregarding actual customer performance. The industry bodies answered it with specification rather than argument — an anti-benchmark-special clause prohibiting all implementations that improve benchmark results but not real-world performance or pricing — and accompanied it with a price requirement that the total price be within 2% of what a customer would actually pay, closing the parallel trick of quoting deep discounts nobody would receive. (c) Proposal (iii) commits the pitfall that <b>ignoring benchmarks is itself a benchmarking failure</b>. The intervention that genuinely improves the odds is to stop being a coin flip and to make sure your own results are the best your product can honestly produce — the friendly-fire remedy: test the top-performing system and configuration, drive it to its true limit and be able to say what the bottleneck was, benchmark the current version on the best available equipment, and share the results with engineering before publication so they can spot what was misconfigured or left off.</p></div>
+  <div class="ans"><p>(a) 0.5 &times; 0.5 &times; 0.5 &times; 0.5 = 0.0625, so <b>6.25%</b> — about one chance in sixteen. The rule is the benchmark paradox: &ldquo;if your product's chances of winning a benchmark are 50/50, you'll usually lose&rdquo;, because customers who want to be sure run several and expect you to win them all, and the more benchmarks the worse the chances. (b) Proposal (i) is <b>benchmarking the competition</b>, and in its cheap-third-party form it is also the <b>misleading benchmarks</b> variant where several firms are engaged not for expertise but for a fast inexpensive result and the best is kept. It backfires because customers use a product for months and tune it, while you have days — so you can only produce untuned and therefore unrealistic results, and the competitor's customers, who are the target of the exercise, will recognise them, costing your company credibility with exactly the people it was trying to impress. Proposal (ii) is a <b>benchmark special</b>: engineering the product to score on the benchmark while disregarding actual customer performance. The <b>transaction-processing body</b> — the one whose focus is price/performance — answered it with specification rather than argument, adding an anti-benchmark-special clause prohibiting all implementations that improve benchmark results but not real-world performance or pricing, and accompanying it with a price requirement that the total price be within 2% of what a customer would actually pay, which closes the parallel trick of quoting deep discounts nobody would receive. (c) Proposal (iii) commits the pitfall that <b>ignoring benchmarks is itself a benchmarking failure</b>. The intervention that genuinely improves the odds is to stop being a coin flip and to make sure your own results are the best your product can honestly produce — the friendly-fire remedy: test the top-performing system and configuration, drive it to its true limit and be able to say what the bottleneck was, benchmark the current version on the best available equipment, and share the results with engineering before publication so they can spot what was misconfigured or left off.</p></div>
 
   <h4>Part 3 · Q1 — replaying block-level traffic at a new storage tier</h4>
-  <div class="ans"><p>(a) It will show a regression, and the regression will be an artefact. The trace was captured at the <b>block device</b> layer, which means it records the requests the <i>old</i> system's cache failed to absorb. Replaying those against the new tier asks its slower spinning media to service, from disk, precisely the traffic the new tier's four-times-larger cache was bought to absorb — so the new tier is measured on its weakest component with its strongest one bypassed. The real production workload would have improved, returning largely from cache, which replaying device-level events cannot simulate. It is the storage-upgrade case exactly: 10K rpm disks replaced by 7,200 rpm disks with sixteen times the file system cache, a replay that showed a regression, and a lost sale; it is a case of <b>testing the wrong thing</b>. (b) Even at the right level, a replay disappoints because <b>a recording cannot react</b>: when the server's characteristics and delivered latency change, the captured client workload is unlikely to respond naturally to those differences, which may prove no better than a simulated workload — and when too much faith is placed in it, worse. Subtle timing effects can also disturb it. (c) Every micro-benchmark test is multiplied by <b>working set size</b> and <b>thread count</b>. Working set much smaller than main memory caches entirely, so the file system software is what you investigate; much larger than main memory minimises cache and drives the test toward disk I/O. Thread count, assuming a small working set: single-threaded tests file system performance at the current CPU clock speed; enough threads to saturate all CPUs tests the maximum of system, file system and CPUs together. To answer &ldquo;does the extra memory help?&rdquo; you need both settings of the working set on both tiers, and in particular a working set sized to fit the new tier's memory but not the old tier's — that is the cell where the extra cache is the only thing that differs. Run single-threaded to attribute the result to the software path and saturating to establish the ceiling.</p></div>
+  <div class="ans"><p>(a) It will show a regression, and the regression will be an artefact. The trace was captured at the <b>block device</b> layer, which means it records the requests the <i>old</i> system's cache failed to absorb. Replaying those against the new tier asks its slower spinning media to service, from disk, precisely the traffic the new tier's four-times-larger cache was bought to absorb — so the new tier is measured on its weakest component with its strongest one bypassed. The real production workload would have improved, returning largely from cache, which replaying device-level events cannot simulate. It is the storage-upgrade case exactly: 10K rpm disks replaced by 7,200 rpm disks with sixteen times the file system cache, a replay that showed a regression, and a lost sale; it is a case of <b>testing the wrong thing</b>. (b) Even at the right level, a replay disappoints because <b>a recording cannot react</b>: when the server's characteristics and delivered latency change, the captured client workload is unlikely to respond naturally to those differences, which may prove no better than a simulated workload — and when too much faith is placed in it, things can get worse. Subtle timing effects can also disturb it. (c) Every micro-benchmark test is multiplied by <b>working set size</b> and <b>thread count</b>. Working set much smaller than main memory caches entirely, so the file system software is what you investigate; much larger than main memory minimises cache and drives the test toward disk I/O. Thread count, assuming a small working set: single-threaded tests file system performance at the current CPU clock speed; enough threads to saturate all CPUs tests the maximum of system, file system and CPUs together. To answer &ldquo;does the extra memory help?&rdquo; you need both settings of the working set on both tiers, and in particular a working set sized to fit the new tier's memory but not the old tier's — that is the cell where the extra cache is the only thing that differs. Run single-threaded to attribute the result to the software path and saturating to establish the ceiling.</p></div>
 
   <h4>Part 3 · Q2 — the six-year-old internal benchmark</h4>
   <div class="ans"><p>(a) It is a <b>simulation</b>, also called a macro-benchmark: a benchmark imitating a customer application workload, normally built from workload characterization of the production environment. The weakness this is an instance of is that <b>customer usage patterns change over time</b>, so simulations require updating and adjusting to stay relevant — and there is resistance to that when published results based on the older version would no longer be usable for comparison with the new one. (b) What is being traded is <b>comparability against relevance</b>: two years of quarterly results form a series that only holds together while the benchmark is unchanged, and the benchmark is only worth running while it resembles the traffic. Either way, keep the two years and relabel them as measurements of the old workload — they remain valid for comparison with each other and invalid as statements about current performance. Do not plot old and new on one line; start a new series and say plainly which property you chose. (c) An independent body's suite offers: tests that are well defined and documented and must be executed under guidelines so results are as intended; <b>full disclosure of the configured environment</b>, which may be audited, and depending on the body either price/performance or a component and tuning list; and results that <b>already exist for a variety of vendors and products</b>, so you can compare without running anything. The question you must answer first is whether it resembles your production workload — for a current workload that is decided by <b>workload characterization</b>, measuring the real makeup of your traffic and comparing it against what the suite exercises.</p></div>

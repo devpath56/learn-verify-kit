@@ -299,9 +299,17 @@ least one code, and each code points at the exact artefact to reread.
 - **Competency 8 names two organisations and their benchmark suites, and no tools.** The reasoning and
   the full list of what was left unnamed are recorded above, under works referenced. It is a different
   line from competency 7's, drawn deliberately.
-- **Competency 8's orphan check found a page the character count could not see.** A page carrying only
-  two ruled write-lines extracts as zero characters, so it registered as an empty page rather than as a
-  spilled question; it was found by rendering the page to an image. This is the same hole in decision
-  I5 recorded when competency 4 was built, and it is still open: the check counts extracted text, so a
-  page of pure write-lines reads as empty and a stranded heading reads as fine.
+- **Decision I5's orphan check is fixed, and competency 8 is the first booklet checked with it.** The
+  old check counted extracted characters, so a page carrying only ruled write-lines read as empty and a
+  heading stranded at the foot of a page read as fine. `booklet-template/check-pages.py` now renders
+  every page and measures how far down the page the ink actually reaches, flagging any page whose
+  content stops above 45% of the height. It found three pages in competency 8 that the character count
+  had passed. Competencies 1–7 have not been re-checked with it.
+- **Competency 8 retired two questions the day it was registered**, as competency 7 did, and for the
+  same unconditional reason: a materially changed question gets a new id. `p1q2` built its contrast on
+  the source's own worked example — the 1981 network-stack analysis, which the booklet also teaches —
+  so its first part tested recognition rather than retrieval; it was replaced with an invented soak-test
+  report and reissued as `p1q2b`. `p2q2` asked what mechanism "the industry-standard bodies" introduced
+  against benchmark specials, when only the transaction-processing body did; the prompt asserted
+  something false, and was reissued as `p2q2b`. Both were caught in review before any attempt existed.
 - Competencies 9–13 are unassigned pending sources.
