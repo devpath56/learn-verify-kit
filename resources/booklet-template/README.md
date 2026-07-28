@@ -50,6 +50,7 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../sysperf-methodology/` — the seventh.
 `../sysperf-benchmarking/` — the eighth.
 `../sre-incident-postmortem/` — the ninth.
+`../swe-lsc-deprecation/` — the tenth.
 
 ## Checking a rendered booklet
 

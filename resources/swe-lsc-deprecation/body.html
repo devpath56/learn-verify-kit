@@ -1,0 +1,1462 @@
+<body>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} h3{break-after:avoid; page-break-after:avoid} #bigmap, #p4map{break-inside:auto; page-break-inside:auto}</style>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Large-Scale Change<br>&amp; Deprecation</h1>
+  <div class="rule"></div>
+  <div class="sub">A decision is only permanent if you cannot change every use of it. Here is why the one big commit stops being possible, who has to pay for the alternative, the machine that does the work — and how to decide what to remove and make the removal actually finish.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>Why one big commit stops working</b>The atomic change gets <i>smaller</i> as you grow, and five reasons why.</div>
+    <div><span class="num">2</span><b>Who pays for the migration</b>Unfunded mandates, and why organic migrations don't finish.</div>
+    <div><span class="num">3</span><b>The machine that does it</b>Authorise, generate, shard, clean up — and the review that scales.</div>
+    <div><span class="num">4</span><b>Deciding what to remove</b>Code as a liability, advisory versus compulsory, and warnings that work.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <div class="box bound">
+    <h4>What this subject asks of you that others don't</h4>
+    <p>Most engineering subjects are about making something work. This one is about <b>the cost of having already made something work</b> — and it keeps handing you conclusions that feel backwards. The bigger your codebase, the <i>smaller</i> the change you can make in one go. The team that should do a migration is the one that did not cause the problem. The right response to code you are proud of may be to delete it. Almost none of this is a technical difficulty; it is a question of who bears a cost that is spread thinly across everybody. So as you read, keep asking the question this competency is really made of: <i>whose budget does this land on, and what happens if the answer is &ldquo;nobody's&rdquo;?</i></p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — Why one big commit stops working</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — Who pays for the migration</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — The machine that does it</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — Deciding what to remove</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move · reverse mapping</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Faced with a change that touches more code than one commit can hold, or an obsolete system nobody has removed, you can:</p>
+    <ol>
+      <li><b>Say why the atomic version is not available</b>, naming which of the five barriers applies to your situation rather than asserting that it is &ldquo;too big&rdquo;.</li>
+      <li><b>Put the cost where the expertise is</b>, and explain why leaving the migration to each consuming team is both slower and less likely to finish.</li>
+      <li><b>Describe the four phases of the process</b> and the two things that make it scale — change generation whose human effort does not grow with the codebase, and review that does not grow with the number of shards.</li>
+      <li><b>Choose between advisory and compulsory deprecation</b>, and say what each one requires from you before it is honest to start.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>Everything here follows from one observation that runs the opposite way to intuition: <b>as a codebase and the number of engineers in it grow, the largest atomic change you can make gets smaller</b>. Running every affected check becomes difficult; merge conflicts become certain; some corners of the code are too frightening to touch at all. So the sweeping change has to be broken into many small independent ones — which is a harder thing to execute, and only worth doing if a machine does the work. Building that machine turns out to be mostly a social problem rather than a technical one. Someone has to fund it, because the benefits of a migration are spread thinly across everybody and the costs are not; the team that should do it is the one holding the expertise, which is the team that built the thing being migrated <i>away from</i>; and the reviewers have to accept that a change nobody on their team wrote is going to land in their code. Once that machine exists, something unexpected becomes true: <b>technical decisions stop being permanent</b>. A widely used name, the location of a class, the choice of an idiom — these stop being one-way doors. And that changes the last question, which is not <i>how</i> to remove an obsolete system but <i>whether</i> to: because code is a liability rather than an asset, and the honest comparison is between the cost of keeping it and the cost of removing it.</p>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version — the whole thing at once</h4>
+    <ul>
+      <li>Some changes touch so much code that you cannot put them in one commit. Not &ldquo;shouldn't&rdquo; — <i>cannot</i>.</li>
+      <li>Strangely, the bigger the project gets, the smaller that one-commit limit becomes.</li>
+      <li>So instead you make thousands of tiny changes. That only works if a program writes them, not a person.</li>
+      <li>The hard part isn't the program. It's that nobody wants to pay for a job that helps everyone a little and nobody a lot.</li>
+      <li>The team that should do it is the team that owns the old thing — because they know it, and because they're the ones who want it gone.</li>
+      <li>Once you can change every use of something, decisions you thought were permanent turn out not to be.</li>
+      <li>And then the real question is what to delete. Code isn't treasure; it's a bill that arrives every month.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>Why one big commit stops working</b></td><td>What a large-scale change actually is; the counterintuitive shrinking of the atomic limit; and the five barriers — version-control limits, merge conflicts, code nobody dares touch, an inconsistent environment, and testing that gets harder as the change gets bigger.</td><td>The whole discipline exists because of a constraint. Naming which barrier you are actually hitting is what tells you whether to shard, to test, or to simplify your environment first.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>Who pays for the migration</b></td><td>Why the infrastructure team does the work rather than each consuming team; unfunded mandates; why organic migrations do not finish; the small fixes that only become possible once the machinery exists; and treating individual changes as replaceable rather than precious.</td><td>The barriers in Part 1 are technical, but the reason migrations stall is economic. This part is the one that decides whether anything actually happens.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>The machine that does it</b></td><td>The four phases — authorisation, change creation, shard management, cleanup; the oversight committee and what it is for; change generation whose effort scales sublinearly; sharding and the independent test-mail-submit pipeline; batching tests on a train; and review by a global approver.</td><td>Now that you know the constraint and who is paying, this is what the money buys. Each piece exists to answer one barrier from Part 1 or one incentive problem from Part 2.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>Deciding what to remove</b></td><td>Code as a liability; why removal is the hardest change of all; designing systems so they can be decommissioned; advisory versus compulsory deprecation; warnings that are actionable and relevant; and why a deprecation without an owner never finishes.</td><td>Last, because it is the part the machine serves. A migration is a means; deciding what deserves removing — and committing to finish it — is the judgement the machine cannot make for you.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;An LSC process makes it possible to rethink the immutability of certain technical decisions.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>Why one big commit stops working</h2>
+    <p>What a large-scale change is, and the five things that make the atomic version impossible.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Ask yourself: how many files could you change in one commit right now? Could you do it in an emergency? Could you undo it?</li>
+      <li>The answer gets <i>worse</i> as the project grows, which is not what anyone expects.</li>
+      <li>Five things get in the way. The version control system runs out of room. Somebody else edits a file while you're working. Some code is so scary nobody will touch it. Every project does things slightly differently, so a robot can't handle them all. And the bigger the change, the harder it is to work out which bit broke the test.</li>
+      <li>Finding the one broken file out of 25 is easy. Out of 10,000 it is not.</li>
+      <li>The cure for the scary code is boring: tests. Test it well enough and its age stops mattering.</li>
+      <li>Splitting the change into small pieces gets round all of this — and makes the job more complicated to run.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A city wants to renumber every house on every street, because the old scheme has become a mess. On a village lane you do it in an afternoon: knock on eight doors, agree it, done. In a city of two million you cannot do it at all in one go — and notice that the reason is not that the job is harder per house. It is that while you are working, people keep moving in and out, so any list you compile is out of date before you finish it; a few buildings are listed and legally frozen and nobody will authorise touching them; the boroughs each keep their records in a different format, so one clerk cannot process them all; and if something goes wrong afterwards, you have no way of telling which of two million changes caused it. So you do it street by street, over a year. That is slower and far more complicated to administer than the afternoon in the village — and it is the only version that exists.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Large-scale change</b> (LSC)</td>
+      <td>Any set of changes that are <b>logically related but cannot practically be submitted as a single atomic unit</b>.</td>
+      <td>It may touch so many files that the tooling cannot commit them all at once, or be so large that it would always have merge conflicts. In some cases it is dictated by repository topology: across a collection of distributed or federated repositories, an atomic change may not even be technically possible.</td>
+      <td>vs a big change. The defining property is not size but <b>the impossibility of atomicity</b> — which is why the same process scales down to a team making only a few dozen related changes. These changes are almost always generated by automated tooling.</td>
+    </tr>
+    <tr>
+      <td><b>The counterintuitive shrink</b></td>
+      <td>As a codebase and the number of engineers working in it grow, <b>the largest atomic change possible counterintuitively decreases</b>.</td>
+      <td>Running all affected presubmit checks and tests becomes difficult — to say nothing of ensuring that every file in the change is still up to date at the moment of submission.</td>
+      <td>vs the expectation that a bigger organisation can do bigger things. Everything else in this competency is a response to this one fact, which is why the idea of making sweeping changes as large atomic commits was abandoned rather than optimised.</td>
+    </tr>
+    <tr>
+      <td><b>What they are for</b></td>
+      <td>Four basic categories: <b>cleaning up common antipatterns</b> using codebase-wide analysis tooling; <b>replacing uses of a deprecated library feature</b>; <b>enabling low-level infrastructure improvements</b> such as compiler upgrades; and <b>moving users from an old system to a newer one</b>.</td>
+      <td>Broader causes sit behind these: a new language standard introducing a more efficient idiom, an internal interface changing, or a new compiler release requiring fixes for things it will now flag as errors.</td>
+      <td>The <b>majority have near-zero functional impact</b> — widespread textual updates for clarity, optimisation or future compatibility. But they are <b>not theoretically limited</b> to this behaviour-preserving, refactoring class of change.</td>
+    </tr>
+    <tr>
+      <td><b>Barrier 1 — technical limits</b></td>
+      <td>Most version control systems have <b>operations that scale linearly with the size of a change</b>.</td>
+      <td>A system may handle commits on the order of tens of files perfectly well and lack the memory or processing power to atomically commit thousands. In centralised systems, commits can block other writers — and in older systems, readers — while they are processed, so large commits stall everyone else.</td>
+      <td>vs a matter of judgement. It might not be merely &ldquo;difficult&rdquo; or &ldquo;unwise&rdquo; to make a large change atomically: <b>it might simply be impossible</b> with a given set of infrastructure. Splitting it up gets around the limit at the cost of a more complex execution.</td>
+    </tr>
+    <tr>
+      <td><b>Barrier 2 — merge conflicts</b></td>
+      <td>Every version control system requires updating and merging, potentially with manual resolution, if a newer version of a file exists centrally. As the number of files in a change increases, so does the probability of a conflict — <b>compounded by the number of engineers working in the repository</b>.</td>
+      <td>A small company might sneak in a change touching every file over a weekend when nobody is developing, or pass a virtual — or even physical — token around the team to hold a global lock.</td>
+      <td>Neither trick survives scale: at a large, global company <b>somebody is always making changes to the repository</b>. The general property that follows holds for the other barriers too: with few files in a change, the probability of conflict shrinks, so it is more likely to be committed without problems.</td>
+    </tr>
+    <tr>
+      <td><b>Barrier 3 — haunted graveyards</b></td>
+      <td>A system so <b>ancient, obtuse, or complex that no one dares enter it</b>. The phrase comes from a production-engineering mantra: <i>no haunted graveyards</i>.</td>
+      <td>They are often business-critical systems frozen in time because any attempt to change them could make them fail in incomprehensible ways, costing real money. They pose a real existential risk and can consume an inordinate amount of resources.</td>
+      <td>They exist in codebases too, not only in production: old, unmaintained software written by someone long off the team, on the critical path of important revenue-generating functionality, with layers of bureaucracy built up to prevent destabilising changes. <b>The counter is good, old-fashioned testing:</b> thoroughly tested software can be changed arbitrarily and you will know whether the change breaks it, <b>no matter the age or complexity of the system</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Barrier 4 — heterogeneity</b></td>
+      <td>Large-scale changes <b>work only when the bulk of the effort can be done by computers, not humans</b> — and computers rely on consistent environments to apply the right transformation in the right place.</td>
+      <td>Many different version control systems, continuous-integration systems, project-specific tooling or formatting guidelines all make sweeping changes difficult. Presubmit checks can be very complex, from checking new dependencies against a list, to running tests, to requiring an associated bug.</td>
+      <td>As good as humans are with ambiguity, machines are not — so <b>simplifying the environment helps the humans moving around in it as well as the robots</b>. The response is two-sided: embrace some of the complexity by making it standard everywhere, and ask teams to omit their special checks where a large-scale change touches their code.</td>
+    </tr>
+    <tr>
+      <td><b>Barrier 5 — testing</b></td>
+      <td>Every change should be tested, but <b>the larger the change, the more difficult it is to test appropriately</b>.</td>
+      <td>A continuous-integration system that runs not only the tests immediately affected but every test that <b>transitively depends</b> on the changed files gives broad coverage — and the farther away in the dependency graph a test is, the more unlikely a failure is to have been caused by the change itself.</td>
+      <td>The decisive comparison: finding the root cause of a test failure in a change of <b>25 files</b> is straightforward; finding one in a <b>10,000-file</b> change is the proverbial needle in a haystack. The trade-off accepted in exchange is that smaller changes rerun the same tests repeatedly &mdash; deliberately, because engineer time spent tracking down failures is <b>much more expensive than the compute time</b>. That balance may not hold for every organisation.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — &ldquo;too big to commit&rdquo; is a property of your infrastructure, not of your change</h4>
+    <p><b>What it sounds like:</b> a judgement about the change — it is sprawling, it is risky, it should have been broken up by a more disciplined author.<br>
+    <b>What it actually is:</b> a statement about the environment the change has to pass through. The same edit is atomic in one repository and impossible in another, and the thing that moved was never the edit.<br>
+    <b>Why that matters practically:</b> it tells you where to spend. If the barrier is the version control system, sharding is the answer. If it is merge conflicts, smaller shards are the answer. If it is code nobody dares touch, <b>the answer is tests</b>, and no amount of tooling substitutes. If it is heterogeneity, the answer is consistency, and it pays back for humans as well as machines.<br>
+    <b>The trap:</b> treating &ldquo;we can't do that here&rdquo; as permanent. Every one of the five barriers is something an organisation chose, inherited, or failed to invest in — and each of them can be moved.</p>
+  </div>
+
+  <h3>Anchor sketch — the shrinking commit, and what stands in the way</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named barrier or term</b> &nbsp; <span class="node nstar">reversed = the fact everything else answers</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   AN LSC = changes that are LOGICALLY RELATED but cannot
+   practically be submitted as a SINGLE ATOMIC UNIT.
+        not "big". "not atomic". the process scales all the
+        way down to a few dozen related changes.
+                          |
+   <span class="tks">AS CODEBASE AND HEADCOUNT GROW, THE ATOMIC LIMIT SHRINKS</span>
+        running every affected check gets hard, and every
+        file must still be up to date AT submission.
+                          |
+   FOUR THINGS THEY ARE FOR
+        clean up antipatterns . replace a deprecated library
+        feature . enable low-level infra work (e.g. compiler
+        upgrades) . move users off an old system
+        +--> MOST have near-zero functional impact. but they
+             are not limited to refactoring.
+                          |
+   FIVE BARRIERS TO DOING IT ATOMICALLY
+   ------------------------------------------------------
+   <span class="tk1">TECHNICAL LIMITS</span> . VCS operations scale LINEARLY with
+        change size. tens of files fine; thousands may be
+        impossible. commits can block other writers.
+        -> not "unwise". IMPOSSIBLE. shard it.
+   <span class="tk1">MERGE CONFLICTS</span> . probability grows with files AND
+        with engineers. the weekend trick and the passed
+        token do not survive scale: somebody is ALWAYS
+        committing. -> fewer files per change.
+   <span class="tk1">HAUNTED GRAVEYARDS</span> . a system so ancient, obtuse or
+        complex that NO ONE DARES ENTER IT. often business-
+        critical, frozen, wrapped in bureaucracy.
+        -> the counter is TESTING. test it well and its age
+           and complexity stop mattering.
+   <span class="tk1">HETEROGENEITY</span> . robots need consistency. many VCSs,
+        CI systems, per-project tooling and formats make
+        sweeping change impossible.
+        -> standardise what you can; ask teams to omit
+           special checks for LSC shards.
+   <span class="tk1">TESTING</span> . CI runs everything that TRANSITIVELY depends
+        on the change. the farther out in the graph, the less
+        likely a failure is really yours.
+        -> root-causing 1 bad file in 25 is easy.
+           in 10,000 it is a needle in a haystack.
+        -> price accepted: small changes rerun the same
+           tests. engineer time >> compute time.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Define a large-scale change without using the word &ldquo;big&rdquo;.<br>
+      <span class="q">Q</span> Name the five barriers, and the specific remedy each one has.<br>
+      <span class="q">Q</span> Which barrier does testing <i>solve</i>, and which one does testing <i>make worse</i>?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Splitting a large change into small independent chunks</td><td>It gets around the version-control limits, and shrinks the probability of merge conflicts.</td><td>The execution of the change becomes more complex.</td><td>Whenever the atomic version is impossible &mdash; which, past a certain size, is always.</td></tr>
+    <tr><td>Testing everything that transitively depends on a change</td><td>Broad coverage: nothing downstream goes unchecked.</td><td>High load on the CI system, and failures far out in the graph that are unlikely to be yours.</td><td>When you would rather over-test than ship a silent break &mdash; and can afford the compute.</td></tr>
+    <tr><td>Many small changes rather than one large one</td><td>Failures are easy to diagnose, and each change affects a smaller set of tests.</td><td>The same tests get run repeatedly, especially ones depending on large parts of the codebase.</td><td>When engineer time costs more than compute time. That is a conscious decision, and it may not hold for you.</td></tr>
+    <tr><td>Writing tests for the code nobody dares touch</td><td>The only thing that dissolves a haunted graveyard &mdash; arbitrary changes become safe regardless of the system's age.</td><td>A lot of effort, on software nobody wants to work on.</td><td>Whenever a frozen system is blocking migrations, decommissioning, or a compiler or library upgrade.</td></tr>
+    <tr><td>Standardising checks and formats across projects</td><td>Robots can operate everywhere, and humans can move between projects more easily.</td><td>Teams lose local rules they chose deliberately.</td><td>When heterogeneity is what is stopping automation &mdash; and note the human benefit is the same benefit.</td></tr>
+    <tr><td>Investing in change tooling early</td><td>It pays off for the many teams doing infrastructure work &mdash; and the same tools scale down to tens of files.</td><td>Engineering time spent on tooling rather than on the changes themselves.</td><td>Early and often. The tools that make thousands of files efficient work reasonably well on tens.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;That change is too big.&rdquo;</td><td>&ldquo;It isn't atomically submittable here. Which barrier are we hitting &mdash; the VCS, conflicts, or the test graph?&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll be able to do bigger changes once we're a bigger team.&rdquo;</td><td>&ldquo;The opposite. The atomic limit shrinks as the codebase and the headcount grow.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll grab the repo on a quiet weekend.&rdquo;</td><td>&ldquo;That works while somebody isn't always committing. Plan for the version where they are.&rdquo;</td></tr>
+    <tr><td>&ldquo;Nobody touches that service, it's too risky.&rdquo;</td><td>&ldquo;That's a haunted graveyard, and it will block every migration that goes near it. The way out is tests, not caution.&rdquo;</td></tr>
+    <tr><td>&ldquo;Each team has its own presubmit rules.&rdquo;</td><td>&ldquo;Then automated change is off the table. Consistency buys the robots and the humans the same thing.&rdquo;</td></tr>
+    <tr><td>&ldquo;A test failed somewhere downstream.&rdquo;</td><td>&ldquo;How far out in the dependency graph? The farther it is, the less likely it's caused by this change.&rdquo;</td></tr>
+    <tr><td>&ldquo;Running these tests over and over is wasteful.&rdquo;</td><td>&ldquo;It's a deliberate trade: compute is cheaper than an engineer hunting a failure through 10,000 files.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A platform team needs to rename a configuration key used in roughly 40,000 files across one repository. Their first attempt — a single commit — was rejected by the version control server after twenty minutes. Their second attempt succeeded locally but failed to land because eleven files had changed underneath them. A colleague suggests scheduling the third attempt for 3 a.m. on a public holiday. Separately, about 300 of the affected files belong to a billing service written six years ago whose last maintainer left the company; the team's own instinct is to skip those files and file a ticket.</p>
+    <p><b>(a)</b> Define a large-scale change, and say whether this qualifies and on what grounds. <b>(b)</b> Name the barrier behind each of the two failed attempts, and give the stated remedy for each. <b>(c)</b> Assess the 3 a.m. proposal: say what it is a version of, and the precise condition under which it stops working. <b>(d)</b> Name what the billing service is, say why skipping it is worse than it looks, and give the one thing that dissolves it.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>Two migrations are proposed in the same quarter. The first replaces a logging call across 9,000 files; the team plans one change and reports that a test three layers away in the dependency graph failed, which they have spent two days investigating. The second is the same edit across 60 files in a subsystem where every project uses a different formatter, a different CI configuration and two different version control systems. A director asks why the second one — a fiftieth of the size — is being quoted as the harder job, and proposes that both be split into 200-file commits to &ldquo;standardise the approach&rdquo;.</p>
+    <p><b>(a)</b> Explain the first team's two days using what is said about the dependency graph, and say what change to their approach would have prevented it. <b>(b)</b> Answer the director's question: name the barrier the second migration is hitting and why size does not govern it. <b>(c)</b> Evaluate the 200-file proposal for each migration separately. <b>(d)</b> Splitting has a stated cost and produces a stated inefficiency. Name both, and give the reasoning by which the inefficiency is accepted.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — how safe is it to change, and can a machine do it</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is the environment consistent enough to automate? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — one set of tools, checks and formats</div>
+      <div class="colh">No — every project does it differently</div>
+
+      <div class="rowh">The code is<br>THOROUGHLY<br>TESTED</div>
+      <div class="cell focus"><b>Malleable</b>
+        Arbitrary changes can be made and you will know whether they broke anything, whatever the age or complexity of the system — and a machine can apply them everywhere.<br>
+        <i>Move:</i> this is the cell the whole competency is trying to reach, and it is worth naming what it buys: technical decisions stop being permanent. Protect it by keeping the environment standard and by treating flaky tests as a cost borne by whoever writes them.</div>
+      <div class="cell"><b>Safe to change, expensive to change</b>
+        You could alter anything without fear, and the alteration has to be done by hand in each project because no single tool understands them all.<br>
+        <i>Move:</i> spend on consistency, not on courage. Standardise what you can and ask teams to omit their special checks for these shards — and note the humans moving between projects get the same benefit the robots do.</div>
+
+      <div class="rowh">NOT really<br>tested</div>
+      <div class="cell"><b>The robots can drive, and nobody dares let them</b>
+        The tooling would work. What is missing is any way to know whether a generated change broke something, so every change is a gamble.<br>
+        <i>Move:</i> write the tests. This is the unglamorous answer and it is the only one; without them, automation multiplies risk rather than reducing it.</div>
+      <div class="cell"><b>The haunted graveyard</b>
+        Ancient, obtuse or complex enough that no one dares enter, often business-critical and frozen, with bureaucracy layered on to prevent change.<br>
+        <i>Move:</i> understand that this cell blocks other people's work — migrations cannot complete, dependent systems cannot be decommissioned, compilers and libraries cannot be upgraded. It is not a local decision to stay here.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row decides whether a change is <i>safe</i> and the column decides whether it is <i>affordable</i>, and they fail in different ways — an untested consistent codebase is a fast way to break things, and a tested inconsistent one is a slow way to fix them. Only the top-left keeps a codebase responsive to changes in the infrastructure underneath it.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>When someone says a change is too big, ask which barrier they mean.</b> There are five, they have different remedies, and the word &ldquo;big&rdquo; hides all of them. Version-control limits and merge conflicts are answered by sharding; frightening code is answered by tests; an inconsistent environment is answered by standardisation; and hard-to-diagnose failures are answered by making each change smaller, not by testing less.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>Who pays for the migration</h2>
+    <p>Why the work lands centrally, and what happens to it when it does not.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>The obvious plan is: build the new thing, tell everyone to move. It doesn't work.</li>
+      <li>The people who know how to do the migration are the people who built the thing being migrated away from. Everyone else would have to learn it — separately, hundreds of times over.</li>
+      <li>If the benefit is spread thinly across everybody, no single team will ever make it their priority. That is called an unfunded mandate, and nobody likes one.</li>
+      <li>People write new code by copying old code, so an old system keeps producing new uses of itself.</li>
+      <li>So the team that wants the old thing gone should be the team that removes it. They want it finished, and they already know how.</li>
+      <li>Once you have the machinery, you can fix tiny irritations that were never worth fixing before.</li>
+      <li>And you stop being precious about individual commits: a machine made them, a machine can make more.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A city changes its recycling rules, and someone has to relabel every bin. Option one: send every household a letter saying the rules have changed and please relabel your own bin. Each household then has to work out what the new rules mean, find the right labels, and do a small job badly and differently from their neighbours; most will not bother, because a slightly better recycling rate next year is worth almost nothing to any one of them. Option two: the department that changed the rules sends a crew round with the correct labels and a van. The crew does the first bin slowly, the next hundred quickly, and by the end they have seen every awkward case twice and know exactly what to do about it. Option two costs the department real money that option one appeared to cost nobody — and that appearance is the entire problem, because the cost in option one was real, it was just spread across two million people who each decided it wasn't their job.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Why the infrastructure team owns it</b></td>
+      <td>The teams that build and manage the underlying systems are <b>also the ones with the domain knowledge required to fix the hundreds of thousands of references to them</b>.</td>
+      <td>Teams that consume the infrastructure are unlikely to have the context for handling many of these migrations, and it is <b>globally inefficient</b> to expect them each to relearn expertise the infrastructure team already has.</td>
+      <td>vs the intuitive plan — introduce the new thing and dictate that everyone using the old one moves. That seems easier and <b>turns out not to scale</b>. Centralisation also allows faster recovery from errors, because errors generally fall into a small set of categories and the team running the migration can keep a playbook — formal or informal — for handling them.</td>
+    </tr>
+    <tr>
+      <td><b>The repeated first change</b></td>
+      <td>The cost of doing the first of a series of semi-mechanical changes you do not understand.</td>
+      <td>You spend time reading about the motivation and nature of the change, find an easy example, try to follow the provided suggestions, and then try to apply that to your local code.</td>
+      <td><b>Repeating this for every team in an organisation greatly increases the overall cost of execution.</b> Making a few centralised teams responsible both internalises those costs and drives them down, because the change can then happen more efficiently.</td>
+    </tr>
+    <tr>
+      <td><b>Unfunded mandate</b></td>
+      <td>&ldquo;Additional requirements imposed by an external entity without balancing compensation.&rdquo; And <b>nobody likes them</b>.</td>
+      <td>Even where a new system is categorically better than the one it replaces, those benefits are <b>often diffused across an organisation</b> and thus unlikely to matter enough for individual teams to want to update on their own initiative.</td>
+      <td>vs the costs disappearing. <b>If the new system is important enough to migrate to, the costs of migration will be borne somewhere in the organisation.</b> Centralising the migration and accounting for its costs is almost always faster and cheaper than depending on individual teams to migrate organically.</td>
+    </tr>
+    <tr>
+      <td><b>Why organic migrations stall</b></td>
+      <td>They are <b>unlikely to fully succeed</b>, in part because <b>engineers tend to use existing code as examples when writing new code</b>.</td>
+      <td>So the old system keeps generating new uses of itself for as long as it exists, regardless of what the documentation says.</td>
+      <td>The structural answer is incentive alignment: having a team with <b>a vested interest in removing the old system</b> responsible for the migration effort helps ensure it actually gets done. Funding and staffing such a team looks like an additional cost, and is <b>actually just internalising the externalities that an unfunded mandate creates</b>, with the added benefit of economies of scale.</td>
+    </tr>
+    <tr>
+      <td><b>Filling potholes</b></td>
+      <td>The small fixes that become possible once the machinery exists, and <b>simply wouldn't have been possible without it</b>.</td>
+      <td>Two header files in the same in-house library were named with <b>different word separators</b> — one with an underscore, one with a hyphen. Beyond irritating the consistency purists, engineers had to remember which file used which, and only discovered they had got it wrong <b>after a potentially lengthy compile cycle</b>.</td>
+      <td>Fixing a single-character difference across a codebase of that size sounds pointless. Mature tooling made it <b>a couple of weeks' worth of background-task effort</b>; library authors could apply it en masse <b>without having to bother end users of those files</b>; and it <b>quantitatively reduced the number of build failures</b> caused by that specific issue. The resulting productivity — and happiness — more than paid for the time.</td>
+    </tr>
+    <tr>
+      <td><b>Decisions stop being immutable</b></td>
+      <td>As the ability to change the entire codebase improves, <b>the diversity of changes expands</b>, and engineering decisions can be made knowing they aren't fixed forever.</td>
+      <td>Technical decisions that used to be final — the name of a widely used symbol, or the location of a popular class within a codebase — <b>no longer need to be final</b>.</td>
+      <td>This is the payoff the rest of the machinery buys, and it works backwards in time: it changes what you are willing to decide <b>at design time</b>, not just what you can fix later. Sometimes it is worth the effort to fill a few potholes.</td>
+    </tr>
+    <tr>
+      <td><b>Cattle, not pets</b></td>
+      <td>The stance to take toward the individual changes a large migration produces.</td>
+      <td>A typical change is handcrafted: an engineer may spend days or weeks on the creation, testing and review of a single one, comes to know it intimately, and is proud when it is committed. That is <b>owning and raising a favourite pet</b>.</td>
+      <td>Effective large-scale change requires a high degree of automation and produces an enormous number of individual changes. Here it helps to treat them as <b>cattle: nameless and faceless commits that might be rolled back or otherwise rejected at any time with little cost, unless the entire herd is affected.</b> Rejection of a pet is hard not to take personally; with automation, tooling can be updated and new changes generated at very low cost, so <b>losing a few cattle now and then isn't a problem</b>.</td>
+    </tr>
+    <tr>
+      <td><b>The social contract</b></td>
+      <td>Code owners need a sense of responsibility for their software <i>and</i> an understanding that these migrations are part of how the organisation scales its engineering.</td>
+      <td>Product teams are most familiar with their own software; library infrastructure teams know the nuances of the infrastructure. <b>Getting product teams to trust that domain expertise is an important step toward social acceptance.</b></td>
+      <td>The line that is easy to get wrong: owners <b>should understand the changes happening to their software</b>, and they <b>do not hold a veto</b> over the broader migration. Local owners do sometimes question a specific commit, and change authors respond as they would to any other review comment. What earns the arrangement is <b>a good set of frequently asked questions and a solid historic track record of improvements</b>.</td>
+    </tr>
+    <tr>
+      <td><b>When humans do the sharding</b></td>
+      <td>The rare case where tooling cannot generate the global change, so change generation itself is spread across people.</td>
+      <td>In early 2017 a vulnerability in a widely used open-source library left any application with a vulnerable version anywhere in its transitive classpath open to remote execution — including, in one case, a municipal transport agency whose systems were encrypted and shut down. Volunteers identified affected projects and sent <b>more than 2,600 patches</b>; <b>more than 50 humans</b> did the work instead of automated tools.</td>
+      <td>vs the normal case. This is <b>much more labour intensive</b> than automatic generation, and it allows global changes to happen <b>much more quickly for time-sensitive applications</b>. Note also what made it possible at all: an existing process, borrowed and pointed outward.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — centralising the work is not centralising the blame</h4>
+    <p><b>What it is not:</b> a claim that consuming teams are careless, or that the infrastructure team should have designed it right the first time. Neither is relevant to who should hold the shovel.<br>
+    <b>What it is:</b> an argument from three properties, all of which are about efficiency rather than fault. The expertise already exists in one place. The errors fall into a small set of categories, so one team accumulates a playbook. And the team that wants the old system gone is the only party with an incentive to see the last reference removed.<br>
+    <b>The accounting point underneath it:</b> a migration's cost does not disappear when you decline to fund it — it is simply paid in fragments by hundreds of teams, more slowly, more badly, and often never. Funding a central team looks like adding a cost and is <b>internalising an externality that already existed</b>.<br>
+    <b>What it does not buy you:</b> the right to make changes people do not understand. Owners keep the right to ask what a commit is for; they lose the right to veto the programme it belongs to.</p>
+  </div>
+
+  <h3>Anchor sketch — where the cost lands</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named idea</b> &nbsp; <span class="node nstar">reversed = the failure mode all of this avoids</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   THE OBVIOUS PLAN: ship the new system, tell everyone
+   using the old one to move.
+        it seems easier. it does not scale.
+                          |
+   <span class="tks">THE UNFUNDED MANDATE</span>  requirements imposed from
+   outside with no balancing compensation
+        benefits DIFFUSE across the org; costs CONCENTRATED
+        on each team -> no team ever prioritises it
+        +--> and the cost does not vanish. it gets paid
+             somewhere, slowly and badly.
+                          |
+   THREE REASONS TO CENTRALISE
+   ------------------------------------------------------
+   <span class="tk1">EXPERTISE IS ALREADY THERE</span> . the team that built the
+        system knows its hundreds of thousands of callers.
+        making every team relearn that is globally
+        inefficient.
+        +--> the repeated first change: read the motivation,
+             find an example, follow the suggestion, apply
+             it locally -- ONCE PER TEAM.
+   <span class="tk1">ERRORS REPEAT</span> . they fall into a small set of
+        categories, so ONE team accumulates a playbook and
+        recovers faster.
+   <span class="tk1">INCENTIVES ALIGN</span> . organic migrations do not finish,
+        because engineers write new code by copying old
+        code -- so the old system keeps producing NEW uses
+        of itself. the team that wants it GONE is the team
+        that should do the work.
+                          |
+   WHAT THE MACHINERY THEN MAKES POSSIBLE
+        <span class="tk1">FILLING POTHOLES</span> . two header files whose names used
+             DIFFERENT SEPARATORS. engineers had to remember
+             which -- and found out after a long compile.
+             fixed in ~2 weeks of background effort, without
+             bothering end users, and build failures from it
+             measurably dropped.
+        <span class="tk1">DECISIONS STOP BEING FINAL</span> . the name of a widely used
+             symbol; where a popular class lives. this changes
+             what you are willing to decide AT DESIGN TIME.
+                          |
+   <span class="tk1">CATTLE, NOT PETS</span>  a handcrafted change is a pet: days of
+   work, known intimately, pride on commit. LSC shards are
+   cattle: nameless, faceless, rolled back at little cost --
+   unless the whole herd is affected.
+        +--> tooling can regenerate them cheaply, so losing
+             a few now and then is not a problem.
+                          |
+   THE SOCIAL CONTRACT  owners SHOULD understand what is
+   happening to their code. owners do NOT hold a veto.
+        earned by a good FAQ and a track record.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Define an unfunded mandate, and say where its cost actually goes.<br>
+      <span class="q">Q</span> Give the three reasons the work is centralised, and which one is about incentives.<br>
+      <span class="q">Q</span> What do owners keep, and what do they give up, under the social contract?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>Funding a central migration team</td><td>Expertise in one place, a playbook for the recurring errors, economies of scale, and an owner who wants it finished.</td><td>Visible headcount against a benefit that is spread thinly and hard to attribute.</td><td>Whenever the migration matters. The alternative pays the same cost invisibly and more slowly.</td></tr>
+    <tr><td>Telling each team to migrate itself</td><td>No line item, and no central team to staff.</td><td>The repeated first change, once per team; migrations that never fully succeed; the old system still producing new uses of itself.</td><td>Almost never &mdash; and be honest that you have chosen a cost, not avoided one.</td></tr>
+    <tr><td>Treating shards as cattle</td><td>Rejection and rollback become cheap, and tooling can regenerate work at low cost.</td><td>The craftsmanship instinct that makes good handcrafted changes has to be switched off.</td><td>Any automated migration &mdash; and note this is a stance to teach, not a tool to install.</td></tr>
+    <tr><td>Letting owners question individual commits</td><td>Social acceptance, and genuine review comments that catch real problems.</td><td>Author time answering questions across many teams.</td><td>Always. Answer them as you would any review comment &mdash; it is what earns the absence of a veto.</td></tr>
+    <tr><td>Spending the machinery on small irritations</td><td>Measurable reductions in things like build failures, and a productivity and happiness return that outweighs the cost.</td><td>Capacity not spent on high-priority migrations.</td><td>When the fix is cheap in background effort and the irritation is chronic.</td></tr>
+    <tr><td>Sharding change generation across humans</td><td>Global changes can happen much more quickly when time matters &mdash; one campaign sent more than 2,600 patches.</td><td>Far more labour intensive than generating changes automatically.</td><td>The rare case where tooling cannot generate the change and the deadline is real, such as a live vulnerability.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We'll announce the new API and let teams move over.&rdquo;</td><td>&ldquo;That's an unfunded mandate. The benefit is diffuse and the cost is concentrated, so no team will prioritise it.&rdquo;</td></tr>
+    <tr><td>&ldquo;Each team knows their own code best.&rdquo;</td><td>&ldquo;For their features, yes. For our migration, we hold the context &mdash; making 200 teams relearn it is globally inefficient.&rdquo;</td></tr>
+    <tr><td>&ldquo;Adoption is at 60% and stalling.&rdquo;</td><td>&ldquo;It will. People write new code by copying old code, so the old system keeps generating new uses of itself.&rdquo;</td></tr>
+    <tr><td>&ldquo;Funding a migration team is an extra cost.&rdquo;</td><td>&ldquo;It's internalising an externality. The cost already exists; right now it's paid in fragments by everyone else.&rdquo;</td></tr>
+    <tr><td>&ldquo;This shard got rejected, I'll work out why.&rdquo;</td><td>&ldquo;Let it go &mdash; it's cattle, not a pet. Regenerate it. Only worry if the whole herd is failing.&rdquo;</td></tr>
+    <tr><td>&ldquo;That team won't approve our change.&rdquo;</td><td>&ldquo;They can ask what it's for and we answer like any review comment. They don't hold a veto over the programme.&rdquo;</td></tr>
+    <tr><td>&ldquo;That inconsistency is annoying but not worth fixing.&rdquo;</td><td>&ldquo;With the tooling, that's a couple of weeks of background effort &mdash; and we can measure the build failures it removes.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>An internal authentication library is being replaced. The platform team has published the new library, written a migration guide, and sent two all-engineering emails. Nine months later, 71% of call sites still use the old library, and the number of <i>new</i> call sites on the old library has gone <i>up</i> since the guide was published. A vice-president proposes a deadline and a dashboard naming the teams with the most remaining call sites. The platform team's lead argues instead for two engineers funded for six months to do the migration themselves, and is told this is &ldquo;adding cost to a project that should cost nothing&rdquo;.</p>
+    <p><b>(a)</b> Name what the current approach is, define it, and explain in terms of how benefits and costs are distributed why nine months produced this result. <b>(b)</b> Explain the rise in <i>new</i> call sites using the stated mechanism, and say what that implies about the migration guide. <b>(c)</b> Give three reasons the platform team should hold the work, and say which of the three the dashboard proposal fails to address. <b>(d)</b> Answer &ldquo;adding cost to a project that should cost nothing&rdquo; directly, in economic terms.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>A migration team has automated tooling and is landing about 400 shards a week. Three things happen in one week. An engineer on the team spends a day debugging why one particular shard was rejected by a project's checks, and asks to hold the migration until it is understood. A staff engineer on a consuming team objects to a commit in their service and asks the migration be stopped company-wide until a design review is held. And a separate team asks whether the tooling could be pointed at a two-year-old naming inconsistency that causes occasional confusing build errors but that nobody has ever thought worth a project.</p>
+    <p><b>(a)</b> Address the rejected shard using the recommended stance toward individual changes, define the two halves of that stance, and give the one condition under which the engineer's instinct would be right. <b>(b)</b> Answer the staff engineer: say precisely what they are entitled to and what they are not, and what earns that arrangement. <b>(c)</b> Assess the naming request, with reference to the comparable worked example and what made it worth doing. <b>(d)</b> Name the wider consequence, for design decisions, of having this capability at all.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — who is funded, and who wants it finished</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does anyone have a stake in the old system disappearing? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — a team is measured on its removal</div>
+      <div class="colh">No — everyone benefits a little, nobody a lot</div>
+
+      <div class="rowh">The work is<br>CENTRALLY<br>funded and<br>staffed</div>
+      <div class="cell focus"><b>It finishes</b>
+        Expertise sits with the people doing the work, the recurring errors accumulate into a playbook, and somebody's job is the last remaining call site.<br>
+        <i>Move:</i> stay here, and spend the surplus capacity on the potholes — the chronic small irritations that were never worth a project on their own. This is also the cell where design decisions stop being permanent, which is a benefit you can spend before the migration even starts.</div>
+      <div class="cell"><b>Funded, and quietly aimless</b>
+        There is a team and a budget and no owner of the outcome, so work drifts to whatever is tractable and the tail never clears.<br>
+        <i>Move:</i> give removal to whoever carries the cost of the old system, measured on the last reference rather than the first thousand.</div>
+
+      <div class="rowh">Left to the<br>teams who<br>use it</div>
+      <div class="cell"><b>Willing, and each starting from zero</b>
+        Somebody wants it gone and cannot make it happen, because every consuming team pays the repeated first change: read the motivation, find an example, apply it locally.<br>
+        <i>Move:</i> centralise the execution even if the enthusiasm is already distributed. Enthusiasm does not transfer expertise, and 200 teams solving the same problem badly is not a migration.</div>
+      <div class="cell"><b>The unfunded mandate</b>
+        Requirements imposed with no balancing compensation, on teams for whom the benefit is too diffuse to matter — while engineers copy existing code and the old system keeps generating new uses of itself.<br>
+        <i>Move:</i> stop calling this free. The cost is being paid, in fragments, by everyone; funding a team internalises it and adds economies of scale.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is where the money is and the column is where the motivation is, and a migration needs both in the same place. Note that the bottom-right cell is the default that arrives when nobody decides anything &mdash; it is what an organisation gets for free, and it is the only cell in which the old system outlives everyone who cared about replacing it.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Before announcing a migration, name whose budget it lands on.</b> If the answer is &ldquo;everyone's, a little&rdquo;, you have not funded a migration — you have written an unfunded mandate, and the honest prediction is that adoption plateaus while the old system keeps acquiring new callers. The question is not whether the cost will be paid; it is whether it will be paid once, by people who know how, or a hundred times by people who don't.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>The machine that does it</h2>
+    <p>Four phases, and the two places where the design has to scale sublinearly.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Four steps: get permission, generate the change, break it into pieces and land them, then stop people putting the old thing back.</li>
+      <li>Permission isn't bureaucracy. It exists because it became very cheap for one person to create a very large amount of work for other people.</li>
+      <li>The generating tool has to take about the same amount of human time no matter how big the codebase is. Otherwise you have just moved the problem.</li>
+      <li>Rule of thumb: past about 500 edits, learning the tool beats doing it by hand.</li>
+      <li>The pieces are tested in batches on a schedule, like a train leaving every few hours, because testing them one at a time would cost too much.</li>
+      <li>One expert reviews all the pieces with pattern-matching tools, and only looks by hand at the odd ones.</li>
+      <li>Machine-written changes have to look like human-written ones, or nobody will be able to read the code afterwards.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A publisher is changing house style across a back catalogue of thirty thousand titles. Nobody proofreads thirty thousand books. What they do instead is: get the change signed off by a small standards committee, who mostly exist to stop somebody launching a catalogue-wide edit over a comma preference; write one script that applies the rule and prove it on a shelf of samples; then send the books through in batches, running the same set of checks over each batch rather than over each book, because the checks are expensive and most batches pass. One senior editor reviews the output — not by reading the books, but by looking at the <i>diff patterns</i> and approving the ones that match what the script was supposed to do, pulling out only the handful that look odd. And afterwards, the style checker is updated so that a new manuscript written in the old style gets flagged at submission. Every part of that is in this section, including the committee's real job, which is not approval but stopping the comma.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>The four phases</b></td>
+      <td><b>Authorisation</b>, <b>change creation</b>, <b>shard management</b>, and <b>cleanup</b> — with very nebulous boundaries between them.</td>
+      <td>These typically happen after a new system, class or function has been written — but it is important to keep them in mind <b>during the design</b> of the new system.</td>
+      <td>The design consequence is explicit: aim to design successor systems <b>with a migration path from older systems in mind</b>, so that maintainers can move users automatically. A successor with no migration path has quietly made itself a second system rather than a replacement.</td>
+    </tr>
+    <tr>
+      <td><b>Why authorisation exists</b></td>
+      <td>Historically the cost to generate a change and the cost to review it were <b>somewhat symmetric</b>, which naturally limited what one person could impose on everyone else.</td>
+      <td>As tooling improved, it became easy to generate a large number of changes very cheaply — <b>and equally easy for a single engineer to impose a burden on a large number of reviewers across the company</b>.</td>
+      <td>So the process is not there to prohibit these changes but to <b>keep some oversight and thoughtfulness behind them, rather than indiscriminate tweaking</b> — the example given is not wanting the tools used to fight over the spelling of a word in comments. Note the underlying economics: the human cost of reviewing far outweighs the technical cost of compute and storage.</td>
+    </tr>
+    <tr>
+      <td><b>The authorisation process</b></td>
+      <td>A <b>lightweight approval process</b>: a brief document giving the reason for the change, its estimated impact across the codebase — how many smaller shards it would generate — and answers to questions reviewers might have.</td>
+      <td>Writing it forces authors to think about how to describe the change to an unfamiliar engineer, as a set of frequently asked questions and a proposed change description. Authors also get <b>domain review from the owners of the interface being refactored</b>. The proposal goes to an email list of <b>about a dozen people</b> with oversight of the whole process.</td>
+      <td>The committee's goal is <b>not to prohibit changes but to help authors produce the best possible ones</b>. Its most common piece of feedback is to <b>direct all reviews for the change to a single global approver</b> — first-time authors tend to assume local project owners should review everything. It has historically been <b>very liberal</b>, often approving a broad set of related changes rather than one; members can <b>fast-track obvious changes</b>; and it is the <b>escalation body</b> for conflicts, which in practice has rarely been needed. The only outright rejections have been changes deemed <b>dangerous</b>, or <b>extremely low-value</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Change creation</b></td>
+      <td>Generating the actual edits, <b>as automated as possible</b> so that the parent change can be updated as users backslide into old uses or as textual merge conflicts appear.</td>
+      <td>Backsliding happens for ordinary reasons: copy-and-paste from existing examples, committing changes that have been in development for some time, or simply reliance on old habits.</td>
+      <td>The scaling requirement is the important part: <b>human effort must scale sublinearly with the codebase</b> — it should take roughly the same amount of human time to generate the collection of all required changes <b>no matter the size of the repository</b>. The tooling must also be <b>comprehensive</b>, so an author can be assured the change covers every case they are trying to fix.</td>
+    </tr>
+    <tr>
+      <td><b>The 500-edit rule of thumb</b></td>
+      <td>If a change requires <b>more than 500 edits</b>, it is usually more efficient for an engineer to learn and execute the change-generation tools than to make the edits manually.</td>
+      <td>For experienced &ldquo;code janitors&rdquo;, that number is often <b>much smaller</b>.</td>
+      <td>vs a threshold for when a change counts as large. It is a threshold for <b>when to stop doing it by hand</b> — and, like the rest, an early investment in tooling usually pays off in the short to medium term.</td>
+    </tr>
+    <tr>
+      <td><b>Human-looking output</b></td>
+      <td>Whatever generates the changes, the result should <b>look as much like a human-generated change as possible</b>, because the codebase is optimised for human readability.</td>
+      <td>Every generation tool runs the automatic formatter for the language being changed <b>as a separate pass</b>, so the change-specific tooling does not have to concern itself with formatting.</td>
+      <td>This is stated as load-bearing rather than cosmetic: <b>without automated formatting, large-scale automated changes would never have become the accepted status quo.</b> Automatic formatters are described as a crucial part of the infrastructure, and the requirement leads directly to the need for style guides.</td>
+    </tr>
+    <tr>
+      <td><b>Sharding</b></td>
+      <td>Taking the large change and splitting it <b>based on project boundaries and ownership rules</b> into changes that can be submitted atomically, then putting each through an <b>independent test-mail-submit pipeline</b>.</td>
+      <td>Because the sharding platform is a heavy user of shared developer infrastructure, it <b>caps the number of outstanding shards</b> for any given change, <b>runs at lower priority</b>, and <b>communicates with the rest of the infrastructure</b> about how much load is acceptable to generate.</td>
+      <td>The requirement on shards: they must be <b>committable independently</b> — either having no interdependence, or with the sharding mechanism grouping dependent changes together, such as a header file and its implementation. They must also pass project-specific checks like any other change.</td>
+    </tr>
+    <tr>
+      <td><b>The train model</b></td>
+      <td>Testing many changes together rather than one at a time. It exploits two facts: these changes <b>rarely interact with one another</b>, and <b>most affected tests pass for most of them</b>.</td>
+      <td>It relies on the changes tending to be <b>pure refactorings, very narrow in scope, preserving local semantics</b>, and on individual changes being <b>simpler and highly scrutinised, so correct more often than not</b>.</td>
+      <td>Its advantage over isolated runs: it works for multiple changes at once and does not require each to ride alone. An isolated run can be requested, but these are <b>very expensive and performed only during off-peak hours</b>.</td>
+    </tr>
+    <tr>
+      <td><b>The five steps of the train</b></td>
+      <td>Started fresh <b>every three hours</b>.</td>
+      <td><b>1.</b> For each change on the train, run a sample of <b>1,000 randomly selected tests</b>. <b>2.</b> Gather all the changes that passed and create one uber-change from them — the train. <b>3.</b> Run the union of all tests directly affected by the group, which for a large or low-level change can mean <b>every single test in the repository</b>, and <b>can take more than six hours</b>.</td>
+      <td><b>4.</b> For each <i>non-flaky</i> test that fails, rerun it individually against each change on the train to determine which one caused it. <b>5.</b> Generate a report per change describing all passing and failing targets, which <b>can be used as evidence that the change is safe to submit</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Testing the shards</b></td>
+      <td>Each shard is run over the <b>transitive closure of every test it might affect</b> rather than the standard project-based presubmit tests, because a shard can contain arbitrary files.</td>
+      <td>In practice the <b>vast majority of shards affect fewer than a thousand tests</b>, out of the millions across the codebase. For those affecting more, shards are grouped: first run the union of all affected tests for all shards, then for each shard run only the intersection of its affected tests with those that failed the first run. Because most of these unions cause almost every test to run, <b>adding more changes to that batch is nearly free</b>.</td>
+      <td>The drawback of running so many tests: <b>independent low-probability events become near-certainties at large enough scale.</b> Flaky and brittle tests do little harm to the teams that own them and seriously affect the throughput of a migration system. Confidence in machine-generated, semantics-preserving changes is now high enough that <b>recently flaky tests are ignored when submitting via the automated tooling</b> — in theory a regression could then be caught only by a flaky test turning into a failing one, and in practice this is rare enough to handle by human communication rather than automation.</td>
+    </tr>
+    <tr>
+      <td><b>Mailing reviewers</b></td>
+      <td>Once a shard is validated by testing, it is mailed to an appropriate reviewer — and in a company with thousands of engineers, <b>reviewer discovery is itself a challenging problem</b>.</td>
+      <td>Ownership files list who may approve changes to a subtree; an owners-detection service reads them and <b>weights each owner by their expected ability to review the specific shard</b>. If an owner proves unresponsive, <b>additional reviewers are added automatically</b>.</td>
+      <td>Two checks are deliberately relaxed. Per-project precommit checks run, but <b>certain checks are selectively disabled</b> — such as those for non-standard change description formatting, which are useful locally and a source of friction at scale. And <b>preexisting check failures are aggressively ignored</b>: local code owners are responsible for having none, <b>as part of the social contract</b> between them and the infrastructure teams.</td>
+    </tr>
+    <tr>
+      <td><b>The global approver</b></td>
+      <td>Someone with ownership rights to approve any change throughout the repository, to whom all shards of a migration are assigned instead of the owners of individual projects.</td>
+      <td>Global approvers generally have specific knowledge of the language or libraries involved, work with the change author to know what to expect, and <b>know the potential failure modes</b>, so they can customise their workflow.</td>
+      <td>The mechanism that makes it scale: rather than reviewing each change individually, they use <b>a separate set of pattern-based tooling</b> to review and <b>automatically approve the ones that meet their expectations</b>, manually examining only the small subset that are anomalous through merge conflicts or tooling malfunction. Local owners are sent changes <b>only where their review is required for context, not just for approval permissions</b> — because in practice they trust the generating engineers too much and give these changes only cursory review.</td>
+    </tr>
+    <tr>
+      <td><b>Cleanup</b></td>
+      <td>Different migrations have different definitions of &ldquo;done&rdquo; — from completely removing an old system, to migrating only high-value references and leaving the rest to disappear organically.</td>
+      <td>In almost all cases it is important to have <b>a system that prevents additional introductions</b> of the symbol or system the change worked to remove.</td>
+      <td>The mechanism is review-time: a static-analysis framework flags when an engineer introduces a new use of a deprecated object, which <b>has proven an effective method to prevent backsliding</b>. Note the honest caveat about the organic option: the systems you most want to decompose organically are the ones most resistant to doing so.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — two things must scale sublinearly, and they are different things</h4>
+    <p><b>Generation:</b> the human effort to produce the complete set of edits must be roughly constant in the size of the repository. If writing the change takes twice as long in a codebase twice the size, you have automated the typing and not the problem.<br>
+    <b>Review:</b> the human effort to approve the shards must not grow with the number of shards. This is what the global approver plus pattern-based tooling buys — approve what matches expectation automatically, examine only the anomalies.<br>
+    <b>Why both are required:</b> they fail independently and each failure is fatal on its own. Perfect generation with per-project review means one engineer can impose unbounded work on hundreds of reviewers, which is the exact asymmetry that made an approval process necessary. Perfect review with hand-written generation means the change never gets made in the first place.<br>
+    <b>The thing that is allowed to scale linearly:</b> compute. Running the same tests repeatedly, and running every test in the repository for a low-level change, are accepted costs — because engineer time is the expensive resource and machine time is not.</p>
+  </div>
+
+  <h3>Anchor sketch — the four phases, end to end</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named phase or component</b> &nbsp; <span class="node nstar">reversed = the property the whole design exists to preserve</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   <span class="tk1">1. AUTHORISATION</span>
+        WHY it exists: generating changes got cheap; REVIEWING
+        them did not. one engineer can now impose a burden on
+        hundreds of reviewers.
+        a brief doc: reason . estimated impact (how many
+        shards) . answers to likely questions . an FAQ .
+        + domain review from the owners of the interface
+        -> an email list of ~a dozen overseers
+        most common feedback: send ALL reviews to ONE
+             GLOBAL APPROVER (first-timers assume local
+             owners should review everything)
+        historically VERY LIBERAL . often approves a broad
+             family of changes . obvious ones fast-tracked
+        also the ESCALATION body. rarely needed.
+        rejected only if DANGEROUS or EXTREMELY LOW VALUE
+                          |
+   <span class="tk1">2. CHANGE CREATION</span>
+        <span class="tks">HUMAN EFFORT MUST SCALE SUBLINEARLY</span> -- roughly the
+        same human time whatever the size of the repository
+        and COMPREHENSIVE: covers every case you meant to fix
+        keep regenerating: users BACKSLIDE (copy-paste, long-
+             lived branches, old habits) and files conflict
+        >500 edits? learn the tool. for "code janitors",
+             much less.
+        run the language's FORMATTER as a separate pass, so
+             machine output reads like human output
+                          |
+   <span class="tk1">3. SHARD MANAGEMENT</span>  split by project boundary and
+   ownership into ATOMICALLY submittable pieces, each through
+   its own TEST -> MAIL -> SUBMIT pipeline
+        caps outstanding shards . runs at LOWER priority .
+             negotiates load with shared infrastructure
+        TEST . transitive closure of every test it may hit.
+             most shards touch <1,000 tests of millions.
+             THE TRAIN: fresh every 3 h .. 1) 1,000 random
+             tests per change 2) merge the passers into one
+             uber-change 3) run the union -- can be EVERY
+             test, 6+ hours 4) rerun each NON-FLAKY failure
+             against each change 5) report = evidence it is
+             safe to submit
+             flaky tests are IGNORED on automated submit
+        MAIL . owners-detection weights owners by expected
+             ability; unresponsive -> add more automatically
+             disable formatting-style checks; IGNORE failures
+             that PREDATE the change (owners' side of the
+             social contract)
+        REVIEW . one GLOBAL APPROVER + pattern-based tooling
+             auto-approves what matches expectation; a human
+             looks only at anomalies
+             local owners only where review gives CONTEXT,
+             not merely approval rights
+                          |
+   <span class="tk1">4. CLEANUP</span>  "done" varies: full removal .. or migrate
+   the high-value references and let the rest fade
+        ALWAYS: stop new introductions. flag new uses of the
+        deprecated thing AT REVIEW TIME.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give the four phases, and say what the first one is actually protecting.<br>
+      <span class="q">Q</span> Give the five steps of the train, with the two numbers attached to them.<br>
+      <span class="q">Q</span> How does review avoid growing with the number of shards?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>An approval committee for large changes</td><td>Oversight and thoughtfulness instead of indiscriminate tweaking, plus an escalation path for conflicts.</td><td>A step before the work, and a body that could become a bottleneck.</td><td>Once generating changes is cheap and reviewing them is not &mdash; keep it lightweight and liberal.</td></tr>
+    <tr><td>Routing all reviews to a global approver</td><td>Review stops growing with the number of shards; one expert knows the failure modes and can automate approval.</td><td>Local owners see less of what lands in their code.</td><td>For mechanical changes. Send to local owners only where their review supplies context.</td></tr>
+    <tr><td>Batching changes onto a test train</td><td>Far fewer total test executions, and a per-change report that serves as evidence.</td><td>A failure has to be attributed by rerunning against each change on the train.</td><td>When changes rarely interact and most tests pass for most of them &mdash; which is what makes the model work at all.</td></tr>
+    <tr><td>Ignoring recently flaky tests on automated submit</td><td>Throughput, in a regime where low-probability failures are near-certainties at scale.</td><td>In theory, a regression detectable only by a flaky test turning into a failing one.</td><td>When confidence in machine-generated, semantics-preserving changes exceeds confidence in the flaky test &mdash; and handle the rare miss by talking to people.</td></tr>
+    <tr><td>Running the formatter as a separate pass</td><td>Machine output that reads like human code, and generation tooling that never has to think about formatting.</td><td>An extra pass, and a house style everyone must accept.</td><td>Always &mdash; without it, automated change at this scale does not become socially acceptable.</td></tr>
+    <tr><td>Ignoring preexisting check failures</td><td>The migration is not blocked by problems it did not cause.</td><td>It relies on owners keeping their own house in order.</td><td>Where that expectation is explicit &mdash; it is one half of the social contract, not a unilateral decision.</td></tr>
+    <tr><td>Preventing reintroduction at review time</td><td>The migration's gains are not eaten by new uses appearing behind it.</td><td>Another warning in reviewers' faces, which has its own budget.</td><td>Almost always &mdash; without it, cleanup never converges.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;Why do we need approval to fix our own code?&rdquo;</td><td>&ldquo;Because generating changes got cheap and reviewing them didn't. The committee is protecting other people's attention.&rdquo;</td></tr>
+    <tr><td>&ldquo;I'll script it, then hand-edit the leftovers.&rdquo;</td><td>&ldquo;Then the tool isn't comprehensive. Generation has to cover every case and take the same human time at any repo size.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's only about 800 edits, I'll just do them.&rdquo;</td><td>&ldquo;Past roughly 500, learning the tool wins &mdash; and you'll need it again when people backslide.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll ask each project's owners to review their shard.&rdquo;</td><td>&ldquo;That's the mistake first-time authors make. Route it to a global approver; send locals only what needs their context.&rdquo;</td></tr>
+    <tr><td>&ldquo;We should test each shard in isolation.&rdquo;</td><td>&ldquo;Isolated runs are very expensive and off-peak only. Put them on the train and attribute failures afterwards.&rdquo;</td></tr>
+    <tr><td>&ldquo;A flaky test is blocking the migration.&rdquo;</td><td>&ldquo;At this scale, flakes are certainties. We trust a semantics-preserving generated change more than a recently flaky test.&rdquo;</td></tr>
+    <tr><td>&ldquo;Their presubmit was already red before we got there.&rdquo;</td><td>&ldquo;Then we ignore it. Keeping their own checks green is their half of the contract.&rdquo;</td></tr>
+    <tr><td>&ldquo;The migration's at 100%, we're done.&rdquo;</td><td>&ldquo;Not until new uses can't be added. Cleanup means flagging reintroductions at review time.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>An engineer proposes replacing a deprecated date-formatting call across an estimated 12,000 sites. Their plan: write a script over a weekend, generate all the edits in one pass, and mail each resulting shard to the owners of the project it touches. In the first week, 340 shards go out; by the following Monday, 190 are unreviewed, four project owners have complained about the volume, nine shards have failed on checks that were already failing before the migration touched them, and roughly 60 sites the script did not recognise have been found by hand. Two new uses of the deprecated call have appeared in code written that week.</p>
+    <p><b>(a)</b> Name the four phases and say which one this plan skipped entirely, giving the specific reason that phase exists. <b>(b)</b> The review backlog is a design failure, not a staffing one. Name the property review must have, the mechanism that provides it, and how that mechanism actually processes 340 shards. <b>(c)</b> Address the nine already-failing checks and say whose responsibility they are and under what arrangement. <b>(d)</b> The 60 unrecognised sites and the two new uses are different failures. Name the property each one violates, and the phase that answers each.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A team is preparing a migration that will produce about 2,000 shards. They intend to run each shard's full transitive test set individually, on the shared CI cluster, at normal priority, as soon as each shard is generated. They have also decided to block submission of any shard whose test run shows a failure of any kind, on the grounds that this is the safe choice. Finally, their generation tool produces correct but unformatted output, which they plan to tidy up in review comments.</p>
+    <p><b>(a)</b> Describe the batching model they should use instead: the two facts it exploits, its five steps, and the two numbers attached. <b>(b)</b> Give the grouping technique for shards affecting large numbers of tests, and why adding more to such a batch is nearly free. <b>(c)</b> Their blocking rule will stall: explain what happens to low-probability failures at this scale, the position taken on recently flaky tests, and the residual risk. <b>(d)</b> Say what is wrong with tidying formatting in review, including the claim about what would not have happened without automated formatting.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — the two costs that must not grow with you</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does review effort grow with the number of shards? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — one approver, pattern-based auto-approval</div>
+      <div class="colh">Yes — every shard read by its project's owners</div>
+
+      <div class="rowh">Generation<br>effort is<br>FLAT in the<br>size of the<br>repository</div>
+      <div class="cell focus"><b>The machine works</b>
+        Roughly constant human time to produce every edit, and review that examines only anomalies. The only cell where one process serves a migration of twelve files and one of twelve thousand.<br>
+        <i>Move:</i> keep both halves honest as you grow — regenerate rather than patch, and check the approver's tooling still recognises what the generator emits.</div>
+      <div class="cell"><b>One engineer, unbounded work for everyone else</b>
+        Cheap to create and expensive to review is exactly the asymmetry that made an approval process necessary.<br>
+        <i>Move:</i> route shards to a global approver, and send local owners only what needs their context rather than their permission. Otherwise expect cursory review — they trust the generating team.</div>
+
+      <div class="rowh">Generation<br>effort GROWS<br>with the<br>codebase</div>
+      <div class="cell"><b>Automated typing, not automated change</b>
+        Review scales fine; the change is a hand-fed pipeline that slows as the repository grows and will not be comprehensive.<br>
+        <i>Move:</i> past roughly 500 edits, build the tool — you will need it again anyway, to regenerate the parent change as people backslide.</div>
+      <div class="cell"><b>A migration that will not finish</b>
+        Both costs grow, so the effort ends when the enthusiasm does, and the tail — awkward projects, unrecognised call sites — never gets done.<br>
+        <i>Move:</i> do not start here. The committee's most common advice fixes the column; the 500-edit heuristic fixes the row.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> both axes are about human time, and the one resource deliberately allowed to grow &mdash; compute &mdash; appears on neither. Running the same tests repeatedly and running every test in the repository for a low-level change are accepted prices, because an engineer hunting a failure costs more than a machine repeating one.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Ask of any migration plan: what happens to it if the codebase doubles?</b> If generating the change takes twice as long, you automated the typing. If reviewing it takes twice as long, you have moved your problem onto people who did not choose it. Both answers should be &ldquo;roughly the same&rdquo;, and only compute should be allowed to double.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>Deciding what to remove</h2>
+    <p>Code as a liability, the two kinds of deprecation, and why removal is the hardest change there is.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Code isn't treasure. It's a bill that keeps arriving. The valuable thing is what the code <i>does</i>, not the code.</li>
+      <li>Old doesn't mean obsolete. Something can be forty years old and still exactly right.</li>
+      <li>Removing a system is the biggest change you can make — you're not altering the behaviour, you're deleting it — so everyone who was quietly depending on it finds out at once.</li>
+      <li>People also just don't want to. They built it, they like it, and nobody gets promoted for deleting things.</li>
+      <li>Two kinds. Advisory: &ldquo;this is old, please move.&rdquo; Compulsory: &ldquo;this stops working on a date.&rdquo;</li>
+      <li>Advisory alone almost never finishes, because the old system keeps attracting new users. Hope is not a strategy.</li>
+      <li>Compulsory without staff is just bullying. If you mean it, fund the team that does the moving.</li>
+      <li>And a warning is only useful if the person can act on it, at the moment they can act on it.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A hospital wants to retire an old drug protocol that a better one has replaced. Notice how little of this is medical. The new protocol is better but it is not identical, so every existing patient has to be looked at individually rather than switched by a rule. Some wards have been using the old one in ways nobody documented — off-label, in combination, at doses the original authors never anticipated — and you only discover those when you try to take it away. The consultant who wrote the old protocol is still on staff and is not thrilled. Meanwhile the cost of leaving it in place is real but invisible: two sets of training, two sets of stock, two sets of interactions to check. And there is a limit to how much of this you can run at once — if you retire every protocol in the hospital simultaneously, nobody can treat anyone. So you pick a few, you staff them properly, and you set a date that you actually mean.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Deprecation</b></td>
+      <td>The process of <b>orderly migration away from and eventual removal of obsolete systems</b>.</td>
+      <td>It belongs to software engineering rather than programming, because it requires managing a system over time. Done correctly it <b>reduces resource costs and improves velocity</b> by removing redundancy and complexity that build up.</td>
+      <td>vs an unambiguous good. <b>Poorly deprecated systems may cost more than leaving them alone.</b> They range from a function call to an entire stack, and can be planned for <i>during design</i>.</td>
+    </tr>
+    <tr>
+      <td><b>Code is a liability, not an asset</b></td>
+      <td>The premise the whole discussion begins from. If code were an asset, there would be no reason to spend time removing it.</td>
+      <td>Code has costs borne at creation and <b>many more borne across its lifetime</b> — the resources to keep it running, and the effort to update it as the ecosystem around it evolves.</td>
+      <td>The resolution of the apparent paradox: <b>code itself doesn't bring value — the functionality it provides does</b>, and that functionality is an asset if it meets a user need. Given the same functionality from one line of maintainable code or ten thousand of convoluted code, prefer the former. So the metric to maximise is <b>functionality delivered per unit of code</b>, and one of the easiest ways to improve it is removing what is no longer needed.</td>
+    </tr>
+    <tr>
+      <td><b>Age is not obsolescence</b></td>
+      <td><b>The age of a system alone doesn't justify its deprecation.</b></td>
+      <td>A system may be finely crafted over years into the epitome of software form and function; some have been improved over decades, with changes now few and far between.</td>
+      <td>What does justify it: deprecation <b>is best suited for systems that are demonstrably obsolete and for which a replacement exists that provides comparable functionality</b> — one that uses resources more efficiently, has better security properties, is built more sustainably, or just fixes bugs. <b>Just because something is old, it does not follow that it is obsolete.</b></td>
+    </tr>
+    <tr>
+      <td><b>The cost of keeping both</b></td>
+      <td>Having two systems doing the same thing may not seem pressing, and <b>over time the costs of maintaining both can grow substantially</b>.</td>
+      <td>Users may need the new system while still depending on the old. The two may need to interface, <b>requiring complicated transformation code</b>, and as both evolve they can come to depend on each other.</td>
+      <td>The cost people miss: having multiple systems performing the same function <b>impedes the evolution of the newer system</b>, because it is still expected to maintain compatibility with the old one. So removing the old system pays off twice — the maintenance saved, and the replacement now free to evolve faster.</td>
+    </tr>
+    <tr>
+      <td><b>The simultaneity limit</b></td>
+      <td>Organisations have <b>a limit on the amount of deprecation work that is reasonable to undergo simultaneously</b> — both for the teams doing it and for their customers.</td>
+      <td>Everybody appreciates freshly paved roads; close every road at once and nobody goes anywhere. By focusing effort, crews finish specific jobs faster <b>while also allowing other traffic to make progress</b>.</td>
+      <td>The instruction that follows is about commitment, not just sequencing: <b>choose deprecation projects with care and then commit to following through on finishing them.</b></td>
+    </tr>
+    <tr>
+      <td><b>Why removal is the hardest change</b></td>
+      <td>Hyrum's Law applies with full force: <b>the more users of a system, the higher the probability that users are using it in unexpected and unforeseen ways</b>, and the harder it is to deprecate and remove.</td>
+      <td>Their usage just <b>happens to work</b> instead of being <b>guaranteed to work</b>. Removing a system can be thought of as <b>the ultimate change</b>: not merely changing behaviour but removing it completely — an alteration radical enough to <b>shake loose a number of unexpected dependents</b>.</td>
+      <td>Two further difficulties compound it. Deprecation usually isn't even an option until a newer system provides the same or better functionality — and that new system <b>is also different</b>, since an identical one would offer users no benefit, so a one-to-one match is rare and <b>every use of the old system must be evaluated in the context of the new</b>. And there is emotional attachment: resistance of the form <b>&ldquo;I like this code!&rdquo;</b>, which is understandable and ultimately self-defeating.</td>
+    </tr>
+    <tr>
+      <td><b>The political difficulty</b></td>
+      <td>Funding and executing removal costs real money, <b>whereas the costs of doing nothing and letting the system lumber along unattended are not readily observable</b>.</td>
+      <td>It is hard to convince stakeholders it is worthwhile, especially where it slows new feature development. Research techniques can supply concrete evidence that it is.</td>
+      <td>One counter to the emotional objection is infrastructural: making the source repository searchable <b>not just at trunk but historically</b>, so that <b>even code that has been removed can be found again</b>. There is also an in-house joke worth knowing, because it names a real condition: there are two ways of doing things — <b>the one that's deprecated, and the one that's not-yet-ready</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Incrementality</b></td>
+      <td>Given the difficulty, it is often easier to <b>evolve a system in situ rather than completely replacing it</b>.</td>
+      <td>Migrating to entirely new systems is <b>extremely expensive, and the costs are frequently underestimated</b>. In-place refactoring keeps existing systems running while still delivering value.</td>
+      <td>vs an escape from the process. <b>Incrementality doesn't avoid the deprecation process altogether</b> — it breaks it into smaller, more manageable chunks that yield incremental benefits.</td>
+    </tr>
+    <tr>
+      <td><b>Design for deprecation</b></td>
+      <td>Planning a system's eventual removal while it is first being built — radical in software, <b>common in other engineering disciplines</b>.</td>
+      <td>A nuclear power station's decommissioning is taken into account as part of its design, <b>even to the point of allocating funds for it</b>, and many design choices follow from knowing it will be needed.</td>
+      <td>Two questions to ask of a new system: <b>how easy will it be for my consumers to migrate from my product to a potential replacement?</b> and <b>how can I replace parts of my system incrementally?</b> Why it rarely happens: engineers are drawn to building rather than maintaining, cultures emphasise shipping quickly, and it is psychologically hard to plan the demise of what you are building. The blunt version: <b>don't start projects your organisation isn't committed to support for its own expected lifespan.</b></td>
+    </tr>
+    <tr>
+      <td><b>Advisory deprecation</b></td>
+      <td>Deprecations that <b>don't have a deadline and aren't high priority</b> for the organisation, and for which it isn't willing to dedicate resources. Also called <b>aspirational</b>.</td>
+      <td>The team knows the system has been replaced and hopes clients will eventually migrate, without imminent plans either to help them move or to delete the old system. <b>This kind of deprecation often lacks enforcement</b> — and as the production engineers will readily tell you, <b>&ldquo;hope is not a strategy.&rdquo;</b></td>
+      <td>What it is good for: advertising a new system's existence and encouraging early adopters. Two conditions attach. The new system <b>should not be considered in a beta period</b> — it must be ready for production use and loads and prepared to support new users indefinitely. And the benefits <b>cannot be simply incremental: they must be transformative</b>, because users will not migrate on their own for marginal gains and <b>even systems with vast improvements will not gain full adoption from advisory efforts alone</b>. Existing uses exert a <b>conceptual pull</b>: many uses of the old system tend to pick up a large share of new uses, no matter how much you say &ldquo;please use the new system&rdquo;.</td>
+    </tr>
+    <tr>
+      <td><b>Compulsory deprecation</b></td>
+      <td>Active encouragement, <b>usually with a deadline for removal</b>: if users continue to depend on the old system beyond that date, <b>they will find their own systems no longer work</b>.</td>
+      <td>Counterintuitively, the way it scales is <b>by localising the expertise of migrating users within a single team of experts</b> — usually the team responsible for removing the old system entirely, which has the incentive to help others move and develops experience and tools the whole organisation can use.</td>
+      <td>Two requirements and one hazard. It <b>needs an enforcement mechanism</b> — not that the schedule can never change, but that the team is empowered to break non-compliant users after sufficient warning; without it, customer teams deprioritise the work in favour of features. And it <b>must be actively staffed by a specialised team through completion</b>, or it reads as mean spirited and as exactly the unfunded mandate it is. The hazard is political: if the last remaining user is critical infrastructure, <b>it is hard to believe the deprecation is really compulsory if that team can veto its progress</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Finding hidden dependents</b></td>
+      <td>Some teams <b>might not even know they have a dependency</b> on an obsolete system, and these can be difficult to discover analytically.</td>
+      <td>They can be found dynamically, through <b>tests of increasing frequency and duration during which the old system is turned off temporarily</b> — planned outages announced in the months and weeks beforehand.</td>
+      <td>These intentional changes discover unintended dependencies <b>by seeing what breaks</b>, alerting teams to prepare for the deadline or to work with the deprecating team to adjust the timeline. A related trick for static dependencies: <b>changing the name of implementation-only symbols to see which users were depending on them unaware</b>. For static code dependencies, semantic analysis is often sufficient to find everything without this.</td>
+    </tr>
+    <tr>
+      <td><b>Warnings: actionable and relevant</b></td>
+      <td>Any deprecation warning issued to a user needs <b>two properties</b>. <b>Actionable</b>: the user can use it to perform some relevant action — not just in theory but in practical terms, given the expertise expected of an average engineer. <b>Relevant</b>: it surfaces <b>at a time when the user actually performs the indicated action</b>.</td>
+      <td>Actionable: a tool warns that a call should be replaced with its updated counterpart, or an email outlines the steps to move data. Relevant: warn about a deprecated function <b>while the engineer is writing the code that uses it</b>, not weeks after it was checked in; send a data-migration email <b>several months before</b> removal, not the weekend before.</td>
+      <td>The failure mode is accumulation. In a transitive context — a library depending on a library depending on one that issues the warning — warnings <b>can soon overwhelm users to the point where they ignore them altogether</b>, which in health care is called <b>alert fatigue</b>. Hence: mark liberally but surface in targeted ways, such as limiting warnings <b>to newly changed lines</b>, and add intrusive ones <b>only for compulsory deprecations where the team is actively moving users</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Process owners and milestones</b></td>
+      <td><b>Without explicit owners, a deprecation process is unlikely to make meaningful progress</b>, no matter how many warnings and alerts the system generates.</td>
+      <td>The alternatives are worse: delegating to users <b>becomes simply an advisory deprecation, which will never organically finish</b>, and deprecating nothing is <b>a commitment to maintain every old system indefinitely</b>. Such teams need <b>removal as their primary goal, not a side project</b> — in a priority contest, deprecation always loses.</td>
+      <td>On milestones: it can feel that the only one is removing the system entirely — and if the team has done its job that step is <b>the least noticed by anyone external</b>, because by then it has no users. Resist making it the only measurable milestone; <b>it might not even happen in all deprecation projects</b>. Use incremental milestones that are measurable and deliver value, recognising things like <b>deleting a key subcomponent</b> as you would a new product.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — advisory and compulsory are not two intensities of the same thing</h4>
+    <p><b>What they look like:</b> points on a dial, where compulsory is advisory with more pressure applied.<br>
+    <b>What actually separates them:</b> a deadline with enforcement behind it, and a funded team doing the migrating. Remove either and you get a different failure mode, not a milder deprecation — a deadline with no staffing is an unfunded mandate that reads as mean spirited; staffing with no enforcement is a team pushing on customers who can always choose features instead.<br>
+    <b>What advisory is genuinely for:</b> advertising and early adopters, on two conditions — a production-ready new system, and <i>transformative</i> rather than incremental benefits. As a strategy for finishing it fails, because existing uses pull new uses toward the old system whatever the documentation says.<br>
+    <b>The honest test:</b> if the last remaining user could refuse and survive, it is advisory whatever you called it.</p>
+  </div>
+
+  <h3>Anchor sketch — deciding, and then finishing</h3>
+  <div class="sketch" id="p4map">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named idea</b> &nbsp; <span class="node nstar">reversed = the premise the rest depends on</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   <span class="tks">CODE IS A LIABILITY, NOT AN ASSET</span>
+        the FUNCTIONALITY is the asset; code is a means. same
+        behaviour in 1 line or 10,000? prefer 1. maximise
+        FUNCTIONALITY PER UNIT OF CODE -- and the easiest
+        lever is removing what is not needed.
+                          |
+   BUT AGE IS NOT OBSOLESCENCE. deprecate what is
+   DEMONSTRABLY OBSOLETE and has a replacement with
+   COMPARABLE functionality.
+        keeping both costs: transformation code . mutual
+        dependence . the OLD holds back the NEW, which must
+        stay compatible. and a LIMIT on how many at once.
+                          |
+   WHY REMOVAL IS THE HARDEST CHANGE
+        HYRUM'S LAW . the more users, the more depend on
+             behaviour you never promised: it "happens to
+             work", not "guaranteed to work"
+        THE ULTIMATE CHANGE: deleting behaviour, not altering
+             it. unknown dependents fall out.
+        the replacement is BETTER AND DIFFERENT -> 1:1 rare
+        "I LIKE THIS CODE!" . understandable, self-defeating
+        POLITICS . removal costs real money; doing nothing
+             costs money you cannot see
+        +--> cheaper: evolve IN PLACE. chunks it, not avoids.
+                          |
+   DESIGN FOR IT UP FRONT (a nuclear plant allocates
+   DECOMMISSIONING FUNDS at design time)
+        how easily can consumers migrate OFF me?
+        how can parts of me be replaced INCREMENTALLY?
+        do not start what you will not support.
+                          |
+   TWO KINDS
+   ------------------------------------------------------
+   <span class="tk1">ADVISORY</span> . no deadline, no priority, no resources.
+        aspirational. "HOPE IS NOT A STRATEGY."
+        good for advertising and early adopters. needs a
+             PRODUCTION-READY new system and TRANSFORMATIVE,
+             not incremental, benefits.
+        fails because EXISTING USES PULL: the old system
+             keeps taking a big share of NEW uses
+   <span class="tk1">COMPULSORY</span> . a DEADLINE. miss it and your system
+        stops working.
+        scales by LOCALISING migration expertise in ONE team
+        needs ENFORCEMENT (power to break non-compliant users
+             after fair warning) AND STAFFING, or it is an
+             unfunded mandate that reads as mean spirited
+        hazard: if the last user is critical infra and can
+             veto, it was never compulsory
+        find hidden dependents: planned outages of INCREASING
+             DURATION; rename internal-only symbols
+                          |
+   <span class="tk1">WARNINGS</span> need BOTH properties, or they are noise
+        ACTIONABLE . the reader can do the next step
+        RELEVANT ... it appears WHEN they are doing the thing
+        too many -> ALERT FATIGUE (a term from health care)
+        so mark liberally, SURFACE NARROWLY: newly changed
+        lines only; intrusive ones only for COMPULSORY,
+        actively staffed deprecations.
+                          |
+   <span class="tk1">OWNERS AND MILESTONES</span>
+        no explicit owner -> no progress, however many
+             warnings the system emits
+        alternatives are worse: delegate to users = advisory,
+             never finishes; do nothing = maintain forever
+        removal must be the PRIMARY GOAL, not a side project
+        celebrate INCREMENTAL milestones. the final deletion
+             is the least noticed thing you will ever do.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Why is code a liability, and what is the asset?<br>
+      <span class="q">Q</span> Give the two properties a warning needs, and what happens without them.<br>
+      <span class="q">Q</span> What does compulsory deprecation need that advisory does not, and what happens if you skip each?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>Removing an obsolete system</td><td>Maintenance saved, and a replacement that can finally evolve without staying compatible with its predecessor.</td><td>Real, visible money &mdash; against a cost of inaction that nobody can see.</td><td>When it is demonstrably obsolete and a replacement offers comparable functionality. Age alone is not a reason.</td></tr>
+    <tr><td>Evolving in place instead of replacing</td><td>Usually much cheaper; existing systems keep running while value is still delivered.</td><td>You still have to deprecate, just in chunks.</td><td>Most of the time &mdash; wholesale migration is extremely expensive and the cost is frequently underestimated.</td></tr>
+    <tr><td>Advisory deprecation</td><td>Advertises the new system and picks up early adopters, cheaply.</td><td>It will not finish. Existing uses pull new uses toward the old system regardless of what you announce.</td><td>When the new system is production-ready and its benefits are transformative &mdash; and you are not relying on it to complete.</td></tr>
+    <tr><td>Compulsory deprecation</td><td>It actually ends, and the expertise concentrates in one team that gets better at it.</td><td>A funded team, a defensible deadline, and the political capital to break someone.</td><td>When the removal matters enough to staff. Without staffing it is an unfunded mandate wearing a deadline.</td></tr>
+    <tr><td>Planned outages of increasing duration</td><td>Discovers dependents nobody knew about, early enough for them to prepare or negotiate.</td><td>Deliberately breaking things, on purpose, on a schedule.</td><td>When dependencies are dynamic and cannot be found by static analysis.</td></tr>
+    <tr><td>Marking many things deprecated</td><td>Cheap, and honest about what is on the way out.</td><td>Alert fatigue &mdash; warnings accumulate transitively until they are ignored altogether.</td><td>Fine, provided you surface them narrowly &mdash; on newly changed lines, and intrusively only where a staffed compulsory effort is under way.</td></tr>
+    <tr><td>Staffing a dedicated removal team</td><td>The only arrangement that reliably finishes, since deprecation loses every priority contest it is put in.</td><td>Headcount on deconstruction rather than construction.</td><td>Whenever you have decided the system must go. Removal has to be their primary goal, not a side project.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We've built up a lot of valuable code.&rdquo;</td><td>&ldquo;We've built up a lot of liability. The functionality is the asset &mdash; what's our functionality per unit of code?&rdquo;</td></tr>
+    <tr><td>&ldquo;That system is ancient, we should replace it.&rdquo;</td><td>&ldquo;Old isn't obsolete. Is there a replacement with comparable functionality, and what is the old one actually costing us?&rdquo;</td></tr>
+    <tr><td>&ldquo;Nobody should still be using that.&rdquo;</td><td>&ldquo;They are, in ways we never promised. Removal is the ultimate change &mdash; expect dependents we've never heard of.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll mark it deprecated and see what happens.&rdquo;</td><td>&ldquo;That's advisory, and hope is not a strategy. It'll reduce new uses slightly and migrate almost nobody.&rdquo;</td></tr>
+    <tr><td>&ldquo;We've set a deadline, so it's compulsory.&rdquo;</td><td>&ldquo;Only if we can enforce it and we're staffing the migration. Otherwise it's an unfunded mandate with a date on it.&rdquo;</td></tr>
+    <tr><td>&ldquo;Everyone's ignoring the deprecation warnings.&rdquo;</td><td>&ldquo;Alert fatigue. Are they actionable, and are they surfacing while people are writing the code &mdash; or weeks later?&rdquo;</td></tr>
+    <tr><td>&ldquo;We can't find who depends on it.&rdquo;</td><td>&ldquo;Turn it off for five minutes, then an hour, then a day. What breaks is your dependency list.&rdquo;</td></tr>
+    <tr><td>&ldquo;The team has nothing to show until it's deleted.&rdquo;</td><td>&ldquo;Then pick milestones that land sooner. The final deletion is the least visible thing they'll ever do &mdash; by then there are no users.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>A team owns a message-serialisation library that a newer one has replaced. Eighteen months ago they added a compile-time warning to every public function in the old library, wrote a migration page, and announced it. Today: the warning fires roughly 40,000 times per build in downstream projects, transitively; adoption of the new library is 22%; the number of call sites on the old library has grown by 4%; and one team told them, politely, that they filter the warnings out of their build logs. The new library is faster to serialise by about 8% and otherwise equivalent. The team's plan is to add a second, louder warning.</p>
+    <p><b>(a)</b> Name the kind of deprecation this is, define it, and give the phrase used for the strategy it amounts to. <b>(b)</b> The 4% growth is predicted by a named mechanism. State it, and say what it implies about the migration page. <b>(c)</b> Assess the warnings against both properties they must have, name the condition the 40,000 figure has produced, and give two specific ways to surface warnings without it. <b>(d)</b> Advisory deprecation has a stated precondition about the <i>benefits</i> of the new system. State it, apply it to the 8% figure, and say what the team must change if they want this to finish.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>An organisation decides to remove an old job-scheduling service by the end of the year. It announces the date, publishes a migration guide, and asks each consuming team to move itself. Nine months in, three things are true. Most teams have moved. The remaining users include the company's revenue-reporting pipeline, whose lead has said publicly that they will not be ready and that switching them off is &ldquo;not going to happen&rdquo;. And a second, unrelated turndown was started in parallel two months ago, so the platform group is now running both while also on call for the old service. A director suggests that since the deadline clearly cannot hold, they should drop it and let the remaining users move when convenient.</p>
+    <p><b>(a)</b> Name the kind of deprecation intended and the two things it requires; say which one the organisation supplied and which it did not. <b>(b)</b> The reporting pipeline is the textbook hazard. State it in general terms and say what its existence proves about the deprecation's true category. <b>(c)</b> Assess running two turndowns at once, using the stated limit and the analogy given for it. <b>(d)</b> Evaluate the director's suggestion: name exactly what the deprecation becomes, what that predicts, and the alternative — including what should happen to the team's milestones.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — the deadline, and who does the moving</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is a dedicated team doing the migration work? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — staffed through to completion</div>
+      <div class="colh">No — users move themselves</div>
+
+      <div class="rowh">COMPULSORY<br>&mdash; a deadline<br>with real<br>enforcement</div>
+      <div class="cell focus"><b>It ends</b>
+        Expertise concentrates in the team removing the old system, which has both the incentive and the tools; the deadline gives customer teams a reason to accept help rather than defer it.<br>
+        <i>Move:</i> keep the enforcement credible, because the whole cell rests on it — if the last remaining user can refuse and survive, you are in the row below whatever the announcement said. Find the unknown dependents early with outages of increasing duration, and celebrate incremental milestones, since the final deletion will be invisible.</div>
+      <div class="cell"><b>An unfunded mandate with a date on it</b>
+        Customers see work pushed onto them to keep their own services running, which is exactly the friction that makes them deprioritise it — and it comes across as mean spirited.<br>
+        <i>Move:</i> either staff it or stop calling it compulsory. A deadline is not a substitute for the migration expertise the removing team already has and every consuming team would have to acquire separately.</div>
+
+      <div class="rowh">ADVISORY<br>&mdash; no deadline,<br>no dedicated<br>resources</div>
+      <div class="cell"><b>Generous, and unfinished</b>
+        Real help is available and there is no reason to take it this quarter, so the tail persists and the team's own removal date keeps moving.<br>
+        <i>Move:</i> this is a reasonable place to start and a bad place to stay. Use it to advertise and to gather early adopters, then convert to a deadline once the new system has proved itself in production.</div>
+      <div class="cell"><b>Hope is not a strategy</b>
+        The honest description of marking something deprecated and walking away. It produces slightly fewer new uses and rarely leads to anyone actively migrating.<br>
+        <i>Move:</i> expect the conceptual pull — the old system will keep taking a large share of new uses however often you say otherwise. If the benefits are genuinely transformative this can still work; if they are incremental, nothing here will finish.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is what you have announced and the column is what you have paid for, and only the top-left is a deprecation that ends. Note that the two off-diagonal cells fail in opposite directions &mdash; the top-right pushes cost onto people who did not choose it, the bottom-left offers help nobody has a reason to accept &mdash; and each is fixed by the other one's strength.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Before announcing a deprecation, ask what happens to the last user who refuses.</b> If the answer is &ldquo;their system stops working, and we have engineers to help them avoid that&rdquo;, it is compulsory and it will finish. If the answer is &ldquo;we'd have to make an exception&rdquo;, it is advisory — and the right response is not a louder warning but either the staffing to make it real or the honesty to call it what it is.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONCEPT SKETCH ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch &mdash; the whole competency, end to end</h2>
+  <p>Four named groups, in the order the story runs: <b>THE CONSTRAINT</b> &rarr; <b>THE ECONOMICS</b> &rarr; <b>THE MACHINE</b> &rarr; <b>THE DECISION</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch" id="bigmap" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b> <b>bold = a group heading</b> &nbsp;
+      <span class="node nstar">reversed = the one group to remember</span> &nbsp;
+      <span class="q">Q = retrieval cue</span><br>
+      <span style="font-size:8.4pt">The four groups run in order: <b>THE CONSTRAINT</b> — why atomic fails ·
+      <b>THE ECONOMICS</b> — who pays · <b>THE MACHINE</b> — how it is done · <b>THE DECISION</b> — what to remove.</span>
+    </div>
+<div class="tree"><span class="tk1">GROUP 1 - THE CONSTRAINT . the atomic commit shrinks</span>
+------------------------------------------------------------------
+   AN LSC is logically related changes that CANNOT PRACTICALLY
+        be submitted as one atomic unit. not "big" -- "not
+        atomic". scales down to a few dozen changes.
+        <span class="q">Q</span> what makes something an LSC, if not its size?
+   AS THE CODEBASE AND HEADCOUNT GROW, THE LARGEST ATOMIC
+        CHANGE GETS SMALLER.
+   FIVE BARRIERS  VCS limits (linear ops, blocked writers) .
+        merge conflicts (files x engineers) . haunted
+        graveyards . heterogeneity . testing
+        <span class="q">Q</span> which barrier does testing solve, and which does it worsen?
+        <span class="q">Q</span> 1 bad file in 25 vs in 10,000 -- what is the point?
+
+<span class="tk1">GROUP 2 - THE ECONOMICS . whose budget does it land on</span>
+------------------------------------------------------------------
+   THE UNFUNDED MANDATE  benefits diffuse, costs concentrated
+        -> nobody prioritises it. the cost does NOT vanish.
+        <span class="q">Q</span> where is that cost actually paid?
+   CENTRALISE, for three reasons: the expertise is already
+        there . errors repeat, so one playbook . and only the
+        team that wants it GONE has the incentive to finish
+        <span class="q">Q</span> why do organic migrations stall, mechanically?
+   THE PAYOFFS  potholes get filled . decisions stop being
+        final . shards are CATTLE, not pets
+        <span class="q">Q</span> what does "cattle not pets" license you to do?
+   THE CONTRACT  owners understand; owners do not veto
+        <span class="q">Q</span> what earns that arrangement?
+
+<span class="tks">GROUP 3 - THE MACHINE . four phases, two sublinear costs</span>
+------------------------------------------------------------------
+   1 AUTHORISE  a brief doc + FAQ + domain review -> ~a dozen
+        overseers. exists because generating got cheap and
+        REVIEWING did not. liberal; fast-tracks; escalation.
+        <span class="q">Q</span> what does the committee most commonly tell you to do?
+   2 GENERATE  human effort FLAT in repo size, and
+        COMPREHENSIVE. >500 edits -> use the tool. run the
+        formatter so machine output reads as human.
+        <span class="q">Q</span> why must you keep regenerating the parent change?
+   3 SHARD  split by project + ownership -> independent
+        test/mail/submit. THE TRAIN every 3 h: 1,000 random
+        tests, merge the passers, run the union (can be every
+        test, 6+ h), attribute non-flaky failures, report.
+        review via ONE GLOBAL APPROVER + pattern tooling.
+        <span class="q">Q</span> how does review avoid growing with the shard count?
+   4 CLEAN UP  stop reintroduction at review time
+        <span class="q">Q</span> what are the two definitions of "done"?
+
+<span class="tk1">GROUP 4 - THE DECISION . what deserves removing</span>
+------------------------------------------------------------------
+   CODE IS A LIABILITY. functionality is the asset.
+        but AGE IS NOT OBSOLESCENCE.
+        <span class="q">Q</span> what metric should you maximise instead of lines?
+   REMOVAL IS THE ULTIMATE CHANGE  Hyrum's Law: people depend
+        on what you never promised. the replacement is better
+        AND DIFFERENT, so 1:1 is rare.
+   DESIGN FOR IT  can consumers migrate off me? can I be
+        replaced in parts? (a power station budgets for its
+        own decommissioning.)
+   ADVISORY vs COMPULSORY  no deadline / a deadline with
+        enforcement AND staffing
+        <span class="q">Q</span> what does advisory require of the NEW system?
+   WARNINGS  actionable AND relevant, or alert fatigue
+   OWNERS  no explicit owner -> no progress. removal must be
+        the primary goal. celebrate incremental milestones.
+        <span class="q">Q</span> why is the final deletion the least noticed step?
+</div>
+  </div>
+
+  <div class="kicker" style="margin-top:7pt">Section 6 continued &middot; the transferable card</div>
+  <h2>Master 2&times;2 &mdash; the decision card you can carry to other problems</h2>
+  <p>Two questions, asked at opposite ends of a system's life.</p>
+
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: have you committed to removing the old one? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — a deadline, an owner and staffing</div>
+      <div class="colh">No — it stays until it falls over</div>
+
+      <div class="rowh">You CAN<br>change every<br>use of it,<br>cheaply</div>
+      <div class="cell focus"><b>The old system actually goes away</b>
+        The mechanism exists and someone is measured on the last reference &mdash; the only cell where an old decision can be revisited at will.<br>
+        <i>Move:</i> spend the capability before you need it: design successors with a migration path, and let reversibility change what you are willing to decide.</div>
+      <div class="cell"><b>Capable, and accumulating</b>
+        You could migrate everyone tomorrow and nobody has decided to, so both stay and the old holds the new back.<br>
+        <i>Move:</i> the constraint is not technical &mdash; name an owner, pick a few removals, set a date you can enforce.</div>
+
+      <div class="rowh">You CANNOT<br>&mdash; changing<br>every use is<br>infeasible</div>
+      <div class="cell"><b>Committed, and stuck</b>
+        The intent is real and the work manual, so it moves at the speed of teams with other jobs.<br>
+        <i>Move:</i> build the mechanism first &mdash; a deadline without one is an unfunded mandate. Frightening code is answered by tests, not tooling.</div>
+      <div class="cell"><b>Everything is permanent</b>
+        No way to change the uses and no intent to remove anything, so every decision is a one-way door.<br>
+        <i>Move:</i> the cheapest first step is admitting the cost exists &mdash; the trap is that doing nothing appears free.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is a capability you build, the column a decision you make, and neither substitutes for the other. The same pair separates a regulator who can update a form across every council from one issuing guidance, a bank that can retire a payment format from one supporting it forever, and a curriculum body that can change what schools teach from one publishing a recommendation.</div>
+  </div>
+
+  <div class="box tip nobreak" style="margin-top:7pt">
+    <h4>The thumb rule</h4>
+    <p><b>A decision is permanent only if you cannot change every use of it &mdash; so build the ability to change them, then decide what to remove.</b> Both halves get skipped, for opposite reasons: the capability helps nobody in particular, and doing nothing has no line item.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. SYMPTOM TABLE ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>Planning a large change</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>The commit is rejected by the server, or stalls everyone else.</td><td>Technical limitation — version-control operations scale linearly with change size.</td><td>Shard it. This is impossibility, not imprudence; accept that execution becomes more complex.</td></tr>
+    <tr><td>The change is ready and files keep moving underneath it.</td><td>Merge conflicts, whose probability grows with files and with engineers.</td><td>Fewer files per change. And keep regenerating the parent change as conflicts appear.</td></tr>
+    <tr><td>Someone proposes doing it at 3 a.m. on a holiday.</td><td>The global-lock trick — a weekend, or a token passed round the team.</td><td>It works only while somebody is not always committing. Plan for the version where they are.</td></tr>
+    <tr><td>A subsystem is being excluded from the migration &ldquo;for safety&rdquo;.</td><td>A haunted graveyard: ancient, obtuse or complex enough that nobody dares enter it.</td><td>Write tests for it. Nothing else works, and until it is done it blocks migrations, decommissioning and compiler upgrades for everyone.</td></tr>
+    <tr><td>A 60-file change is harder than a 9,000-file one.</td><td>Heterogeneity, which is governed by the number of environments, not the number of files.</td><td>Standardise what you can; ask teams to omit special checks for these shards. The humans get the same benefit as the robots.</td></tr>
+    <tr><td>A test three layers away in the dependency graph failed.</td><td>Transitive testing doing its job — and the farther out, the less likely the failure is yours.</td><td>Make the changes smaller so failures are diagnosable. One bad file in 25 is findable; in 10,000 it is not.</td></tr>
+    <tr><td>The same tests run over and over across shards.</td><td>The accepted inefficiency of many small changes.</td><td>Leave it. Engineer time hunting failures costs more than the compute — though check that trade-off holds for you.</td></tr>
+    <tr><td>&ldquo;We'll be able to do this in one commit once we're bigger.&rdquo;</td><td>The expectation that scale buys atomicity.</td><td>Correct it: the largest atomic change gets <i>smaller</i> as the codebase and headcount grow.</td></tr>
+  </table>
+
+  <h3>Running the machine</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Reviewers across the company are complaining about volume.</td><td>Generation got cheap; review did not. Nobody protected the reviewers.</td><td>Authorisation, then a global approver. This asymmetry is the reason the approval process exists at all.</td></tr>
+    <tr><td>Shards sit unreviewed for a week.</td><td>Review effort is growing with the number of shards.</td><td>Assign all shards to one global approver using pattern-based tooling to auto-approve what matches expectation, examining only anomalies.</td></tr>
+    <tr><td>Local owners approve everything instantly without reading it.</td><td>They trust the generating team too much — the usual outcome.</td><td>Send them only changes where their review supplies context, not permission. Everything else goes to the global approver.</td></tr>
+    <tr><td>The script handled most sites and you found more by hand.</td><td>Generation is not comprehensive.</td><td>Fix the tool. The author must be able to rely on it covering every case they meant to fix.</td></tr>
+    <tr><td>Generating the change took twice as long in the bigger repository.</td><td>Human effort is scaling linearly — you automated the typing.</td><td>Rebuild so effort is roughly constant in repository size. Past ~500 edits, the tool wins anyway.</td></tr>
+    <tr><td>New uses of the old thing appear while you are migrating.</td><td>Backsliding — copy-and-paste, long-lived branches, old habits.</td><td>Regenerate the parent change, and add review-time flagging so new uses stop arriving.</td></tr>
+    <tr><td>A shard was rejected and an engineer wants to know why.</td><td>Treating a shard as a pet.</td><td>Regenerate it. Investigate only if the whole herd is failing.</td></tr>
+    <tr><td>A project's checks were already red before you arrived.</td><td>A preexisting failure, not yours.</td><td>Ignore it. Keeping their checks green is the owners' half of the social contract.</td></tr>
+    <tr><td>A flaky test is blocking submission.</td><td>At this scale, low-probability failures are near-certainties.</td><td>Ignore recently flaky tests on automated submit, and handle the rare real miss by talking to people.</td></tr>
+    <tr><td>Testing each shard individually is saturating the cluster.</td><td>Isolated runs — very expensive, and off-peak only.</td><td>Put them on the train, and group large shards: union first, then the intersection with what failed.</td></tr>
+    <tr><td>The generated code looks nothing like the surrounding code.</td><td>No formatter pass.</td><td>Run the language's formatter as a separate pass. Without it this practice never becomes socially acceptable.</td></tr>
+    <tr><td>The migration reached 100% and the count is creeping back up.</td><td>Cleanup was skipped.</td><td>Flag new uses of the removed symbol at review time; without that, cleanup never converges.</td></tr>
+  </table>
+
+  <h3>Deprecating something</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>&ldquo;It's old, we should replace it.&rdquo;</td><td>Age being mistaken for obsolescence.</td><td>Ask what it costs and whether a replacement with comparable functionality exists. Decades-old can still be right.</td></tr>
+    <tr><td>Two systems do the same job and both are maintained.</td><td>The cost of keeping both, which grows over time.</td><td>Count the transformation code, the mutual dependence, and the drag the old one puts on the new one's evolution.</td></tr>
+    <tr><td>Adoption plateaus at a fraction and new uses keep appearing.</td><td>Advisory deprecation plus the conceptual pull of existing uses.</td><td>Either accept it is advisory, or convert: a deadline you can enforce and a team funded to do the moving.</td></tr>
+    <tr><td>A deadline exists and each team is told to move itself.</td><td>An unfunded mandate with a date on it, which reads as mean spirited.</td><td>Staff it. Localise migration expertise in the team removing the system.</td></tr>
+    <tr><td>The last remaining user says they will not move.</td><td>The political hazard — a critical dependency that can veto.</td><td>Recognise the deprecation is advisory in fact. Either build the power to enforce, or say so honestly.</td></tr>
+    <tr><td>Nobody knows who still depends on it.</td><td>Dependencies that static analysis cannot see.</td><td>Announce planned outages of increasing duration, and rename implementation-only symbols to see who breaks.</td></tr>
+    <tr><td>Warnings fire tens of thousands of times per build.</td><td>Alert fatigue, usually from transitive propagation.</td><td>Mark liberally, surface narrowly — newly changed lines only, with intrusive warnings reserved for staffed compulsory efforts.</td></tr>
+    <tr><td>A warning tells you something is deprecated and nothing else.</td><td>It is not actionable.</td><td>Name the replacement and the next step, at the level of an average engineer in that area.</td></tr>
+    <tr><td>The warning arrives weeks after the code was written.</td><td>It is not relevant.</td><td>Surface it while the engineer is writing the code, and send migration mail months before removal rather than the weekend before.</td></tr>
+    <tr><td>Everyone agrees it should go and nothing happens.</td><td>No explicit owner.</td><td>Assign one, with removal as their primary goal. Deprecation loses every priority contest it is entered in.</td></tr>
+    <tr><td>Four turndowns are running at once and all are late.</td><td>The simultaneity limit, for the teams and their customers alike.</td><td>Pave some roads, not every road. Choose fewer projects and commit to finishing them.</td></tr>
+    <tr><td>&ldquo;I like this code.&rdquo;</td><td>Emotional attachment — understandable, and self-defeating.</td><td>Note that removed code remains findable in history, and judge the system on its net cost to the organisation.</td></tr>
+    <tr><td>The team has nothing to show for six months of work.</td><td>Final removal treated as the only milestone.</td><td>Set incremental, measurable milestones and celebrate them — deleting a key subcomponent counts.</td></tr>
+    <tr><td>A wholesale replacement is estimated at two years.</td><td>Migration to an entirely new system, whose cost is usually underestimated.</td><td>Consider evolving in place instead. It does not avoid deprecation; it breaks it into chunks that pay off sooner.</td></tr>
+  </table>
+
+  <h3>Reverse mapping — you see a practice, what is it there for?</h3>
+  <p>The other direction. Use this when auditing an organisation's approach rather than planning one change: for each thing you find them doing, say what it was buying and what it does <i>not</i> buy.</p>
+  <table class="tight">
+    <tr><th style="width:52mm">What you find people doing</th><th style="width:52mm">What it counters</th><th>What it does <i>not</i> cover</th></tr>
+    <tr><td>Sharding a change by project and ownership</td><td>Version-control limits and merge conflicts, and failures that cannot be attributed.</td><td>Heterogeneity. Smaller pieces do not make four different environments into one.</td></tr>
+    <tr><td>Writing tests for frightening code</td><td>Haunted graveyards — the only thing that dissolves them, whatever the system's age or complexity.</td><td>The cost of running those tests, which the transitive model then multiplies.</td></tr>
+    <tr><td>Standardising checks, tooling and formats</td><td>The barrier that stops automation working at all, and the friction humans feel moving between projects.</td><td>Whether the change is safe. A consistent untested codebase automates its own breakage.</td></tr>
+    <tr><td>Funding a central migration team</td><td>The unfunded mandate, the repeated first change, and migrations that never fully succeed.</td><td>Social acceptance, which comes from a good FAQ and a track record rather than from a budget.</td></tr>
+    <tr><td>An approval committee</td><td>One engineer imposing unbounded review load on everybody else, and indiscriminate tweaking.</td><td>Change quality. It advises and escalates; it does not write the tooling.</td></tr>
+    <tr><td>Change generation with flat human effort</td><td>Tooling that quietly becomes a bottleneck as the repository grows, and incomplete coverage.</td><td>Review load. Cheap generation is precisely what makes review the next constraint.</td></tr>
+    <tr><td>A global approver with pattern-based tooling</td><td>Review effort growing with the number of shards, and local owners rubber-stamping.</td><td>Context. Some changes genuinely need the owning team's knowledge, and those must still go to them.</td></tr>
+    <tr><td>The test train</td><td>The cost of testing every shard in isolation, which is very expensive and off-peak only.</td><td>Attribution. A failure still has to be rerun against each change to find its cause.</td></tr>
+    <tr><td>Ignoring recently flaky tests</td><td>Throughput loss from failures that are near-certainties at scale.</td><td>A regression visible only through a flake turning into a failure — rare, and handled by talking.</td></tr>
+    <tr><td>Running the formatter as a separate pass</td><td>Machine output that nobody can read afterwards, and generation tooling burdened with style.</td><td>Correctness. It makes the change legible, not right.</td></tr>
+    <tr><td>Review-time flagging of new uses</td><td>Backsliding, which otherwise turns cleanup into whack-a-mole.</td><td>Existing uses. It stops the inflow; it migrates nothing.</td></tr>
+    <tr><td>Advisory deprecation</td><td>Ignorance of the new system, and the absence of early adopters.</td><td>Completion. It will not finish, and it requires the new system to be production-ready with transformative benefits.</td></tr>
+    <tr><td>Compulsory deprecation</td><td>The indefinite maintenance of an obsolete system, and teams deprioritising the work forever.</td><td>Anything, without both enforcement and staffing. Missing either, it fails in a specific and predictable way.</td></tr>
+    <tr><td>Planned outages of increasing duration</td><td>Dependents that neither you nor they knew existed.</td><td>Static dependencies, where semantic analysis is usually sufficient on its own.</td></tr>
+    <tr><td>Designing for decommissioning up front</td><td>Successor systems that quietly become second systems because nobody can migrate off the first.</td><td>The decision to remove, which is separate and still has to be made and funded.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. NUMBERS + GLOSSARY ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:34mm">Number</th><th>What it is</th></tr>
+    <tr><td><b>4 categories</b></td><td>What large-scale changes are for: cleaning up common antipatterns, replacing uses of a deprecated library feature, enabling low-level infrastructure improvements such as compiler upgrades, and moving users from an old system to a newer one.</td></tr>
+    <tr><td><b>5 barriers</b></td><td>Why the atomic version is unavailable: version-control limits, merge conflicts, haunted graveyards, heterogeneity, and testing.</td></tr>
+    <tr><td><b>4 phases</b></td><td>The process: authorisation, change creation, shard management, cleanup — with very nebulous boundaries between them.</td></tr>
+    <tr><td><b>25 vs 10,000</b></td><td>Finding the root cause of a test failure in a change of 25 files is straightforward; finding one in a 10,000-file change is the proverbial needle in a haystack. This is the argument for small shards in one line.</td></tr>
+    <tr><td><b>500 edits</b></td><td>The rule of thumb: past this, it is usually more efficient for an engineer to learn and execute the change-generation tooling than to make the edits by hand. For experienced &ldquo;code janitors&rdquo;, often much smaller.</td></tr>
+    <tr><td><b>~a dozen</b></td><td>The size of the email list with oversight of the whole large-scale-change process — experienced engineers familiar with the nuances of various languages, plus invited domain experts for the change in question.</td></tr>
+    <tr><td><b>10&ndash;20%</b></td><td>The double-digit percentage of changes in a project that today result from large-scale changes — meaning a substantial amount of code is changed by people whose full-time job is unrelated to that project.</td></tr>
+    <tr><td><b>3 hours / 1,000 tests</b></td><td>The test train is started fresh every three hours, and its first step runs a sample of 1,000 randomly selected tests against each change on it.</td></tr>
+    <tr><td><b>6+ hours</b></td><td>How long step 3 can take — running the union of all tests directly affected by the group, which for a large enough or low-level enough change can mean every single test in the repository.</td></tr>
+    <tr><td><b>&lt; 1,000 of millions</b></td><td>The vast majority of shards affect fewer than a thousand tests, out of the millions across the codebase. For those affecting more, shards are batched — and because those unions run almost everything anyway, adding more changes to the batch is nearly free.</td></tr>
+    <tr><td><b>500,000+ references</b></td><td>The scale of the largest migration attempted to that point: an in-house self-destructing smart pointer, referenced more than half a million times across millions of source files, replaced by the standard-library equivalent introduced in the 2011 revision of the language.</td></tr>
+    <tr><td><b>700 &times; 15,000</b></td><td>At the height of that migration: more than 700 independent changes generated, tested and committed, touching more than 15,000 files, <b>per day</b>. Today that throughput is sometimes ten times higher, after refining practices and improving tooling.</td></tr>
+    <tr><td><b>2 &rarr; 1 alias</b></td><td>How that migration finally ended: by first making the old type an alias of the new one, then performing the textual substitution between old and new, and eventually removing the old alias.</td></tr>
+    <tr><td><b>1 character</b></td><td>The pothole worth filling: two header files in the same in-house library whose names used different word separators. Engineers had to remember which was which and found out they had guessed wrong only after a potentially lengthy compile.</td></tr>
+    <tr><td><b>~2 weeks</b></td><td>What fixing that separator cost, in background-task effort, with mature tooling — applied without bothering the end users of those files, and measurably reducing the build failures it caused.</td></tr>
+    <tr><td><b>2,600+ patches, 50+ people</b></td><td>The outward-facing campaign: after a 2017 vulnerability in a widely used open-source library left anything with it on the transitive classpath open to remote execution, volunteers identified affected projects and sent more than 2,600 patches — with more than fifty humans doing the work instead of automated tooling.</td></tr>
+    <tr><td><b>1 billion lines / 3 days</b></td><td>The largest series of such changes ever executed removed more than a billion lines of code over three days — largely an obsolete part of the repository that had been migrated elsewhere.</td></tr>
+    <tr><td><b>a few dozen &rarr; tens of thousands</b></td><td>The leverage the whole apparatus produces: a few dozen engineers supporting tens of thousands of others, keeping the codebase consistent both spatially and temporally.</td></tr>
+    <tr><td><b>2 rejection categories</b></td><td>The only kinds of change the committee has outright rejected: those deemed <b>dangerous</b>, and those that are <b>extremely low value</b>. As experience grew and costs dropped, the approval threshold dropped too.</td></tr>
+    <tr><td><b>2 kinds of deprecation</b></td><td>Advisory — no deadline, not a priority, no dedicated resources — and compulsory, which comes with a deadline and requires both an enforcement mechanism and active staffing.</td></tr>
+    <tr><td><b>2 warning properties</b></td><td>Actionable: the reader can perform the next step in practical terms. Relevant: it surfaces when they are actually doing the thing. Without both, warnings accumulate into alert fatigue.</td></tr>
+    <tr><td><b>2 design questions</b></td><td>Ask of a new system: how easy will it be for consumers to migrate off it to a potential replacement, and how can parts of it be replaced incrementally?</td></tr>
+    <tr><td><b>3 things it changes</b></td><td>The summary claims: the process makes it possible to rethink the immutability of certain technical decisions; traditional models of refactoring break at large scales; and making these changes means making a habit of making them.</td></tr>
+  </table>
+
+  <h2 style="margin-top:14pt">Glossary</h2>
+  <table class="tight">
+    <tr><th style="width:42mm">Term</th><th>Meaning</th></tr>
+    <tr><td><b>Large-scale change</b></td><td>Any set of changes that are logically related but cannot practically be submitted as a single atomic unit — because of tooling limits, guaranteed merge conflicts, or repository topology.</td></tr>
+    <tr><td><b>Atomic change</b></td><td>A change committed as one indivisible unit. The largest one available to you shrinks as the codebase and the number of engineers grow.</td></tr>
+    <tr><td><b>Haunted graveyard</b></td><td>A system so ancient, obtuse or complex that no one dares enter it — often business-critical, frozen in time, and wrapped in bureaucracy. The counter is thorough testing.</td></tr>
+    <tr><td><b>Heterogeneity</b></td><td>Variety in version control, continuous integration, project tooling or formatting across an organisation. It defeats automation, because machines need consistent environments to apply the right transformation in the right place.</td></tr>
+    <tr><td><b>Transitive testing</b></td><td>Running not only the tests immediately affected by a change but every test that depends on the changed files, however indirectly. Broad coverage, at the price of distant failures that are unlikely to be yours.</td></tr>
+    <tr><td><b>Unfunded mandate</b></td><td>Additional requirements imposed by an external entity without balancing compensation. The costs do not disappear; they are paid in fragments by the teams told to comply.</td></tr>
+    <tr><td><b>Internalising the externality</b></td><td>What funding a central migration team actually does — taking a cost already being paid diffusely and paying it once, with economies of scale.</td></tr>
+    <tr><td><b>Filling potholes</b></td><td>Small codebase-wide fixes that only become worth doing once the machinery exists, and that measurably reduce friction.</td></tr>
+    <tr><td><b>Cattle, not pets</b></td><td>The stance toward the individual changes a migration generates: nameless, faceless commits that can be rolled back or rejected at little cost, unless the entire herd is affected.</td></tr>
+    <tr><td><b>Backsliding</b></td><td>New uses of the old thing appearing while the migration runs — from copy-and-paste, long-lived branches, or habit. Countered by regenerating the parent change and by review-time flagging.</td></tr>
+    <tr><td><b>Sharding</b></td><td>Splitting a global change by project boundary and ownership into pieces that can be submitted atomically, each going through its own test-mail-submit pipeline.</td></tr>
+    <tr><td><b>The train model</b></td><td>Testing many changes together on a fixed schedule rather than individually, exploiting the facts that such changes rarely interact and that most affected tests pass for most of them.</td></tr>
+    <tr><td><b>Global approver</b></td><td>Someone with ownership rights to approve any change throughout the repository, who reviews shards with pattern-based tooling and examines only the anomalies by hand.</td></tr>
+    <tr><td><b>Sublinear human effort</b></td><td>The scaling requirement on change generation: roughly the same human time to produce all required edits regardless of repository size.</td></tr>
+    <tr><td><b>Comprehensiveness</b></td><td>The other requirement on generation tooling: that an author can be assured the change covers every case they are trying to fix.</td></tr>
+    <tr><td><b>Deprecation</b></td><td>The process of orderly migration away from and eventual removal of obsolete systems.</td></tr>
+    <tr><td><b>Advisory deprecation</b></td><td>Deprecation with no deadline, no priority and no dedicated resources — aspirational. Useful for advertising a new system, and it will not finish on its own.</td></tr>
+    <tr><td><b>Compulsory deprecation</b></td><td>Deprecation with a deadline, after which dependent systems stop working. Requires both an enforcement mechanism and a specialised team staffed through completion.</td></tr>
+    <tr><td><b>Conceptual pull</b></td><td>The tendency of a system's existing uses to attract a large share of new uses, regardless of what the documentation asks for.</td></tr>
+    <tr><td><b>Hyrum's Law</b></td><td>The more users a system has, the more of them depend on behaviour it never promised — their use happens to work rather than being guaranteed to work. It is what makes removal the hardest change of all.</td></tr>
+    <tr><td><b>Alert fatigue</b></td><td>A term from health care for what happens when warnings accumulate, especially transitively, until users ignore them altogether.</td></tr>
+    <tr><td><b>Actionability</b></td><td>A property a warning must have: the reader can actually perform a relevant next step, in practical terms, given the expertise expected of an average engineer.</td></tr>
+    <tr><td><b>Relevance</b></td><td>The other property: the warning surfaces at the moment the user performs the indicated action, not long afterwards.</td></tr>
+    <tr><td><b>Design for decommissioning</b></td><td>Planning a system's eventual removal while designing it — normal in other engineering disciplines, where funds for decommissioning are allocated up front.</td></tr>
+    <tr><td><b>Monorepo</b></td><td>Storing the bulk of an organisation's source in a single repository, with visibility for every engineer into almost all of it — which is what makes codebase-wide analysis and change possible, and what makes review load the binding constraint.</td></tr>
+    <tr><td><b>Presubmit check</b></td><td>A check configured to run before a change lands in a project — from dependency allowlists to tests to requiring an associated bug. Useful locally, a source of heterogeneity at scale, and selectively disabled for migration shards.</td></tr>
+    <tr><td><b>Domain review</b></td><td>Review of a proposed large change by the owners of the interface being refactored, obtained during authorisation and separate from the oversight body's approval.</td></tr>
+    <tr><td><b>Code is a liability</b></td><td>The premise that code carries ongoing cost while the functionality it delivers is the asset — so the metric to maximise is functionality per unit of code.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page">
+  <div class="kicker">Section 9 · keep this covered until you have written your answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the 40,000-file rename</h4>
+  <div class="ans"><p>(a) A large-scale change is any set of changes that are <b>logically related but cannot practically be submitted as a single atomic unit</b>. This qualifies on both of the stated grounds at once: it touches so many files that the underlying tooling cannot commit them all, and it is large enough that it would always have merge conflicts. Note that it qualifies because of the impossibility of atomicity, not because 40,000 is a big number. (b) The first failure is a <b>technical limitation</b>: most version control systems have operations that scale linearly with the size of a change, and a system that handles tens of files may lack the memory or processing power to atomically commit thousands — in centralised systems such commits can also block other writers while they process. The remedy is to split the change into smaller independent chunks, accepting that this makes execution more complex. The second is <b>merge conflicts</b>: every version control system requires updating and merging if a newer version of a file exists centrally, and the probability of hitting that grows with the number of files in the change, compounded by the number of engineers working in the repository. The remedy is the same shape — with few files in a change, the probability shrinks. (c) The 3 a.m. proposal is the small-company manoeuvre: sneaking in a change that touches every file at a time when nobody is developing, or holding an informal global lock by passing a virtual — or even physical — token around the team. It stops working at exactly the point where <b>somebody is always making changes to the repository</b>, which is the normal condition of a large or globally distributed organisation. (d) The billing service is a <b>haunted graveyard</b>: a system so ancient, obtuse or complex that no one dares enter it, typically business-critical, frozen in time because any change might make it fail in incomprehensible ways, and often wrapped in layers of bureaucracy to prevent destabilising changes. Skipping it is worse than it looks because these are <b>anathema to the whole process</b>: they prevent the completion of large migrations, the decommissioning of other systems that rely on them, and the upgrade of compilers or libraries they use — from this perspective they prevent all kinds of meaningful progress, and the harm is to other people's work rather than to the team that owns them. The one thing that dissolves it is <b>thorough testing</b>: when software is thoroughly tested, arbitrary changes can be made to it and you will know with confidence whether they break it, <b>no matter the age or complexity of the system</b>.</p></div>
+
+  <h4>Part 1 · Q2 — the 9,000-file change and the 60-file one</h4>
+  <div class="ans"><p>(a) The continuous-integration system runs not only the tests immediately impacted by a change but every test that <b>transitively depends</b> on the changed files, which gives broad coverage — and the farther away in the dependency graph a test is from the impacted files, <b>the more unlikely a failure is to have been caused by the change itself</b>. Two days on a three-layers-away failure is therefore the expected outcome rather than bad luck. What would have prevented it is smaller independent changes: each affects a smaller set of tests, and failures are easier to diagnose and fix. Finding the root cause of a failure in a change of 25 files is straightforward; finding one in a 10,000-file change is the proverbial needle in a haystack. (b) The second migration is hitting <b>heterogeneity</b>. These changes work only when the bulk of the effort can be done by computers rather than humans, and computers rely on consistent environments to apply the proper transformations to the correct places; many different version control systems, continuous-integration systems, project-specific tooling or formatting guidelines make sweeping changes difficult. Size does not govern it because the obstacle scales with the number of distinct environments, not the number of files — 60 files spread across several incompatible setups needs several solutions, while 9,000 files in one consistent setup needs one. (c) For the first migration, splitting into 200-file commits is exactly right: it addresses the version-control limits, reduces the conflict probability, and makes failures diagnosable. For the second it accomplishes nothing, because the barrier is not change size; the remedy there is to simplify the environment — embracing some of the complexity by making it standard across the codebase, and asking teams to omit their special checks where the shards touch their project code. Most teams are happy to help, given the benefit. (d) The cost of splitting is that it <b>makes the execution of the change more complex</b>. The inefficiency it produces is that <b>smaller changes cause the same tests to be run multiple times</b>, particularly tests that depend on large parts of the codebase. It is accepted because <b>engineer time spent tracking down test failures is much more expensive than the compute time required to run those extra tests</b> — a conscious decision, and one explicitly flagged as a trade-off that might not hold for every organisation.</p></div>
+
+  <h4>Part 2 · Q1 — nine months of announcements</h4>
+  <div class="ans"><p>(a) The current approach is an <b>unfunded mandate</b>: additional requirements imposed by an external entity without balancing compensation. Even where a new system is categorically better than the one it replaces, <b>those benefits are often diffused across an organisation</b> and are therefore unlikely to matter enough for individual teams to want to update on their own initiative — while the cost of updating lands concentrated on each of those teams. Nine months of emails does not change that arithmetic for any single team, so the plateau is the predicted result rather than a surprise. (b) The rise in new call sites follows from the fact that <b>engineers tend to use existing code as examples when writing new code</b>, so an old system keeps generating new uses of itself for as long as it exists. The implication for the migration guide is uncomfortable: the guide is not the binding constraint, because it is competing with the pull of the examples already in the repository. A better guide will not fix this, and neither will a third email. (c) Three reasons the platform team should hold the work. First, <b>the team that built and manages the system also has the domain knowledge</b> required to fix the references to it; consuming teams are unlikely to have the context, and it is globally inefficient to expect each of them to relearn expertise that already exists in one place. Second, <b>centralisation allows faster recovery from errors</b>, because errors generally fall into a small set of categories and the team running the migration can keep a playbook — formal or informal — for them. Third, <b>incentives</b>: having a team with a vested interest in removing the old system responsible for the migration helps ensure it actually gets done, whereas organic migrations are unlikely to fully succeed. The dashboard addresses none of them — it does not move the expertise, it does not build the playbook, and it does not change any consuming team's incentive; it restates the mandate with more visibility, and leaves every team paying the repeated first change of reading the motivation, finding an example, and applying it locally. (d) It is not adding cost. <b>Funding and staffing such a team is actually just internalising the externalities that an unfunded mandate creates</b>, with the additional benefit of economies of scale. If the new system is important enough to migrate to, <b>the costs of migration will be borne somewhere in the organisation</b> regardless; centralising the migration and accounting for its costs is almost always faster and cheaper than depending on individual teams to migrate organically. The current arrangement has not avoided a cost — it has hidden one.</p></div>
+
+  <h4>Part 2 · Q2 — three things in one week</h4>
+  <div class="ans"><p>(a) The stance is <b>cattle, not pets</b>. A pet is the handcrafted change: an engineer may spend days or weeks on its creation, testing and review, comes to know it intimately, and is proud when it is committed. Cattle are the changes a large migration produces — <b>nameless and faceless commits that might be rolled back or otherwise rejected at any given time with little cost</b>, often because of an unforeseen problem the tests did not catch or something as simple as a merge conflict. Because automation means tooling can be updated and new changes generated at very low cost, <b>losing a few cattle now and then isn't a problem</b>, so the right response to one rejected shard is to regenerate rather than to investigate, and certainly not to halt. The one condition under which the engineer's instinct is right is stated in the same breath: <b>unless the entire herd is affected</b> — a failure pattern across many shards is a tooling problem and does deserve a day. (b) The staff engineer is entitled to <b>question the purpose of a specific commit</b> being made as part of the broader change, and the author should respond to that comment <b>just as they would any other review comment</b>. They are not entitled to stop the programme: it is important that code owners understand the changes happening to their software, and they <b>do not hold a veto over the broader change</b>. What earns that arrangement is not authority but evidence — <b>a good set of frequently asked questions and a solid historic track record of improvements</b>, plus product teams coming to trust the infrastructure team's domain expertise the way that team trusts theirs. (c) The naming request is worth doing, on the same grounds as the comparable case: two header files in one in-house library used different word separators in their names, which drove consistency purists mad and, more importantly, reduced productivity — engineers had to remember which file used which, and discovered they had got it wrong only after a potentially lengthy compile cycle. Fixing a single-character difference across a codebase that size sounds pointless; mature tooling made it <b>a couple of weeks' worth of background-task effort</b>, library authors could apply it <b>without having to bother end users</b>, and it <b>quantitatively reduced the number of build failures</b> caused by that issue, with productivity and happiness gains that more than paid for the time. (d) The wider consequence is that <b>engineering decisions can be made knowing they aren't immutable</b>. As the ability to change the entire codebase improves, the diversity of possible changes expands, and technical decisions that used to be final — the name of a widely used symbol, the location of a popular class — <b>no longer need to be final</b>. That is a benefit which applies at design time, before any migration is contemplated.</p></div>
+
+  <h4>Part 3 · Q1 — 12,000 sites and a weekend script</h4>
+  <div class="ans"><p>(a) The four phases are <b>authorisation, change creation, shard management and cleanup</b>. The plan skipped authorisation entirely. That phase exists because the costs of generating a change and of reviewing it were historically symmetric, which naturally limited what one person could produce — and as tooling improved it became easy to generate a large number of changes very cheaply, and <b>equally easy for a single engineer to impose a burden on a large number of reviewers across the company</b>. The process exists to keep <b>oversight and thoughtfulness</b> behind such changes rather than indiscriminate tweaking, to help authors produce the best possible change, and to provide an escalation path; it is deliberately lightweight and historically very liberal. (b) The property review must have is that it <b>does not grow with the number of shards</b>. The mechanism is the <b>global approver</b>: someone with ownership rights to approve any change throughout the repository, to whom all shards are assigned rather than to the owners of individual projects, and who generally has specific knowledge of the language or libraries involved and knows the change's potential failure modes. The way they process 340 shards is not by reading 340 changes: they use <b>a separate set of pattern-based tooling to review each change and automatically approve those that meet their expectations</b>, manually examining only the small subset that are anomalous because of merge conflicts or tooling malfunctions. Directing all reviews for a change to a single global approver is in fact the <b>most common piece of feedback</b> the oversight committee gives, precisely because first-time authors assume local project owners should review everything. (c) The nine already-failing checks should be <b>aggressively ignored</b>. Preexisting failures are not the migration's to fix, and the reason is explicit: <b>local code owners are responsible for having no preexisting failures in their codebase, as part of the social contract</b> between them and the infrastructure teams. Fixing them is a technique that works for an engineer on one project and does not scale across a codebase-wide change. (d) The 60 unrecognised sites violate <b>comprehensiveness</b>: change-creation tooling should be comprehensive across the codebase, so that an author can be assured their change <b>covers all of the cases they're trying to fix</b>. That is answered in the change-creation phase, by fixing the generator rather than by hand-patching. The two new uses are <b>backsliding</b>, which is answered in two places — change creation, because the generation process should be automated enough that <b>the parent change can be updated as users backslide into old uses</b>, and cleanup, which requires a system that <b>prevents additional introductions</b> of the symbol being removed, typically by flagging new uses of a deprecated object at review time.</p></div>
+
+  <h4>Part 3 · Q2 — 2,000 shards, tested one at a time</h4>
+  <div class="ans"><p>(a) They should use the <b>train model</b>. It exploits two facts: these changes <b>rarely interact with one another</b>, and <b>most affected tests are going to pass for most of them</b> — which holds because such changes tend to be pure refactorings, very narrow in scope and preserving local semantics, and because individual changes are simpler and highly scrutinised, so correct more often than not. The train is started fresh <b>every three hours</b> and has five steps. <b>1.</b> For each change on the train, run a sample of <b>1,000 randomly selected tests</b>. <b>2.</b> Gather all the changes that passed their thousand and create one uber-change from them — the train. <b>3.</b> Run the union of all tests directly affected by the group, which for a large enough or low-level enough change can mean running every single test in the repository, and <b>can take more than six hours</b>. <b>4.</b> For each non-flaky test that fails, rerun it individually against each change that made it onto the train, to determine which change caused the failure. <b>5.</b> Generate a report for each change describing all passing and failing targets, which can be used as evidence that the change is safe to submit. It also has the advantage of working for multiple changes at once without requiring each to ride in isolation — isolated runs can be requested but are very expensive and performed only during off-peak hours. (b) For shards affecting large numbers of tests, group them: <b>first run the union of all affected tests for all shards, and then for each individual shard run just the intersection of its affected tests with those that failed the first run</b>. Adding more shards to such a batch is nearly free because <b>most of these unions cause almost every test in the codebase to be run anyway</b>. (c) The blocking rule stalls because of a scale effect: one of the drawbacks of running such a large number of tests is that <b>independent low-probability events are almost certainties at large enough scale</b>. Flaky and brittle tests often do little harm to the teams that write and maintain them, and are <b>particularly difficult for the authors of these changes</b>, seriously affecting throughput. The position taken is that confidence in the correctness of a single semantics-preserving, machine-generated change is now higher than confidence in a test with any recent history of flakiness — <b>so recently flaky tests are ignored when submitting via the automated tooling</b>. The residual risk is that in theory a single shard could cause a regression detected only by a flaky test going from flaky to failing; in practice this is seen so rarely that <b>it is easier to deal with via human communication rather than automation</b>. (d) Tidying formatting in review puts the cost on reviewers, who are the scarce resource the whole design protects — and it misses the point of the requirement. Because the codebase is optimised for human readability, changes produced by automated tooling must be intelligible to immediate reviewers and to future readers, so <b>all generation tools run the automated formatter appropriate to the language as a separate pass</b>, leaving the change-specific tooling free of formatting concerns. Automatically produced changes then &ldquo;fit in&rdquo; with human-written code, reducing future development friction. The claim attached is strong: <b>without automated formatting, large-scale automated changes would never have become the accepted status quo.</b></p></div>
+
+  <h4>Part 4 · Q1 — eighteen months of warnings</h4>
+  <div class="ans"><p>(a) This is <b>advisory deprecation</b>: a deprecation that has <b>no deadline and is not high priority</b> for the organisation, and for which it is not willing to dedicate resources. Such deprecations are also called <b>aspirational</b> — the team knows the system has been replaced and hopes clients will eventually migrate, without imminent plans either to provide support to help them move or to delete the old system — and this kind <b>often lacks enforcement</b>. The phrase for the strategy it amounts to: <b>&ldquo;hope is not a strategy.&rdquo;</b> (b) The 4% growth is predicted by the <b>conceptual, or technical, pull</b> that existing uses exert: comparatively many uses of the old system <b>will tend to pick up a large share of new uses, no matter how much we say &ldquo;please use the new system&rdquo;</b>. The implication for the migration page is that it is not the binding constraint. Putting a deprecation warning on an old system and walking away can lead to slightly fewer new uses of it, but <b>rarely leads to teams actively migrating away</b> — so more or better documentation will not change the trajectory. (c) Against the two properties: the warnings may be <b>actionable</b> if they name the replacement call and the next step an average engineer in that area could take — but firing at build time in transitive dependents, they are not <b>relevant</b>, because relevance means surfacing <b>at a time when the user actually performs the indicated action</b>: while the engineer is writing the code that uses the function, not once it has been in the repository for weeks and is being rebuilt by somebody else. The 40,000 transitive firings have produced <b>alert fatigue</b>, the term from health care for warnings accumulating until users ignore them altogether — which is exactly what the team filtering their logs is telling them. Two ways to surface narrowly: <b>limit warnings to newly changed lines</b>, so they reach the person introducing a new use at the moment they introduce it; and <b>reserve much more intrusive warnings — such as those on deprecated targets in the dependency graph — for compulsory deprecations where a team is actively moving users</b>. A second, louder warning makes the condition worse, not better. (d) The precondition is that the benefits of the new system <b>cannot be simply incremental: they must be transformative</b>. Users will be hesitant to migrate on their own for marginal benefits, and <b>even new systems with vast improvements will not gain full adoption using only advisory deprecation efforts</b>. An 8% serialisation improvement with otherwise equivalent behaviour is squarely incremental, so advisory deprecation will not finish here under any amount of warning. If the team wants it to finish they must convert to <b>compulsory deprecation</b> — a deadline after which dependent systems stop working, backed by an enforcement mechanism, and, crucially, <b>actively staffed by a specialised team through completion</b> rather than delegated to the consuming teams.</p></div>
+
+  <h4>Part 4 · Q2 — the scheduler that will not die</h4>
+  <div class="ans"><p>(a) The intent is <b>compulsory deprecation</b>: it comes with a deadline for removal of the obsolete system, after which users who still depend on it find their own systems no longer work. It requires two things. It <b>needs an enforcement mechanism</b> — not that the schedule can never change, but that the team running the process is empowered to break non-compliant users after they have been sufficiently warned; without that power it becomes easy for customer teams to ignore the work in favour of features. And it must be <b>actively staffed by a specialised team through completion</b>, because a compulsory deprecation without staffing comes across as mean spirited and reads to customers as an unfunded mandate requiring them to push aside their own priorities just to keep their services running. The organisation supplied the deadline and the announcement; it supplied neither the staffing — each team was asked to move itself — nor, as events have shown, the enforcement. (b) The hazard in general terms: when <b>the last remaining user of the old system is a critical piece of infrastructure that the entire organisation depends on</b>, you have to ask how willing you would be to break that infrastructure, and everything that transitively depends on it, for the sake of an arbitrary deadline. <b>It is hard to believe the deprecation is really compulsory if that team can veto its progress.</b> Its existence therefore proves the deprecation was advisory in fact from the start, whatever it was called — which also explains why most teams moving does not indicate success: the tail is the whole problem. (c) Running two turndowns in parallel runs into the stated limit: organisations have <b>a limit on the amount of deprecation work that is reasonable to undergo simultaneously</b>, from the point of view of the teams doing the deprecation as well as the customers of those teams. The analogy is road paving: everybody appreciates having freshly paved roads, but <b>if the public works department decided to close down every road for paving simultaneously, nobody would go anywhere</b>; by focusing their efforts, paving crews get specific jobs done faster <b>while also allowing other traffic to make progress</b>. Hence the instruction to <b>choose deprecation projects with care and then commit to following through on finishing them</b> — which is precisely what starting a second turndown two months ago failed to do. (d) Dropping the deadline converts the effort into an <b>advisory deprecation</b>, and delegating deprecation to the users of a system <b>becomes simply an advisory deprecation, which will never organically finish</b>. What that predicts is the old scheduler maintained indefinitely, continuing to attract new uses through the conceptual pull of its existing ones, while the platform group stays on call for it. The alternative is to make it real: keep a date, ensure the team is <b>empowered to break non-compliant users after sufficient warning</b>, and staff the migration — <b>localising the expertise of migrating users within a single team of experts</b>, usually the team responsible for removing the old system, which has both the incentive and the accumulated tooling, and using that team to move the reporting pipeline rather than asking it to move itself. On milestones: final removal should not be the only measurable one, since it <b>might not even happen in all deprecation projects</b> and, if the team has done its job, is <b>the least noticed step by anyone external</b> because by that point the system has no users. Set concrete incremental milestones that are measurable and deliver value, and recognise achievements such as <b>deleting a key subcomponent</b> the way you would recognise shipping a new product.</p></div>
+</section>
+
+<!-- ============================== 10. TRACKER + FINAL QUIZ ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <style>#trk td,#trk th{padding:1.3pt 5pt; font-size:7.9pt} #quiz .writeline{height:11.5pt} #quiz li{margin-bottom:0.5pt} #quiz{padding-left:22pt}</style>
+  <table class="tight" id="trk">
+    <tr>
+      <th style="width:58mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:24mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> What makes a change an LSC, if not its size</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> The counterintuitive shrink, and why</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> The four categories of LSC</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> Technical limits and merge conflicts</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Haunted graveyards, and the one counter</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Heterogeneity, and why size doesn't govern it</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> Transitive testing, and 25 vs 10,000 files</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> The trade accepted: compute vs engineer time</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Unfunded mandate — definition and where cost lands</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> The three reasons to centralise</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> Why organic migrations stall, mechanically</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Filling potholes — the separator example</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Decisions stop being immutable</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Cattle vs pets, and the one exception</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> The social contract: understand, but no veto</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> The four phases</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> Why authorisation exists, and what it does</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> Sublinear generation, and comprehensiveness</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> The 500-edit rule of thumb</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> Why machine output must look human-written</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> Sharding, and what a shard must satisfy</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> The train: two facts, five steps, two numbers</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> Union-then-intersection batching</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> Flaky tests at scale, and the position taken</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>25 ·</b> Reviewer discovery and preexisting failures</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>26 ·</b> The global approver, and how they scale</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>27 ·</b> Cleanup, and preventing reintroduction</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>28 ·</b> Code is a liability — and what the asset is</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>29 ·</b> Age is not obsolescence; the cost of keeping both</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>30 ·</b> Why removal is the ultimate change</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>31 ·</b> Design for decommissioning — the two questions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>32 ·</b> Advisory: what it's for, and its precondition</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>33 ·</b> Compulsory: the two requirements and the hazard</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>34 ·</b> Warnings: actionable, relevant, alert fatigue</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>35 ·</b> Owners and milestones</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>36 ·</b> Master matrix — can change × committed to remove</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twenty minutes, write the answers</h3>
+  <ol id="quiz">
+    <li>Define a large-scale change without reference to size, state what happens to the largest possible atomic change as a codebase and its engineering population grow, and give the four categories such changes fall into.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name the five barriers to making a change atomically, and give the specific remedy for each — including which barrier is answered by testing and which one testing makes harder.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Define a haunted graveyard, say why it is a problem for other people rather than only for its owners, and give the one thing that dissolves it.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Define an unfunded mandate, explain in terms of how benefits and costs are distributed why it does not produce migration, and say what funding a central team actually does in economic terms.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the three reasons the work of a large migration is centralised on the team that owns the system being migrated away from, and state the mechanism by which organic migrations fail to finish.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain the cattle-and-pets distinction, say what it licenses you to do and under what single condition it does not apply, and state what code owners keep and what they give up under the social contract.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the four phases of the process, say why the first one exists in terms of the costs of generating and reviewing changes, and give the most common piece of feedback the oversight body offers.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>State the two scaling requirements on change generation, give the rule of thumb for when to stop editing by hand, and explain why generated changes must be run through an automated formatter.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Describe the train model: the two facts it exploits, its five steps with the two numbers attached, and how a global approver reviews a large number of shards without the effort growing with their number.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Distinguish advisory from compulsory deprecation, give what each one requires before it is honest to start, and give the two properties a deprecation warning must have and the condition that follows when it lacks them.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+  </ol>
+</section>
+
+</body>
+</html>

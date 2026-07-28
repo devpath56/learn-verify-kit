@@ -24,10 +24,38 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 7 | Performance Methodology — Concepts, Perspectives, Methods, Statistics | `sysperf-methodology/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 2 "Methodologies". | Built · 18 questions registered |
 | 8 | Benchmarking — What the Number Is, How It Lies, Which Kind, and Active Analysis | `sysperf-benchmarking/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 12 "Benchmarking". | Built · 18 questions registered |
 | 9 | Incident Response & Postmortems — Structure, Mitigation, Practice, Learning | `sre-incident-postmortem/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 9 "Incident Response" by Jennifer Mace, Jelena Oertel, Stephen Thorne and Arup Chakrabarti with Jian Ma and Jessie Yang (pp. 175–194), Ch. 10 "Postmortem Culture: Learning from Failure" by Daniel Rogers, Murali Suriar, Sue Lueder, Pranjal Deo and Divya Sudhakar with Gary O'Connor and Dave Rensin (pp. 195–223). | Built · 18 questions registered |
-| 10 | *unassigned* | — | — | Awaiting source |
+| 10 | Large-Scale Change & Deprecation — Constraint, Economics, Machinery, Removal | `swe-lsc-deprecation/` | Titus Winters, Tom Manshreck & Hyrum Wright (eds.), *Software Engineering at Google: Lessons Learned from Programming Over Time*, O'Reilly — Ch. 22 "Large-Scale Changes" by Hyrum Wright, edited by Lisa Carey, with the "Testing LSCs" section by Adam Bender; Ch. 15 "Deprecation" by Hyrum Wright, edited by Tom Manshreck. | Built · 18 questions registered |
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 10
+
+Cited within the source chapters and named or described in the booklet's teaching: Google's monorepo and the
+internal systems named throughout — Rosie, the Test Automation Platform (TAP) and its train, Kythe, ClangMR,
+JavacFlume, Refaster, Tricorder, ErrorProne, Code Search, BigQuery, OWNERS files, the Google Template Library and
+its stl_util.h / map-util.h header pair, scoped_ptr and its replacement std::unique_ptr introduced in C++11, and
+Google's Disaster Recovery Testing (DiRT) exercises; the formatters clang-format, clang-tidy and google-java-
+format, and perl and sed as small-change tools; the languages named for their static or dynamic typing —
+Python, Ruby, JavaScript, Java, C++ and Go, the last for the refactoring features it introduced deliberately;
+"Operation RoseHub", the 2017 Mad Gadget vulnerability in the Apache Commons library, the San Francisco
+Municipal Transportation Agency ransomware incident it enabled, and GitHub as the host of the affected projects;
+Hyrum's Law and its author; Douglas Adams on deadlines; the LaTeX typesetting system as the example of an old
+system that is not obsolete; the IAEA technical report on designing nuclear power plants to facilitate
+decommissioning; the @deprecated Java annotation and the abseil.io API-upgrade documentation; and the many
+cross-references to other chapters of the same book.
+
+The booklet names **the concepts, the eponymous law and the language properties**, and nothing else. Hyrum's Law
+is named for the same reason competency 7 names Amdahl's and the Universal Scalability Law — an eponymous law is
+durable vocabulary. Programming languages and language features are named only where a teaching point turns on
+the property itself, such as static versus dynamic typing or type aliases. Everything else is described by what
+it does: no companies, no products, no internal tool or programme names, no individuals, and no internal symbol
+names — the flagship migration is "an in-house self-destructing smart pointer" replaced by "the standard-library
+equivalent introduced in the 2011 revision of the language", and the outward-facing campaign is described
+without naming the vulnerability, the library, the host or the transit agency. This is a fourth distinct line:
+competency 7 named nothing, competency 8 named the organisations that were a section's subject, competency 9
+named one vendor-neutral framework, and competency 10 names a law and a set of language properties. The rule
+behind all four is the same — name what is durable and transferable, describe what is a brand.
 
 ### Works referenced inside competency 9
 
@@ -358,4 +386,17 @@ least one code, and each code points at the exact artefact to reread.
   outage recurred during the four months the weak write-up was pending. All three are now stated as the two
   facts they actually are. The lesson for future builds: when a case study gives both a narrative and a
   retrospective timeline, check figures against both, because they can disagree.
-- Competencies 10–13 are unassigned pending sources.
+- **Competency 10 carries the scoped style block**, as competencies 5–9 do, with one addition of its own: the
+  part 4 anchor sketch is taller than a page, so it is allowed to break across pages in the same way the section
+  6 concept map is. Without that, the concept-boundary box above it was stranded on a page of its own.
+- **Competency 10's printed final quiz also has no answers in the booklet**, by the same deliberate choice as
+  competencies 1–9.
+- **Competency 10 names a law and a set of language properties, and nothing else.** The reasoning and the full
+  list of what was left unnamed are recorded above, under works referenced. It is a fourth distinct de-vendoring
+  line, drawn deliberately.
+- **Competency 10's quiz ideals were rewritten wholesale to pass the decision I8 overlap test.** The source's
+  definitions are dense and quotable, and the first draft of the ideals reused the booklet's own phrasing in
+  thirty places, any one of which would have made part of the printed quiz self-checkable from the teaching
+  pages. All ten were rewritten in deliberately different prose. Worth expecting on any source whose material is
+  heavily definitional.
+- Competencies 11–13 are unassigned pending sources.
