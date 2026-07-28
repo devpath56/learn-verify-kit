@@ -1,0 +1,1409 @@
+<body>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} h3{break-after:avoid; page-break-after:avoid} #bigmap{break-inside:auto; page-break-inside:auto}</style>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Incident Response<br>&amp; Postmortems</h1>
+  <div class="rule"></div>
+  <div class="sub">An outage is a coordination problem before it is a technical one. Here is the structure that contains it, the habit that shortens it, the practice that makes both possible — and the write-up that stops it happening twice.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>The structure, before you need it</b>Declaring, the three goals, and the three roles that carry them.</div>
+    <div><span class="num">2</span><b>Mitigate first, understand later</b>Why stopping the bleeding outranks knowing what cut you.</div>
+    <div><span class="num">3</span><b>Practise before the pager</b>Training, logistics decided in advance, and drills that find the gaps.</div>
+    <div><span class="num">4</span><b>The write-up that changes something</b>Blameless, specific, owned, published — and acted on.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <div class="box bound">
+    <h4>What this subject asks of you that others don't</h4>
+    <p>Everything here has to work <b>while you are frightened</b>. That is the constraint the whole subject is built around, and it is why so much of the advice is about deciding things in advance. You cannot choose a chat channel, invent a role structure, or remember to be fair to a colleague while a service is down and your phone is going. So as you read, keep asking the question this competency is really made of: <i>which of these decisions am I making now, calmly, so that nobody has to make it at three in the morning?</i> The answer is almost always &ldquo;more of them than I thought&rdquo;.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — The structure, before you need it</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — Mitigate first, understand later</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — Practise before the pager</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — The write-up that changes something</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move · reverse mapping</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Handed a live incident, or a postmortem someone else wrote, you can:</p>
+    <ol>
+      <li><b>Impose a structure in under a minute</b> — declare, take command, name the two roles that report to you, and put everyone in one place.</li>
+      <li><b>Order the work correctly</b>: assess, mitigate, then diagnose — and say why a mitigation that does not depend on understanding the cause is the one worth building in advance.</li>
+      <li><b>Name what should have been decided before the pager went off</b>, and decide it.</li>
+      <li><b>Read a postmortem and say whether it will change anything</b> — judging it on blame, specificity, ownership, priority, audience and speed, not on how thorough it feels.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>An outage has two problems inside it, and they are not the same problem. There is the technical fault, and there is the <b>coordination</b> of everyone converging on it — and the second is the one that turns a bad hour into a bad day. Structure is the answer to the second: a single line of command, roles agreed beforehand, one place where everyone talks, and a written record kept as you go. That structure is worth nothing unless someone actually declares an incident, which is why &ldquo;declare early and often&rdquo; is a principle rather than a preference. Once the structure exists, the work has an order that people reliably get wrong: <b>stop the bleeding before you understand the wound</b>, because customers do not care whether you know what caused their errors, only that the errors have stopped. None of this can be improvised at three in the morning, so the real work happens beforehand — training, a chosen channel, a contact list, criteria for what counts as an incident, and drills that expose the gaps while the stakes are low. And when it is over, the only thing that carries forward is the write-up: blameless enough that people tell the truth, specific enough to act on, owned and prioritised so the actions actually close, and published widely enough that someone who was not there learns something.</p>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version — the whole thing at once</h4>
+    <ul>
+      <li>When something big breaks, the hard part usually isn't the bug. It's ten people all helping at once and none of them knowing who is deciding.</li>
+      <li>So: one person is in charge. One person fixes. One person talks to everyone else. Everybody in the same room, real or virtual.</li>
+      <li>Say &ldquo;this is an incident&rdquo; out loud, early. It is much cheaper to stand a response down than to start one late.</li>
+      <li>Stop the damage first. You do not need to know <i>why</i> to make it stop — you only need to know roughly <i>where</i>.</li>
+      <li>Everything that has to work when you're panicking has to be decided when you're calm. Which chat channel. Who to call. What even counts as an incident.</li>
+      <li>Afterwards, write it down without blaming anyone, with real numbers, with named owners and priorities — and then actually do the things. A write-up nobody acts on is the same as no write-up.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>The structure, before you need it</b></td><td>Managing an incident versus resolving it; the four basic principles; the framework the whole practice is borrowed from; the three goals it exists to serve; and the three roles — commander, operations, communications — with how they nest, delegate and collapse back.</td><td>Every later part assumes someone is in charge. This is the part that puts them there, and it is the part most often skipped because the incident &ldquo;doesn't feel big enough yet&rdquo;.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>Mitigate first, understand later</b></td><td>The four-step order of an active incident; generic mitigations versus bespoke ones; why knowing the <i>location</i> of a cause is enough to act; when to build the tools that make it possible; and three worked incidents — one mishandled, one large and messy, one handled well.</td><td>Structure without the right ordering just coordinates people into the wrong work. This part is where minutes are actually saved, and where the biggest single habit lives.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Practise before the pager</b></td><td>What to teach responders; the logistics to settle in advance — channel, templates, contacts, criteria; and drills, from company-scale controlled emergencies down to treating a small problem as a big one on purpose.</td><td>Parts 1 and 2 describe behaviour under stress, and stressed people do what they have practised. This part is how the previous two become reflexes instead of good intentions.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>The write-up that changes something</b></td><td>A worked case with two postmortems of the same outage, one bad and one good; the eight ways a write-up fails; the seven qualities of one that works; the incentives that keep the culture alive; and the four signs that it is quietly dying.</td><td>The last part because it is the only one that outlives the incident. An organisation that is good at parts 1–3 and bad at this one relives the same outage indefinitely.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;By the time a pager alerts you to a problem, it's too late to think about how to manage the incident.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>The structure, before you need it</h2>
+    <p>What an incident response framework is for, and the three roles that do the work.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Two different jobs are happening at once: fixing the thing, and running the people who are fixing the thing. They are not the same job, and one person doing both is how it goes wrong.</li>
+      <li>The whole approach is borrowed from firefighting. It has been around since 1968 and was built for exactly this: strangers turning up to one emergency and needing to work together immediately.</li>
+      <li>Three goals: coordinate, communicate, stay in control. When incident response goes wrong, it is nearly always one of those three.</li>
+      <li>Three roles: the commander decides, the operations lead fixes, the communications lead talks. The commander holds every role they haven't handed out yet.</li>
+      <li>Everyone in one place — one room, or one channel. Not five side conversations.</li>
+      <li>Write things down as you go. Three or more people means someone should be keeping a document of what you've tried and ruled out.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A child goes missing on a school trip. Within a minute there are fifteen adults, all of whom want to help, and that is the danger — not the shortage of effort but the shape of it. What actually works is somebody saying, out loud, three things: <i>I am coordinating this</i>; <i>you two search the east side and report back to me</i>; <i>you phone the parents and the school and keep phoning them</i>. Everything else follows from those sentences. Note what they do. They establish one person whose job is to decide rather than to search. They split the doing from the telling, because the person crawling under the bleachers cannot also be reassuring a parent. And they stop the other twelve adults from starting twelve uncoordinated searches, each of which will later have to be repeated because nobody knows where anyone has already looked. That is the entire content of this part, and none of it is about children.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Resolving an incident</b></td>
+      <td>Mitigating the impact <b>and/or</b> restoring the service to its previous condition.</td>
+      <td>This is the technical work: the thing everyone instinctively runs toward.</td>
+      <td>vs <b>managing</b> an incident, below. The two words get used interchangeably and they name different jobs. Resolving is about the system; managing is about the people. A response can resolve the fault and still be badly managed, and that is the common case.</td>
+    </tr>
+    <tr>
+      <td><b>Managing an incident</b></td>
+      <td>Coordinating the efforts of responding teams in an efficient manner, and ensuring that communication flows <b>both</b> between the responders <b>and</b> to those interested in the incident's progress.</td>
+      <td>When a not-so-ordinary, urgent problem requires multiple individuals or teams, you are suddenly faced with doing both at once — managing the response and resolving the problem.</td>
+      <td>Note the two directions of communication. Inward, between responders, is what stops duplicated and contradictory work. Outward, to everyone watching, is what stops the second incident: the one where the organisation concludes nothing is being done.</td>
+    </tr>
+    <tr>
+      <td><b>The four basic principles</b></td>
+      <td>The premise is to respond in a <b>structured way</b>, because large-scale incidents can be confusing and a structure teams agree on beforehand reduces chaos.</td>
+      <td><b>Maintain a clear line of command. Designate clearly defined roles. Keep a working record of debugging and mitigation as you go. Declare incidents early and often.</b></td>
+      <td>Formulating the rules for communication and coordination <i>before</i> disaster strikes is what allows the team to concentrate on resolving the incident when it happens. A team that has already practised does not have to spend attention on these factors at all — which is the actual benefit, and it is a benefit to <i>attention</i>, not to procedure.</td>
+    </tr>
+    <tr>
+      <td><b>Incident Command System</b> (ICS)</td>
+      <td>The framework the whole practice derives from. Established in <b>1968 by firefighters</b> as a way to manage wildfires; it provides standardized ways to communicate and fill clearly specified roles during an incident.</td>
+      <td>Based on the model's success, companies later adapted it to respond to computer and system failures. Two such adaptations are compared here: one from a large technology company, and one from a company whose own product is incident management.</td>
+      <td>vs a process you must adopt whole. The full approach may be more than you need; you can build a framework by <b>selecting the parts that matter to your organisation</b>. It is a simple concept, easily understood, and it scales up or down with the size of the company and of the incident — but simple to understand is not the same as easy to implement.</td>
+    </tr>
+    <tr>
+      <td><b>The three Cs</b></td>
+      <td>The common goals of every incident response framework: <b>Coordinate</b> the response effort; <b>Communicate</b> between responders, within the organisation, and to the outside world; and maintain <b>Control</b> over the incident response.</td>
+      <td>When something goes wrong with incident response, <b>the culprit is likely in one of these three areas.</b></td>
+      <td>Note what is not on the list: fixing the fault. The 3Cs are goals for the <i>response</i>, not for the system. Mastering them is described as essential for effective incident response, which is a claim about the response and not about your uptime.</td>
+    </tr>
+    <tr>
+      <td><b>Incident Commander</b> (IC)</td>
+      <td>Leads the incident response and directs its high-level state. <b>The person who declares the incident typically steps into this role.</b></td>
+      <td>The IC commands and coordinates the response, delegating roles as needed; communicates effectively; stays in control of the response; and works with other responders to resolve the incident. The roles are organised as a hierarchy — the other two report to the IC.</td>
+      <td>The default that makes the system work with one person: <b>the IC assumes all roles that have not been delegated yet.</b> So there is never a gap. The IC may either hand the command role to someone else and take operations themselves, or assign operations to someone else — both are normal, and one of the worked cases turns on a commander handing over to a more experienced colleague mid-incident.</td>
+    </tr>
+    <tr>
+      <td><b>Operations Lead</b> (OL)</td>
+      <td>Works to respond to the incident by <b>applying operational tools</b> to mitigate or resolve it.</td>
+      <td>In one worked case the commander delegated the ordinary problems — restoring power, rebooting servers — to the operations lead, and engineers reported their progress back through that lead.</td>
+      <td>vs the commander. The distinction is that the OL acts on the system and the IC decides what should be acted on. The OL may lead a team, and those teams expand or contract as needed.</td>
+    </tr>
+    <tr>
+      <td><b>Communications Lead</b> (CL)</td>
+      <td>The <b>public face</b> of the incident response team. Provides periodic updates to the response team and to stakeholders, and manages inquiries about the incident.</td>
+      <td>In the power-outage case the CL observed and asked questions about all incident-related activities, and reported accurate information to four distinct audiences: company leaders, teams with storage concerns, external customers, and specific customers who had filed support tickets.</td>
+      <td>The role is elastic in one direction only: <b>if the incident becomes small enough, the CL role can be subsumed back into the IC role.</b> It is created by delegation and dissolved by absorption, which is why an incident does not need to be big before it can be managed.</td>
+    </tr>
+    <tr>
+      <td><b>Centralized communication</b></td>
+      <td>Gathering <b>all</b> the responders in one place and communicating in real time. The war room can be a physical location like a conference room, or virtual — a chat channel or a call.</td>
+      <td>It is named as an important principle of the response protocol, and it is the first thing the commander does in two of the worked cases.</td>
+      <td>vs communicating <i>about</i> the incident in the bug tracker. In the mishandled case, the team never declared an incident and kept troubleshooting through &ldquo;normal&rdquo; methods, using the bug tracking system for communication — and miscommunication between two groups of developers led them down the wrong path for days.</td>
+    </tr>
+    <tr>
+      <td><b>The working document</b></td>
+      <td>When <b>three or more people</b> work on an incident, start a collaborative document listing working theories, eliminated causes, and useful debugging information such as error logs and suspect graphs.</td>
+      <td>Its purpose is stated precisely: the document <b>preserves this information so it doesn't get lost in the conversation</b>.</td>
+      <td>It also gives you somewhere to put the detail when the main channel gets too busy. In the large case, discussion became too dense for the chat channel, so detailed debugging moved to the shared document and the channel became <b>the hub for decision making</b> — a split worth copying deliberately.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — declaring an incident is a cheap, reversible act</h4>
+    <p><b>What people think it is:</b> an escalation with a cost — waking people, alarming management, admitting the situation is out of hand. So they wait until they are sure.<br>
+    <b>What it actually is:</b> the act that gives you the tools. Declaring is what creates the command line, the roles, the shared channel and the record. Until it happens you are a group of individuals with a bug number.<br>
+    <b>What waiting costs, specifically:</b> declaring early prevents miscommunication between separate groups of developers; makes root-cause identification and resolution happen sooner; and loops relevant teams in earlier, which makes external communication faster and smoother. Those three are the stated benefits, and every one of them is a benefit you forfeit by waiting rather than a cost you defer.<br>
+    <b>The rule that follows:</b> declare early <i>and often</i>. Standing a response down is trivial; starting one two hours late is not.</p>
+  </div>
+
+  <h3>Anchor sketch — who holds what, and how it collapses</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named role or goal</b> &nbsp; <span class="node nstar">reversed = the act that creates all of it</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   two jobs are running at once, and they are different:
+      RESOLVING = mitigate the impact and/or restore
+                  the service to its previous condition
+      MANAGING  = coordinate the responding teams, and
+                  keep communication flowing BOTH ways
+                  (between responders, and outward)
+                          |
+   <span class="tks">SOMEONE DECLARES AN INCIDENT</span>  <- everything below
+   exists only after this sentence is said out loud.
+   whoever declares it TYPICALLY becomes the commander.
+                          |
+   <span class="tk1">THE THREE Cs</span>  what the framework is FOR
+        COORDINATE the response effort
+        COMMUNICATE between responders, inside the org,
+                    and to the outside world
+        CONTROL     stay in control of the response
+        +--> when incident response goes wrong, the culprit
+             is LIKELY in one of these three.
+                          |
+   <span class="tk1">THE THREE ROLES</span>  a hierarchy: the other two report
+   up to the commander
+        INCIDENT COMMANDER . decides, delegates, stays in
+             control, works with responders to resolve
+             +--> DEFAULT: the IC holds every role not yet
+                  delegated. so there is never a gap.
+             +--> may hand OVER command and take ops, or
+                  assign ops to someone else. both normal.
+        OPERATIONS LEAD .... applies operational tools to
+             mitigate or resolve
+        COMMUNICATIONS LEAD  the public face. periodic
+             updates to the team and to stakeholders;
+             handles inquiries
+             +--> if the incident gets SMALL enough, this
+                  role is subsumed back into the IC.
+                          |
+   <span class="tk1">FOUR BASIC PRINCIPLES</span>
+        clear line of command . clearly defined roles .
+        a working record kept AS YOU GO .
+        declare incidents EARLY AND OFTEN
+                          |
+   everyone in ONE place (room, channel or call), talking
+   in real time. 3+ people -> start a shared document of
+   theories tried and causes eliminated, so it is not
+   lost in the conversation.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give the 3Cs, and say what they are goals <i>for</i>.<br>
+      <span class="q">Q</span> Who is the commander by default, and which roles do they hold?<br>
+      <span class="q">Q</span> Name the three specific things declaring early is said to buy you.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Declaring an incident early</td><td>The command line, the roles, the shared channel and the record — plus earlier root-causing and smoother external communication.</td><td>The appearance of over-reacting, and other people's attention.</td><td>Always, on the stated rule: early <i>and often</i>. Standing down is cheap.</td></tr>
+    <tr><td>Handing over command mid-incident</td><td>The response gets whoever is best at running it, which may not be whoever noticed first.</td><td>A handover, at the worst possible moment, with context to transfer.</td><td>When someone with more incident-response experience is available &mdash; one worked case does exactly this, two hours in.</td></tr>
+    <tr><td>Splitting out a communications lead</td><td>The people fixing the thing stop being interrupted, and the outside world gets consistent, accurate updates.</td><td>A responder who is now not resolving anything.</td><td>As soon as anyone outside the response is asking. It collapses back into the commander when the incident shrinks.</td></tr>
+    <tr><td>One channel for everyone</td><td>Real-time coordination, and a record everyone can see.</td><td>It gets loud. In the large case a dozen participants made communication itself a challenge.</td><td>Always &mdash; and when it gets too dense, move detail to the shared document and keep the channel for decisions.</td></tr>
+    <tr><td>Keeping the record as you go</td><td>Theories and eliminated causes survive the conversation, and the postmortem is much easier to write.</td><td>Somebody's attention, during the incident, on writing rather than fixing.</td><td>Three or more responders. Below that the conversation is small enough to hold.</td></tr>
+    <tr><td>Adopting the framework whole</td><td>A complete, battle-tested structure with nothing left to invent.</td><td>More process than a small organisation needs, and more to teach.</td><td>Rarely at first &mdash; select the parts that matter to you and grow into the rest.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;Let's keep digging and see if it gets worse.&rdquo;</td><td>&ldquo;I'm declaring an incident and taking command. If it turns out to be nothing we stand down &mdash; that costs us far less than starting late.&rdquo;</td></tr>
+    <tr><td>&ldquo;Everyone's on it.&rdquo;</td><td>&ldquo;Who is the commander? Until that's answered, everyone being on it is the problem, not the reassurance.&rdquo;</td></tr>
+    <tr><td>&ldquo;I'll update the bug as I go.&rdquo;</td><td>&ldquo;Bug trackers are for tracking, not for coordinating. Everyone into the channel &mdash; real time, one place.&rdquo;</td></tr>
+    <tr><td>&ldquo;I'm running the response and also debugging it.&rdquo;</td><td>&ldquo;I hold every role I haven't delegated. Let me hand operations to you so I can stay on coordination.&rdquo;</td></tr>
+    <tr><td>&ldquo;Support keeps interrupting us for updates.&rdquo;</td><td>&ldquo;That's a comms lead's job. They're the public face; we stop context-switching and the outside world stops guessing.&rdquo;</td></tr>
+    <tr><td>&ldquo;This channel is unreadable now.&rdquo;</td><td>&ldquo;Move the debugging detail into the shared doc and keep the channel as the decision hub. Log the theories we've eliminated.&rdquo;</td></tr>
+    <tr><td>&ldquo;I noticed it, so I suppose I'm running it.&rdquo;</td><td>&ldquo;I am, by default &mdash; and I'd like to hand command to someone with more incident experience. I'll take operations.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A payments API starts returning errors for a subset of merchants. The on-call engineer opens a ticket, starts investigating, and posts findings into the ticket as they go. Over the next ninety minutes four other engineers notice the ticket and begin investigating in parallel; two of them independently rule out the same subsystem. The support team, fielding merchant calls, is asking the on-call engineer for updates roughly every ten minutes. Nobody has used the word &ldquo;incident&rdquo;. The on-call engineer's view is that they will declare one &ldquo;if it turns out to be serious&rdquo;.</p>
+    <p><b>(a)</b> Name the two distinct jobs now in progress, define each, and say which one has no owner. <b>(b)</b> Give the four basic principles, and identify which of them this situation violates and how. <b>(c)</b> Take the on-call engineer's reasoning seriously and say precisely what is wrong with it, using the three specific benefits that declaring early is said to provide. <b>(d)</b> Write the three sentences you would say to fix this in the next sixty seconds.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>Three hours into a regional outage, the incident channel has nineteen participants. The commander — the engineer who first noticed the problem — is simultaneously answering questions from a director, running two debugging threads, and writing an update for the status page. A colleague who has run many incidents joins and offers to help. Separately, two responders have each spent forty minutes eliminating the same suspected cause without knowing about each other.</p>
+    <p><b>(a)</b> Diagnose the commander's situation in terms of the default rule about undelegated roles, and say what specifically has gone wrong as a result. <b>(b)</b> Give both of the moves available to the commander now that an experienced colleague has arrived, and say what each costs. <b>(c)</b> Name the artefact that would have prevented the duplicated forty minutes, say at what team size it should have been started, and state exactly what it holds. <b>(d)</b> The channel is now too noisy to follow. Give the specific split to make, and say what stays in each place.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — has it been declared, and is anyone in command</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is there a single, named commander? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — one person, and everyone knows who</div>
+      <div class="colh">No — several people helping</div>
+
+      <div class="rowh">An incident<br>HAS been<br>declared</div>
+      <div class="cell focus"><b>The structure is doing its job</b>
+        Command line, roles, one channel, a record kept as you go. The commander holds whatever has not been delegated, so nothing is unowned.<br>
+        <i>Move:</i> stay here. Delegate operations and communications as the incident grows, and let communications collapse back into command as it shrinks. Keep the shared document alive from the third responder onward.</div>
+      <div class="cell"><b>Declared, and drifting</b>
+        The word was said but no one took command, so the roles never got assigned and the response is a crowd with a label.<br>
+        <i>Move:</i> somebody claims it, out loud, now &mdash; by default the person who declared it. An incident with no commander is worse than an undeclared one, because everyone believes it is being run.</div>
+
+      <div class="rowh">Still &ldquo;just<br>a ticket&rdquo;</div>
+      <div class="cell"><b>Quietly competent, and fragile</b>
+        Someone senior is effectively running it without the word being used. It often works &mdash; until they go off shift, or the incident outgrows one person's head.<br>
+        <i>Move:</i> declare anyway. You lose nothing and you gain the record, the channel and the ability to hand over. The handover is the part that fails without it.</div>
+      <div class="cell"><b>Where the bad case starts</b>
+        Parallel investigation in a bug tracker; support chasing individuals; duplicated work nobody can see; miscommunication between two groups sending them down the wrong path.<br>
+        <i>Move:</i> declare. That single act creates the command line, the roles, the shared channel and the record. Everything else in this booklet is downstream of it, which is why the principle is early <i>and often</i>.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is a decision that takes one sentence, and the column is a decision that takes one more. Both are free, and both are routinely postponed until the situation is bad enough to &ldquo;justify&rdquo; them &mdash; by which point the cost has already been paid in duplicated work and silence.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>If you are asking whether it is big enough to declare, declare it.</b> The question itself is the signal: it only occurs to you once coordination has already become a problem. Declaring costs one sentence and is reversible in one more; not declaring costs duplicated investigations, an uninformed audience, and a handover you cannot perform.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>Mitigate first, understand later</h2>
+    <p>The order the work has to happen in, and the kind of fix that does not wait for a diagnosis.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Four steps, in this order: work out who is hurt, stop the hurting, then find out why, then fix the why and write it up.</li>
+      <li>Most people do it in the wrong order. They try to understand before they try to stop it, because understanding feels like the responsible thing.</li>
+      <li>You do not need to know <i>what</i> broke to make it stop. You only need to know roughly <i>where</i>.</li>
+      <li>A blunt fix that works without a diagnosis — roll it back, take that region out — is worth more in the first hour than a precise one you can't apply yet.</li>
+      <li>Blunt fixes are blunt: they can cause their own problems. That is a price, not a reason to skip them.</li>
+      <li>The tools that let you do this take time to build, so they have to be built before the emergency, not during it.</li>
+      <li>Customers do not care whether you understand the outage. They care that the errors stopped.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>Water is coming through the kitchen ceiling. There are two things you can do, and only one of them is urgent. You can go up to the bathroom with a torch and work out which joint has failed, how long it has been weeping, and whether the last plumber used the wrong fitting — or you can turn off the stopcock. The stopcock is a <b>generic mitigation</b>: a blunt instrument that works without any diagnosis at all, because it does not care <i>which</i> pipe is leaking. It has real costs — nobody in the house has water now — and it fixes nothing permanently. But it stops the damage in fifteen seconds, and it buys you the whole afternoon to find the joint calmly. The mistake, and it is the natural one, is to go up with the torch first, because that feels like the competent thing to do while the ceiling is still dripping. Note also that the stopcock only helps if you know where it is and it turns. That is a thing you find out on a dry day.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>The order of an active incident</b></td>
+      <td>With mitigation as top priority: <b>1.</b> Assess the impact. <b>2.</b> Mitigate the impact. <b>3.</b> Perform a root-cause analysis. <b>4.</b> After the incident is over, fix what caused it and write a postmortem.</td>
+      <td>Afterwards you can run response drills to exercise the vulnerabilities in the system, and engineers can work on projects to address them.</td>
+      <td>vs the order people actually use, which puts diagnosis second. The consequence is stated flatly: <b>first responders must prioritize mitigation above all else, or time to resolution suffers.</b></td>
+    </tr>
+    <tr>
+      <td><b>Generic mitigation</b></td>
+      <td>An action first responders take to alleviate pain <b>even before the root cause is fully understood</b>.</td>
+      <td>Roll back a recent release when an outage is correlated with the release cycle; reconfigure load balancers to avoid a region when errors are localized.</td>
+      <td>They are <b>blunt instruments and may cause other disruptions to the service</b>. So while they may have broader impact than a precise solution, they can be put in place quickly to stop the bleeding while the team discovers and addresses the root cause. The bluntness is the price of not needing a diagnosis, not a defect.</td>
+    </tr>
+    <tr>
+      <td><b>Location beats detail</b></td>
+      <td>The rule that makes generic mitigation possible: <b>to mitigate an incident, you don't have to fully understand the details — you only need to know the location of the root cause.</b></td>
+      <td>In the large worked case, the responders identified a plausible cause at 9:56 a.m. If they had then rolled all images back to a known good state, the incident would have been mitigated by <b>10 a.m.</b> Instead the first mitigation attempt began at 10:59 and the fix landed at 11:59.</td>
+      <td>Having the ability to mitigate an outage <b>before its cause is fully understood</b> is described as crucial for running robust services with high availability. Note the ordering claim hidden here: knowing the location arrives much earlier than knowing the cause, and that gap is where the saved time lives.</td>
+    </tr>
+    <tr>
+      <td><b>Bespoke mitigation</b></td>
+      <td>A fix built for this specific fault, which therefore cannot start until the fault is understood.</td>
+      <td>In the same case: rebuilding binaries to push a new configuration that fetched images from a different location. The rebuild took about an hour; at 10:59, with the team 90% done, they discovered another location using the bad path and had to <b>restart the build</b>.</td>
+      <td>vs generic. Bespoke work is not wrong — it was one of two options assigned owners in that incident — but it is slow, and it is exposed to exactly the kind of setback above. The error is running it <i>instead of</i> a generic mitigation rather than alongside one.</td>
+    </tr>
+    <tr>
+      <td><b>Mitigation tools</b></td>
+      <td>The tooling that makes a generic mitigation a one-command action rather than a project.</td>
+      <td>The responders in that case would have benefited from some sort of tool that facilitated rollbacks.</td>
+      <td><b>Mitigation tools do take engineering time to develop. The right time to create general-purpose mitigation tools is before an incident occurs, not when you are responding to an emergency.</b> Where to find out which ones you need: browsing postmortems is a great way to discover mitigations and tools that would have been useful in retrospect.</td>
+    </tr>
+    <tr>
+      <td><b>Mitigating is not preventing</b></td>
+      <td>Stopping the impact and stopping the recurrence are different achievements, and only the second needs the root cause.</td>
+      <td>In the mishandled case, mitigation successfully stopped the impact on <b>three separate occasions</b> — each time by raising a quota — but the team could only prevent the issue from recurring once they discovered the root cause.</td>
+      <td>The general policy is to <b>first stop the impact of an incident, and then find the root cause</b>, unless the root cause happens to be identified early on. Once mitigated, understanding the cause is <i>just as important</i>, to stop it happening again. What that case got wrong was continuing the rollout after the first mitigation: better to have postponed it until the root cause was fully determined.</td>
+    </tr>
+    <tr>
+      <td><b>Assessing impact</b></td>
+      <td>Step 1, and it is a verification rather than an assumption: confirm that real users are affected, and how.</td>
+      <td>In the large case the on-call checked a dashboard showing failures above <b>60% for two zones</b>, then verified the issue was affecting user attempts to create new clusters while traffic to existing ones was unaffected — and declared an incident <b>25 minutes after being paged</b>.</td>
+      <td>This is listed as something that <b>went well</b> in a case where much did not. It is also what licenses the outward communication: a notice went to users 18 minutes after the declaration, which is only possible because someone had established what to tell them.</td>
+    </tr>
+    <tr>
+      <td><b>Escalation paths and &ldquo;all hands on deck&rdquo;</b></td>
+      <td>Prepared routes to more people: documented escalation paths, an on-call developer who can be paged for emergencies, and a broadcast to prepared mailing lists.</td>
+      <td>In the large case the commander escalated to the infrastructure, networking and compute teams to eliminate them as causes; the communications lead then sent an &ldquo;all hands on deck&rdquo; email to several lists including all developer leads. A security-team engineer who joined that way found the failing component.</td>
+      <td>vs escalation as an admission of failure. The lists existed beforehand, which is what made the broadcast a thirty-second action. Escalation is not a sin — especially if it helps lower customer pain.</td>
+    </tr>
+    <tr>
+      <td><b>Heroics</b></td>
+      <td>Individuals rescuing an incident outside their working hours, off-rota, because they happened to be reachable.</td>
+      <td>In the mishandled case, developers rallied on a weekend and provided valuable input. This was <b>both good and bad</b>: the effort was valued, but <b>successful incident management shouldn't rely on heroic efforts of individuals</b>. What if they had been unreachable?</td>
+      <td>vs a staffing solution. The stated alternatives are structural: conduct rollouts during business hours, or organise an on-call rotation that provides <b>paid</b> coverage outside them. Note the related failure in the same case: the rollout continued over a weekend when developers were not readily available, against the practice of rolling out only on business days.</td>
+    </tr>
+    <tr>
+      <td><b>Delegating the defined, coordinating the undefined</b></td>
+      <td>The commander's allocation rule in the well-handled case: hand off the work that has procedures, and personally drive the work that has none.</td>
+      <td>Three objectives after a power loss. Two — safely restoring grid power, and restarting machines not hosting customer workloads — were <b>clearly defined, well understood, and documented</b>, and went to the operations lead with regular status reports back. The third, moving unaffected workloads off hosts that needed rebooting, was <b>more vague and wasn't covered by any existing procedures</b>.</td>
+      <td>For the third, the commander assigned a dedicated person to coordinate between the two teams, monitored progress closely, realised the work called for <b>new tools to be written quickly</b>, and organised more engineers to build them. The command role also stayed with the team that had <b>the best visibility into customer impact</b> — the tie-breaker when deciding who should hold it.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — &ldquo;we don't understand it yet&rdquo; is not a reason to wait</h4>
+    <p><b>The instinct:</b> acting before you understand is reckless. You might make it worse, and you will certainly look as though you are guessing.<br>
+    <b>Why the instinct is wrong here:</b> a generic mitigation is defined as an action taken <i>before the root cause is fully understood</i>. That is its purpose, not a compromise. It needs one input only — roughly where the problem is — and that input becomes available long before a cause does.<br>
+    <b>What is genuinely being traded:</b> generic mitigations are blunt, and may cause other disruptions to the service. A rollback undoes good changes with the bad; draining a region moves load somewhere that may not want it. You accept a broader, smaller harm to end a narrower, larger one.<br>
+    <b>The line that settles it:</b> customers do not care whether or not you fully understand what caused an outage. What they want is to stop receiving errors.</p>
+  </div>
+
+  <h3>Anchor sketch — the four steps, and where the hour goes</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named step or move</b> &nbsp; <span class="node nstar">reversed = the step people postpone</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   AN ACTIVE INCIDENT, IN ORDER
+   ------------------------------------------------------
+   1  <span class="tk1">ASSESS THE IMPACT</span>  verify real users are hurt,
+         and how. this is what you can then announce.
+   2  <span class="tks">MITIGATE THE IMPACT</span>  <- the one that gets skipped
+   3  <span class="tk1">ROOT-CAUSE ANALYSIS</span>
+   4  <span class="tk1">AFTER IT IS OVER</span>  fix the cause, write the
+         postmortem, then drill the vulnerability
+
+   MITIGATE FIRST -- the rule that makes step 2 possible:
+        you do NOT need the details.
+        you need the LOCATION of the root cause.
+                          |
+        +-- GENERIC MITIGATION . works with no diagnosis
+        |     roll back a release correlated with the outage
+        |     reconfigure load balancers away from a region
+        |     PRICE: blunt. may disrupt other things. take it.
+        |
+        +-- BESPOKE MITIGATION . needs the diagnosis first
+              rebuild + push a new config: about an hour,
+              and it can be knocked back to zero
+
+   WHAT IT COST IN ONE REAL INCIDENT
+   ------------------------------------------------------
+        7:00   impact assessed .............. users confirmed
+        9:56   possible cause found ......... location known
+        |          +--> a generic rollback HERE would have
+        |               mitigated it by 10:00
+       10:59   bespoke mitigation begun ..... 90% done, then
+                                              a second bad
+                                              path found ->
+                                              restart build
+       11:59   root cause found and fixed
+       12:11   all zones back to 0% error
+        total: 6 h 40 m of failure
+
+   MITIGATION IS NOT PREVENTION
+        stopping the impact 3 times did not stop it coming
+        back. only the ROOT CAUSE did.
+        and: build the rollback tooling BEFORE the emergency.
+        read old postmortems to find out which tools.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give the four steps in order, and say which is top priority and why.<br>
+      <span class="q">Q</span> What is the single input a generic mitigation needs, and what does it <i>not</i> need?<br>
+      <span class="q">Q</span> Give two examples of a generic mitigation, and the price they both carry.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>Applying a generic mitigation as soon as you know the location</td><td>The bleeding stops, hours before a diagnosis would have arrived.</td><td>A blunt instrument's side effects &mdash; good changes rolled back with bad, load moved somewhere unwelcome.</td><td>As soon as step 1 is done and you know roughly where. Mitigation outranks everything.</td></tr>
+    <tr><td>Pursuing a bespoke fix</td><td>A precise repair with no collateral damage.</td><td>It cannot start until you understand the fault, takes far longer, and can be reset by a late discovery.</td><td>Alongside a generic mitigation, never instead of one.</td></tr>
+    <tr><td>Building mitigation tooling in advance</td><td>Turns a generic mitigation from a project into a command.</td><td>Engineering time, spent on something no incident is currently demanding.</td><td>Before the incident &mdash; and let old postmortems tell you which tools would have helped.</td></tr>
+    <tr><td>Continuing a rollout after mitigating</td><td>Momentum on the release.</td><td>The impact returns, because mitigation was never prevention &mdash; and in the worked case it returned at 100% rollout, on a weekend.</td><td>Not until the root cause is fully determined.</td></tr>
+    <tr><td>Relying on people who happen to be reachable</td><td>A resolution this weekend.</td><td>A response that depends on luck, and on unpaid time.</td><td>Never as a plan. Roll out in business hours, or pay for out-of-hours coverage.</td></tr>
+    <tr><td>Broadcasting &ldquo;all hands on deck&rdquo;</td><td>Expertise you did not know you needed &mdash; in the worked case, the person who found the failing component arrived this way.</td><td>Many people's attention, and a noisier channel.</td><td>When the incident is hours old with no cause and no mitigation. The lists must exist already.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;Let's find out what's causing it.&rdquo;</td><td>&ldquo;Let's stop it first. What can we roll back or drain right now, without knowing the cause?&rdquo;</td></tr>
+    <tr><td>&ldquo;We can't act until we understand it.&rdquo;</td><td>&ldquo;We don't need the details, only the location. We have that &mdash; so we can mitigate now and diagnose after.&rdquo;</td></tr>
+    <tr><td>&ldquo;A rollback might break other things.&rdquo;</td><td>&ldquo;It might. Generic mitigations are blunt by design; that's the price of not needing a diagnosis. It's cheaper than another two hours of errors.&rdquo;</td></tr>
+    <tr><td>&ldquo;The fix is nearly built.&rdquo;</td><td>&ldquo;Keep building it, and mitigate generically in parallel. Bespoke work can be knocked back to zero by one late discovery.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's mitigated, so we're fine.&rdquo;</td><td>&ldquo;It's mitigated, not prevented. Hold the rollout until we have the root cause &mdash; this one has come back twice already.&rdquo;</td></tr>
+    <tr><td>&ldquo;We got lucky, people were around at the weekend.&rdquo;</td><td>&ldquo;That's the finding, not the happy ending. Either we roll out in business hours or we pay for out-of-hours cover.&rdquo;</td></tr>
+    <tr><td>&ldquo;We should write a rollback tool sometime.&rdquo;</td><td>&ldquo;Now, not during the next one. And the last three postmortems will tell us which tools we actually needed.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>A search service starts returning empty results for about a fifth of queries. Forty minutes in, the responders establish that every failing query is served from one of three sites in one continent, and that a configuration push went out to those sites shortly before the errors began — but they cannot yet say what in the configuration is wrong. The team lead's position is that pushing the previous configuration back would &ldquo;undo a week of unrelated changes as well&rdquo; and that they should keep reading the diff until they find the offending line. Two engineers are already writing a targeted patch, which they estimate at ninety minutes.</p>
+    <p><b>(a)</b> Give the four steps of an active incident in order, and say which step this team is on and which one they have skipped. <b>(b)</b> State the rule about details versus location, and apply it: is enough known to act, and on what evidence? <b>(c)</b> Take the team lead's objection at full strength, name what it correctly identifies, and say why it does not change the decision. <b>(d)</b> The targeted patch is not wasted work. Say what should happen to it and why, referring to what went wrong with the equivalent effort in the worked case.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>A queue-backed notification system has now overflowed three times in a fortnight. Each time, an engineer has raised the consumer's memory limit, the backlog has drained, and the alert has cleared; nobody has found out why the backlog forms. A fourth occurrence lands on a Sunday, during a staged rollout that is at 60% and still progressing. The engineer who fixed it the previous three times is on holiday but answers a message and talks a colleague through it.</p>
+    <p><b>(a)</b> Name precisely what the three previous fixes achieved and what they did not, using the distinction the source draws. <b>(b)</b> Two decisions in this story are the same mistake as in the mishandled worked case. Name both, and give the specific corrective for each. <b>(c)</b> The holidaying engineer answered, so the incident was handled. Explain why this is recorded as a finding rather than a relief, and give the two structural alternatives. <b>(d)</b> Say what should be done with the rollout now, and what would have to be true before it resumes.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — what you know, and what you can reach for</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is a generic mitigation available to you? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — rollback, drain, failover, a switch</div>
+      <div class="colh">No — only a bespoke fix exists</div>
+
+      <div class="rowh">You know<br>roughly<br>WHERE the<br>cause is</div>
+      <div class="cell focus"><b>Act now — this is the whole lesson</b>
+        Location is the only input a generic mitigation needs. Waiting for the details here is what turns a two-hour incident into a seven-hour one.<br>
+        <i>Move:</i> apply it, accept the bluntness, and keep diagnosing behind it. In the worked case this cell was reached at 9:56 and not used; a rollback then would have ended the impact by 10:00 instead of 12:11.</div>
+      <div class="cell"><b>The expensive cell</b>
+        You could stop it, but nobody built the switch. Every minute now is spent on a fix that cannot ship until it is finished, and can be reset by a late discovery.<br>
+        <i>Move:</i> improvise the bluntest thing available &mdash; take the region out, stop the rollout, shed load &mdash; then put &ldquo;build the tool&rdquo; in the postmortem. Old postmortems are where you find out which tool you were missing.</div>
+
+      <div class="rowh">You do NOT<br>yet know<br>where</div>
+      <div class="cell"><b>Aim the blunt instrument</b>
+        You hold the lever but do not know which way to pull it. This is where step 1 earns its place: assessing impact usually localises the fault.<br>
+        <i>Move:</i> finish assessing &mdash; which users, which region, which version, since when &mdash; and correlate with recent change. That is a much shorter job than diagnosis, and it moves you up a row.</div>
+      <div class="cell"><b>Genuinely early</b>
+        Nothing to pull and nowhere to aim. The only honest cell of the four, and the one people believe they are in for far longer than they actually are.<br>
+        <i>Move:</i> escalate wide, get people who know the system into one place, and keep a shared document of causes eliminated. Re-ask &ldquo;do we know where yet?&rdquo; every few minutes &mdash; the answer usually arrives well before the cause does.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is what you know and it improves quickly; the column is what you built, and during an incident it cannot change at all. Most responses stall in the top-left, holding both the knowledge and the lever, because acting without a diagnosis feels like guessing &mdash; and that hesitation is the single most expensive habit in this competency.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Ask &ldquo;can we stop this without knowing why?&rdquo; before you ask &ldquo;why?&rdquo;</b> Ask it out loud, and ask it again every ten minutes. The answer changes as the location becomes clearer, and the moment it turns into &ldquo;yes&rdquo; is the moment the incident should end for your users — regardless of how much of it you understand.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>Practise before the pager</h2>
+    <p>What to teach, what to decide in advance, and how to find the gaps while the stakes are low.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Nobody reads the fire evacuation map during a fire. Everything that has to work under stress has to be familiar before the stress.</li>
+      <li>Teach people the shape of a response — that they can delegate, that they can escalate, that mitigation comes first, and what the three roles are.</li>
+      <li>Decide the boring logistics now: which chat channel, who to contact, what wording to publish, and what even counts as an incident.</li>
+      <li>Tell people what's happening. If you don't say an incident is being worked on, everyone assumes nobody is working on it. If you don't say it's over, everyone assumes it isn't.</li>
+      <li>Then practise. Invent an outage. Break something on purpose in a test environment. Treat a small problem as a big one just to run the drill.</li>
+      <li>The valuable bit of a drill isn't the drill — it's the report afterwards saying what didn't work.</li>
+      <li>Practice builds muscle memory, and muscle memory is what you have left when you panic.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>Every building you have ever worked in runs fire drills, and everyone finds them mildly annoying. Notice what a drill is actually testing, though — almost none of it is the fire. It tests whether the alarm is audible in the far corner of the basement; whether the door that is always propped open is still propped open; whether anyone remembers that the assembly point moved; whether the person with the visitor list is the person who was in that day. These are logistics questions, decided long before, and the drill exists to find out which of those decisions have quietly rotted. The genuinely valuable part is not the walk down the stairs. It is the five minutes afterwards when someone says &ldquo;the third-floor stairwell door was locked&rdquo; — and then somebody unlocks it. A drill nobody reviews is exercise; a drill with a report is maintenance.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Response training</b></td>
+      <td>Training responders to <b>organize</b> an incident, so they have a pattern to follow in a real emergency.</td>
+      <td>What it buys: knowing how to organise an incident, having a common language to use throughout, and sharing the same expectations — which together <b>reduce the chance of miscommunication</b>.</td>
+      <td>vs training people to fix things. This is training in the <i>shape</i> of a response, not in any system. Three suggested starting points if the full framework is more than you need: let on-calls know they can delegate and escalate; encourage a mitigation-first response; define the commander, communications and operations roles.</td>
+    </tr>
+    <tr>
+      <td><b>Connecting theory to scenarios</b></td>
+      <td>People are <b>more receptive to incident response training when they can connect the theory to actual scenarios and concrete actions</b>.</td>
+      <td>So include hands-on exercises, and share what happened in past incidents — analysing what went well and what didn't. You can adapt and summarise your framework into a deck for new team members, and external agencies specialising in incident response classes are an option.</td>
+      <td>vs presenting the framework as doctrine. The abstract version is what people forget; the story of an outage they recognise is what they retain.</td>
+    </tr>
+    <tr>
+      <td><b>Deciding the channel</b></td>
+      <td>Agree the communication channel beforehand — chat, a phone bridge, or similar — and <b>practise using it so there are no surprises</b>.</td>
+      <td>The reason, stated plainly: <b>no Incident Commander wants to make this decision during an incident.</b> If possible pick one the team is already familiar with, so everyone feels comfortable using it.</td>
+      <td>vs picking the best tool. Familiarity beats capability here, because the cost you are avoiding is hesitation, not missing features. One organisation's practice makes the split explicit: coordination decisions are made on a conference call and the outcomes are recorded in chat, with calls recorded so the timeline can be reconstructed if the scribe misses something.</td>
+    </tr>
+    <tr>
+      <td><b>Keeping your audience informed</b></td>
+      <td>Two symmetrical assumptions people make in the absence of information.</td>
+      <td><b>Unless you acknowledge that an incident is happening and actively being addressed, people will automatically assume nothing is being done.</b> Similarly, <b>if you forget to call off the response once the issue is mitigated or resolved, people will assume the incident is ongoing.</b></td>
+      <td>vs a communication task that ends when the fault does. Both failures are failures of the <i>edges</i> — the start and the end — and both are preempted by regular status updates plus a prepared contact list. Note that closing the incident is an announcement, not merely a state.</td>
+    </tr>
+    <tr>
+      <td><b>Prepared templates and contacts</b></td>
+      <td>Two or three ready-to-use templates for sharing information, which the on-call knows how to send; and a list of people to email or page, prepared beforehand.</td>
+      <td>The reason for templates: <b>no one wants to write these announcements under extreme stress with no guidelines.</b> Think ahead about how you will draft, review, approve and release public posts — one organisation's teams seek guidance from their public relations team.</td>
+      <td>The contact list is what makes a broadcast instant: in the large worked case, the &ldquo;all hands on deck&rdquo; call was an email to several lists that had been <b>prepared beforehand</b>. Both items save critical time and ensure you don't miss anyone.</td>
+    </tr>
+    <tr>
+      <td><b>Criteria for an incident</b></td>
+      <td>An established list of criteria for determining whether a paging issue is <b>indeed an incident</b>.</td>
+      <td>Sometimes it is clear; other times it is not. A team can come up with a solid list by <b>looking at past outages</b> and taking known high-risk areas into consideration.</td>
+      <td>vs judgement in the moment. This is the mechanism that makes &ldquo;declare early and often&rdquo; actionable rather than aspirational, because it removes the argument about whether the threshold has been met. The summary: decide how to communicate, who your audience is, and who is responsible for what — guidelines that are easy to set up and have high impact on shortening resolution time.</td>
+    </tr>
+    <tr>
+      <td><b>Drills</b></td>
+      <td>The final step: practising your incident management skills, so the team develops good habits and patterns of behaviour before they are needed.</td>
+      <td>Three scales. A company-wide resilience-testing programme creates a <b>controlled emergency that doesn't actually impact customers</b>, which teams respond to as if it were real, reviewing the procedures afterwards. Smaller: a role-playing exercise rehearsing specific incidents. Smallest: <b>intentionally treating minor problems as major ones</b> requiring a large-scale response.</td>
+      <td>vs testing the system. Drills test the <i>response</i>. Everyone who could get swept in should feel comfortable with the tactics — including developers, customer support and marketing partners, not only engineers on call.</td>
+    </tr>
+    <tr>
+      <td><b>Running a drill well</b></td>
+      <td>Invent an outage, or build one from a postmortem — <b>postmortems contain plenty of ideas for drills</b>. Use real tools as much as possible; consider breaking your test environment so the team performs real troubleshooting.</td>
+      <td>Drills are <b>far more useful if they're run periodically</b>, and each should be followed by a report detailing what went well, what didn't, and how things could have been handled better.</td>
+      <td><b>The most valuable part of running a drill is examining the outcomes</b>, which can reveal a lot about gaps in incident management — and once you know what they are, you can work toward closing them. So a drill without a review has skipped its own point. What made one such programme succeed organisationally: accepting failure as a means of learning, finding value in the gaps identified, and getting leadership on board.</td>
+    </tr>
+    <tr>
+      <td><b>Simulation with a clock</b></td>
+      <td>Practice exercises teach roles and process, but <b>can't fully replicate the urgency of actual major incidents</b>. Time-bound simulation games are used to capture that aspect.</td>
+      <td>One weekly failure-injection exercise nominates a commander beforehand — typically a person training to become one — who is expected to behave and act like a real commander throughout, while subject-matter experts use the same processes and vernacular they would use during an actual incident.</td>
+      <td>The exercise serves both directions of experience: it familiarises new on-call engineers with the language and processes, and gives seasoned ones a refresher. The separate use of a cooperative, time-limited puzzle game is deliberate — its stressful, communication-intensive nature forces players to cooperate under a deadline, which the calmer exercises cannot manufacture.</td>
+    </tr>
+    <tr>
+      <td><b>Rotating during a long incident</b></td>
+      <td>Swapping responders, including the commander, on a fixed interval during a long response.</td>
+      <td>In a ten-hour incident, on-call engineers and the commander were rotated <b>every four hours</b>. When the runbook procedures did not resolve the issue, the response team started trying new recovery options <b>in a methodical manner</b>.</td>
+      <td>The two stated reasons are different in kind: it <b>encouraged engineers to get rest</b>, and it <b>brought new ideas into the response team</b>. The second is easy to miss — rotation is not only a welfare measure, it is a debugging technique.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — preparation is not documentation</h4>
+    <p><b>What organisations usually produce:</b> a written incident response policy, filed, linked from an onboarding page, technically correct and never read under stress.<br>
+    <b>What is actually being asked for:</b> decisions made in advance and then <i>rehearsed</i> — a channel the team has already used for this purpose, templates the on-call has already sent, contact lists that have already been mailed, criteria already argued over on a calm afternoon.<br>
+    <b>The test that separates them:</b> a document tells you what you should do; practice determines what you will do. Staying calm and following a structure during an emergency <b>takes practice, and practice builds muscle memory</b> — which is what gives you the confidence you need in a real emergency.<br>
+    <b>The consequence for drills:</b> a drill with no report afterwards is exercise, not preparation. Examining the outcomes is where the gaps become visible, and the gaps are the entire product.</p>
+  </div>
+
+  <h3>Anchor sketch — everything that must be settled before the pager</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named preparation</b> &nbsp; <span class="node nstar">reversed = the step that turns the rest into reflex</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   "by the time a pager alerts you to a problem, it is too
+    late to think about how to MANAGE the incident."
+                          |
+   <span class="tk1">TRAIN</span>  teach the SHAPE of a response, not a system
+        you may delegate . you may escalate .
+        mitigation comes first . the three roles exist
+        +--> the full framework may be more than you need.
+             take the parts that matter to you.
+        +--> people take it in when it is attached to a
+             REAL past incident. use hands-on exercises.
+                          |
+   <span class="tk1">DECIDE THE LOGISTICS</span>  all of it, on a calm day
+        CHANNEL ....... agree it and PRACTISE it. pick one
+                        the team already knows. no commander
+                        wants to choose this mid-incident.
+        TEMPLATES ..... 2-3 ready to send, and the on-call
+                        knows how. nobody writes well under
+                        extreme stress.
+        CONTACTS ...... prepared lists = an "all hands on
+                        deck" broadcast takes 30 seconds.
+        CRITERIA ...... what counts as an incident. build it
+                        from PAST OUTAGES + known high-risk
+                        areas. this is what makes "declare
+                        early" a rule instead of a mood.
+                          |
+   <span class="tk1">TELL PEOPLE</span>  two symmetrical assumptions:
+        say nothing is happening -> they assume NOBODY IS
+                                     WORKING ON IT
+        forget to call it off ----> they assume it is STILL
+                                     GOING
+                          |
+   <span class="tks">DRILL</span>  practice builds muscle memory. muscle memory
+   is what is left when you panic.
+        big ..... a controlled emergency, no real customer
+                  impact, treated as if it were real
+        medium .. role-play a previous postmortem
+        small ... treat a minor problem as a major one
+                  ON PURPOSE, just to run the machinery
+        rules: run them PERIODICALLY . use real tools .
+               consider breaking the test environment
+        +--> the value is NOT the drill. it is the report
+             afterwards: what went well, what did not, what
+             would be handled differently. no report, no
+             preparation.
+        +--> long real incident? rotate responders AND the
+             commander (one team: every 4 hours) -- for rest,
+             and for FRESH IDEAS.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Name the four things to settle in advance, and the reason given for each.<br>
+      <span class="q">Q</span> Give the two symmetrical assumptions people make when you don't tell them anything.<br>
+      <span class="q">Q</span> What is the most valuable part of a drill, and what makes a drill worthless?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>Adopting only part of the framework</td><td>Something a small team will actually use, taught in an afternoon.</td><td>Gaps the full structure would have covered, found later and the hard way.</td><td>Starting out &mdash; take delegation, escalation, mitigation-first and the three roles, and grow.</td></tr>
+    <tr><td>Picking the channel the team already uses</td><td>No hesitation, no learning curve, no surprises mid-incident.</td><td>It may be worse at the job than a purpose-built tool.</td><td>Almost always. Familiarity is the feature you are buying.</td></tr>
+    <tr><td>Writing announcement templates in advance</td><td>The on-call can inform the world without composing prose under stress.</td><td>Time spent, plus review and approval routes to agree while nothing is wrong.</td><td>Before you need them &mdash; two or three, and make sure the on-call knows how to send them.</td></tr>
+    <tr><td>Publishing criteria for what counts as an incident</td><td>Removes the argument about the threshold, which is what actually delays declaration.</td><td>Effort to derive them, and they must be revisited as the system changes.</td><td>As soon as you have past outages to learn from &mdash; which is the stated source for them.</td></tr>
+    <tr><td>Running a company-scale controlled emergency</td><td>Finds gaps nothing smaller can, across teams that never rehearse together.</td><td>Expensive, disruptive, and needs leadership backing to survive its first bad result.</td><td>When the organisation can accept failure as a means of learning &mdash; that acceptance is a precondition, not a benefit.</td></tr>
+    <tr><td>Treating a minor problem as major on purpose</td><td>Real tools, real people, real procedures, low stakes.</td><td>Attention spent on something that did not need a full response.</td><td>Regularly, as the cheapest drill available.</td></tr>
+    <tr><td>Rotating the commander every few hours</td><td>Rested responders, and fresh ideas entering a stuck investigation.</td><td>A handover, and the context that goes with it.</td><td>Any incident long enough that people are tiring &mdash; one worked case rotated every four hours across ten.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We've written the incident policy.&rdquo;</td><td>&ldquo;Has anyone run it? A document tells people what they should do; only practice decides what they will do.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll set up a channel when something happens.&rdquo;</td><td>&ldquo;Agree it now and practise in it. No commander wants to be choosing a tool mid-incident.&rdquo;</td></tr>
+    <tr><td>&ldquo;Support can explain it to customers.&rdquo;</td><td>&ldquo;Give them two or three approved templates and make sure the on-call can send them. Nobody writes well under extreme stress.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's obvious when something is an incident.&rdquo;</td><td>&ldquo;Sometimes. Write the criteria from our past outages and known high-risk areas &mdash; that's what makes declaring early actually happen.&rdquo;</td></tr>
+    <tr><td>&ldquo;We fixed it, we can stop updating now.&rdquo;</td><td>&ldquo;Call it off explicitly. If we don't say it's over, everyone assumes it's still going.&rdquo;</td></tr>
+    <tr><td>&ldquo;The drill went fine.&rdquo;</td><td>&ldquo;Then write the report. What went well, what didn't, what we'd do differently &mdash; the outcomes are the product, not the exercise.&rdquo;</td></tr>
+    <tr><td>&ldquo;She's been on it eight hours, she knows it best.&rdquo;</td><td>&ldquo;Rotate her out. It's for rest, and it's also how a stuck investigation gets a new idea.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>A sixty-person engineering organisation has a well-written incident response policy on its internal wiki, revised last year. During a genuine outage last month: the responders spent eleven minutes deciding between two chat tools and a video call; the on-call engineer wrote a customer-facing status update from scratch, which a manager then rewrote twice before it was published forty minutes later; nobody could find the escalation contact for the payments team; and two engineers argued for a quarter of an hour about whether the event qualified as an incident at all. The postmortem's single action item reads &ldquo;re-read the incident policy&rdquo;.</p>
+    <p><b>(a)</b> Name the four things that should have been settled in advance, matching each to the specific delay it would have removed here. <b>(b)</b> For the channel and the templates, give the stated reason each must be decided beforehand rather than chosen well in the moment. <b>(c)</b> Explain what is wrong with the action item, using the distinction between documentation and preparation. <b>(d)</b> The criteria argument is the most consequential of the four delays. Say why, and say where the criteria should come from.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A team wants to start practising incident response but has no budget for anything elaborate. They propose a quarterly exercise in which the on-call engineer is given a written scenario and talks through what they would do, in a meeting, for twenty minutes. There is no report afterwards — the group discusses it and moves on. Separately, during a real nine-hour incident last week, the same commander ran the whole response because &ldquo;she had all the context&rdquo;, and by hour seven the team was re-testing hypotheses it had already eliminated.</p>
+    <p><b>(a)</b> Give the three scales of drill available, and say which of them this team could run this week at no cost. <b>(b)</b> Name what their proposed exercise is missing that would make it preparation rather than conversation, and say what specifically that missing piece produces. <b>(c)</b> Their scenario is invented from scratch each time. Give the better source and say why. <b>(d)</b> Address the nine-hour incident: name the practice that was skipped, give both of its stated benefits, and say which one would have prevented the repeated hypotheses.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — decided in advance, and rehearsed</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: has the team actually practised? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — drills, run periodically, reviewed</div>
+      <div class="colh">No — they have been told, not trained</div>
+
+      <div class="rowh">The logistics<br>ARE settled<br>in advance</div>
+      <div class="cell focus"><b>Ready</b>
+        Channel agreed and used, templates written and sendable, contacts listed, criteria published &mdash; and people who have run the machinery with nothing at stake.<br>
+        <i>Move:</i> keep drilling periodically and keep writing the report each time, because this cell decays quietly: contact lists rot, the channel gets replaced, the criteria stop matching the system. The drill is what detects the rot.</div>
+      <div class="cell"><b>A good policy, untested</b>
+        Everything is decided and written down, and nobody has ever done it. The gaps are all still there; they are simply invisible.<br>
+        <i>Move:</i> the cheapest drill in the book &mdash; take the next minor problem and deliberately run it as a major one, with real tools, real roles and a real report. It costs nothing and tests the decisions you have already made.</div>
+
+      <div class="rowh">Nothing is<br>settled &mdash; it<br>gets decided<br>on the night</div>
+      <div class="cell"><b>Skilled improvisers</b>
+        People know how to run a response and burn the first fifteen minutes of every one choosing tools, writing prose and arguing about whether this counts.<br>
+        <i>Move:</i> write the four decisions down this week. This team gets the most immediate return of the four cells, because the skill is already there and only the friction is missing.</div>
+      <div class="cell"><b>Where every bad case in this booklet begins</b>
+        No channel, no templates, no contacts, no criteria, no practice. The response will be assembled from scratch, by frightened people, at the worst moment.<br>
+        <i>Move:</i> start with criteria and channel &mdash; they are free and they unblock declaring. Then one drill, then the report. Do not attempt the full framework; take the parts that matter and grow into the rest.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is cheap and can be done in an afternoon; the column is not, and cannot be bought late. Note that the two off-diagonal cells fail differently &mdash; the top-right has answers nobody has tested, the bottom-left has skill with no scaffolding &mdash; and the fix for each is the other one's strength.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Every decision you make during an incident is one you failed to make before it.</b> Keep a running list of them: each time a response stalls to choose a tool, find a phone number, compose a sentence or argue about a threshold, that is next week's preparation task. The list writes itself, for free, from every incident and every drill — provided somebody writes the report afterwards.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>The write-up that changes something</h2>
+    <p>Two postmortems of the same outage — one that taught nothing, and one that changed the system.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>After it's over, someone writes up what happened. Most of the value of the whole incident is in that document, and most write-ups waste it.</li>
+      <li>Don't blame people. Not because it's unkind — because blamed people go quiet, and the next write-up is missing the bit you needed.</li>
+      <li>Use numbers. If you can't measure the damage, you can't know when it's fixed.</li>
+      <li>&ldquo;Improve the alerting&rdquo; is not an action. &ldquo;Alert when more than X% of our machines disappear&rdquo; is, because you can tell whether it's done.</li>
+      <li>Every action needs one owner, a priority, and a ticket. Without a ticket it will be forgotten.</li>
+      <li>Don't try to fix humans. Fix the system that let the humans do it.</li>
+      <li>Publish it widely and publish it fast. A write-up read by one team, four months late, has taught nobody anything.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>Two documents can follow the same plane landing badly. One is a disciplinary hearing: who was flying, what they failed to do, what will happen to them. The other is an accident investigation: what the aircraft did, second by second, with the figures; which warnings were displayed and which were ambiguous; why a reasonable crew would have read them the way this crew did; and a numbered list of changes to the checklist, the instrument and the training, each with an owner and a deadline. Both are thorough. Only one of them is read by other airlines, and only one of them changes anything, and the reason is the same in both cases. The hearing tells everyone that the safe move is to say as little as possible; the investigation tells everyone that the useful move is to say exactly what happened. Every rule in this part is downstream of that single difference.</p>
+  </div>
+
+  <h3>The worked case, in four sentences</h3>
+  <p>A rack of edge proxy machines was marked for decommissioning, and the decommission process — which overwrites the full content of all drives, irreversibly — ran successfully for that rack while the automation for the remaining steps failed. To debug the failure, an engineer retried the process. On the second run the step that fetched the machines in the rack returned an <b>empty list</b>, because they had already been decommissioned, and an <b>input validation bug</b> in the admin server treated an empty list as &ldquo;no filter&rdquo; rather than &ldquo;act on no machines&rdquo;. Within minutes the disks of all such machines <b>globally</b> were erased; user traffic was rerouted to core datacentres, causing a latency increase; it took <b>two days</b> to reinstall the machines, and several weeks afterwards to audit the automation and make the workflow idempotent.</p>
+  <p>Two postmortems of that outage are compared below. Both are about the same 40 minutes. One was published four and a half months later to a single team; the other was published <b>four days</b> later to everyone in engineering. Three years on, a similar incident occurred — and the action items from the second document had <b>dramatically reduced the blast radius and rate</b> of the repeat.</p>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Failure or quality</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Missing context</b></td>
+      <td>Introducing terminology specific to one system without explaining it, while the Background and Glossary sections sit empty.</td>
+      <td>If you need to provide additional context, use those sections — which can link to longer documents.</td>
+      <td>The consequence is not pedantry: an uncontextualised document <b>might be misunderstood or even ignored</b>. And the reason it matters is the audience rule — <b>your audience extends beyond the immediate team.</b></td>
+    </tr>
+    <tr>
+      <td><b>Key details omitted</b></td>
+      <td>Sections that contain high-level summaries but lack the details that make them useful.</td>
+      <td>Three places it showed: a <b>problem summary</b> whose only numerical data was the duration, so the size of the outage cannot be estimated; a <b>root causes and trigger</b> section that describes the cause in a paragraph without exploring the lower-level details; and a <b>recovery efforts</b> section left completely empty.</td>
+      <td>On the missing numbers: for outages affecting multiple services you should present numbers to give a consistent representation of impact, and <b>even if there is no concrete data, a well-informed estimate is better than no data at all</b> — because <b>if you don't know how to measure it, then you can't know it's fixed.</b> On recovery efforts: the postmortem <i>is</i> the record of the incident for its readers, and that is the section which tells them how it was mitigated.</td>
+    </tr>
+    <tr>
+      <td><b>Weak action items</b></td>
+      <td>The section that is supposed to be an actionable plan to prevent recurrence, and instead is a list of intentions.</td>
+      <td>Four defects, all present at once: the items were <b>mostly mitigative</b> with almost no preventative ones; <b>all tagged with equal priority</b>, so there is no way to determine which to tackle first; two used <b>ambiguous phrases</b> like &ldquo;Improve&rdquo; and &ldquo;Make better&rdquo;, which are open to interpretation and make success criteria unmeasurable; and <b>only one had a tracking bug</b>.</td>
+      <td>The one &ldquo;preventative&rdquo; item proposed making humans less error-prone. In general, <b>trying to change human behavior is less reliable than changing automated systems and processes</b> — or, as one engineer put it, &ldquo;let's plan for a future where we're all as stupid as we are today&rdquo;. On tracking: <b>without a formal tracking process, action items from postmortems are often forgotten, resulting in outages.</b></td>
+    </tr>
+    <tr>
+      <td><b>Finger pointing</b></td>
+      <td>Naming individuals as causes. Every postmortem has the potential to lapse into a blameful narrative.</td>
+      <td>It appeared in three separate sections of the bad example: the whole team blamed with two members called out by name; a named individual targeted in an action item; and one person <b>held solely responsible</b> in the root cause section.</td>
+      <td>vs accountability, which is what ownership provides. The stated mechanism of harm is specific: highlighting individuals <b>leads team members to become risk-averse because they're afraid of being publicly shamed</b>, and <b>they may be motivated to cover up facts critical to understanding and preventing recurrence</b>. The blameless version focuses on the <b>gaps in system design</b> that permitted the failure mode — on <i>what</i> went wrong, not <i>who</i> — and aims its actions at improving the system rather than improving people.</td>
+    </tr>
+    <tr>
+      <td><b>Animated language</b></td>
+      <td>Personal judgements and subjective language in a document that should be a <b>factual artifact</b>, considering multiple perspectives and respectful of others.</td>
+      <td>Three examples from the same document: superfluous language (&ldquo;careless ignorance&rdquo;), animated text (&ldquo;which is ridiculous&rdquo;), and an exclamation of disbelief (&ldquo;I can't believe we survived this one!!!&rdquo;).</td>
+      <td>The cost is twofold: dramatic descriptions <b>distract from the key message</b> and <b>erode psychological safety</b>. The replacement is not blandness — it is evidence: <b>provide verifiable data to justify the severity of a statement.</b></td>
+    </tr>
+    <tr>
+      <td><b>Ownership</b></td>
+      <td>Declaring official ownership <b>results in accountability, which leads to action</b>.</td>
+      <td>Two failures: the document listed <b>four owners</b>, and the action items had little or no ownership.</td>
+      <td>Ideally an owner is a <b>single point of contact</b> responsible for the postmortem, the follow-up and the completion — <b>better to have a single owner and multiple collaborators</b>. Action items without clear owners are less likely to be resolved. Note this is the exact opposite of finger pointing: naming who <i>will act</i> is required; naming who <i>caused it</i> is forbidden.</td>
+    </tr>
+    <tr>
+      <td><b>Audience</b></td>
+      <td>By default the document should be accessible to <b>everyone at the company</b>; the recommendation is to share it as widely as possible — perhaps even with your customers.</td>
+      <td>The bad example was shared only among members of the team; the good one went to all engineering employees.</td>
+      <td>The principle behind it: <b>the value of a postmortem is proportional to the learning it creates</b>, and the more people who can learn from past incidents, the less likely they are to be repeated. A thoughtful and honest postmortem is also <b>a key tool in restoring shaken trust</b>. As a culture matures the audience may extend to non-humans, with machine-readable tags and metadata enabling downstream analytics.</td>
+    </tr>
+    <tr>
+      <td><b>Promptness</b></td>
+      <td>Writing and circulating the document while the incident is fresh.</td>
+      <td>The bad example was published <b>four months</b> after the incident — and in the interim the incident recurred, by which point team members would likely have forgotten key details a timely document would have captured. The good one was circulated <b>less than a week</b> after the incident closed.</td>
+      <td>Two reasons, and the second is the one people miss. A prompt postmortem <b>tends to be more accurate because information is fresh</b>. And the people affected are waiting for an explanation and some demonstration that you have things under control: <b>the longer you wait, the more they will fill the gap with the products of their imagination.</b></td>
+    </tr>
+    <tr>
+      <td><b>Depth, metrics and conciseness</b></td>
+      <td>Three of the qualities that made the second document work.</td>
+      <td><b>Depth</b>: rather than only investigating the proximate area of failure, it explored impact and system flaws across multiple teams, with impact described from several perspectives and all conclusions based on facts and linked data. <b>Quantifiable metrics</b>: cache hit ratios, traffic levels and durations, with links back to original sources — data transparency that removes ambiguity. <b>Conciseness</b>: lengthy chat transcripts and system logs were abstracted, with the unedited versions linked.</td>
+      <td>Add <b>clarity</b>: a well-written glossary makes the document accessible to a broad audience, and grouping action items by theme makes it easier to assign owners and priorities — that incident's items were split into five themes covering prevention, emergency response, monitoring, provisioning and cleanup. Measurability is what makes an action item finishable: &ldquo;add an alert when more than X% of our machines have been taken away from us&rdquo; has a verifiable end state.</td>
+    </tr>
+    <tr>
+      <td><b>The culture that produces them</b></td>
+      <td>Postmortems are as much a cultural change as a technical one, and the culture has to be incentivised and defended.</td>
+      <td><b>Rewarding:</b> reward action item <i>closeout</i>, not only authorship — reward writing but not closing and you risk an unvirtuous cycle of unclosed postmortems. Reward the organisational change with bonuses, reviews and promotion; highlight the improved reliability; hold authors up as experts; and gamify, with scoreboards or burndowns of open action items. <b>Sharing:</b> announce drafts organisation-wide, run cross-team reviews and reading clubs, reenact past incidents as training with the original commander present, and publish a weekly outage report.</td>
+      <td><b>The four signs it is failing:</b> people <i>avoiding association</i> with a postmortem, and being glad not to be involved; leadership <i>failing to reinforce</i> — a &ldquo;this is a safe space, but someone must have known&rdquo; framing, which a responder can redirect by asking generically whether there were warning signs and why they were dismissed; <i>lacking time to write them</i>, since subpar postmortems with incomplete action items make recurrence far more likely — <b>postmortems are letters you write to future team members</b>, so keep a consistent quality bar; and <i>repeating incidents</i>, which should trigger questions about whether action items take too long to close, whether feature velocity is trumping reliability fixes, whether the right items are being captured, whether the service is overdue for a refactor, and whether people are putting sticking plasters on a more serious problem.</td>
+    </tr>
+  </table>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — blameless is not ownerless, and not vague</h4>
+    <p><b>The misreading:</b> &ldquo;blameless&rdquo; means avoiding names, softening findings, and declining to say anything anyone might take personally. Documents written this way are gentle and useless.<br>
+    <b>What it actually forbids:</b> attributing the <i>cause</i> to a person — holding someone solely responsible, calling out individuals for what went poorly, aiming an action item at a named person's behaviour. That is what makes people risk-averse and motivates them to cover up the facts you needed.<br>
+    <b>What it actively requires:</b> naming a <i>single</i> owner of the document, and an owner plus a priority plus a tracking bug for every action item — because declaring official ownership results in accountability, which leads to action. Naming who will act is mandatory; naming who caused it is forbidden. Those are not in tension; they are the same instinct applied to the future rather than the past.<br>
+    <b>The test:</b> read every sentence and ask whether it is about a <i>gap in the system</i> or about a <i>person's judgement</i>. Then read every action item and ask whether you could tell, six months from now, whether it is done.</p>
+  </div>
+
+  <h3>Anchor sketch — the same outage, written twice</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named failure or quality</b> &nbsp; <span class="node nstar">reversed = the one that costs you the next postmortem</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   ONE OUTAGE. 40 MINUTES. TWO DOCUMENTS.
+   ------------------------------------------------------
+   THE WRITE-UP THAT TAUGHT NOTHING
+        <span class="tk1">MISSING CONTEXT</span> ..... jargon, and the Background
+             and Glossary sections both left blank
+        <span class="tk1">DETAILS OMITTED</span> ..... the only number was the
+             DURATION. recovery efforts: empty.
+             "if you don't know how to measure it, then
+              you can't know it's fixed"
+        <span class="tk1">WEAK ACTIONS</span> ........ "Improve alerting."
+             "Make automation better."
+             all one priority . 1 of 4 had a ticket .
+             mostly mitigate, almost no prevent .
+             the one "prevent" tried to fix HUMANS
+        <span class="tks">FINGER POINTING</span> ..... a team blamed, two named,
+             one "solely responsible"
+             +--> people go risk-averse, and start
+                  COVERING UP the facts you needed
+        <span class="tk1">ANIMATED LANGUAGE</span> ... "careless ignorance"
+             "which is ridiculous" / "I can't believe
+             we survived this one!!!"
+             +--> distracts, and erodes psychological safety
+        <span class="tk1">NO REAL OWNER</span> ....... four owners = none
+        <span class="tk1">TINY AUDIENCE</span> ....... one team
+        <span class="tk1">FOUR MONTHS LATE</span> .... and it recurred meanwhile
+
+   THE WRITE-UP THAT CHANGED THE SYSTEM
+        CLARITY ........ glossary . actions grouped into
+                         five themes
+        METRICS ........ real figures, linked to sources
+        ACTIONS ........ every one has an OWNER, a
+                         PRIORITY and a TICKET, and a
+                         verifiable end state
+                         ("alert when more than X% of our
+                          machines have been taken away")
+        BLAMELESS ...... what went wrong, not who
+        DEPTH .......... impact across teams, not just the
+                         proximate failure
+        PROMPT ......... circulated in under a week
+                         "the longer you wait, the more
+                          they will fill the gap with the
+                          products of their imagination"
+        CONCISE ........ long logs abstracted, originals
+                         linked
+        WIDE ........... all of engineering
+   ------------------------------------------------------
+   THREE YEARS LATER a similar incident happened. the
+   action items from the second document had DRAMATICALLY
+   REDUCED the blast radius and the rate.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give four defects of a weak action-item list, and the rule about fixing humans.<br>
+      <span class="q">Q</span> State the mechanism by which blame destroys the <i>next</i> postmortem.<br>
+      <span class="q">Q</span> Why is publishing promptly about accuracy <i>and</i> about the audience?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:32mm">Choose it when</th></tr>
+    <tr><td>Publishing within days rather than when it is complete</td><td>Accuracy while memories are fresh, and an audience that stops inventing its own explanation.</td><td>Sections you would rather have finished, and figures still marked as estimates.</td><td>Always &mdash; a well-informed estimate is better than no data at all.</td></tr>
+    <tr><td>Sharing company-wide by default</td><td>Learning proportional to the readership, and a tool for restoring shaken trust.</td><td>Exposure: your team's worst day, readable by everyone.</td><td>By default &mdash; and consider going further, to customers.</td></tr>
+    <tr><td>One owner instead of four</td><td>A single point of contact accountable for follow-up and completion.</td><td>The appearance of pinning a whole team's work on one person.</td><td>Always. Multiple collaborators, one owner.</td></tr>
+    <tr><td>Preventative action items over mitigative ones</td><td>The outage stops being possible rather than becoming survivable.</td><td>They are slower, more invasive, and harder to get scheduled.</td><td>Every theme needs some &mdash; a list that is all mitigation has not addressed recurrence.</td></tr>
+    <tr><td>Grouping action items by theme</td><td>Owners and priorities become easy to assign, and coverage gaps become visible.</td><td>Overhead on a small incident with three items.</td><td>Large incidents &mdash; the worked case used five themes.</td></tr>
+    <tr><td>Rewarding closeout, not just authorship</td><td>Action items that actually close.</td><td>Recognition arriving months after the writing, when attention has moved on.</td><td>Always &mdash; rewarding only the writing risks an unvirtuous cycle of unclosed postmortems.</td></tr>
+    <tr><td>Requiring a P0 or P1 bug for any user-affecting outage</td><td>A guarantee that something is tracked, and a hard floor under the whole practice.</td><td>Rigidity, and pressure to file something rather than nothing.</td><td>When you accept the premise: to users, a postmortem without subsequent action is indistinguishable from no postmortem.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;He ran it twice, that's what did it.&rdquo;</td><td>&ldquo;The system accepted an empty filter and treated it as &lsquo;everything&rsquo;. That's the finding. Who typed it is not.&rdquo;</td></tr>
+    <tr><td>&ldquo;Action item: improve the alerting.&rdquo;</td><td>&ldquo;Alert when more than X% of our machines are taken away. Owner, priority, ticket &mdash; otherwise I can't tell if it's done.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll train people not to do that.&rdquo;</td><td>&ldquo;Changing human behaviour is less reliable than changing the system. What check would have rejected the command?&rdquo;</td></tr>
+    <tr><td>&ldquo;We don't have exact numbers yet.&rdquo;</td><td>&ldquo;Put in a well-informed estimate and say it's one. If we can't measure the impact we can't know when it's fixed.&rdquo;</td></tr>
+    <tr><td>&ldquo;I'll publish it once every section is complete.&rdquo;</td><td>&ldquo;Publish this week. Every day we wait, people fill the gap with the products of their imagination &mdash; and details go stale.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's a bit sensitive, let's keep it in the team.&rdquo;</td><td>&ldquo;The value is proportional to the learning it creates. Company-wide by default; an honest one is how we get trust back.&rdquo;</td></tr>
+    <tr><td>&ldquo;We wrote it up, so we're done.&rdquo;</td><td>&ldquo;To our users, a postmortem without subsequent action is indistinguishable from no postmortem. Who owns each item, and by when?&rdquo;</td></tr>
+    <tr><td>&ldquo;That team keeps having the same outage.&rdquo;</td><td>&ldquo;Then ask the four questions: are the items closing, is velocity beating reliability, are we capturing the right items, is the service overdue a refactor?&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>Here is the whole Lessons Learned section of a postmortem for a six-hour billing outage. <i>&ldquo;Things that went poorly: nobody on the platform team had documented the failover procedure, which is frankly astonishing for a service this old. Priya was on call and did not escalate for two hours. Where we got lucky: the batch job hadn't started yet — I don't want to think about what would have happened otherwise!&rdquo;</i> The action items are: &ldquo;Make failover more reliable&rdquo; (P2, no owner, no ticket); &ldquo;Improve on-call training so people escalate sooner&rdquo; (P2, no owner, no ticket); &ldquo;Document the failover runbook&rdquo; (P2, owner: Priya, ticket BUG-4471). The document lists five owners and was shared with the platform team.</p>
+    <p><b>(a)</b> Identify every distinct failure mode present, naming each. <b>(b)</b> For the blame, state the mechanism by which it damages the organisation — and say why that mechanism makes this a practical problem rather than an etiquette one. <b>(c)</b> Rewrite the three action items so they satisfy every stated characteristic of a good one, and say which one you would delete outright and why. <b>(d)</b> Two structural facts are given at the end. Name what is wrong with each and what it should be instead.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>A director notices three things over six months. Postmortems for that org are consistently published seven to ten weeks after the incident. In a review meeting a vice-president said, &ldquo;Look, blameless is fine in principle, but someone in that room clearly knew this was risky — why did nobody speak up?&rdquo; And a team has now had three outages with near-identical causes, each with a completed postmortem and every action item closed.</p>
+    <p><b>(a)</b> For the publication delay, give both stated harms, and name the underlying cause the source identifies along with what it says about quality bars. <b>(b)</b> Give a specific reply to the vice-president that redirects the conversation without contradicting them, and state the principle about good faith and information that justifies it. <b>(c)</b> The third observation is the strangest: closed action items and recurring outages. Give the questions to ask, and say what it means when the items are all closing on time. <b>(d)</b> Name two incentives the director could introduce that target closeout and organisational learning rather than authorship, and say what each is designed to prevent.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — is it safe to write, and is it possible to act on</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: can the actions actually be finished? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — owner, priority, ticket, verifiable end state</div>
+      <div class="colh">No — vague, unowned, unprioritised, untracked</div>
+
+      <div class="rowh">BLAMELESS<br>&mdash; findings<br>are about<br>the system</div>
+      <div class="cell focus"><b>The document that changes something</b>
+        People told the truth because it was safe to, and the truth was turned into work somebody owns.<br>
+        <i>Move:</i> publish it widely and quickly, group the items by theme, and reward the closing rather than the writing. This is the cell where a repeat of the same outage arrives smaller and rarer &mdash; which is the only evidence any of this works.</div>
+      <div class="cell"><b>Kind, thorough, and inert</b>
+        Nobody is blamed, everybody agrees, and in a year nothing has changed. &ldquo;Improve the alerting&rdquo; can never be finished, so it never is.<br>
+        <i>Move:</i> rewrite each item until you could tell from the outside whether it is done, then give it one owner, a priority and a ticket. Without a formal tracking process, action items are simply forgotten &mdash; and that is how the outage returns.</div>
+
+      <div class="rowh">BLAMEFUL<br>&mdash; findings<br>are about<br>people</div>
+      <div class="cell"><b>It works once</b>
+        The actions are sharp and they will get done. The cost is deferred and lands on the <i>next</i> incident, when people are careful about what they write down.<br>
+        <i>Move:</i> strip the names from the causes, keep them on the actions. If you cannot see the difference, that is exactly the confusion this quadrant is made of.</div>
+      <div class="cell"><b>Worse than writing nothing</b>
+        Individuals named as causes, actions aimed at making humans less error-prone, nothing owned or tracked. It teaches the organisation that postmortems are where blame is assigned.<br>
+        <i>Move:</i> stop, and rewrite from the system's behaviour outward. Ask what check would have rejected the action &mdash; changing systems and processes is more reliable than changing people.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row decides whether you will get the truth <i>next</i> time, and the column decides whether anything changes <i>this</i> time. The two are independent, which is why a document can be scrupulously fair and completely useless, or sharply actionable and quietly corrosive &mdash; and why judging a postmortem by how thorough it feels tells you nothing about which cell it is in.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Read your own action items as a stranger, six months late.</b> For each one ask two questions: can I tell whether this is done, and who exactly would I ask? If either answer is missing, the item will not close — and to your users, a postmortem without subsequent action is indistinguishable from no postmortem.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONCEPT SKETCH ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch &mdash; the whole competency, end to end</h2>
+  <p>Four named groups, in the order the story runs: <b>STRUCTURE</b> &rarr; <b>ORDER</b> &rarr; <b>PREPARATION</b> &rarr; <b>THE RECORD</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch" id="bigmap" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b> <b>bold = a group heading</b> &nbsp;
+      <span class="node nstar">reversed = the one group to remember</span> &nbsp;
+      <span class="q">Q = retrieval cue</span><br>
+      <span style="font-size:8.4pt">The four groups run in order: <b>STRUCTURE</b> — who is in charge ·
+      <b>ORDER</b> — what to do first · <b>PREPARATION</b> — decided in advance · <b>THE RECORD</b> — what outlives it.</span>
+    </div>
+<div class="tree"><span class="tk1">GROUP 1 - STRUCTURE . an outage is a coordination problem</span>
+------------------------------------------------------------------
+   RESOLVING is mitigating impact and/or restoring the
+        service. MANAGING is coordinating the teams and
+        keeping communication flowing BOTH ways.
+        <span class="q">Q</span> which of the two has no owner by default?
+   DECLARE EARLY AND OFTEN. whoever declares it typically
+        becomes the commander.
+        <span class="q">Q</span> name the three things declaring early buys you
+   THE THREE Cs  coordinate . communicate . control
+   THE THREE ROLES  commander (holds everything not yet
+        delegated) . operations (applies the tools) .
+        communications (the public face)
+        <span class="q">Q</span> where is the culprit when a response goes wrong?
+        <span class="q">Q</span> which role can be subsumed back, and when?
+   ONE PLACE, real time. 3+ people -> a shared document of
+        theories and eliminated causes.
+        <span class="q">Q</span> what goes in the doc, what stays in the channel?
+
+<span class="tks">GROUP 2 - ORDER . mitigate first, understand later</span>
+------------------------------------------------------------------
+   1 ASSESS . 2 MITIGATE . 3 ROOT CAUSE . 4 FIX + WRITE UP
+   YOU NEED THE LOCATION, NOT THE DETAILS
+        <span class="q">Q</span> which step is top priority, and what if it isn't?
+   GENERIC MITIGATION  roll back . drain a region. blunt,
+        may disrupt other things - take it anyway. build the
+        tooling BEFORE; old postmortems say which was missing.
+        <span class="q">Q</span> in the worked case, how many hours did hesitating cost?
+   MITIGATION IS NOT PREVENTION. three mitigations did not
+        stop it returning; only the root cause did.
+   NO HEROICS . business-hours rollouts, or PAID cover
+        <span class="q">Q</span> so what should have happened to the rollout?
+        <span class="q">Q</span> why is a weekend rescue a finding, not a happy ending?
+
+<span class="tk1">GROUP 3 - PREPARATION . decided calmly, or not at all</span>
+------------------------------------------------------------------
+   TRAIN the shape: you may delegate . you may escalate .
+        mitigation first . the three roles exist
+   SETTLE FOUR THINGS  channel . templates . contacts .
+        criteria for what counts as an incident
+        <span class="q">Q</span> where do the criteria come from?
+   TELL PEOPLE. silence at the start = "nobody is on it".
+        silence at the end = "it is still going".
+        <span class="q">Q</span> so what is closing an incident, procedurally?
+   DRILL  controlled emergency . role-play a postmortem .
+        treat a small thing as big ON PURPOSE
+        <span class="q">Q</span> what is a drill's actual product?
+   ROTATE on long incidents - for rest AND for fresh ideas
+        <span class="q">Q</span> which of those two is the debugging technique?
+
+<span class="tk1">GROUP 4 - THE RECORD . the only part that outlives it</span>
+------------------------------------------------------------------
+   BLAMELESS  what went wrong, never who. blame makes people
+        risk-averse and motivates them to COVER UP facts.
+   BUT OWNED  one owner for the document; an owner, a priority
+        and a ticket for every action
+        <span class="q">Q</span> why is blame a practical problem, not a courtesy?
+        <span class="q">Q</span> reconcile "no names" with "name an owner"
+   ACTIONABLE  verifiable end state . preventative, not only
+        mitigative . don't fix humans . MEASURED, with numbers
+        or an estimate: cannot measure -> cannot know it is fixed
+        <span class="q">Q</span> rewrite "improve the alerting" so it can be finished
+   PROMPT + WIDE  under a week, whole company. wait, and people
+        fill the gap with their imagination.
+        <span class="q">Q</span> what did the good write-up do to the repeat incident?
+</div>
+  </div>
+
+  <div class="kicker" style="margin-top:7pt">Section 6 continued &middot; the transferable card</div>
+  <h2>Master 2&times;2 &mdash; the decision card you can carry to other problems</h2>
+  <p>Two questions, asked at opposite ends of an emergency.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: afterwards, did anything in the system change? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — owned, tracked changes that closed</div>
+      <div class="colh">No — a document, and good intentions</div>
+
+      <div class="rowh">DURING:<br>one named<br>person was<br>in command</div>
+      <div class="cell focus"><b>Handled, and learned from</b>
+        Someone coordinated while it burned, and something was different afterwards. The only cell where a repeat arrives smaller and rarer.<br>
+        <i>Move:</i> protect both halves; they decay for different reasons — command when declaring feels like over-reacting, change when nobody rewards a closure.</div>
+      <div class="cell"><b>A good war story</b>
+        The response was crisp, the write-up reads well — and nothing is different, so the same event is scheduled to happen again.<br>
+        <i>Move:</i> go item by item and ask whether a stranger could tell it was done, and who they would ask. An action-free write-up is indistinguishable from no write-up.</div>
+
+      <div class="rowh">DURING:<br>everyone<br>helped;<br>nobody led</div>
+      <div class="cell"><b>Fixed by luck, then fixed properly</b>
+        The response was chaotic — duplicated work, an audience left guessing — but the review was honest enough to change the system.<br>
+        <i>Move:</i> the changes will hold. Now fix the response, which is cheap: criteria for declaring, a named commander, one channel.</div>
+      <div class="cell"><b>The loop that never closes</b>
+        Nobody led, nothing changed, and the next one will be handled exactly as badly.<br>
+        <i>Move:</i> pick the cheapest end. Declaring costs one sentence; giving three action items owners and tickets costs an afternoon. Take the parts that matter and grow into the rest.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is decided in the first minute, the column over the following weeks, and neither substitutes for the other. The same pair separates a serious incident review from a disciplinary hearing, an accident report from a verdict, and a safeguarding review from a meeting where everyone agreed it was unfortunate.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:7pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11pt; line-height:1.45"><b>Somebody has to be in charge while it burns, and something has to be different once it's out.</b></p>
+    <p style="margin-top:5pt">Both are cheap, and both are skipped for opposite reasons: command because declaring feels like over-reacting, change because the crisis is over.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. SYMPTOM TABLE ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>During an incident</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Several people are investigating and you cannot say who is in charge.</td><td>No incident was declared, so no command line exists.</td><td>Declare, take command, and name the two roles. Whoever declares it typically becomes commander; they hold every role not yet delegated.</td></tr>
+    <tr><td>Two responders have eliminated the same cause independently.</td><td>No working record — the coordination is happening in people's heads.</td><td>Start the shared document: working theories, eliminated causes, error logs, suspect graphs. Three or more responders is the threshold.</td></tr>
+    <tr><td>The commander is answering a director, debugging, and drafting an update.</td><td>Nothing has been delegated, so all three roles are still theirs.</td><td>Delegate operations, delegate communications, or hand over command and take operations. All three are normal moves.</td></tr>
+    <tr><td>Support keeps interrupting the people fixing it.</td><td>No communications lead.</td><td>Appoint one. They give periodic updates to the team and stakeholders and absorb the inquiries; the role collapses back into command when the incident shrinks.</td></tr>
+    <tr><td>The channel has a dozen participants and is unreadable.</td><td>Detail and decisions are competing for the same space.</td><td>Move detailed debugging to the shared document and keep the channel as the decision hub.</td></tr>
+    <tr><td>Coordination is happening in the bug tracker.</td><td>Communication was never centralised.</td><td>Get everyone into one place — room, channel or call — talking in real time. A tracker tracks; it does not coordinate.</td></tr>
+    <tr><td>Hours in, with no cause and no mitigation.</td><td>The response has run out of expertise, not effort.</td><td>Escalate wide. Page the neighbouring on-calls to eliminate their areas, and broadcast to prepared lists. Escalation is not a sin, especially if it lowers customer pain.</td></tr>
+    <tr><td>You know which region and which release, but not what is wrong.</td><td>You already have everything a generic mitigation needs.</td><td>Roll back or drain, now. You need the location of the cause, not its details.</td></tr>
+    <tr><td>&ldquo;We shouldn't roll back, it'll undo unrelated changes.&rdquo;</td><td>The bluntness of a generic mitigation, correctly identified.</td><td>Accept it. Blunt is the price of not needing a diagnosis; the impact ends now and the precise fix continues behind it.</td></tr>
+    <tr><td>The targeted fix is nearly built.</td><td>Bespoke work being run instead of a mitigation.</td><td>Run both. In the worked case a rebuild reached 90% and had to restart when a second bad path appeared.</td></tr>
+    <tr><td>The alert cleared, so the incident is over.</td><td>Impact mitigated; recurrence untouched.</td><td>Keep going to root cause, and hold any in-flight rollout until you have it.</td></tr>
+    <tr><td>The response is being carried by someone who is off-rota.</td><td>Heroics standing in for staffing.</td><td>Note it as a finding. Roll out in business hours, or pay for out-of-hours coverage.</td></tr>
+    <tr><td>Hour seven, and the team is re-testing an eliminated hypothesis.</td><td>Fatigue, and no fresh perspective entering.</td><td>Rotate responders and the commander. It is for rest <i>and</i> for new ideas; the shared document guards the same failure from the other side.</td></tr>
+    <tr><td>Nobody outside the response knows anything.</td><td>The outward half of managing an incident is not being done.</td><td>Give regular status updates. Silence is read as &ldquo;nobody is working on it&rdquo;.</td></tr>
+    <tr><td>It is fixed, and people are still asking about it.</td><td>The response was never called off.</td><td>Announce the close explicitly, and validate recovery with each on-call before you do.</td></tr>
+  </table>
+
+  <h3>Preparing, between incidents</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>The first ten minutes of every incident go on choosing a tool.</td><td>The channel was never agreed.</td><td>Agree it and practise in it. Prefer one the team already knows — no commander wants to choose mid-incident.</td></tr>
+    <tr><td>A status update took forty minutes and three drafts.</td><td>No templates.</td><td>Write two or three ready-to-use ones, agree the review and approval route, and make sure the on-call knows how to send them.</td></tr>
+    <tr><td>Nobody could find the escalation contact for another team.</td><td>No prepared contact list.</td><td>Build it. It is what turns &ldquo;all hands on deck&rdquo; into a thirty-second action.</td></tr>
+    <tr><td>People argue about whether something counts as an incident.</td><td>No published criteria.</td><td>Derive them from past outages and known high-risk areas. This is what makes &ldquo;declare early&rdquo; operable.</td></tr>
+    <tr><td>The policy is excellent and nobody has ever run it.</td><td>Documentation mistaken for preparation.</td><td>Drill. A document says what people should do; practice decides what they will do, and practice is what builds muscle memory.</td></tr>
+    <tr><td>Drills happen and nothing changes afterwards.</td><td>No report — the drill's actual product is missing.</td><td>Write up what went well, what didn't, and what would be handled differently. Examining the outcomes is the valuable part.</td></tr>
+    <tr><td>Drill scenarios are invented from scratch each time.</td><td>An unused source of realistic failures.</td><td>Build them from postmortems, use real tools, and consider breaking the test environment so the troubleshooting is real.</td></tr>
+    <tr><td>Only the on-call engineers have ever practised.</td><td>The circle of responders is wider than the rota.</td><td>Include everyone who could be swept in — developers, customer support, marketing partners.</td></tr>
+    <tr><td>The full framework is too much for the team.</td><td>Correct, and not a reason to have none.</td><td>Take the parts that matter: delegation and escalation are allowed, mitigation comes first, and the three roles are defined.</td></tr>
+    <tr><td>Exercises feel nothing like the real thing.</td><td>Calm rehearsal cannot manufacture urgency.</td><td>Add a time-bound simulation. The pressure and the need to talk to each other are the parts that do not transfer from a tabletop.</td></tr>
+  </table>
+
+  <h3>Reading a postmortem</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>A named individual appears in the root cause.</td><td>Finger pointing.</td><td>Rewrite it as a system gap. Blame makes people risk-averse and motivates them to cover up the facts you needed next time.</td></tr>
+    <tr><td>&ldquo;Which is ridiculous&rdquo;, &ldquo;careless&rdquo;, an exclamation mark.</td><td>Animated language in what should be a factual artifact.</td><td>Replace judgement with verifiable data. It distracts from the message and erodes psychological safety.</td></tr>
+    <tr><td>The only number in the document is the duration.</td><td>Key details omitted.</td><td>Add impact figures — even a well-informed estimate. If you cannot measure it, you cannot know it is fixed.</td></tr>
+    <tr><td>&ldquo;Improve alerting.&rdquo; &ldquo;Make automation better.&rdquo;</td><td>Ambiguous action items with no success criteria.</td><td>Rewrite until a stranger could tell whether it is done — for example, alert when more than X% of machines disappear.</td></tr>
+    <tr><td>Every action item is the same priority.</td><td>No way to determine what to tackle first.</td><td>Prioritise them, and require at least one P0 or P1 for a user-affecting outage.</td></tr>
+    <tr><td>One item has a ticket; the rest do not.</td><td>No formal tracking.</td><td>File them all. Untracked items are forgotten, and forgotten items become outages.</td></tr>
+    <tr><td>Every item is mitigative.</td><td>Recurrence has not been addressed.</td><td>Add preventative items per theme. Survivable is not the same as impossible.</td></tr>
+    <tr><td>&ldquo;Train people not to run that command.&rdquo;</td><td>An attempt to fix humans.</td><td>Ask what check would have rejected the command. Changing systems and processes is more reliable than changing behaviour.</td></tr>
+    <tr><td>Four or five owners on the front page.</td><td>Diffused ownership.</td><td>One owner, many collaborators — a single point of contact for the document, the follow-up and the completion.</td></tr>
+    <tr><td>Shared with the team that owns the service.</td><td>Limited audience.</td><td>Publish company-wide by default, and consider customers. The value is proportional to the learning it creates.</td></tr>
+    <tr><td>Published two months after the incident.</td><td>Delayed publication.</td><td>Publish in days. Details decay, and readers fill the gap with the products of their imagination.</td></tr>
+    <tr><td>People are relieved not to be involved in one.</td><td>Avoiding association — the culture is failing.</td><td>Review high-visibility documents for blameful prose, and share strong examples along with how the authors were rewarded.</td></tr>
+    <tr><td>&ldquo;Blameless is fine, but someone must have known.&rdquo;</td><td>Leadership failing to reinforce the culture.</td><td>Redirect generically: were there warning signs, and why might we have dismissed them? People act in good faith on the information they have.</td></tr>
+    <tr><td>Quality is dropping and documents arrive late.</td><td>No time allocated to write them.</td><td>Prioritise the work and track completion. These are letters to future team members; the quality bar teaches them what to do.</td></tr>
+    <tr><td>The same outage recurs though every item closed.</td><td>The right items were never captured.</td><td>Ask the five questions, then step back to overall service health and bring the collaborators from each occurrence together.</td></tr>
+  </table>
+
+  <h3>Reverse mapping — you see a practice, what is it there for?</h3>
+  <p>The other direction. Use this when auditing a team's incident practice rather than diagnosing a live incident: for each thing you find them doing, say what it was buying and what it does <i>not</i> buy.</p>
+  <table class="tight">
+    <tr><th style="width:52mm">What you find people doing</th><th style="width:52mm">What it counters</th><th>What it does <i>not</i> cover</th></tr>
+    <tr><td>Declaring early and often</td><td>Uncoordinated parallel investigation, silence toward the audience, and a response nobody can hand over.</td><td>The fault itself. Declaring creates the structure; it does not shorten the diagnosis by a minute on its own.</td></tr>
+    <tr><td>A single named commander</td><td>Unowned work, because the commander holds every role not yet delegated.</td><td>Expertise. A commander who is also the only person who understands the system is still a bottleneck.</td></tr>
+    <tr><td>A communications lead</td><td>Interruptions to the people fixing it, and an organisation that assumes nothing is being done.</td><td>Anything technical. It is deliberately the one role that touches no systems.</td></tr>
+    <tr><td>One channel, in real time</td><td>Side conversations, contradictory decisions, and a lost timeline.</td><td>Depth. Dense debugging drowns it, which is what the shared document is for.</td></tr>
+    <tr><td>The shared working document</td><td>Duplicated investigation and theories lost in the scroll.</td><td>Decisions. Keep those in the channel, or nobody knows what was agreed.</td></tr>
+    <tr><td>Generic mitigation</td><td>The hours between knowing where the problem is and knowing what it is.</td><td>Recurrence, and precision. It is blunt by design and it prevents nothing.</td></tr>
+    <tr><td>Pre-built mitigation tooling</td><td>The discovery, mid-incident, that the blunt instrument would take an hour to build.</td><td>Knowing which tool you need — that comes from reading old postmortems.</td></tr>
+    <tr><td>Root-cause analysis</td><td>Recurrence.</td><td>The current impact. Doing it first is the single most expensive ordering mistake available.</td></tr>
+    <tr><td>Agreed channel, templates, contacts, criteria</td><td>The first fifteen minutes of every incident, spent deciding things twice.</td><td>Whether anyone can actually use them — only a drill establishes that.</td></tr>
+    <tr><td>Drills, run periodically</td><td>Gaps in the response that no document reveals, and hesitation under stress.</td><td>Nothing at all, unless a report follows. The outcomes are the product.</td></tr>
+    <tr><td>Rotating the commander on a long incident</td><td>Exhaustion, and an investigation circling its own eliminated theories.</td><td>Continuity. Every rotation is a handover, which is why the record has to exist.</td></tr>
+    <tr><td>Blameless language</td><td>Risk aversion and the covering-up of facts, which is what costs you the <i>next</i> postmortem.</td><td>Accountability — that comes from a single owner and owned, tracked action items.</td></tr>
+    <tr><td>Owner, priority and ticket per action item</td><td>Items quietly forgotten, and no way to decide what to do first.</td><td>Whether the item is the right one. All of them can close and the outage still recur.</td></tr>
+    <tr><td>Publishing company-wide within days</td><td>Stale details, an audience inventing its own account, and learning trapped in one team.</td><td>Follow-through. A widely read document with no closed actions is indistinguishable from no document.</td></tr>
+    <tr><td>Rewarding action-item closeout</td><td>The unvirtuous cycle where postmortems are written and never finished.</td><td>The writing itself, which still needs time explicitly allocated to it.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. NUMBERS + GLOSSARY ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:34mm">Number</th><th>What it is</th></tr>
+    <tr><td><b>1968</b></td><td>When the Incident Command System was established, by firefighters, as a way to manage wildfires. Companies later adapted it to computer and system failures.</td></tr>
+    <tr><td><b>3 Cs</b></td><td>Coordinate the response effort; communicate between responders, within the organisation and to the outside world; maintain control over the response. When incident response goes wrong, the culprit is likely in one of these.</td></tr>
+    <tr><td><b>3 roles</b></td><td>Incident Commander, Operations Lead, Communications Lead — a hierarchy, with the latter two reporting to the commander, who holds every role not yet delegated.</td></tr>
+    <tr><td><b>4 principles</b></td><td>Maintain a clear line of command; designate clearly defined roles; keep a working record of debugging and mitigation as you go; declare incidents early and often.</td></tr>
+    <tr><td><b>4 steps</b></td><td>The order of an active incident: assess the impact, mitigate the impact, perform root-cause analysis, and afterwards fix the cause and write the postmortem.</td></tr>
+    <tr><td><b>3 or more</b></td><td>The number of responders at which you should start a collaborative document of working theories, eliminated causes and useful debugging information.</td></tr>
+    <tr><td><b>6 h 40 m</b></td><td>How long cluster creation failed across one continent in the large worked case: paged at 6:41 a.m., incident declared at 7:06, users notified at 7:24, all zones back to 0% error at 12:11 p.m.</td></tr>
+    <tr><td><b>9:56 &rarr; 10:00</b></td><td>The cost of hesitating. A plausible cause was identified at 9:56 a.m.; a generic rollback to a known good state at that point would have mitigated the incident by <b>10 a.m.</b> The bespoke mitigation instead began at 10:59 and the fix landed at 11:59.</td></tr>
+    <tr><td><b>90%</b></td><td>How far the bespoke rebuild had got at 10:59 when a second bad path was discovered — forcing a restart. Bespoke work can be reset to zero by one late finding.</td></tr>
+    <tr><td><b>41 &middot; 26,000 &middot; 7 &middot; 6 &middot; 28</b></td><td>The scale of that one incident: 41 unique people in the channel, 26,000 words of logs, seven task forces (up to four simultaneously), on-calls summoned from six teams, and 28 action items in the postmortem.</td></tr>
+    <tr><td><b>2.5 hours</b></td><td>How long that incident ran before a formal response structure was put in place — a dozen participants, no root cause and no mitigation. Recorded as the thing that should have happened at the first page.</td></tr>
+    <tr><td><b>&times;3</b></td><td>In the mishandled case, quota was raised three separate times, stopping the impact each time and preventing recurrence none of them. Only the root cause did that.</td></tr>
+    <tr><td><b>48 a day</b></td><td>The symptom in that case: training data was being fetched every 30 minutes instead of once per day, exceeding the service's quota. The underlying bug caused fetches roughly 50 times more often than expected.</td></tr>
+    <tr><td><b>25% &rarr; 100%</b></td><td>The rollout that kept going: halted at 25% when the anomaly was first noticed, restarted, past 50% mid-week, and at 100% over a weekend when developers were not readily available — at which point users lost half their requests.</td></tr>
+    <tr><td><b>4 strikes, 2 minutes</b></td><td>The power-outage case: lightning struck the grid near a datacentre four times within two minutes, and the third and fourth strikes were too closely spaced for the disk-tray batteries to swap over.</td></tr>
+    <tr><td><b>0.000001%</b></td><td>The data lost from running machines in that incident — and only from running instances — because storage was replicated across multiple datacentres.</td></tr>
+    <tr><td><b>4 audiences</b></td><td>What the communications lead reported to in that incident: company leaders, teams with storage concerns, external customers, and specific customers who had filed support tickets.</td></tr>
+    <tr><td><b>3 objectives</b></td><td>Two were clearly defined, well understood and documented, and went to the operations lead. The third was vague and covered by no procedure, so the commander assigned a dedicated coordinator and organised engineers to build new tools.</td></tr>
+    <tr><td><b>every 4 hours</b></td><td>How often on-call engineers and the commander were rotated during a ten-hour incident — for rest, and to bring new ideas into the response team.</td></tr>
+    <tr><td><b>2 hours</b></td><td>How long that incident ran across three teams before anyone declared a major incident. The commander assembled the response team six minutes after the declaration.</td></tr>
+    <tr><td><b>40 minutes</b></td><td>The main outage in the postmortem case study, on 11 August 2014 — after which reconstruction and residual problems ran for a further two days.</td></tr>
+    <tr><td><b>4 months vs 4 days</b></td><td>The two publication dates for that same outage. The weak postmortem appeared at the end of December; the strong one appeared four days after the incident — and the incident recurred during the interval the weak one was pending.</td></tr>
+    <tr><td><b>3 years later</b></td><td>When a similar incident happened. The action items from the strong postmortem had dramatically reduced the blast radius and the rate of the repeat — the only real evidence that any of this works.</td></tr>
+    <tr><td><b>5 themes</b></td><td>How that postmortem's action items were grouped: prevention and risk education, emergency response, monitoring and alerting, provisioning, and cleanup — which makes owners and priorities easier to assign.</td></tr>
+    <tr><td><b>P0 / P1</b></td><td>The stated floor: all postmortems following a user-affecting outage must have at least one P0 or P1 bug associated with them, because to users a postmortem without subsequent action is indistinguishable from no postmortem.</td></tr>
+    <tr><td><b>25% / 23% / 29%</b></td><td>A monitoring safety check that did not fire when 23% of targets were removed, but did fire when the same contents — 29% of what remained — were added back, delaying the restoration of monitoring by 30 minutes. An example of a check calibrated to the wrong direction.</td></tr>
+    <tr><td><b>2 &times; a year</b></td><td>How often one organisation runs fix-it weeks, where engineers who close the most postmortem action items get recognition — one of several ways to reward closeout rather than authorship.</td></tr>
+  </table>
+
+  <h2 style="margin-top:14pt">Glossary</h2>
+  <table class="tight">
+    <tr><th style="width:42mm">Term</th><th>Meaning</th></tr>
+    <tr><td><b>Resolving an incident</b></td><td>Mitigating the impact and/or restoring the service to its previous condition.</td></tr>
+    <tr><td><b>Managing an incident</b></td><td>Coordinating the efforts of responding teams efficiently, and ensuring communication flows both between responders and to those interested in the incident's progress.</td></tr>
+    <tr><td><b>Incident Command System</b></td><td>The framework the practice derives from: established in 1968 by firefighters, providing standardized ways to communicate and fill clearly specified roles during an incident. It scales up or down with the size of the company and the incident.</td></tr>
+    <tr><td><b>The three Cs</b></td><td>Coordinate, communicate, control — the common goals of every incident response framework, and where the culprit usually lies when a response goes wrong.</td></tr>
+    <tr><td><b>Incident Commander</b></td><td>Leads the response and directs its high-level state; commands and coordinates, delegates, communicates, stays in control, and works with responders to resolve. Assumes all roles not yet delegated.</td></tr>
+    <tr><td><b>Operations Lead</b></td><td>Responds to the incident by applying operational tools to mitigate or resolve it. May lead a team, which expands or contracts as needed.</td></tr>
+    <tr><td><b>Communications Lead</b></td><td>The public face of the response: periodic updates to the response team and stakeholders, and managing inquiries. Can be subsumed back into the commander if the incident becomes small enough.</td></tr>
+    <tr><td><b>Declaring an incident</b></td><td>The act that creates the structure. The person who declares it typically steps into the commander role. The principle is to declare early and often.</td></tr>
+    <tr><td><b>War room</b></td><td>The single place — physical or virtual — where all responders gather and communicate in real time. Centralized communication is a stated principle of the protocol.</td></tr>
+    <tr><td><b>Working document</b></td><td>A collaborative document started when three or more people work on an incident, listing working theories, eliminated causes and useful debugging information, so it isn't lost in the conversation.</td></tr>
+    <tr><td><b>Generic mitigation</b></td><td>An action first responders take to alleviate pain before the root cause is fully understood — a rollback, or reconfiguring load balancers away from a region. Blunt instruments that may cause other disruptions.</td></tr>
+    <tr><td><b>Bespoke mitigation</b></td><td>A fix built for the specific fault, which cannot begin until the fault is understood and can be reset by a late discovery.</td></tr>
+    <tr><td><b>Mitigation tooling</b></td><td>General-purpose tools that make a generic mitigation a single action. They take engineering time, so the right time to create them is before an incident, not during one.</td></tr>
+    <tr><td><b>Escalation</b></td><td>Bringing in more people or other teams, by documented path or by broadcasting to prepared lists. Not a sin — especially if it helps lower customer pain.</td></tr>
+    <tr><td><b>Heroics</b></td><td>Individuals rescuing an incident off-rota because they happened to be reachable. Valued, but successful incident management shouldn't rely on it.</td></tr>
+    <tr><td><b>Criteria for an incident</b></td><td>An established list for determining whether a paging issue is indeed an incident, derived from past outages and known high-risk areas.</td></tr>
+    <tr><td><b>Drill</b></td><td>Practising incident management on something that is not a real emergency: a controlled company-wide exercise, a role-play of a previous postmortem, or deliberately treating a minor problem as a major one.</td></tr>
+    <tr><td><b>Scribe</b></td><td>The person capturing actions, owners and timestamps into the incident channel, which functions as an information ledger for the response.</td></tr>
+    <tr><td><b>Postmortem</b></td><td>The written record of an incident: what happened, how it was mitigated, how users were impacted, why it happened, and what will change. Its value is proportional to the learning it creates.</td></tr>
+    <tr><td><b>Blameless</b></td><td>Focusing on the gaps in system design that permitted the failure mode — on what went wrong rather than who — with action items aimed at improving the system instead of improving people.</td></tr>
+    <tr><td><b>Psychological safety</b></td><td>What animated language and public blame erode, and what makes people willing to record facts that are critical to understanding and preventing recurrence.</td></tr>
+    <tr><td><b>Action item</b></td><td>A change arising from a postmortem. A good one has a single owner, a priority, a tracking bug and a verifiable end state, and at least some per theme are preventative rather than mitigative.</td></tr>
+    <tr><td><b>Root cause and trigger</b></td><td>The underlying defect and the specific event that set it off — identifying both is one of the most important reasons to write a postmortem, and it should explore the lower-level details rather than summarise them.</td></tr>
+    <tr><td><b>Idempotent</b></td><td>Safe to run more than once with the same result. The worked outage happened because a decommission workflow was not, and the follow-up work made it so.</td></tr>
+    <tr><td><b>Unvirtuous cycle</b></td><td>What you risk by rewarding engineers for writing postmortems but not for closing the associated action items: documents that are written and never finished.</td></tr>
+    <tr><td><b>Letters to future team members</b></td><td>How postmortems are described when arguing for a consistent quality bar — a subpar one teaches future teammates a bad lesson.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page">
+  <div class="kicker">Section 9 · keep this covered until you have written your answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the payments API that was never declared</h4>
+  <div class="ans"><p>(a) <b>Resolving</b> the incident — mitigating the impact and/or restoring the service to its previous condition — and <b>managing</b> it: coordinating the efforts of the responding teams efficiently, and ensuring communication flows both between the responders and to those interested in the incident's progress. Five people are resolving. Nobody is managing, and that is the job with no owner. (b) The four principles are: maintain a clear line of command; designate clearly defined roles; keep a working record of debugging and mitigation as you go; and declare incidents early and often. All four are broken. There is no line of command, because nobody is leading and four people joined without being asked. There are no roles — in particular nobody is doing communications, which is why the support team is interrupting the one person best placed to fix it. The record is a ticket used as a notebook rather than a working document of theories and eliminated causes, which is how two engineers came to rule out the same subsystem independently; with five responders that document should exist. And no incident has been declared. (c) The reasoning treats declaring as an escalation whose cost must be justified by severity. It is the opposite: declaring is the act that <i>supplies</i> the tools — the command line, the roles, the shared channel and the record — so waiting does not defer a cost, it forfeits three specific benefits. Declaring early prevents miscommunication between the separate groups working the problem; makes root-cause identification and resolution occur sooner; and loops relevant teams in earlier, which makes external communication faster and smoother. Each of those is already being lost here. The principle is early <b>and often</b>, precisely because standing a response down is trivial and starting one ninety minutes late is not. (d) Something close to: &ldquo;I'm declaring an incident, and I'm the Incident Commander.&rdquo; &ldquo;You're Operations Lead — you own the merchant errors, and everything you rule out goes in the shared doc.&rdquo; &ldquo;You're Communications Lead — support and the status page come to you, not to us; everyone else into the incident channel now.&rdquo;</p></div>
+
+  <h4>Part 1 · Q2 — nineteen people and one exhausted commander</h4>
+  <div class="ans"><p>(a) By default <b>the commander assumes all roles that have not been delegated yet</b>. Nothing has been delegated, so this person is simultaneously Incident Commander, Operations Lead and Communications Lead. The consequence is that the one job only they can do — coordinating — is the one being starved, because it has no deadline attached to it while the director and the status page do. The visible symptom is the duplicated forty minutes: coordination is what prevents two people doing the same elimination, and coordination is not happening. (b) Two moves are available, and both are described as normal. The commander may <b>hand off the commander role</b> to the experienced colleague and take the Operations Lead role themselves — cost: a handover, at a bad moment, with all the context to transfer; benefit: the response is run by whoever is best at running it, which need not be whoever noticed first. Or they may <b>assign the Operations Lead role</b> to someone else and stay in command — cost: they keep the coordination load and, unless they also delegate communications, the director too. The large worked case took the first option, transferring command before the scheduled shift handover specifically because the incoming person had more incident-response experience. (c) The <b>working document</b>, started once three or more people are working an incident. It lists working theories, eliminated causes, and useful debugging information such as error logs and suspect graphs, and its stated purpose is to preserve that information so it does not get lost in the conversation. With nineteen participants it is long overdue. (d) Move the <b>detailed debugging into the shared document</b> and keep the <b>channel as the hub for decision making</b>. That is exactly the split the large worked case adopted once discussion became too dense for the channel, and it works because the two kinds of traffic have different readers: detail is read by whoever picks up the thread, decisions must be read by everyone.</p></div>
+
+  <h4>Part 2 · Q1 — three sites, one continent, a recent push</h4>
+  <div class="ans"><p>(a) The order is: <b>1.</b> assess the impact; <b>2.</b> mitigate the impact; <b>3.</b> perform a root-cause analysis; <b>4.</b> after the incident is over, fix what caused it and write a postmortem. Step 1 is done — a fifth of queries failing, localised to three sites. The team is working on step 3, and has skipped step 2 entirely. That inversion is the specific failure the source warns about: first responders must prioritise mitigation above all else, or time to resolution suffers. (b) The rule is that <b>to mitigate an incident you don't have to fully understand the details — you only need to know the location of the root cause</b>. Enough is known. The failures are confined to three named sites in one continent, and a configuration push went to exactly those sites shortly before the errors began. That is a location plus a correlation with a recent change, which is precisely the situation the two canonical generic mitigations are for: roll back a recent release when an outage is correlated with the release cycle, or reconfigure load balancers to avoid a region when errors are localised. Both are available here. (c) The objection correctly identifies something real: generic mitigations are <b>blunt instruments and may cause other disruptions to the service</b>, and rolling back the configuration genuinely does undo a week of unrelated changes. It does not change the decision because that bluntness is the price of not needing a diagnosis, not an argument against paying it — the alternative on offer is another ninety minutes of a fifth of queries failing. Customers do not care whether you understand the outage; what they want is to stop receiving errors. The unrelated changes can be reapplied on a calm afternoon. (d) The targeted patch should continue <b>in parallel</b>, not instead. The error is running bespoke work as the only thing standing between users and the impact, and the worked case shows why: the equivalent effort there was a rebuild taking about an hour, which reached 90% completion before the team discovered another location using the bad path and had to restart the build. Bespoke work can be reset to zero by a single late discovery, and it cannot begin at all until the fault is understood. Note also that the rollback ends the impact but not the incident: mitigation is not prevention, so the investigation continues to root cause.</p></div>
+
+  <h4>Part 2 · Q2 — the queue that overflows every fortnight</h4>
+  <div class="ans"><p>(a) The three previous fixes <b>mitigated the impact</b> — the backlog drained and the alert cleared — and did nothing about <b>recurrence</b>, which requires the root cause. This is the mishandled worked case exactly: mitigation successfully stopped the impact on three separate occasions, each time by raising a quota, but the team could only prevent the issue from happening again once they discovered the root cause. Stopping the impact and stopping the repeat are different achievements, and only the second needs a diagnosis. (b) Two decisions repeat that case's mistakes. First, <b>continuing the rollout after mitigating</b>: after the first mitigation it would have been better to postpone the rollout until the root cause was fully determined, which is what avoids the eventual major disruption. The corrective is to hold the rollout until the cause is understood. Second, <b>rolling out when the people who understand it are not available</b> — the worked case's rollout reached 100% on a weekend, against the practice of performing rollouts only during business days so developers are around if something goes wrong. The corrective is to conduct rollouts during business hours. (c) Because <b>successful incident management shouldn't rely on heroic efforts of individuals</b> — the question that makes it a finding is <i>what if they had been unreachable?</i> The organisation was one unanswered message away from having no response at all, and the arrangement also taps someone during their own time, against a good work-life balance. The two structural alternatives are stated: conduct the rollouts during business hours, or organise an on-call rotation that provides <b>paid</b> coverage outside business hours. (d) Stop the rollout where it is. It should not resume until the root cause of the backlog is fully determined — and, given that this is the fourth occurrence, until whatever the root cause turns out to be has an owned fix rather than another limit increase. When it does resume, it should resume on a business day with the people who understand the system available.</p></div>
+
+  <h4>Part 3 · Q1 — an excellent policy nobody has run</h4>
+  <div class="ans"><p>(a) Four things should have been settled in advance, and each maps to one delay. The <b>communication channel</b> — agreed and practised beforehand — removes the eleven minutes spent choosing between tools. Two or three <b>ready-to-use templates</b>, with the on-call knowing how to send them and the review and approval route agreed, remove the forty minutes of drafting and rewriting. A <b>prepared list of contacts</b> to email or page removes the search for the payments escalation. And <b>established criteria for what counts as an incident</b> remove the quarter-hour argument. (b) For the channel: <b>no Incident Commander wants to make this decision during an incident</b> — and the further instruction is to practise using it so there are no surprises, and to prefer one the team is already familiar with, because familiarity is what removes hesitation. For the templates: <b>no one wants to write these announcements under extreme stress with no guidelines.</b> Neither reason is about quality of judgement; both are about the cost of deciding at all at the worst moment. (c) &ldquo;Re-read the incident policy&rdquo; mistakes documentation for preparation. A document tells people what they should do; practice determines what they will do. Staying calm and following a response structure during an emergency <b>takes practice, and practice builds muscle memory</b>, which is what supplies confidence in a real emergency. Re-reading rehearses nothing and closes none of the four gaps. The correct action items are the four concrete decisions above, plus a drill and — crucially — the report that follows it. (d) The criteria argument is the most consequential because it delays the <b>declaration itself</b>, and everything else in the response exists only after that: the command line, the roles, the shared channel, the record. A team that cannot agree whether an event qualifies cannot declare early, so the whole structure arrives late. The criteria should be derived by <b>looking at past outages and taking known high-risk areas into consideration</b> — which this organisation, having had the outage described, is now in a position to do.</p></div>
+
+  <h4>Part 3 · Q2 — a tabletop with no report, and a nine-hour incident</h4>
+  <div class="ans"><p>(a) Three scales are available: a <b>company-wide resilience test</b>, which creates a controlled emergency that does not actually impact customers and which teams respond to as if it were real; a <b>role-playing exercise</b> in which engineers reenact a previous incident in its documented roles; and <b>intentionally treating minor problems as major ones</b> requiring a large-scale response, which lets the team practise with the real procedures and tools in a real-world situation at lower stakes. The third costs nothing and can be run this week, on the next minor problem that arrives; the role-play is nearly as cheap if any postmortems exist. (b) What is missing is the <b>report afterwards</b>, detailing what went well, what didn't, and how things could have been handled better. Its product is the list of <b>gaps in incident management</b>: the most valuable part of running a drill is examining the outcomes, because once you know what the gaps are you can work toward closing them. Without it the exercise is a conversation that leaves no trace, which is also why drills are far more useful when run periodically rather than once. (c) Build the scenario from a <b>postmortem</b> — postmortems contain plenty of ideas for incident management drills. They describe failures the system has actually produced rather than ones somebody imagined, they come with a known account of what happened for comparison, and they reuse work already done. Two related instructions: use real tools as much as possible, and consider breaking your test environment so the team performs real troubleshooting. (d) The skipped practice is <b>rotating responders, including the commander</b> — one organisation rotated both every four hours through a ten-hour incident. Its two stated benefits are different in kind: it <b>encouraged engineers to get rest</b>, and it <b>brought new ideas into the response team</b>. The second is what would have prevented hour seven's re-testing of an eliminated hypothesis, since the person who eliminated it seven hours ago is the least likely person to notice they are doing it again. (The shared working document guards the same failure from the other direction, by recording what has already been ruled out.)</p></div>
+
+  <h4>Part 4 · Q1 — the billing postmortem</h4>
+  <div class="ans"><p>(a) Six distinct failure modes. <b>Counterproductive finger pointing</b>: a named individual identified as not having escalated, and the platform team blamed for the missing documentation. <b>Animated language</b>: &ldquo;frankly astonishing&rdquo; and the exclamation in &ldquo;Where we got lucky&rdquo; — a postmortem is a factual artifact that should be free from personal judgements and subjective language. <b>Weak action items</b>, with four separate defects: ambiguous phrasing (&ldquo;Make failover more reliable&rdquo;, &ldquo;Improve on-call training&rdquo;) that is open to interpretation and unmeasurable; all items at equal priority, so there is no way to determine which to tackle first; missing owners on two of three; and only one tracking bug. <b>An action item aimed at humans</b> rather than systems. <b>Missing ownership</b>: five owners on the document. <b>Limited audience</b>: shared with the platform team alone. There is also no impact data anywhere in the section shown, which is <b>key details omitted</b>. (b) Highlighting individuals <b>leads team members to become risk-averse because they're afraid of being publicly shamed</b>, and — the part that matters operationally — <b>they may be motivated to cover up facts critical to understanding and preventing recurrence</b>. That makes it a practical problem rather than an etiquette one: the cost is not hurt feelings but missing information in the <i>next</i> postmortem, which is the document you will need to prevent the next outage. Naming Priya here buys nothing and quietly degrades every future write-up in the organisation. (c) Rewritten, each with a single owner, a priority, a tracking bug and a verifiable end state, and aimed at the system: &ldquo;<b>Add an automated failover exercise to the weekly release pipeline that fails the build if failover exceeds N minutes</b>&rdquo; — P1, one owner, ticket. &ldquo;<b>Page the secondary on-call automatically when an incident is unmitigated after 30 minutes</b>&rdquo; — P1, one owner, ticket. &ldquo;<b>Write the failover runbook and validate it by executing it end to end in a drill</b>&rdquo; — P1, one owner, ticket. The item to delete outright is &ldquo;improve on-call training so people escalate sooner&rdquo;: <b>trying to change human behavior is less reliable than changing automated systems and processes</b>, so it is replaced by the automatic escalation above rather than kept. Note also that this was a user-affecting outage, so at least one item should be P0 or P1. And the runbook item's owner should be whoever will do the work, not the person who was on call. (d) The five owners should be <b>one owner and multiple collaborators</b> — a single point of contact responsible for the postmortem, the follow-up and the completion, because declaring official ownership results in accountability, which leads to action. The platform-team-only audience should be <b>everyone at the company by default</b>, shared as widely as possible and perhaps even with customers, because the value of a postmortem is proportional to the learning it creates.</p></div>
+
+  <h4>Part 4 · Q2 — three signals a director noticed</h4>
+  <div class="ans"><p>(a) Two harms. A prompt postmortem <b>tends to be more accurate because information is fresh in the contributors' minds</b>, so a seven-to-ten-week delay loses detail — in the worked case the incident actually recurred while the document was pending, and team members would likely have forgotten details a timely one would have captured. And the people affected are waiting for an explanation and a demonstration that you have things under control: <b>the longer you wait, the more they will fill the gap with the products of their imagination</b>, which seldom works in your favour. The underlying cause named is <b>lacking time to write postmortems</b>: quality postmortems take time, and when a team is overloaded the quality suffers, producing subpar documents with incomplete action items that make recurrence far more likely. On quality bars: <b>postmortems are letters you write to future team members</b>, so it is very important to keep a consistent bar, lest you accidentally teach future teammates a bad lesson. The remedy is to prioritise postmortem work, track completion and review, and allow teams adequate time to implement the action plan. (b) Something close to: &ldquo;I'm sure everyone had the best intent, so to keep it blameless, maybe we ask generically whether there were any warning signs we could have heeded, and why we might have dismissed them.&rdquo; It moves the narrative in a more constructive direction without contradicting the vice-president. The justifying principle is that <b>individuals act in good faith and make decisions based on the best information available</b>, so <b>investigating the source of misleading information is much more beneficial to the organisation than assigning blame</b> — the interesting question is why the warning did not reach the people deciding, which is a system question. (c) Repeating incidents mean it is time to dig deeper, and the questions are: are action items taking too long to close? Is feature velocity trumping reliability fixes? Are the right action items being captured in the first place? Is the faulty service overdue for a refactor? Are people putting sticking plasters on a more serious problem? When every item is closing on time, the first question is answered and the remaining ones become the live ones — most pointedly whether the right items were ever captured, and whether the service needs a refactor rather than more patches. Having uncovered a systemic process or technical problem, step back and consider overall service health, and bring the postmortem collaborators from each similar incident together to decide the course of action. (d) Two that target closeout and learning rather than authorship. <b>Reward action item closeout explicitly</b>, keeping incentives balanced between writing the postmortem and successfully implementing its action plan — this prevents the unvirtuous cycle of unclosed postmortems you get from rewarding the writing alone. And <b>gamification</b>: a scoreboard or burndown of open action items, of the kind used in twice-yearly fix-it weeks where those who close the most receive recognition — this prevents items ageing invisibly by making the backlog itself public. Equally acceptable: rewarding the resulting organisational change with peer bonuses, positive reviews or promotion, which prevents learning staying inside one team; and holding postmortem owners up as experts, which counteracts people avoiding association with a write-up.</p></div>
+</section>
+
+<!-- ============================== 10. TRACKER + FINAL QUIZ ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <style>#trk td,#trk th{padding:1.3pt 5pt; font-size:7.9pt} #quiz .writeline{height:11.5pt} #quiz li{margin-bottom:0.5pt} #quiz{padding-left:22pt}</style>
+  <table class="tight" id="trk">
+    <tr>
+      <th style="width:58mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:24mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> Resolving vs managing an incident</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> The four basic principles</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Where the framework came from, and its scaling</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> The three Cs, and what they are goals for</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> The commander's default over undelegated roles</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Operations and communications leads</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> Which role collapses back, and when</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> The three things declaring early buys you</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Centralized communication, and the channel/doc split</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> The working document: when, and what it holds</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> The four steps of an active incident</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Location, not details — and why it saves hours</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Generic mitigation: two examples and the price</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Bespoke mitigation, and how it gets reset</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> When to build mitigation tooling, and how to know which</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Mitigation is not prevention — the three-quota case</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> Heroics, and the two structural alternatives</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> Delegating the documented, coordinating the vague</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> What response training actually teaches</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> The four things to settle in advance</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> The two symmetrical assumptions of silence</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> Where incident criteria come from</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> The three scales of drill</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> The actual product of a drill</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>25 ·</b> Rotation: both reasons, and which is a technique</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>26 ·</b> The worked outage: empty list, no filter</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>27 ·</b> The eight ways a postmortem fails</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>28 ·</b> Four defects of a weak action-item list</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>29 ·</b> Why blame is a practical problem</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>30 ·</b> Blameless but owned — reconciling the two</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>31 ·</b> The seven qualities of a good postmortem</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>32 ·</b> Audience and promptness, and the reasons for each</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>33 ·</b> The four signs the culture is failing</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>34 ·</b> Master matrix — commanded × changed</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twenty minutes, write the answers</h3>
+  <ol id="quiz">
+    <li>Define resolving an incident and managing an incident, give the four basic principles of incident response, and say what a pre-agreed structure is actually protecting.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the three Cs, say what they are goals for and what they are not, and state where the culprit usually lies when a response goes wrong.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name the three main roles, say how they are organised, give the default rule about roles that have not been delegated, and say which role can be absorbed back and under what condition.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the three specific benefits of declaring an incident early, and explain why declaring is described as creating the response rather than escalating it.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the four steps of an active incident in order, say which is top priority and what happens if it is not, and state the rule about details versus location.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Define a generic mitigation, give two examples, state the price it carries, and say when the tooling for one should be built and how you find out which tooling you need.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain the difference between mitigating an incident and preventing its recurrence, using the case where the impact was stopped three times, and say what should have happened to the rollout.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name the four things to settle before an incident, give the stated reason for two of them, and give the two symmetrical assumptions people make when you tell them nothing.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the three scales of incident drill, say what makes a drill worth running and what makes one worthless, and give the two reasons for rotating responders during a long incident.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the four characteristics of a good action item, state the rule about changing humans versus changing systems, and explain the mechanism by which blame in a postmortem damages the next one.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+  </ol>
+</section>
+
+</body>
+</html>

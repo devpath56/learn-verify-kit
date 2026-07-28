@@ -3,8 +3,8 @@
   "what_this_is": "Answer-level log for the printed competency booklets. One file for the whole 13-competency set. Questions are asked ONLY from the banks below, never invented. Separate from the repo-root progress.json, which logs concepts taught in conversation.",
   "set": {
     "size": 13,
-    "registered": 8,
-    "remaining": 5
+    "registered": 9,
+    "remaining": 4
   },
   "bank_scope": "applied + quiz only — the 8 three-part applied cases and the 10 final-quiz questions per booklet (18). Concept-sketch node questions stay in the printed booklet as self-test cues but are not tracked.",
   "conventions": {
@@ -35,7 +35,7 @@
     "phrasing": "had it, couldn't say it in expert terms - go back to the plain/expert table"
   },
   "set_rollup": {
-    "untested": 144,
+    "untested": 162,
     "shaky": 0,
     "comfortable": 0,
     "gaps": {
@@ -2206,6 +2206,269 @@
           "ideal": "(a) 0.5 × 0.5 × 0.5 × 0.5 = 0.0625, so 6.25% — about one chance in sixteen. The rule is the benchmark paradox: “if your product's chances of winning a benchmark are 50/50, you'll usually lose”, because customers who want to be sure run several and expect you to win them all, and the more benchmarks the worse the chances. (b) Proposal (i) is benchmarking the competition, and in its cheap-third-party form it is also the misleading benchmarks variant where several firms are engaged not for expertise but for a fast inexpensive result and the best is kept. It backfires because customers use a product for months and tune it, while you have days — so you can only produce untuned and therefore unrealistic results, and the competitor's customers, who are the target of the exercise, will recognise them, costing your company credibility with exactly the people it was trying to impress. Proposal (ii) is a benchmark special: engineering the product to score on the benchmark while disregarding actual customer performance. The industry bodies answered it with specification rather than argument — an anti-benchmark-special clause prohibiting all implementations that improve benchmark results but not real-world performance or pricing — and accompanied it with a price requirement that the total price be within 2% of what a customer would actually pay, closing the parallel trick of quoting deep discounts nobody would receive. (c) Proposal (iii) commits the pitfall that ignoring benchmarks is itself a benchmarking failure. The intervention that genuinely improves the odds is to stop being a coin flip and to make sure your own results are the best your product can honestly produce — the friendly-fire remedy: test the top-performing system and configuration, drive it to its true limit and be able to say what the bottleneck was, benchmark the current version on the best available equipment, and share the results with engineering before publication so they can spot what was misconfigured or left off."
         }
       ]
+    },
+    {
+      "id": "sre-incident-postmortem",
+      "index": 9,
+      "title": "Incident Response & Postmortems — Structure, Mitigation, Practice, Learning",
+      "booklet": "resources/sre-incident-postmortem/",
+      "registered": "2026-07-28",
+      "parts": [
+        "The structure, before you need it",
+        "Mitigate first, understand later",
+        "Practise before the pager",
+        "The write-up that changes something"
+      ],
+      "rollup": {
+        "untested": 18,
+        "shaky": 0,
+        "comfortable": 0,
+        "gaps": {
+          "name": 0,
+          "mechanism": 0,
+          "boundary": 0,
+          "price": 0,
+          "phrasing": 0
+        },
+        "weakest": null
+      },
+      "questions": [
+        {
+          "id": "sre-incident-postmortem.p1q1",
+          "type": "applied",
+          "where": "Part 1 · Question 1",
+          "prompt": "A payments API starts returning errors for a subset of merchants. The on-call engineer opens a ticket, starts investigating, and posts findings into the ticket as they go. Over the next ninety minutes four other engineers notice the ticket and begin investigating in parallel; two of them independently rule out the same subsystem. The support team, fielding merchant calls, is asking the on-call engineer for updates roughly every ten minutes. Nobody has used the word “incident”. The on-call engineer's view is that they will declare one “if it turns out to be serious”. (a) Name the two distinct jobs now in progress, define each, and say which one has no owner. (b) Give the four basic principles, and identify which of them this situation violates and how. (c) Take the on-call engineer's reasoning seriously and say precisely what is wrong with it, using the three specific benefits that declaring early is said to provide. (d) Write the three sentences you would say to fix this in the next sixty seconds.",
+          "ideal": "(a) Resolving the incident — mitigating the impact and/or restoring the service to its previous condition — and managing it: coordinating the efforts of the responding teams efficiently, and ensuring communication flows both between the responders and to those interested in the incident's progress. Five people are resolving. Nobody is managing, and that is the job with no owner. (b) The four principles are: maintain a clear line of command; designate clearly defined roles; keep a working record of debugging and mitigation as you go; and declare incidents early and often. All four are broken. There is no line of command, because nobody is leading and four people joined without being asked. There are no roles — in particular nobody is doing communications, which is why the support team is interrupting the one person best placed to fix it. The record is a ticket used as a notebook rather than a working document of theories and eliminated causes, which is how two engineers came to rule out the same subsystem independently; with five responders that document should exist. And no incident has been declared. (c) The reasoning treats declaring as an escalation whose cost must be justified by severity. It is the opposite: declaring is the act that supplies the tools — the command line, the roles, the shared channel and the record — so waiting does not defer a cost, it forfeits three specific benefits. Declaring early prevents miscommunication between the separate groups working the problem; makes root-cause identification and resolution occur sooner; and loops relevant teams in earlier, which makes external communication faster and smoother. Each of those is already being lost here. The principle is early and often, precisely because standing a response down is trivial and starting one ninety minutes late is not. (d) Something close to: “I'm declaring an incident, and I'm the Incident Commander.” “You're Operations Lead — you own the merchant errors, and everything you rule out goes in the shared doc.” “You're Communications Lead — support and the status page come to you, not to us; everyone else into the incident channel now.”",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p1q2",
+          "type": "applied",
+          "where": "Part 1 · Question 2",
+          "prompt": "Three hours into a regional outage, the incident channel has nineteen participants. The commander — the engineer who first noticed the problem — is simultaneously answering questions from a director, running two debugging threads, and writing an update for the status page. A colleague who has run many incidents joins and offers to help. Separately, two responders have each spent forty minutes eliminating the same suspected cause without knowing about each other. (a) Diagnose the commander's situation in terms of the default rule about undelegated roles, and say what specifically has gone wrong as a result. (b) Give both of the moves available to the commander now that an experienced colleague has arrived, and say what each costs. (c) Name the artefact that would have prevented the duplicated forty minutes, say at what team size it should have been started, and state exactly what it holds. (d) The channel is now too noisy to follow. Give the specific split to make, and say what stays in each place.",
+          "ideal": "(a) By default the commander assumes all roles that have not been delegated yet. Nothing has been delegated, so this person is simultaneously Incident Commander, Operations Lead and Communications Lead. The consequence is that the one job only they can do — coordinating — is the one being starved, because it has no deadline attached to it while the director and the status page do. The visible symptom is the duplicated forty minutes: coordination is what prevents two people doing the same elimination, and coordination is not happening. (b) Two moves are available, and both are described as normal. The commander may hand off the commander role to the experienced colleague and take the Operations Lead role themselves — cost: a handover, at a bad moment, with all the context to transfer; benefit: the response is run by whoever is best at running it, which need not be whoever noticed first. Or they may assign the Operations Lead role to someone else and stay in command — cost: they keep the coordination load and, unless they also delegate communications, the director too. The large worked case took the first option, transferring command before the scheduled shift handover specifically because the incoming person had more incident-response experience. (c) The working document, started once three or more people are working an incident. It lists working theories, eliminated causes, and useful debugging information such as error logs and suspect graphs, and its stated purpose is to preserve that information so it does not get lost in the conversation. With nineteen participants it is long overdue. (d) Move the detailed debugging into the shared document and keep the channel as the hub for decision making. That is exactly the split the large worked case adopted once discussion became too dense for the channel, and it works because the two kinds of traffic have different readers: detail is read by whoever picks up the thread, decisions must be read by everyone.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p2q1",
+          "type": "applied",
+          "where": "Part 2 · Question 1",
+          "prompt": "A search service starts returning empty results for about a fifth of queries. Forty minutes in, the responders establish that every failing query is served from one of three sites in one continent, and that a configuration push went out to those sites shortly before the errors began — but they cannot yet say what in the configuration is wrong. The team lead's position is that pushing the previous configuration back would “undo a week of unrelated changes as well” and that they should keep reading the diff until they find the offending line. Two engineers are already writing a targeted patch, which they estimate at ninety minutes. (a) Give the four steps of an active incident in order, and say which step this team is on and which one they have skipped. (b) State the rule about details versus location, and apply it: is enough known to act, and on what evidence? (c) Take the team lead's objection at full strength, name what it correctly identifies, and say why it does not change the decision. (d) The targeted patch is not wasted work. Say what should happen to it and why, referring to what went wrong with the equivalent effort in the worked case.",
+          "ideal": "(a) The order is: 1. assess the impact; 2. mitigate the impact; 3. perform a root-cause analysis; 4. after the incident is over, fix what caused it and write a postmortem. Step 1 is done — a fifth of queries failing, localised to three sites. The team is working on step 3, and has skipped step 2 entirely. That inversion is the specific failure the source warns about: first responders must prioritise mitigation above all else, or time to resolution suffers. (b) The rule is that to mitigate an incident you don't have to fully understand the details — you only need to know the location of the root cause. Enough is known. The failures are confined to three named sites in one continent, and a configuration push went to exactly those sites shortly before the errors began. That is a location plus a correlation with a recent change, which is precisely the situation the two canonical generic mitigations are for: roll back a recent release when an outage is correlated with the release cycle, or reconfigure load balancers to avoid a region when errors are localised. Both are available here. (c) The objection correctly identifies something real: generic mitigations are blunt instruments and may cause other disruptions to the service, and rolling back the configuration genuinely does undo a week of unrelated changes. It does not change the decision because that bluntness is the price of not needing a diagnosis, not an argument against paying it — the alternative on offer is another ninety minutes of a fifth of queries failing. Customers do not care whether you understand the outage; what they want is to stop receiving errors. The unrelated changes can be reapplied on a calm afternoon. (d) The targeted patch should continue in parallel, not instead. The error is running bespoke work as the only thing standing between users and the impact, and the worked case shows why: the equivalent effort there was a rebuild taking about an hour, which reached 90% completion before the team discovered another location using the bad path and had to restart the build. Bespoke work can be reset to zero by a single late discovery, and it cannot begin at all until the fault is understood. Note also that the rollback ends the impact but not the incident: mitigation is not prevention, so the investigation continues to root cause.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p2q2",
+          "type": "applied",
+          "where": "Part 2 · Question 2",
+          "prompt": "A queue-backed notification system has now overflowed three times in a fortnight. Each time, an engineer has raised the consumer's memory limit, the backlog has drained, and the alert has cleared; nobody has found out why the backlog forms. A fourth occurrence lands on a Sunday, during a staged rollout that is at 60% and still progressing. The engineer who fixed it the previous three times is on holiday but answers a message and talks a colleague through it. (a) Name precisely what the three previous fixes achieved and what they did not, using the distinction the source draws. (b) Two decisions in this story are the same mistake as in the mishandled worked case. Name both, and give the specific corrective for each. (c) The holidaying engineer answered, so the incident was handled. Explain why this is recorded as a finding rather than a relief, and give the two structural alternatives. (d) Say what should be done with the rollout now, and what would have to be true before it resumes.",
+          "ideal": "(a) The three previous fixes mitigated the impact — the backlog drained and the alert cleared — and did nothing about recurrence, which requires the root cause. This is the mishandled worked case exactly: mitigation successfully stopped the impact on three separate occasions, each time by raising a quota, but the team could only prevent the issue from happening again once they discovered the root cause. Stopping the impact and stopping the repeat are different achievements, and only the second needs a diagnosis. (b) Two decisions repeat that case's mistakes. First, continuing the rollout after mitigating: after the first mitigation it would have been better to postpone the rollout until the root cause was fully determined, which is what avoids the eventual major disruption. The corrective is to hold the rollout until the cause is understood. Second, rolling out when the people who understand it are not available — the worked case's rollout reached 100% on a weekend, against the practice of performing rollouts only during business days so developers are around if something goes wrong. The corrective is to conduct rollouts during business hours. (c) Because successful incident management shouldn't rely on heroic efforts of individuals — the question that makes it a finding is what if they had been unreachable? The organisation was one unanswered message away from having no response at all, and the arrangement also taps someone during their own time, against a good work-life balance. The two structural alternatives are stated: conduct the rollouts during business hours, or organise an on-call rotation that provides paid coverage outside business hours. (d) Stop the rollout where it is. It should not resume until the root cause of the backlog is fully determined — and, given that this is the fourth occurrence, until whatever the root cause turns out to be has an owned fix rather than another limit increase. When it does resume, it should resume on a business day with the people who understand the system available.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p3q1",
+          "type": "applied",
+          "where": "Part 3 · Question 1",
+          "prompt": "A sixty-person engineering organisation has a well-written incident response policy on its internal wiki, revised last year. During a genuine outage last month: the responders spent eleven minutes deciding between two chat tools and a video call; the on-call engineer wrote a customer-facing status update from scratch, which a manager then rewrote twice before it was published forty minutes later; nobody could find the escalation contact for the payments team; and two engineers argued for a quarter of an hour about whether the event qualified as an incident at all. The postmortem's single action item reads “re-read the incident policy”. (a) Name the four things that should have been settled in advance, matching each to the specific delay it would have removed here. (b) For the channel and the templates, give the stated reason each must be decided beforehand rather than chosen well in the moment. (c) Explain what is wrong with the action item, using the distinction between documentation and preparation. (d) The criteria argument is the most consequential of the four delays. Say why, and say where the criteria should come from.",
+          "ideal": "(a) Four things should have been settled in advance, and each maps to one delay. The communication channel — agreed and practised beforehand — removes the eleven minutes spent choosing between tools. Two or three ready-to-use templates, with the on-call knowing how to send them and the review and approval route agreed, remove the forty minutes of drafting and rewriting. A prepared list of contacts to email or page removes the search for the payments escalation. And established criteria for what counts as an incident remove the quarter-hour argument. (b) For the channel: no Incident Commander wants to make this decision during an incident — and the further instruction is to practise using it so there are no surprises, and to prefer one the team is already familiar with, because familiarity is what removes hesitation. For the templates: no one wants to write these announcements under extreme stress with no guidelines. Neither reason is about quality of judgement; both are about the cost of deciding at all at the worst moment. (c) “Re-read the incident policy” mistakes documentation for preparation. A document tells people what they should do; practice determines what they will do. Staying calm and following a response structure during an emergency takes practice, and practice builds muscle memory, which is what supplies confidence in a real emergency. Re-reading rehearses nothing and closes none of the four gaps. The correct action items are the four concrete decisions above, plus a drill and — crucially — the report that follows it. (d) The criteria argument is the most consequential because it delays the declaration itself, and everything else in the response exists only after that: the command line, the roles, the shared channel, the record. A team that cannot agree whether an event qualifies cannot declare early, so the whole structure arrives late. The criteria should be derived by looking at past outages and taking known high-risk areas into consideration — which this organisation, having had the outage described, is now in a position to do.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p3q2",
+          "type": "applied",
+          "where": "Part 3 · Question 2",
+          "prompt": "A team wants to start practising incident response but has no budget for anything elaborate. They propose a quarterly exercise in which the on-call engineer is given a written scenario and talks through what they would do, in a meeting, for twenty minutes. There is no report afterwards — the group discusses it and moves on. Separately, during a real nine-hour incident last week, the same commander ran the whole response because “she had all the context”, and by hour seven the team was re-testing hypotheses it had already eliminated. (a) Give the three scales of drill available, and say which of them this team could run this week at no cost. (b) Name what their proposed exercise is missing that would make it preparation rather than conversation, and say what specifically that missing piece produces. (c) Their scenario is invented from scratch each time. Give the better source and say why. (d) Address the nine-hour incident: name the practice that was skipped, give both of its stated benefits, and say which one would have prevented the repeated hypotheses.",
+          "ideal": "(a) Three scales are available: a company-wide resilience test, which creates a controlled emergency that does not actually impact customers and which teams respond to as if it were real; a role-playing exercise in which engineers reenact a previous incident in its documented roles; and intentionally treating minor problems as major ones requiring a large-scale response, which lets the team practise with the real procedures and tools in a real-world situation at lower stakes. The third costs nothing and can be run this week, on the next minor problem that arrives; the role-play is nearly as cheap if any postmortems exist. (b) What is missing is the report afterwards, detailing what went well, what didn't, and how things could have been handled better. Its product is the list of gaps in incident management: the most valuable part of running a drill is examining the outcomes, because once you know what the gaps are you can work toward closing them. Without it the exercise is a conversation that leaves no trace, which is also why drills are far more useful when run periodically rather than once. (c) Build the scenario from a postmortem — postmortems contain plenty of ideas for incident management drills. They describe failures the system has actually produced rather than ones somebody imagined, they come with a known account of what happened for comparison, and they reuse work already done. Two related instructions: use real tools as much as possible, and consider breaking your test environment so the team performs real troubleshooting. (d) The skipped practice is rotating responders, including the commander — one organisation rotated both every four hours through a ten-hour incident. Its two stated benefits are different in kind: it encouraged engineers to get rest, and it brought new ideas into the response team. The second is what would have prevented hour seven's re-testing of an eliminated hypothesis, since the person who eliminated it seven hours ago is the least likely person to notice they are doing it again. (The shared working document guards the same failure from the other direction, by recording what has already been ruled out.)",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p4q1",
+          "type": "applied",
+          "where": "Part 4 · Question 1",
+          "prompt": "Here is the whole Lessons Learned section of a postmortem for a six-hour billing outage. “Things that went poorly: nobody on the platform team had documented the failover procedure, which is frankly astonishing for a service this old. Priya was on call and did not escalate for two hours. Where we got lucky: the batch job hadn't started yet — I don't want to think about what would have happened otherwise!” The action items are: “Make failover more reliable” (P2, no owner, no ticket); “Improve on-call training so people escalate sooner” (P2, no owner, no ticket); “Document the failover runbook” (P2, owner: Priya, ticket BUG-4471). The document lists five owners and was shared with the platform team. (a) Identify every distinct failure mode present, naming each. (b) For the blame, state the mechanism by which it damages the organisation — and say why that mechanism makes this a practical problem rather than an etiquette one. (c) Rewrite the three action items so they satisfy every stated characteristic of a good one, and say which one you would delete outright and why. (d) Two structural facts are given at the end. Name what is wrong with each and what it should be instead.",
+          "ideal": "(a) Six distinct failure modes. Counterproductive finger pointing: a named individual identified as not having escalated, and the platform team blamed for the missing documentation. Animated language: “frankly astonishing” and the exclamation in “Where we got lucky” — a postmortem is a factual artifact that should be free from personal judgements and subjective language. Weak action items, with four separate defects: ambiguous phrasing (“Make failover more reliable”, “Improve on-call training”) that is open to interpretation and unmeasurable; all items at equal priority, so there is no way to determine which to tackle first; missing owners on two of three; and only one tracking bug. An action item aimed at humans rather than systems. Missing ownership: five owners on the document. Limited audience: shared with the platform team alone. There is also no impact data anywhere in the section shown, which is key details omitted. (b) Highlighting individuals leads team members to become risk-averse because they're afraid of being publicly shamed, and — the part that matters operationally — they may be motivated to cover up facts critical to understanding and preventing recurrence. That makes it a practical problem rather than an etiquette one: the cost is not hurt feelings but missing information in the next postmortem, which is the document you will need to prevent the next outage. Naming Priya here buys nothing and quietly degrades every future write-up in the organisation. (c) Rewritten, each with a single owner, a priority, a tracking bug and a verifiable end state, and aimed at the system: “Add an automated failover exercise to the weekly release pipeline that fails the build if failover exceeds N minutes” — P1, one owner, ticket. “Page the secondary on-call automatically when an incident is unmitigated after 30 minutes” — P1, one owner, ticket. “Write the failover runbook and validate it by executing it end to end in a drill” — P1, one owner, ticket. The item to delete outright is “improve on-call training so people escalate sooner”: trying to change human behavior is less reliable than changing automated systems and processes, so it is replaced by the automatic escalation above rather than kept. Note also that this was a user-affecting outage, so at least one item should be P0 or P1. And the runbook item's owner should be whoever will do the work, not the person who was on call. (d) The five owners should be one owner and multiple collaborators — a single point of contact responsible for the postmortem, the follow-up and the completion, because declaring official ownership results in accountability, which leads to action. The platform-team-only audience should be everyone at the company by default, shared as widely as possible and perhaps even with customers, because the value of a postmortem is proportional to the learning it creates.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.p4q2",
+          "type": "applied",
+          "where": "Part 4 · Question 2",
+          "prompt": "A director notices three things over six months. Postmortems for that org are consistently published seven to ten weeks after the incident. In a review meeting a vice-president said, “Look, blameless is fine in principle, but someone in that room clearly knew this was risky — why did nobody speak up?” And a team has now had three outages with near-identical causes, each with a completed postmortem and every action item closed. (a) For the publication delay, give both stated harms, and name the underlying cause the source identifies along with what it says about quality bars. (b) Give a specific reply to the vice-president that redirects the conversation without contradicting them, and state the principle about good faith and information that justifies it. (c) The third observation is the strangest: closed action items and recurring outages. Give the questions to ask, and say what it means when the items are all closing on time. (d) Name two incentives the director could introduce that target closeout and organisational learning rather than authorship, and say what each is designed to prevent.",
+          "ideal": "(a) Two harms. A prompt postmortem tends to be more accurate because information is fresh in the contributors' minds, so a seven-to-ten-week delay loses detail — in the worked case the incident actually recurred while the document was pending, and team members would likely have forgotten details a timely one would have captured. And the people affected are waiting for an explanation and a demonstration that you have things under control: the longer you wait, the more they will fill the gap with the products of their imagination, which seldom works in your favour. The underlying cause named is lacking time to write postmortems: quality postmortems take time, and when a team is overloaded the quality suffers, producing subpar documents with incomplete action items that make recurrence far more likely. On quality bars: postmortems are letters you write to future team members, so it is very important to keep a consistent bar, lest you accidentally teach future teammates a bad lesson. The remedy is to prioritise postmortem work, track completion and review, and allow teams adequate time to implement the action plan. (b) Something close to: “I'm sure everyone had the best intent, so to keep it blameless, maybe we ask generically whether there were any warning signs we could have heeded, and why we might have dismissed them.” It moves the narrative in a more constructive direction without contradicting the vice-president. The justifying principle is that individuals act in good faith and make decisions based on the best information available, so investigating the source of misleading information is much more beneficial to the organisation than assigning blame — the interesting question is why the warning did not reach the people deciding, which is a system question. (c) Repeating incidents mean it is time to dig deeper, and the questions are: are action items taking too long to close? Is feature velocity trumping reliability fixes? Are the right action items being captured in the first place? Is the faulty service overdue for a refactor? Are people putting sticking plasters on a more serious problem? When every item is closing on time, the first question is answered and the remaining ones become the live ones — most pointedly whether the right items were ever captured, and whether the service needs a refactor rather than more patches. Having uncovered a systemic process or technical problem, step back and consider overall service health, and bring the postmortem collaborators from each similar incident together to decide the course of action. (d) Two that target closeout and learning rather than authorship. Reward action item closeout explicitly, keeping incentives balanced between writing the postmortem and successfully implementing its action plan — this prevents the unvirtuous cycle of unclosed postmortems you get from rewarding the writing alone. And gamification: a scoreboard or burndown of open action items, of the kind used in twice-yearly fix-it weeks where those who close the most receive recognition — this prevents items ageing invisibly by making the backlog itself public. Equally acceptable: rewarding the resulting organisational change with peer bonuses, positive reviews or promotion, which prevents learning staying inside one team; and holding postmortem owners up as experts, which counteracts people avoiding association with a write-up.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z01",
+          "type": "quiz",
+          "where": "Final quiz · 1",
+          "prompt": "Define resolving an incident and managing an incident, give the four basic principles of incident response, and say what a pre-agreed structure is actually protecting.",
+          "ideal": "Resolving an incident means mitigating its impact and/or restoring the service to the condition it was in before. Managing one means coordinating the efforts of the responding teams efficiently, and making sure communication flows in both directions — between the responders themselves, and outward to everyone with an interest in how the incident is progressing. The four basic principles: keep one clear line of command; give the roles clear definitions; maintain a working record of the debugging and the mitigation while you do it; and declare incidents both early and often. What a pre-agreed structure protects is attention. Large-scale incidents are confusing, and a structure the team has settled on beforehand reduces that chaos; formulating the rules for communicating and coordinating before disaster strikes is what lets the team concentrate on resolving the problem when one occurs. A team that has already practised and familiarised itself with those rules does not have to spend any of its thinking on them during the emergency.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z02",
+          "type": "quiz",
+          "where": "Final quiz · 2",
+          "prompt": "Give the three Cs, say what they are goals for and what they are not, and state where the culprit usually lies when a response goes wrong.",
+          "ideal": "Coordinate the response effort; communicate between the incident responders, within the organisation, and to the outside world; and maintain control over the incident response. They are the goals every incident response framework has in common, and they are goals for the response rather than for the system — none of them is about repairing the fault, which is why a response can resolve a problem quickly and still have failed at all three. Mastering them is described as essential to responding effectively. And when something goes wrong with incident response, the culprit is likely to be found in one of those three areas, which makes them a diagnostic list as well as a set of aims.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z03",
+          "type": "quiz",
+          "where": "Final quiz · 3",
+          "prompt": "Name the three main roles, say how they are organised, give the default rule about roles that have not been delegated, and say which role can be absorbed back and under what condition.",
+          "ideal": "The Incident Commander, the Operations Lead and the Communications Lead. They are organised as a hierarchy: the commander leads the response, and the other two report to them. The commander directs the high-level state of the incident, commands and coordinates it, delegates roles as needed, communicates, stays in control and works with the other responders toward resolution; the operations lead applies operational tools to mitigate or resolve the problem; the communications lead is the public face, giving periodic updates to the response team and to stakeholders and handling inquiries about the incident. The default rule is that the commander assumes every role that has not yet been delegated, so no part of the work is ever unowned — and the person who declares the incident typically steps into the commander role. The elastic role is communications: if the incident becomes small enough, that role can be subsumed back into the commander's. Both leads may run teams of their own, and those teams expand or contract as the incident requires.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z04",
+          "type": "quiz",
+          "where": "Final quiz · 4",
+          "prompt": "Give the three specific benefits of declaring an incident early, and explain why declaring is described as creating the response rather than escalating it.",
+          "ideal": "Declaring early ensures three things. Miscommunication between the separate groups working the problem is prevented. Root-cause identification and resolution happen sooner. And relevant teams are looped in earlier, which makes communication to the outside world faster and smoother. It is described as creating the response rather than escalating it because everything a managed incident consists of comes into being at that moment: the line of command, the defined roles, the single place where everyone talks, and the record kept as the work proceeds. Until the declaration, there is a group of individuals and a ticket. That is why the principle is to declare early and often, and why the observation that managed incidents are resolved faster is an argument for lowering the threshold rather than for being sure first — the three benefits above are forfeited by waiting, not merely postponed.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z05",
+          "type": "quiz",
+          "where": "Final quiz · 5",
+          "prompt": "Give the four steps of an active incident in order, say which is top priority and what happens if it is not, and state the rule about details versus location.",
+          "ideal": "The order is: assess the impact of the incident; mitigate the impact; perform a root-cause analysis; and, once the incident is over, fix whatever caused it and write a postmortem. Afterwards you can run drills against the vulnerabilities the incident exposed, and engineers can work on projects to address them. Mitigation is the top priority, and the consequence of treating it otherwise is stated plainly — a first responder who puts anything above mitigating will see the time to resolution suffer for it. The enabling rule: mitigating an incident does not require you to understand the details in full, only to know whereabouts the root cause lies. That is what makes acting before diagnosis possible, and the capacity to mitigate while the cause remains unexplained is called crucial for running robust services at high availability. Customers do not care whether you understand what caused the outage; what they want is to stop receiving errors.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z06",
+          "type": "quiz",
+          "where": "Final quiz · 6",
+          "prompt": "Define a generic mitigation, give two examples, state the price it carries, and say when the tooling for one should be built and how you find out which tooling you need.",
+          "ideal": "A generic mitigation is something a first responder does to relieve the pain while the root cause is still not fully understood. Two examples: rolling back a recent release when an outage correlates with the release cycle, and reconfiguring load balancers to steer away from a region when the errors are localised there. The price is that they are blunt instruments and may disrupt other parts of the service — their impact is broader than a precise solution's — but they go in fast and stop the bleeding while the team is still working out what the underlying cause is and dealing with it. The tooling that makes such an action quick does take engineering time to develop, and general-purpose mitigation tools should be built ahead of any incident rather than in the middle of responding to one. To find out which tools you actually need, browse your existing postmortems: they are a good way to discover the mitigations and tools that would have been useful in retrospect, so you can build them into services and manage the next incident better.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z07",
+          "type": "quiz",
+          "where": "Final quiz · 7",
+          "prompt": "Explain the difference between mitigating an incident and preventing its recurrence, using the case where the impact was stopped three times, and say what should have happened to the rollout.",
+          "ideal": "Mitigating stops the impact; preventing recurrence requires the root cause, and only the second is achieved by understanding what happened. In the case where a quota was raised, mitigation successfully stopped the impact on three separate occasions, and on each occasion the problem returned — the team could only stop it recurring once they had found the underlying defect. The general policy is to stop the impact of an incident first and find the root cause afterwards, unless the cause happens to be identified early on; but once the impact is mitigated, understanding the cause is just as important, precisely so the issue does not happen again. What should have happened to the rollout is that it should have been postponed after the first mitigation, until the root cause had been fully determined. Continuing it instead is what led to the major disruption later, when the release reached every device over a weekend and users lost half of their requests.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z08",
+          "type": "quiz",
+          "where": "Final quiz · 8",
+          "prompt": "Name the four things to settle before an incident, give the stated reason for two of them, and give the two symmetrical assumptions people make when you tell them nothing.",
+          "ideal": "Settle the communication channel, two or three ready-to-use announcement templates, a prepared list of people to email or page, and an established set of criteria for deciding whether a paging issue is really an incident. The channel must be agreed and practised in advance because no Incident Commander wants to be making that decision during an incident — and it is better to pick one the team is already familiar with, so everyone is comfortable using it. The templates must exist in advance because nobody wants to be writing public announcements under extreme stress with no guidelines; the drafting, review, approval and release path should be thought through at the same time. The two assumptions people make in the absence of information are symmetrical. If you do not acknowledge that an incident is happening and is actively being addressed, they will automatically assume that nothing is being done about it. And if you forget to call off the response once the problem has been mitigated or resolved, they will assume the incident is still going on. Both are preempted by regular status updates, and the second means that closing an incident is an announcement rather than merely a state.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z09",
+          "type": "quiz",
+          "where": "Final quiz · 9",
+          "prompt": "Give the three scales of incident drill, say what makes a drill worth running and what makes one worthless, and give the two reasons for rotating responders during a long incident.",
+          "ideal": "Three scales. A company-wide resilience test, in which a controlled emergency that does not actually affect customers is created and teams respond to it as though it were real, reviewing the response procedures afterwards. A smaller role-playing exercise, in which engineers rehearse a specific past incident. And the cheapest of the three: deliberately handling a minor problem as though it were a major one demanding a full-scale response, so the team exercises the actual procedures and tools in a genuine situation where the stakes are low. What makes a drill worth running is that it is run periodically and followed by a report detailing what went well, what did not, and how things could have been handled better — examining the outcomes is the most valuable part, because it reveals the gaps in incident management, and once you know what those are you can work toward closing them. A drill with no such review is exercise rather than preparation. Build scenarios from postmortems, which contain plenty of ideas, use real tools as far as possible, and consider breaking a test environment so the troubleshooting is genuine. The two reasons for rotating responders and the commander during a long incident — one organisation rotated both every four hours through a ten-hour response — are that it encourages engineers to get rest, and that it brings new ideas into the response team.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "sre-incident-postmortem.z10",
+          "type": "quiz",
+          "where": "Final quiz · 10",
+          "prompt": "Give the four characteristics of a good action item, state the rule about changing humans versus changing systems, and explain the mechanism by which blame in a postmortem damages the next one.",
+          "ideal": "A good action item has a single owner, an assigned priority, a tracking number, and a verifiable end state, so that it is measurable — 'add an alert when more than a given percentage of our machines have been taken away from us' can be checked, whereas 'improve the alerting' cannot. Alongside those, each theme of items should contain preventative as well as mitigative work, since only prevention addresses recurrence. Without a formal tracking process, action items are often simply forgotten, which results in further outages. The rule about people is that trying to change human behaviour is less reliable than changing automated systems and processes, so an item proposing to make humans less error-prone should be replaced by one that changes what the system will accept. Blame damages the next postmortem through a specific mechanism. Singling people out makes the rest of the team risk-averse, because nobody wants to be shamed in public next, and it gives them a motive to conceal exactly the facts that are critical to understanding the incident and stopping it recurring. So the cost is not hurt feelings but missing information in the very document you will need next time — which is why blamelessness is a practical requirement rather than a courtesy, and why it coexists with naming a single owner for the document and for every action item.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        }
+      ],
+      "retired": []
     }
   ]
 }

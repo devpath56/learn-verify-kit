@@ -49,6 +49,7 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../hpbn-browser-networking/` — the sixth.
 `../sysperf-methodology/` — the seventh.
 `../sysperf-benchmarking/` — the eighth.
+`../sre-incident-postmortem/` — the ninth.
 
 ## Checking a rendered booklet
 

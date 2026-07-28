@@ -23,11 +23,38 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 6 | Browser Networking — Latency, HTTP/1.x, Server-Sent Events, WebSocket | `hpbn-browser-networking/` | Ilya Grigorik, *High Performance Browser Networking*, O'Reilly — Ch. 1 "Primer on Latency and Bandwidth", Ch. 11 "HTTP 1.X", Ch. 16 "Server-Sent Events (SSE)", Ch. 17 "WebSocket". | Built · 18 questions registered |
 | 7 | Performance Methodology — Concepts, Perspectives, Methods, Statistics | `sysperf-methodology/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 2 "Methodologies". | Built · 18 questions registered |
 | 8 | Benchmarking — What the Number Is, How It Lies, Which Kind, and Active Analysis | `sysperf-benchmarking/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 12 "Benchmarking". | Built · 18 questions registered |
-| 9 | *unassigned* | — | — | Awaiting source |
+| 9 | Incident Response & Postmortems — Structure, Mitigation, Practice, Learning | `sre-incident-postmortem/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 9 "Incident Response" by Jennifer Mace, Jelena Oertel, Stephen Thorne and Arup Chakrabarti with Jian Ma and Jessie Yang (pp. 175–194), Ch. 10 "Postmortem Culture: Learning from Failure" by Daniel Rogers, Murali Suriar, Sue Lueder, Pranjal Deo and Divya Sudhakar with Gary O'Connor and Dave Rensin (pp. 195–223). | Built · 18 questions registered |
 | 10 | *unassigned* | — | — | Awaiting source |
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 9
+
+Cited within the source chapters and named or described in the booklet's teaching: the Incident Command System,
+established in 1968 by firefighters to manage wildfires, and the two frameworks derived from it — Incident
+Management at Google (IMAG) and PagerDuty's published Incident Response process at response.pagerduty.com;
+*Managing Incidents* in the first SRE book, and its Chapter 15 on blameless postmortem philosophy; the four case
+studies and the products they concern — Google Home and Google Assistant, Kubernetes and Google Kubernetes
+Engine, DockerHub and Google Container Registry, Google Compute Engine and Persistent Disk, the Google Front End
+and the satellite edge racks, Borg, MDB, OMG, Requiem and the Autoreplacer; PagerDuty's Failure Friday, drawn
+from Netflix's Simian Army, and the co-operative bomb-defusal game *Keep Talking and Nobody Explodes*; Google's
+Disaster Recovery Testing (DiRT) programme and Kripa Krishnan's *Communications of the ACM* article "Weathering
+the Unexpected", together with the Wheel of Misfortune exercise from *Site Reliability Engineering*; Ben Treynor
+Sloss on postmortems without subsequent action; Dan Milstein's "let's plan for a future where we're all as stupid
+as we are today"; the tools named for incident response and postmortem work — Slack, IRC, HipChat, Hangouts,
+conference bridges, Google Docs and Apps Script, PagerDuty Postmortems, Morgue by Etsy and VictorOps; the
+postmortem templates shared by PagerDuty, Julian Dunn, Server Fault and others; and the pseudonymous responders
+and postmortem authors used throughout both chapters.
+
+The booklet names **the Incident Command System and the year it was established**, because it is the framework the
+whole practice derives from, is more than fifty years old and belongs to nobody. It names **no companies, no
+products, no internal programme names and no individuals** — the two derived frameworks are described as "one from
+a large technology company, and one from a company whose own product is incident management"; the case studies
+are told in terms of what failed rather than what it was called; and the drills are described by what they do.
+This is a third distinct line: competency 7 named nothing at all, competency 8 named the organisations that were
+the subject of a section, and competency 9 names one vendor-neutral framework. The rule behind all three is the
+same — name what is durable and transferable, describe what is a brand.
 
 ### Works referenced inside competency 8
 
@@ -312,4 +339,13 @@ least one code, and each code points at the exact artefact to reread.
   report and reissued as `p1q2b`. `p2q2` asked what mechanism "the industry-standard bodies" introduced
   against benchmark specials, when only the transaction-processing body did; the prompt asserted
   something false, and was reissued as `p2q2b`. Both were caught in review before any attempt existed.
-- Competencies 9–13 are unassigned pending sources.
+- **Competency 9 carries the scoped style block**, as competencies 5–8 do, with the same three additions
+  competency 8 introduced: the section 6 concept map may break across pages, `h3` never breaks away from what
+  follows it, and the tracker and final quiz are tightened.
+- **Competency 9's printed final quiz also has no answers in the booklet**, by the same deliberate choice as
+  competencies 1–8.
+- **Competency 9 is the second booklet built from *The Site Reliability Workbook*.** Competency 3 uses chapters 2
+  and 16 of the same book; there is no overlap of material, and the two booklets never reference each other.
+- **Competency 9 names one framework and nothing else.** The reasoning and the full list of what was left unnamed
+  are recorded above, under works referenced. It is a third distinct de-vendoring line, drawn deliberately.
+- Competencies 10–13 are unassigned pending sources.
