@@ -1,6 +1,6 @@
 # Transactions — printable study booklet
 
-- `DDIA-Transactions-Study-Booklet.pdf` — 44 pages, A4, grayscale, print-ready.
+- `DDIA-Transactions-Study-Booklet.pdf` — 45 pages, A4, grayscale, print-ready.
 - `booklet.html` — the rendered source. Self-contained: no images, no external CSS, no fonts to fetch.
 - `body.html` — the content alone; `booklet.html` is this plus the shared style block.
 
@@ -11,7 +11,7 @@
 | 1 | Learning goal, the core model, four-part roadmap |
 | 2–5 | One part each: tenth-grader version → everyday analogy → term table (name · definition · example · boundary vs look-alike) → trade-offs → concept-boundary box → anchor sketch → plain/expert phrasing table → two retrieval questions on unseen cases → a 2×2 |
 | 6 | Whole-competency concept sketch, one question per node, plus the master 2×2 decision card |
-| 7 | Symptom → diagnosis → move, split into an isolation-anomalies half and a serializability/commit half |
+| 7 | Symptom → diagnosis → move (isolation anomalies, then serializability and commit) · reverse mapping: prescription → what it counters |
 | 8 | Numbers worth remembering · glossary |
 | 9 | Answer key |
 | 10 | Spaced-review tracker (day 1/3/7/16/35) · final quiz |

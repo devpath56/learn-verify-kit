@@ -188,4 +188,8 @@ least one code, and each code points at the exact artefact to reread.
   size and tightening the tracker and quiz spacing. Every other booklet takes all its styling from the
   shared block. The scoped rules exist to fit five large sketches onto their pages; if the shared style
   block is ever revised, check this booklet's sketches first.
+- **Competencies 2, 3 and 4 have no reverse-mapping section**, which decision H lists as part of the
+  fixed back matter (prescription → what it counters, so a reader can audit a design rather than
+  diagnose an incident). Competency 1 has one and competency 5 now has one; the three in between
+  drifted. They have not been re-rendered.
 - Competencies 6–13 are unassigned pending sources.
