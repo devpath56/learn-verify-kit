@@ -40,7 +40,13 @@ Built from the scaffold in `../booklet-template/`.
 
 ## Being questioned on this
 
-All 32 questions — 8 applied cases, 10 quiz questions, 14 concept-sketch node questions — are
-registered in `../competency-progress.json`. Ask for questions whenever you want them; there is no
-schedule. Questions are drawn only from that bank, graded against the frozen answer key in
-section 9 of the booklet, and each attempt is filed verbatim to `../../attempts/`.
+18 questions — the 8 applied cases and the 10 final-quiz questions — are registered in
+`../competency-progress.json`, each with its ideal answer frozen inline. The 14 concept-sketch node
+questions stay here as self-test cues and are not tracked.
+
+Ask for questions whenever you want them; there is no schedule. Questions are drawn only from that
+bank, and each attempt is filed verbatim to `../../attempts/`. Offline answers can be handed over a
+whole part at a time.
+
+Note: the printed final quiz has no answers in the booklet by design. Their ideals exist in the
+tracker, so the quiz is gradeable without being self-checkable on paper.

@@ -126,7 +126,8 @@ The reader should learn the rhythm by part two and be able to navigate blind. Fi
 | I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Structure the file as explicit `.page` sections so section starts are predictable. |
 | I4 | Verification | **Rasterise and look at the pages.** Never trust the HTML. Check at minimum: a part opener, a matrix page, a sketch page, the cover. |
 | I5 | Orphan check | Extract per-page text and flag any page under ~800 characters. Fix by tightening upstream copy, not by inserting filler. |
-| I6 | Register the question bank | Extract **every** question — part questions, quiz questions, concept-sketch node questions — into `resources/competency-progress.json` as a new competency entry, with the answer-key location recorded. A booklet whose bank is not registered cannot be quizzed, so the booklet is not finished until this is done. |
+| I6 | Register the question bank | Extract the **8 applied cases + 10 quiz questions** into `resources/competency-progress.json` as a new competency entry, with stable ids (`<competency-id>.<local-id>`) and a **frozen ideal answer stored inline for every one**. Concept-sketch node questions stay in the booklet as cues and are not tracked. If the printed answer key doesn't cover the final quiz, write those ideals here, before any attempt exists. A booklet whose bank isn't registered cannot be quizzed, so it isn't finished. |
+| I7 | Record provenance in the set spine | Add the competency's row to `resources/META.md` — source, edition, chapter and page range, plus any works it cites. This is the only place provenance is allowed to exist (G1), so skipping it loses the information rather than tidying it. |
 
 ---
 

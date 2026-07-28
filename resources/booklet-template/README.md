@@ -21,8 +21,9 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
      file://$PWD/booklet.html
    ```
 
-4. Register the question bank into `../competency-progress.json` (decision I6) — the booklet is not
-   finished until its questions can be asked without opening the PDF.
+4. Register the question bank into `../competency-progress.json` (decision I6) — 18 questions with
+   stable ids and a frozen ideal inline for each — and add the competency's provenance row to
+   `../META.md` (decision I7). The booklet isn't finished until both are done.
 5. Verify per decision I4/I5: rasterise a part opener, a matrix page, a sketch page and the cover
    and look at them; then flag any page under ~800 characters and fix the orphan upstream.
 
@@ -34,8 +35,9 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 - **Every part carries** a tenth-grader box, a term table with a boundary column, an anchor sketch,
   two retrieval questions on unseen cases, and one 2×2.
 - **Answers live at the back**, never on the question page.
-- **The question bank is registered** in `../competency-progress.json`, with the answer key frozen
-  before anyone attempts it.
+- **The question bank is registered** in `../competency-progress.json` — 18 questions, stable ids,
+  ideal answers frozen inline before anyone attempts them.
+- **Provenance is recorded** in `../META.md`, and nowhere else.
 
 ## Reference build
 

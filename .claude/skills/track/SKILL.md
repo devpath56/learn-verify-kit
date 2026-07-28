@@ -87,7 +87,19 @@ When asked for questions:
 
 **Say "stale", not "shaky".** A comfortable item that has aged past its window is *unverified*, not failed. Conflating the two inflates the lacking list and makes the log less trustworthy, not more.
 
-**Registering a new booklet:** when a booklet is built, add its competency entry and extract its full question bank into the file — every part question, quiz question and concept-sketch node question. A booklet with no bank registered cannot be quizzed, and the set tracker (`registered_count` / `slots_remaining`) will show the gap.
+**Bank scope:** track the **8 applied cases + 10 final-quiz questions = 18 per booklet**. Concept-sketch node questions stay in the printed booklet as self-test cues and are not tracked.
+
+**Frozen ideals live in the file, not the booklet.** Each question stores its ideal answer inline, frozen at registration. Grade against that, never by re-reading the booklet — otherwise editing or re-rendering a booklet silently moves the goalposts.
+
+**Stable IDs.** `<competency-id>.<local-id>`, never reused. Rebuilding a booklet preserves history; a materially changed question gets a **new** id and the old one moves to that competency's `retired` array rather than being overwritten.
+
+**Batch intake.** Offline answers arrive a part or a booklet at a time. Grade the whole batch in one pass, file each attempt verbatim, then give **one consolidated miss profile** rather than eight separate verdicts — the batch shows patterns a single answer cannot. Never treat an incomplete batch as full coverage; anything not answered stays `untested`.
+
+**Record the mode.** Every attempt is tagged `online` (typed in chat) or `offline` (written cold in the printed booklet). Writing an answer with no screen in front of you is the harder test — keep the two visible in the rollup rather than averaging them into one number.
+
+**Registering a new booklet:** add its competency entry, extract the 18 questions, write a frozen ideal for **every one of them**, and update `set.registered` / `set.remaining`. If the booklet's printed answer key does not cover the final quiz, write those ideals at registration — before any attempt exists. A booklet with no bank registered cannot be quizzed.
+
+Provenance and method for the set live in `resources/META.md`, never in a booklet.
 
 ## Revision deck (transferable cards)
 

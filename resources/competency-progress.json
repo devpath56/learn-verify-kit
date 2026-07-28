@@ -1,21 +1,31 @@
 {
-  "version": 1,
-  "what_this_is": "Answer-level log for the printed competency booklets. Scoped to the question banks below: questions are asked ONLY from here, never invented. Separate from the repo-root progress.json, which logs concepts taught in conversation.",
-  "set_size": 13,
-  "registered_count": 1,
-  "slots_remaining": 12,
+  "version": 2,
+  "what_this_is": "Answer-level log for the printed competency booklets. One file for the whole 13-competency set. Questions are asked ONLY from the banks below, never invented. Separate from the repo-root progress.json, which logs concepts taught in conversation.",
+  "set": {
+    "size": 13,
+    "registered": 1,
+    "remaining": 12
+  },
+  "bank_scope": "applied + quiz only — the 8 three-part applied cases and the 10 final-quiz questions per booklet (18). Concept-sketch node questions stay in the printed booklet as self-test cues but are not tracked.",
+  "conventions": {
+    "question_id": "<competency-id>.<local-id>. Stable and never reused. Rebuilding a booklet preserves history; a materially changed question gets a NEW id and the old one moves to 'retired' rather than being overwritten.",
+    "frozen_ideal": "Each question stores its ideal answer inline, frozen at registration. Grading never reads the booklet file, so editing or re-rendering a booklet cannot move the goalposts.",
+    "attempt_mode": "Every attempt records 'online' (typed in chat) or 'offline' (written cold in the printed booklet). Handwriting an answer with no screen is the harder test; keep the two visible rather than averaging them.",
+    "intake": "Batch. A whole part or booklet of offline answers arrives at once, is graded in one pass, and produces one consolidated miss profile. An incomplete batch leaves the rest 'untested' — never assume coverage.",
+    "file_split": "Single file until roughly 500KB, then split per competency with an index. 13 banks of 18 sits well inside that."
+  },
   "how_it_runs": [
-    "On demand only. No schedule. The learner says they want questions; a session reads this file and picks.",
-    "Pick order: untested first, then shaky, then comfortable items whose last_attempted is over 35 days old (stale, not failed). Never two in a row from the same part.",
-    "Ask ONE question, verbatim from 'prompt'. Withhold the ideal answer.",
-    "Grade per .claude/skills/learn/references/house-style.md -> 'Record the gap'. File the verbatim attempt per .claude/skills/track/SKILL.md -> 'Graded attempts'.",
-    "Update the question row and the competency rollup, then commit."
+    "On demand only. No schedule, no uninvited quizzing.",
+    "Pick order: untested -> shaky -> comfortable whose last_attempted is over 35 days old. Never two in a row from the same part.",
+    "Ask verbatim from 'prompt'. Withhold 'ideal'.",
+    "Grade per .claude/skills/learn/references/house-style.md -> 'Record the gap'; file the verbatim attempt per .claude/skills/track/SKILL.md -> 'Graded attempts'.",
+    "Update the question row and both rollups, then commit."
   ],
   "status_rules": {
     "untested": "no attempts yet",
     "shaky": "attempted, and either the last verdict was not a pass or the pass streak is under 2",
     "comfortable": "2 or more consecutive passes",
-    "stale": "not a stored status - derived at read time: comfortable, but last_attempted is more than 35 days ago. Unverified, not failed. Say so honestly rather than demoting it."
+    "stale": "not a stored status - derived at read time: comfortable, but last_attempted is more than 35 days ago. Unverified, not failed. Say so rather than demoting it."
   },
   "miss_codes": {
     "name": "didn't produce the term - go back to the term table",
@@ -24,15 +34,39 @@
     "price": "prescribed without naming the cost - go back to the trade-offs table",
     "phrasing": "had it, couldn't say it in expert terms - go back to the plain/expert table"
   },
+  "set_rollup": {
+    "untested": 18,
+    "shaky": 0,
+    "comfortable": 0,
+    "gaps": {
+      "name": 0,
+      "mechanism": 0,
+      "boundary": 0,
+      "price": 0,
+      "phrasing": 0
+    },
+    "weakest": null,
+    "weakest_competency": null,
+    "by_mode": {
+      "online": 0,
+      "offline": 0
+    }
+  },
   "competencies": [
     {
       "id": "release-it-stability",
+      "index": 1,
       "title": "Stability Antipatterns & Stability Patterns",
       "booklet": "resources/release-it-ch4-5/",
-      "answer_key": "resources/release-it-ch4-5/booklet.html — section 9, frozen before any attempt",
       "registered": "2026-07-27",
+      "parts": [
+        "Where cracks start: every integration point",
+        "How a crack becomes an outage",
+        "Load-shaped failure: demand, scale, and automation",
+        "The counter-moves: twelve stability patterns"
+      ],
       "rollup": {
-        "untested": 32,
+        "untested": 18,
         "shaky": 0,
         "comfortable": 0,
         "gaps": {
@@ -46,10 +80,11 @@
       },
       "questions": [
         {
-          "id": "p1q1",
+          "id": "release-it-stability.p1q1",
           "type": "applied",
-          "where": "Part 1 · Question 1",
+          "where": "Part 1 · Question 1 — the fraud-scoring API",
           "prompt": "Your payments service calls an external fraud-scoring API. During an incident, monitoring shows CPU at 3%, memory flat, no errors in the application log — and yet every request-handling thread is occupied and the service returns nothing to anyone. (a) Name the failure mode at the integration point. (b) Explain why the absence of errors and the absence of load is the strongest clue you have. (c) Name the two settings you would check first, and say which one you'd bet on.",
+          "ideal": "(a) A slow failure at an integration point producing blocked threads . The provider accepted the connection and never responded, or the connection was silently torn down by something in the middle; either way the calling threads are parked inside a socket read. (b) The absences are the evidence. No errors means nothing has thrown yet, which rules out fast failure — a refused connection or a reset would have raised an exception immediately. No CPU and no memory movement rules out a leak, garbage-collection thrash, or an infinite loop; the threads aren't working, they're waiting. A process monitor will call this instance healthy, so you need thread dumps or an external synthetic transaction to see the truth. This is the “dog that didn't bark” pattern from the 5 a.m. story. (c) The socket read timeout and the connect timeout on the HTTP client — and behind them, the checkout timeout on any connection pool. Bet on the read timeout being unset or infinite: that's the common default, and it's the one that produces exactly this symptom. Full marks also for noting that if the client library hides the socket you may not be able to set it, which is itself the finding.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -58,10 +93,11 @@
           "attempts": []
         },
         {
-          "id": "p1q2",
+          "id": "release-it-stability.p1q2",
           "type": "applied",
-          "where": "Part 1 · Question 2",
+          "where": "Part 1 · Question 2 — the Monday-morning hang",
           "prompt": "A nightly job holds a pooled TCP connection to a partner's service. It runs fine all week. Every Monday at 06:10 it hangs for about thirty minutes, then throws. No code has changed. The partner insists their service was up the whole time — and their logs prove it. (a) State your hypothesis in one sentence. (b) Name the single packet-level observation that would confirm it. (c) Give the cheapest fix and say why the two obvious fixes — validating the connection before use, or closing connections older than an hour — both fail.",
+          "ideal": "(a) The connection sat idle over the weekend and a firewall or NAT device reaped it from its state table , while both endpoints still believe the connection is valid. This is the 5 a.m. problem with a weekly period instead of a daily one. (b) Take a packet capture on both sides. The confirming observation is your side retransmitting the same segment with no response and no ICMP unreachable , and simultaneously nothing at all arriving at the partner's interface . The silence on the far side is the proof: the packets are being dropped in the middle, not rejected at the end. (This also explains why the partner's logs are honestly clean — their application never saw a thing.) (c) Cheapest fix: a keep-alive / periodic ping on the idle connection, at an interval shorter than the middlebox's idle timeout — the mechanism Oracle's dead connection detection provided. Configuring a read timeout is a necessary companion, so the failure at least becomes fast. Why the obvious fixes fail: a validation query before checkout travels over the same dead connection, so it hangs exactly as the real query would. Closing connections older than an hour requires sending a teardown packet over the same dead connection — which also hangs. Both “fixes” move the hang, they don't remove it.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -70,10 +106,11 @@
           "attempts": []
         },
         {
-          "id": "p2q1",
+          "id": "release-it-stability.p2q1",
           "type": "applied",
-          "where": "Part 2 · Question 1",
+          "where": "Part 2 · Question 1 — twelve instances in seven minutes",
           "prompt": "Your recommendations service runs twelve instances behind a load balancer. At 14:02 one instance stops responding. By 14:09 all twelve are gone, and the gaps between failures got noticeably shorter each time. Upstream, the product-page service is also down — its own CPU and memory look normal, but its thread count is pinned at maximum. (a) Name the two distinct antipatterns at work. (b) Say which one travelled sideways and which travelled upward, and what carried each. (c) Give the one pattern that would have stopped each, and say why swapping the two patterns would not have worked.",
+          "ideal": "(a) A Chain Reaction in the recommendations layer and a Cascading Failure into the product-page service. (b) The chain reaction moved sideways , carried by redistributed load : each death handed its share to identical peers running the same defective code, so every survivor got closer to the same cliff. The shrinking gaps between failures are the signature — that acceleration is exactly what the search-farm story charted. The cascade moved upward , carried by blocked threads : the product-page service's threads were parked waiting on a service that had stopped answering, which is why its CPU and memory looked fine while its thread count pinned. (c) Against the chain reaction: fix the underlying load-related defect — a leak or a race. Structurally, Bulkheads split the layer into pools so one chain reaction becomes two slower ones; health-checked autoscaling helps if the scaler reacts faster than the reaction propagates. Against the cascade: Circuit Breaker plus Timeouts on the calling side. Why swapping them fails: a circuit breaker in the recommendations layer wouldn't have saved it — the peers weren't calling each other, they were absorbing traffic. And bulkheads in the recommendations layer do nothing for its callers; bulkheads explicitly won't help the callers of whichever partition does go down — Circuit Breaker on the calling side is what covers them.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -82,10 +119,11 @@
           "attempts": []
         },
         {
-          "id": "p2q2",
+          "id": "release-it-stability.p2q2",
           "type": "applied",
-          "where": "Part 2 · Question 2",
+          "where": "Part 2 · Question 2 — the synchronized cache",
           "prompt": "A team speeds up a slow partner API by subclassing an existing in-memory cache and overriding get() to fetch on a miss. The parent's get() is synchronized . Code review passes, load tests pass. In production, when the partner API stops responding, the entire service hangs — even though only 2% of traffic touches that feature. (a) Explain the mechanism in one sentence. (b) Name the object-oriented principle violated and the one-line reason the compiler didn't stop it. (c) Give one code-level fix and one architectural fix, and say which one you'd ship tonight.",
+          "ideal": "(a) One thread entered the inherited synchronized get() , called the dead partner API, and blocked there indefinitely while holding the monitor — so every other thread that touched the cache queued behind it, and eventually every request-handling thread on the box was blocked, regardless of which feature it was serving. (b) The Liskov substitution principle . Any property true of a type should hold for its subtypes, but the subclass turned a fast in-memory lookup into a blocking remote call under the same lock. The compiler allows it because Java and C# don't treat synchronisation as part of a method's contract — you can't even declare an interface method synchronized . The underlying reason: functional behaviour composes; concurrency does not. (c) Code-level, ship tonight: put a timeout on the remote call and take the remote call out of the critical section — synchronise only the map read and the map write, never the fetch. (A dedicated bounded thread pool returning a future for the fetch is the fuller version.) Architectural: a bulkhead — give this feature its own bounded thread pool or its own instances — plus a circuit breaker around the partner API so you stop calling it at all when it's sick, with a fallback of “availability unknown”. Ship the timeout tonight; the architecture change wants a design conversation and a stakeholder decision about what the page shows when availability is unknown. Section 9 continued",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -94,10 +132,11 @@
           "attempts": []
         },
         {
-          "id": "p3q1",
+          "id": "release-it-stability.p3q1",
           "type": "applied",
-          "where": "Part 3 · Question 1",
+          "where": "Part 3 · Question 1 — search results in the session",
           "prompt": "Your team ships pagination by storing each user's full search-result set in the session. Load tests at 500 concurrent users pass comfortably. Two months after launch the fleet starts running out of memory every afternoon, and the crashes across instances get closer together each time. (a) Name the three antipatterns chained together here and the order they fire in. (b) Give the cheapest code change that stops today's bleeding. (c) Give the change that eliminates the whole class of problem, and say what it costs you.",
+          "ideal": "(a) Three, in this order: Users (session memory — a large object held for the full session timeout, most of it never read again, and the “dead time” after the last request is pure waste); then a memory leak in effect, which surfaces as Slow Responses as the collector works harder and harder; then a Chain Reaction , because every instance runs the same code with the same defect, and each death pushes its traffic onto peers that then exhaust memory faster. The accelerating crash intervals are the tell. If the result sets grew because customer history grew, you can fairly add Unbounded Result Sets as the root cause — and note that two months of production data is exactly the timescale on which that appears. (b) Cheapest: stop putting the result set in the session — re-query the search engine for each page of results. Keeping an entire set of search results in the session for pagination is the textbook version of this mistake. If you must keep something, wrap it in a weak/soft reference so the collector can reclaim it, and make every accessor handle null . (c) Class-eliminating: pagination in the service contract — first-item and count parameters going in, an approximate total coming back — plus a hard LIMIT on the query, plus production-sized data in the performance environment. Cost: a contract change every caller must adopt, callers must now loop, and “approximately how many results” is a real product decision rather than a free number.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -106,10 +145,11 @@
           "attempts": []
         },
         {
-          "id": "p3q2",
+          "id": "release-it-stability.p3q2",
           "type": "applied",
-          "where": "Part 3 · Question 2",
+          "where": "Part 3 · Question 2 — hourly pulls, midnight jobs, twitchy autoscaler",
           "prompt": "An ops team sets the config-management agent to pull on the hour and the cache-warming job to run at 00:00. Separately, they add an autoscaler that reacts to one-second CPU samples, while a new instance takes five minutes to become useful. (a) Name the two failure modes you now expect. (b) Say which one is a control-plane problem and what makes it different in kind from the other. (c) Give one specific safeguard for each, and name the pattern each safeguard belongs to.",
+          "ideal": "(a) A Dogpile (every agent pulling on the hour, every cache warming at midnight, and the fleet restarting with cold caches all at once), and a Force Multiplier (an autoscaler sampling on a one-second horizon while its actions take five minutes to land). (b) The autoscaler is the control-plane problem, and it differs in kind: it isn't a bug and it isn't excess demand. The automation senses current state, compares it to a computed desired state, and acts — correctly, by its own logic — on a belief that is either stale or unmeasurable. That's what makes it dangerous: it will be working exactly as designed while it destroys you, and it'll finish before a human notices. The dogpile, by contrast, is ordinary demand arriving in the wrong shape . (c) For the dogpile: randomised clock slew on the config agent and jitter on every scheduled job, so the pull spreads across the hour rather than landing on it; warm caches before an instance accepts traffic. That's the Dogpile counter, and jittered exponential backoff is its retry-side twin. For the autoscaler: a Governor — asymmetric (scale up readily, scale down slowly), stateful and time-aware, with a deceleration zone that accounts for the five-minute lag so it doesn't start three hundred instances because the load persisted for three hundred seconds, and an alert when it engages. Bonus marks for adding a financial ceiling and the >80%-unavailable heuristic.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -118,10 +158,11 @@
           "attempts": []
         },
         {
-          "id": "p4q1",
+          "id": "release-it-stability.p4q1",
           "type": "applied",
-          "where": "Part 4 · Question 1",
+          "where": "Part 4 · Question 1 — three dependencies and a marketing email",
           "prompt": "A checkout service calls three things: (i) an inventory service your own team owns, (ii) a third-party tax API with a hard rate limit and no health endpoint, (iii) an internal fraud model that is slow but usually correct. Overnight, traffic doubles because of a marketing email nobody warned you about. (a) Choose one primary pattern for each of the three dependencies and justify each in one line. (b) Name the pattern you'd apply to your own inbound traffic, and say why it is not the same one you used for (ii) even though both are about “too much load”. (c) Name the conversation you should have had last week and with whom.",
+          "ideal": "(a) (i) Inventory service, which you own: Handshaking — a health-check endpoint the caller respects, because you control both ends and cooperative throttling beats guessing. Back it with a timeout. (ii) Third-party tax API, rate-limited, no health endpoint: Circuit Breaker , explicitly because it can't handshake — you can't ask politely, so you make the call, track whether it works, and stop calling when it doesn't. Trip on fault density, and decide with the business what checkout does when it's open. (iii) Slow internal fraud model: Timeouts derived from your checkout SLA, plus a defined fallback (queue for asynchronous review, or accept-and-flag) — this is where Decoupling Middleware earns its keep if you can restructure. (b) For your own inbound traffic: Shed Load (with Fail Fast as its per-request form). It's not the same pattern as (ii) because the two sit on opposite sides of the call. A circuit breaker is a caller-side decision to stop making outbound calls; shed load is a provider-side decision to refuse inbound work. Note also that shed load is right here specifically because the demand is uncontrolled and effectively infinite — inside your own boundary, with a finite set of known consumers, Back Pressure would be the more efficient choice. (c) The conversation with marketing , last week. Self-denial attacks are the most preventable class precisely because somebody in your own building already knew. Ask for the send time and volume, get the deep link removed so the CDN isn't bypassed, get the mail sent in waves, put a static landing page behind the first click, and pre-scale before the send rather than trusting autoscaling to catch up.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -130,10 +171,11 @@
           "attempts": []
         },
         {
-          "id": "p4q2",
+          "id": "release-it-stability.p4q2",
           "type": "applied",
-          "where": "Part 4 · Question 2",
+          "where": "Part 4 · Question 2 — the shared-state circuit breaker",
           "prompt": "A colleague proposes: “Let's wrap every outbound call in a circuit breaker, and store the breaker state in a shared Redis so all instances agree on when it's open. And let's trip it at ten failures total.” (a) Give the two objections — one about where the state lives , one about how you count . (b) Name the mechanism you'd propose for counting instead, and describe it in one sentence. (c) The team's real requirement is “we want to see globally when a provider is sick.” Satisfy that requirement without sharing breaker state.",
+          "ideal": "(a) On where the state lives: a circuit breaker should be built at the scope of a single process . Sharing state through Redis introduces another out-of-process call — “that means the safety mechanism would introduce a new failure mode.” Your protection now has a dependency that can itself be slow, full, or unreachable, and it fails at exactly the moment everything else is failing. The cost of not sharing is small and known: several instances each independently discover the provider is down. On how you count: a simple total is nearly meaningless. “There's a world of difference between observing five faults spread evenly over five hours versus five faults in the last thirty seconds.” You want fault density , not a running total, or the breaker will eventually trip on ancient history. (b) A Leaky Bucket : a counter incremented on every observed fault, with a background thread or timer decrementing it periodically toward zero. If the count exceeds the threshold, faults are genuinely arriving quickly. Consider tracking fault types separately too — a lower threshold for “timeout calling remote system” than for “connection refused”. (c) Keep the state local and make the observability global. Log every state change, expose current state for querying, and ship those events to your monitoring system; then chart the aggregate. State-change frequency is itself a valuable metric — a leading indicator of problems elsewhere in the enterprise. You get the global picture without putting a network call inside your safety mechanism. Add a manual trip/reset control for Operations while you're there.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -142,178 +184,11 @@
           "attempts": []
         },
         {
-          "id": "n01",
-          "type": "recall",
-          "where": "Concept sketch · Integration point",
-          "prompt": "Why is it called the number-one killer?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n02",
-          "type": "recall",
-          "where": "Concept sketch · Fast fail vs slow fail",
-          "prompt": "Which one do you want, and why is that counter-intuitive?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n03",
-          "type": "recall",
-          "where": "Concept sketch · Load from outside",
-          "prompt": "What's the one architectural component all four external threats attack?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n04",
-          "type": "recall",
-          "where": "Concept sketch · Load from inside",
-          "prompt": "What makes self-inflicted load the most preventable kind?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n05",
-          "type": "recall",
-          "where": "Concept sketch · Blocked Threads",
-          "prompt": "Why is this called the proximate cause of most failures?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n06",
-          "type": "recall",
-          "where": "Concept sketch · Chain Reaction",
-          "prompt": "Direction, cause, and the only real cure?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n07",
-          "type": "recall",
-          "where": "Concept sketch · Cascading Failure",
-          "prompt": "Why is this the node to remember?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n08",
-          "type": "recall",
-          "where": "Concept sketch · Slow Responses",
-          "prompt": "Why do slow responses increase load?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n09",
-          "type": "recall",
-          "where": "Concept sketch · Timeouts + Circuit Breaker",
-          "prompt": "What's the division of labour between them?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n10",
-          "type": "recall",
-          "where": "Concept sketch · Fail Fast vs Timeouts",
-          "prompt": "The one-line distinction?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n11",
-          "type": "recall",
-          "where": "Concept sketch · Shed Load vs Back Pressure",
-          "prompt": "Where does each belong?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n12",
-          "type": "recall",
-          "where": "Concept sketch · Bulkheads",
-          "prompt": "What does it protect, and what does it explicitly not protect?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n13",
-          "type": "recall",
-          "where": "Concept sketch · Governor",
-          "prompt": "What makes it different from a rate limiter?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "n14",
-          "type": "recall",
-          "where": "Concept sketch · Test Harnesses",
-          "prompt": "Why can't an integration environment do this job?",
-          "status": "untested",
-          "streak": 0,
-          "last_verdict": null,
-          "last_attempted": null,
-          "miss_codes": [],
-          "attempts": []
-        },
-        {
-          "id": "z01",
+          "id": "release-it-stability.z01",
           "type": "quiz",
           "where": "Final quiz · 1",
           "prompt": "You have one change you're allowed to make to a legacy service with forty outbound calls and no timeouts anywhere. What do you change, and which four antipatterns does that single change address?",
+          "ideal": "Add a read timeout (and a connect timeout) to every outbound call, derived from your own SLA rather than a round number. That single change addresses Integration Points (the call now returns), Blocked Threads (the thread comes back), Slow Responses (you stop waiting past the point of usefulness) and Cascading Failures (the crack can no longer jump the layer boundary through a drained pool). It moves failures from the slow row of the matrix to the fast row, where your existing error handling already knows what to do.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -322,10 +197,11 @@
           "attempts": []
         },
         {
-          "id": "z02",
+          "id": "release-it-stability.z02",
           "type": "quiz",
           "where": "Final quiz · 2",
           "prompt": "Name the direction of travel and the carrying mechanism for: a chain reaction, a cascading failure, a slow-response amplification loop.",
+          "ideal": "Chain reaction: travels sideways among peers in one horizontally-scaled layer, carried by redistributed load landing on identical code with the same defect. Cascading failure: travels upward across a layer boundary, carried by blocked threads holding a drained resource pool, or by a retry storm. Slow-response amplification: travels upward as well, carried by callers retrying and users hitting Reload, so the response to slowness generates more demand — a feedback loop rather than a one-way spread.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -334,10 +210,11 @@
           "attempts": []
         },
         {
-          "id": "z03",
+          "id": "release-it-stability.z03",
           "type": "quiz",
           "where": "Final quiz · 3",
           "prompt": "Your monitoring reports that 94% of your fleet is unavailable. State your first hypothesis and your reason for it.",
+          "ideal": "Suspect the observer, not the system. Any observation claiming more than roughly 80 percent of the fleet is unavailable is more likely a monitoring or control-plane fault — a partitioned discovery node that cannot tell 'the universe disappeared' from 'I am blindfolded' — than a genuine total outage. Confirm from a second, independent vantage point before allowing any automation to act on it; this is precisely the belief that shut down most of a fleet in the Reddit outage.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -346,10 +223,11 @@
           "attempts": []
         },
         {
-          "id": "z04",
+          "id": "release-it-stability.z04",
           "type": "quiz",
           "where": "Final quiz · 4",
           "prompt": "Give the one-line difference between Shed Load and Back Pressure, and name the property of your consumer population that decides which you use.",
+          "ideal": "Shed load refuses inbound work at the edge; back pressure blocks the producer until the consumer catches up, inside the boundary. The deciding property is whether the consumer pool is finite and known. Against the open internet it is effectively infinite, so there is nobody to slow down and you must refuse; inside your own system the consumers are countable and can actually be throttled, which is more efficient than dropping their work.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -358,10 +236,11 @@
           "attempts": []
         },
         {
-          "id": "z05",
+          "id": "release-it-stability.z05",
           "type": "quiz",
           "where": "Final quiz · 5",
           "prompt": "A teammate says “we'll add data purging six months after launch.” Give the two-sentence rebuttal, naming the pattern.",
+          "ideal": "Purging is not a feature you bolt on later — it is the mechanism that keeps a resource-accumulating system in steady state, and the first six months after launch are consumed by emergency releases and must-have features, so it never happens. It also has to be written in application logic rather than a DBA script, because only the application knows what breaks when rows disappear, which makes it real coding and testing work rather than a cleanup task.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -370,10 +249,11 @@
           "attempts": []
         },
         {
-          "id": "z06",
+          "id": "release-it-stability.z06",
           "type": "quiz",
           "where": "Final quiz · 6",
           "prompt": "Why is a bulkhead no help to the callers of the partition that fails, and what is?",
+          "ideal": "A bulkhead partitions capacity inside your system so a flood in one compartment does not sink the rest — but the compartment that floods still fails completely, and its callers are outside the partition, still making calls into something that is dead. What protects them is a Circuit Breaker on the calling side, which stops the calls altogether. Bulkhead is provider-side partitioning; Circuit Breaker is caller-side abstention.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -382,10 +262,11 @@
           "attempts": []
         },
         {
-          "id": "z07",
+          "id": "release-it-stability.z07",
           "type": "quiz",
           "where": "Final quiz · 7",
           "prompt": "Name the four conditions that must hold before “let it crash” is a responsible strategy, and one system type where it is simply wrong.",
+          "ideal": "Limited granularity (a real boundary for the crash — an actor, a process, a container, not the whole system); fast replacement (restart measured in milliseconds, not minutes, or you lose service while everything bounces); supervision (a hierarchy that decides whether to restart, restart siblings, or escalate, and that tracks restart density — an autoscaler is not a supervisor because it has no discretion); and reintegration (the restored instance rejoins automatically via circuit breakers or load-balancer health checks). It is the wrong strategy for a monolith or any heavy runtime with startup measured in minutes.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -394,10 +275,11 @@
           "attempts": []
         },
         {
-          "id": "z08",
+          "id": "release-it-stability.z08",
           "type": "quiz",
           "where": "Final quiz · 8",
           "prompt": "A query “can only ever return a handful of rows.” Give the two-sentence reply, including the sentence about which numbers are sensible.",
+          "ideal": "Design the caller so it states how much it is prepared to accept, regardless of what the producer promises — this is a handshaking failure, not a database problem. The only sensible numbers are zero, one and lots: unless the query selects exactly one row it can return too many, and the data producer can change without warning, so the limit belongs in your query and in your API contract as a first-item and count parameter.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -406,10 +288,11 @@
           "attempts": []
         },
         {
-          "id": "z09",
+          "id": "release-it-stability.z09",
           "type": "quiz",
           "where": "Final quiz · 9",
           "prompt": "Explain in one sentence why sharing circuit-breaker state across processes is a bad trade.",
+          "ideal": "It puts a network call inside your safety mechanism, so the thing protecting you from a failing dependency acquires a dependency of its own that fails at exactly the moment everything else is failing. The cost of keeping it per-process is small and known — each instance independently rediscovers the outage — while the cost of sharing it is a new failure mode in the component you added to reduce failure modes.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -418,10 +301,11 @@
           "attempts": []
         },
         {
-          "id": "z10",
+          "id": "release-it-stability.z10",
           "type": "quiz",
           "where": "Final quiz · 10",
           "prompt": "Where would you rather be on the coupling × complexity matrix, which direction can you realistically move, and name three things that move you there.",
+          "ideal": "Aim for loose coupling with low interactive complexity — the boring quadrant, where failures stay local and legible. You can rarely reduce complexity, because systems only grow; you can almost always reduce coupling, so the realistic escape from the tight-coupling, high-complexity technology frontier is upward, not leftward. Three things that buy looseness: asynchronous messaging in place of synchronous request/reply, bulkheads at natural boundaries, and circuit breakers so a caller stops depending on a sick provider in real time.",
           "status": "untested",
           "streak": 0,
           "last_verdict": null,
@@ -429,7 +313,8 @@
           "miss_codes": [],
           "attempts": []
         }
-      ]
+      ],
+      "retired": []
     }
   ]
 }
