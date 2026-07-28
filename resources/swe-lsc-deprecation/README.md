@@ -43,9 +43,10 @@ internal symbol names. Everything left unnamed is recorded in `../META.md`.
 
 Like competencies 5–9, this booklet carries one scoped `<style>` block inside `body.html`: it reduces
 the monospace sketch size, tightens the tracker and final quiz, suppresses the page break after the
-last section, and stops an `h3` from ever being the last thing on a page. It adds one rule of its own —
-the part 4 anchor sketch is taller than a page and is allowed to break across pages, as the section 6
-concept map is. Competencies 1–4 take all their styling from the shared block.
+last section, and stops an `h3` from ever being the last thing on a page. It adds two rules of its own: the
+part 4 anchor sketch is taller than a page and is allowed to break across pages, as the section 6 concept
+map is; and the part 3 sketch sets a slightly smaller monospace size so that it fits on a single page.
+Competencies 1–4 take all their styling from the shared block.
 
 ## Printing
 

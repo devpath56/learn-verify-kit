@@ -142,7 +142,7 @@ The reader should learn the rhythm by part two and be able to navigate blind. Fi
 | 4 parts | ~6 pages each |
 | Back matter | ~14 pages |
 | Retrieval load | 8 primary questions + ~14 sketch-node questions + 10 quiz questions |
-| Tracker rows | ~18 (one per independently testable idea, not one per term) |
+| Tracker rows | One per independently testable idea, not one per term. The first build calibrated this at ~18 for a ~30-page booklet; the 45–50 page builds since have settled at **32–36**, which is the figure to use for a four-part booklet of that length. |
 
 If a part runs past 8 pages, the grouping axis in B2 is wrong — you have two parts pretending to
 be one. If a part is under 4 pages, it is a section of another part.

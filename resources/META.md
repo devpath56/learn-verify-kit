@@ -399,4 +399,13 @@ least one code, and each code points at the exact artefact to reread.
   thirty places, any one of which would have made part of the printed quiz self-checkable from the teaching
   pages. All ten were rewritten in deliberately different prose. Worth expecting on any source whose material is
   heavily definitional.
+- **Decision G3 is broken in competencies 3–9: the word &ldquo;competency&rdquo; appears in reader-facing text.**
+  G3 forbids kit-internal vocabulary, and the unit name from `competency-progress.json` had leaked into section
+  headings and boundary boxes — two to four occurrences per booklet, in competencies 3, 4, 5, 6, 7, 8 and 9.
+  Competency 10 was caught in review and now says &ldquo;subject&rdquo; throughout. The earlier booklets have not been
+  re-rendered.
+- **Decision J's tracker-row heuristic was stale and has been recalibrated.** It read &ldquo;~18&rdquo;, a figure taken
+  from the first build; every booklet since competency 6 has shipped 32–36 rows, because the guideline is one row
+  per independently testable idea and a 45–50 page booklet simply contains more of them. The heuristic now states
+  both figures and which length each applies to.
 - Competencies 11–13 are unassigned pending sources.

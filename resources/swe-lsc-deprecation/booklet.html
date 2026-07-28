@@ -112,7 +112,7 @@ tr{break-inside:avoid}
 </style>
 </head>
 <body>
-<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} h3{break-after:avoid; page-break-after:avoid} #bigmap, #p4map{break-inside:auto; page-break-inside:auto}</style>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto} h3{break-after:avoid; page-break-after:avoid} #bigmap, #p4map{break-inside:auto; page-break-inside:auto} #p3map .tree{font-size:7.5pt; line-height:1.5}</style>
 
 <!-- ============================== COVER ============================== -->
 <section class="page cover">
@@ -154,7 +154,7 @@ tr{break-inside:avoid}
 
   <div class="box bound">
     <h4>What this subject asks of you that others don't</h4>
-    <p>Most engineering subjects are about making something work. This one is about <b>the cost of having already made something work</b> — and it keeps handing you conclusions that feel backwards. The bigger your codebase, the <i>smaller</i> the change you can make in one go. The team that should do a migration is the one that did not cause the problem. The right response to code you are proud of may be to delete it. Almost none of this is a technical difficulty; it is a question of who bears a cost that is spread thinly across everybody. So as you read, keep asking the question this competency is really made of: <i>whose budget does this land on, and what happens if the answer is &ldquo;nobody's&rdquo;?</i></p>
+    <p>Most engineering subjects are about making something work. This one is about <b>the cost of having already made something work</b> — and it keeps handing you conclusions that feel backwards. The bigger your codebase, the <i>smaller</i> the change you can make in one go. The team that should do a migration is the one that did not cause the problem. The right response to code you are proud of may be to delete it. Almost none of this is a technical difficulty; it is a question of who bears a cost that is spread thinly across everybody. So as you read, keep asking the question this subject is really made of: <i>whose budget does this land on, and what happens if the answer is &ldquo;nobody's&rdquo;?</i></p>
   </div>
 
   <h3>The spacing schedule</h3>
@@ -263,7 +263,7 @@ tr{break-inside:avoid}
       <td><b>The counterintuitive shrink</b></td>
       <td>As a codebase and the number of engineers working in it grow, <b>the largest atomic change possible counterintuitively decreases</b>.</td>
       <td>Running all affected presubmit checks and tests becomes difficult — to say nothing of ensuring that every file in the change is still up to date at the moment of submission.</td>
-      <td>vs the expectation that a bigger organisation can do bigger things. Everything else in this competency is a response to this one fact, which is why the idea of making sweeping changes as large atomic commits was abandoned rather than optimised.</td>
+      <td>vs the expectation that a bigger organisation can do bigger things. Everything else here is a response to this one fact, which is why the idea of making sweeping changes as large atomic commits was abandoned rather than optimised.</td>
     </tr>
     <tr>
       <td><b>What they are for</b></td>
@@ -417,7 +417,7 @@ tr{break-inside:avoid}
       <div class="rowh">The code is<br>THOROUGHLY<br>TESTED</div>
       <div class="cell focus"><b>Malleable</b>
         Arbitrary changes can be made and you will know whether they broke anything, whatever the age or complexity of the system — and a machine can apply them everywhere.<br>
-        <i>Move:</i> this is the cell the whole competency is trying to reach, and it is worth naming what it buys: technical decisions stop being permanent. Protect it by keeping the environment standard and by treating flaky tests as a cost borne by whoever writes them.</div>
+        <i>Move:</i> this is the cell the whole subject is trying to reach, and it is worth naming what it buys: technical decisions stop being permanent. Protect it by keeping the environment standard and by treating flaky tests as a cost borne by whoever writes them.</div>
       <div class="cell"><b>Safe to change, expensive to change</b>
         You could alter anything without fear, and the alteration has to be done by hand in each project because no single tool understands them all.<br>
         <i>Move:</i> spend on consistency, not on courage. Standardise what you can and ask teams to omit their special checks for these shards — and note the humans moving between projects get the same benefit the robots do.</div>
@@ -791,64 +791,60 @@ tr{break-inside:avoid}
   </div>
 
   <h3>Anchor sketch — the four phases, end to end</h3>
-  <div class="sketch nobreak">
+  <div class="sketch nobreak" id="p3map">
     <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named phase or component</b> &nbsp; <span class="node nstar">reversed = the property the whole design exists to preserve</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
 <div class="tree">   <span class="tk1">1. AUTHORISATION</span>
         WHY it exists: generating changes got cheap; REVIEWING
-        them did not. one engineer can now impose a burden on
-        hundreds of reviewers.
+             them did not, so one engineer can now burden
+             hundreds of reviewers.
         a brief doc: reason . estimated impact (how many
-        shards) . answers to likely questions . an FAQ .
-        + domain review from the owners of the interface
-        -> an email list of ~a dozen overseers
-        most common feedback: send ALL reviews to ONE
-             GLOBAL APPROVER (first-timers assume local
-             owners should review everything)
-        historically VERY LIBERAL . often approves a broad
-             family of changes . obvious ones fast-tracked
-        also the ESCALATION body. rarely needed.
-        rejected only if DANGEROUS or EXTREMELY LOW VALUE
+             shards) . answers to likely questions . an FAQ .
+             + domain review from the interface's owners
+             -> an email list of ~a dozen overseers
+        most common feedback: send ALL reviews to ONE GLOBAL
+             APPROVER (first-timers assume local owners should
+             review everything)
+        VERY LIBERAL . often approves a broad family at once .
+             obvious ones fast-tracked . also the ESCALATION
+             body, rarely needed . rejects only the DANGEROUS
+             or the EXTREMELY LOW VALUE
                           |
    <span class="tk1">2. CHANGE CREATION</span>
         <span class="tks">HUMAN EFFORT MUST SCALE SUBLINEARLY</span> -- roughly the
-        same human time whatever the size of the repository
-        and COMPREHENSIVE: covers every case you meant to fix
+             same human time whatever the repository's size,
+             and COMPREHENSIVE: every case you meant to fix
         keep regenerating: users BACKSLIDE (copy-paste, long-
              lived branches, old habits) and files conflict
-        >500 edits? learn the tool. for "code janitors",
-             much less.
+        >500 edits? learn the tool ("code janitors": far less)
         run the language's FORMATTER as a separate pass, so
              machine output reads like human output
                           |
    <span class="tk1">3. SHARD MANAGEMENT</span>  split by project boundary and
-   ownership into ATOMICALLY submittable pieces, each through
-   its own TEST -> MAIL -> SUBMIT pipeline
-        caps outstanding shards . runs at LOWER priority .
-             negotiates load with shared infrastructure
+        ownership into ATOMICALLY submittable pieces, each
+        through its own TEST -> MAIL -> SUBMIT pipeline
+        caps outstanding shards . LOWER priority . negotiates
+             load with shared infrastructure
         TEST . transitive closure of every test it may hit.
-             most shards touch <1,000 tests of millions.
              THE TRAIN: fresh every 3 h .. 1) 1,000 random
              tests per change 2) merge the passers into one
              uber-change 3) run the union -- can be EVERY
              test, 6+ hours 4) rerun each NON-FLAKY failure
              against each change 5) report = evidence it is
-             safe to submit
-             flaky tests are IGNORED on automated submit
+             safe to submit. most shards touch <1,000 tests of
+             millions. flaky tests IGNORED on auto-submit
         MAIL . owners-detection weights owners by expected
-             ability; unresponsive -> add more automatically
-             disable formatting-style checks; IGNORE failures
-             that PREDATE the change (owners' side of the
-             social contract)
+             ability; unresponsive -> add more. disable
+             formatting-style checks; IGNORE failures that
+             PREDATE the change (the owners' half of the deal)
         REVIEW . one GLOBAL APPROVER + pattern-based tooling
              auto-approves what matches expectation; a human
-             looks only at anomalies
-             local owners only where review gives CONTEXT,
-             not merely approval rights
+             sees only anomalies. local owners only where
+             review gives CONTEXT, not approval rights
                           |
    <span class="tk1">4. CLEANUP</span>  "done" varies: full removal .. or migrate
-   the high-value references and let the rest fade
-        ALWAYS: stop new introductions. flag new uses of the
-        deprecated thing AT REVIEW TIME.
+        the high-value references and let the rest fade
+        ALWAYS: stop new introductions -- flag new uses of the
+             deprecated thing AT REVIEW TIME.
 </div>
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Give the four phases, and say what the first one is actually protecting.<br>
@@ -1217,7 +1213,7 @@ tr{break-inside:avoid}
 <!-- ============================== 6. CONCEPT SKETCH ============================== -->
 <section class="page">
   <div class="kicker">Section 6</div>
-  <h2>Concept sketch &mdash; the whole competency, end to end</h2>
+  <h2>Concept sketch &mdash; the whole subject, end to end</h2>
   <p>Four named groups, in the order the story runs: <b>THE CONSTRAINT</b> &rarr; <b>THE ECONOMICS</b> &rarr; <b>THE MACHINE</b> &rarr; <b>THE DECISION</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
 
   <div class="sketch" id="bigmap" style="padding:13pt">
