@@ -365,7 +365,7 @@ tr{break-inside:avoid}
     <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
       <span class="q">Q</span> Where exactly does CI end and the build pipeline continue — and why is &ldquo;funnel&rdquo; the better word?<br>
       <span class="q">Q</span> Name the two failure modes convergence has that the reversed node does not.<br>
-      <span class="q">Q</span> Which pairing of the bottom two rows is the one the text says they naturally align into, and why?
+      <span class="q">Q</span> Which pairing of the bottom two rows do these naturally align into, and why?
     </div>
   </div>
 </section>
@@ -429,7 +429,7 @@ tr{break-inside:avoid}
         IaaS and PaaS. The image is the unit of packaging; the platform matches capacity to constraints, avoids co-locating instances, and configures routing.<br>
         <i>Move:</i> this is where zero-downtime rollout is cheapest, because replacing an instance <i>is</i> the deployment. Spend the effort here rather than perfecting convergence.</div>
     </div>
-    <div class="legend"><b>Read it as:</b> the two diagonal corners are the ones that actually occur — immutable is for cattle, convergence is for pets. The off-diagonal cells are transitional; if you find yourself in one, it is usually a sign of a migration that stalled halfway.</div>
+    <div class="legend"><b>Read it as:</b> the two diagonal corners are where these approaches naturally align — immutable closely with IaaS/PaaS and automatic mapping, convergence more commonly with physical hosts, long-lived VMs and manual mapping. The off-diagonal cells are transitional; if you find yourself in one, it is usually a sign of a migration that stalled halfway.</div>
   </div>
 
   <div class="box tip nobreak">
@@ -471,7 +471,7 @@ tr{break-inside:avoid}
   <table class="tight">
     <tr><th style="width:44mm">Expansion — safe <i>before</i> rollout</th><th>Contraction — only <i>after</i> rollout</th></tr>
     <tr><td>
-      Add a table · add views · add a <b>nullable</b> column · add aliases or synonyms · add new stored procedures · add triggers · copy existing data into new tables or columns.
+      Add a table · add views · add a <b>nullable</b> column · add aliases or synonyms · add new stored procedures · <b>add triggers &mdash; but only if they are nonconditional and cannot throw an error</b> · copy existing data into new tables or columns.
       <br><br>The criterion that decides all of them: <b>nothing here is used by the current application.</b>
     </td><td>
       Drop old tables · drop old views · drop old columns · drop unused aliases and synonyms · drop stored procedures no longer called · apply <b>NOT NULL</b> constraints on new columns · apply <b>foreign key</b> constraints.
@@ -624,7 +624,7 @@ tr{break-inside:avoid}
   <div class="qbox nobreak">
     <div class="lab">Part 2 · Question 1</div>
     <p>A team is splitting a customer table into two. The plan: run the migration to create and populate the new table on Friday evening, deploy the new code on Saturday morning, then drop the old columns on Saturday afternoon once the deploy is green.</p>
-    <p><b>(a)</b> Identify the two ordering errors, naming the phase each piece of work belongs to. <b>(b)</b> Name the failure that occurs between Friday and Saturday even if nothing else goes wrong, and say why writing during that window loses data. <b>(c)</b> Give the mechanism that closes that window, say roughly how many you'd need, and name the specific bug to watch for.</p>
+    <p><b>(a)</b> Name the phase each of the three pieces of work belongs to, and identify the one that is scheduled wrongly. <b>(b)</b> Name the failure that occurs between Friday and Saturday even if nothing else goes wrong, and say why writing during that window loses data. <b>(c)</b> Give the mechanism that closes that window, say roughly how many you'd need, and name the specific bug to watch for.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -705,8 +705,8 @@ tr{break-inside:avoid}
   <table class="tight">
     <tr><th style="width:26mm">Span</th><th style="width:44mm">The question</th><th style="width:48mm">What makes it short</th><th>What makes it long</th></tr>
     <tr><td><b>1 · Prepare</b></td><td>How long to get ready to switch over?</td><td>Mutable: copying files into place so a symlink or directory reference can be flipped.</td><td>Immutable: the time to deploy a whole new image.</td></tr>
-    <tr><td><b>2 · Drain</b></td><td>Once you stop accepting new requests, how long until the existing ones finish?</td><td>A second or two for a stateless microservice.</td><td>A front end with sticky sessions: <b>session timeout plus maximum session duration</b> — and there may be <i>no upper bound</i>, especially if you can't distinguish bots and crawlers from humans. <b>Blocked threads also block the drain</b>, and those stuck requests look like valuable work but definitely are not.</td></tr>
-    <tr><td><b>3 · Apply</b></td><td>How long to actually apply the change?</td><td>A symlink update — very quick. For disposable infrastructure there is no &ldquo;apply&rdquo; at all; you bring up a new instance, so this span overlaps the drain.</td><td>Manually copying archives or editing configuration files. Slower, and — as the text drily notes — more error-prone too.</td></tr>
+    <tr><td><b>2 · Drain</b></td><td>Once you stop accepting new requests, how long until the existing ones finish?</td><td>A second or two for a stateless microservice.</td><td>A front end with sticky sessions: <b>session timeout plus maximum session duration</b> — and there may be <i>no upper bound</i>, especially if you can't distinguish bots and crawlers from humans. <b>Blocked threads also block the drain</b>, and those stuck requests look like valuable work but definitely are not. Either watch the load until enough has drained that you're comfortable killing the process, or <b>pick a &ldquo;good enough&rdquo; time limit</b> — the larger your scale, the more you'll want the limit, to make the whole process predictable.</td></tr>
+    <tr><td><b>3 · Apply</b></td><td>How long to actually apply the change?</td><td>A symlink update — very quick. For disposable infrastructure there is no &ldquo;apply&rdquo; at all; you bring up a new instance, so this span overlaps the drain.</td><td>Manually copying archives or editing configuration files. Slower, and more error-prone too.</td></tr>
     <tr><td><b>4 · Ready</b></td><td>After starting, how long until it can take load?</td><td>A process with no warm-up.</td><td>Loading caches, warming the JIT, establishing database connections. Send load before this completes and you get server errors or very long response times for whoever is unlucky enough to arrive first.</td></tr>
   </table>
 
@@ -715,6 +715,16 @@ tr{break-inside:avoid}
     <p>Deployment units sit on a spectrum: <b>single files</b> (static sites, PHP, CGI scripts) → <b>archives</b> (<code>.rpm</code>, <code>.deb</code>, <code>.msi</code>, <code>.ear</code>, <code>.war</code>, <code>.exe</code>, <code>.jar</code>, <code>.dll</code>, gems) → <b>whole machines</b> (AMIs, containers, VMDKs). Copying a single file with no runtime restart will always beat copying an archive and restarting a container, which will always beat copying a gigabyte image and booting an operating system.</p>
     <p>The consequence is arithmetic, and it is the kind of thing that ruins an evening: <b>it is no good planning a rolling deployment over a 30-minute window only to discover each machine needs 60 minutes to restart.</b></p>
   </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:28mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr><td><b>Drain</b></td><td>The span between refusing new requests and the last in-flight one finishing.</td><td>A second or two for a stateless microservice; potentially unbounded for a sticky-session front end.</td><td>vs <b>time-to-ready</b>: both are waiting, for opposite reasons. Drain is at the <i>end</i> of the old process's life; ready is at the <i>start</i> of the new one's. Confusing them is why teams budget one and get caught by the other.</td></tr>
+    <tr><td><b>Time-to-ready</b></td><td>The span between a process starting and being genuinely able to serve.</td><td>Loading caches, warming the JIT, establishing database connections.</td><td>vs <b>startup time</b>: the socket opens long before the work can be done. A machine that is &ldquo;up&rdquo; by any process check may still fail every request it receives.</td></tr>
+    <tr><td><b>Canary group</b></td><td>The first batch of a rollout, which you deliberately stop on.</td><td>Alpha, of Alpha through Foxtrot. Traffic is ramped to it with the load balancer while errors, latency and RAM are watched.</td><td>vs <b>an ordinary batch</b>: mechanically identical — drain, apply, health-check, re-enable. The only difference is that you <i>pause and look</i>, which is the entire value.</td></tr>
+    <tr><td><b>Health check route</b></td><td>An end-to-end route reporting whether an instance can actually do work.</td><td>Reports application version, runtime version, host IP, and the status of connection pools, caches and circuit breakers.</td><td>vs a <b>port or process check</b>: those confirm something is listening. A health check confirms it can serve — and doubles as the control surface that drains and re-enables the instance.</td></tr>
+    <tr><td><b>Grain size</b></td><td>The unit you deploy.</td><td>Files → archives → whole machine images.</td><td>vs <b>deployment frequency</b>: grain size sets the per-machine clock; frequency is what you may choose <i>given</i> that clock. Confusing the two produces the 30-minute plan with the 60-minute restart.</td></tr>
+  </table>
 
   <h3>The rollout itself</h3>
   <ul>
@@ -765,7 +775,7 @@ tr{break-inside:avoid}
   <h3>Deploy like the pros — make the pipeline carry the expertise</h3>
   <ul>
     <li>The example is a foreign-key constraint with no index on it. Anyone in the relational world winces; it costs hours of downtime.</li>
-    <li>Blaming the DBA for not catching it is the wrong answer, and the text is blunt that it leads somewhere bad. The better answer starts from &ldquo;SQL is hard to parse, so our pipeline can't catch that&rdquo; — because that contains the fix.</li>
+    <li>Blaming the DBA for not catching it is the wrong answer, and it leads somewhere bad. The better answer starts from &ldquo;SQL is hard to parse, so our pipeline can't catch that&rdquo; — because that contains the fix.</li>
     <li>If you accept that the pipeline should catch every mechanical error of that kind, then it follows that you should <b>stop specifying schema changes in SQL DDL</b>. Home-grown DSL or off-the-shelf migration library, it hardly matters: <b>turn the schema changes into data</b> so the pipeline has X-ray vision into them and can reject any build defining a foreign key without an index.</li>
     <li>The principle generalises well past schemas: <b>have the humans define the rules, have the machines enforce them.</b></li>
   </ul>
@@ -783,7 +793,7 @@ tr{break-inside:avoid}
                          |
               MICROSCOPIC -- one machine
               +-----------------------------------+
-              | 1 <span class="tk3">PREP</span>   2 <span class="tks">DRAIN</span>   3 APPLY   4 <span class="tks">READY</span> |
+              | 1 <span class="tk3">PREP</span>   2 <span class="tks">DRAIN</span>   3 APPLY   4 <span class="tk3">READY</span> |
               |  copy    finish    flip     warm  |
               |  files   in-flight  link    caches|
               +-----------------------------------+
@@ -818,7 +828,7 @@ tr{break-inside:avoid}
   <div class="qbox nobreak">
     <div class="lab">Part 3 · Question 1</div>
     <p>A team plans a rolling deployment across 40 machines in a 30-minute window, in four batches of ten. In rehearsal, each machine takes about 90 seconds to apply the change. On the night, the rollout is still running three hours later, and the machines that <i>have</i> been updated are returning 500s to a fraction of users.</p>
-    <p><b>(a)</b> Name the two time spans the team failed to budget for, and say why rehearsal didn't reveal either. <b>(b)</b> Explain the 500s specifically. <b>(c)</b> Give the one mechanism that fixes both problems, and say what a good version of it reports.</p>
+    <p><b>(a)</b> Name the two time spans the team failed to budget for, and say why rehearsal didn't reveal either. <b>(b)</b> Explain the 500s specifically. <b>(c)</b> Give the two mechanisms needed — one for each problem — and say what a good version of the second reports.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
     </div>
@@ -914,12 +924,22 @@ tr{break-inside:avoid}
     </li>
   </ul>
 
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:28mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr><td><b>Chaos engineering</b></td><td>Experimenting on a distributed system to build confidence it can withstand turbulent production conditions.</td><td>Chaos Monkey wakes, picks an autoscaling cluster, kills one instance; the cluster should recover by itself.</td><td>vs <b>testing</b>: a test verifies a condition you already knew to check, and passes or fails. A chaos experiment carries a <i>hypothesis</i> about a steady state and can invalidate it — empirical rather than formal.</td></tr>
+    <tr><td><b>Steady state</b></td><td>The externally observable healthy behaviour the system maintains as a whole.</td><td>&ldquo;Clustered services should be unaffected by instance failures&rdquo; — a hypothesis observations invalidated almost immediately.</td><td>vs <b>internal metrics</b>: the hypothesis must be framed on externally observable behaviour, as an invariant the system upholds under turbulence — not on internals only you can see.</td></tr>
+    <tr><td><b>Blast radius</b></td><td>The magnitude of bad experience an experiment may cause — how many customers, and how badly.</td><td>Starting as crudely as &ldquo;every 10,000th request will fail&rdquo;, then moving to real victim-selection criteria.</td><td>vs an <b>error budget</b>: a budget is how much unreliability you tolerate over a period. Blast radius is how much one experiment may cause right now, and it is bounded <i>before</i> you start.</td></tr>
+    <tr><td><b>Injection</b></td><td>A deliberately introduced fault.</td><td>Kill an instance; add latency; fail one service-to-service call.</td><td>vs a <b>bug</b>: an injection is chosen, bounded, observed and reversible. You know when it started and can stop it — which is why a recovery plan is a prerequisite rather than a nicety.</td></tr>
+    <tr><td><b>Disaster simulation</b></td><td>The same discipline applied to the human system rather than the software.</td><td>A zombie apocalypse day: 50% of people designated unavailable, refusing all contact.</td><td>vs an <b>injection</b>: injections break software; simulations break roles, knowledge and availability. Both find single points of failure, but only one is usually fixed by writing documentation.</td></tr>
+  </table>
+
   <h3>Where the idea comes from — three arguments, all worth having</h3>
   <table class="tight">
     <tr><th style="width:36mm">Idea</th><th style="width:52mm">What it says</th><th>Why it justifies deliberately breaking things</th></tr>
     <tr><td><b>Drift</b><br><small>Sidney Dekker, <i>Drift into Failure</i></small></td>
-      <td>A system — people, technology and process together — lives inside three boundaries: <b>safety, economy, and capacity</b>. Pressure for economic return, plus the fact that people don't want to work at the upper limit of productivity, creates a gradient pushing the whole system toward the safety boundary.</td>
-      <td>The airliner: jets fly faster higher, and faster trips mean more turnarounds and more revenue. But at the revenue-optimal altitude, stall speed and the turbulence-onset speed are much closer together than in thicker air. Less room for error exactly where the economics point you. <b>Highly efficient systems handle disruption badly; they tend to break all at once.</b> Chaos is the balancing force.</td></tr>
+      <td>A system — people, technology and process together — lives inside three boundaries: <b>safety, economy, capacity</b>. Economic pressure, plus people not wanting to work at their productivity limit, creates a gradient pushing the whole system toward the safety boundary.</td>
+      <td>The airliner: jets fly faster higher, and faster trips mean more revenue. But at the revenue-optimal altitude, stall speed and turbulence-onset speed sit much closer together than in thicker air — less room for error exactly where the economics point. <b>Highly efficient systems handle disruption badly; they break all at once.</b> Chaos is the balancing force.</td></tr>
     <tr><td><b>The fundamental regulator paradox</b><br><small>Gerald Weinberg</small></td>
       <td>&ldquo;The task of a regulator is to eliminate variation, but this variation is the ultimate source of information about the quality of its work. Therefore, the better job a regulator does, the less information it gets about how to improve.&rdquo;</td>
       <td>Success destroys your own feedback. Paraphrased: you don't know how much you depend on your IT staff until they go on vacation. If you want information, you must reintroduce variation deliberately.</td></tr>
@@ -981,7 +1001,7 @@ tr{break-inside:avoid}
     <ul style="margin-bottom:0">
       <li><b>Randomness works at first</b> because the search space for faults is <b>densely populated</b> — most software has so many problems that shooting at random will uncover something alarming.</li>
       <li>Once the easy things are fixed, the space becomes <b>sparse but not uniform</b>. Some services, network segments, and combinations of state and request still hide killer bugs.</li>
-      <li>The scale is hostile: with <i>x</i> services there can be up to <b>2<sup>2x</sup></b> possible faults to inject. Exhaustive search is not available.</li>
+      <li>The scale is hostile: the space is <b>2<sup>n</sup></b>, where <i>n</i> is the number of service-to-service calls — so it grows doubly exponentially in the number of services. Exhaustive search is not available at any realistic size.</li>
       <li>Randomness also has blind spots by construction: a partner data load that runs every Tuesday corrupts data, and a service later throws a 500 rendering it. Random search is <b>not very likely</b> to find that.</li>
       <li>So targeting becomes human work — applying knowledge of the system, abductive reasoning and pattern matching, thinking about how a successful request works: a top-level request generates a whole tree of supporting calls; kick out one support and it may succeed or fail, and <b>either way you learn something</b>.</li>
       <li>Which is why you must <b>study the faults that did not become failures.</b> The system did something to stop it. Learn from the happy outcomes as much as the bad ones.</li>
@@ -1048,7 +1068,7 @@ tr{break-inside:avoid}
         |
         v
   <span class="tks">TARGET</span> -- random works while the space is DENSE
-             then it is a search problem: up to 2^2x faults
+             then it is a search problem: a 2^n space, n = calls
              so: human reasoning, and study the faults that
              did NOT become failures
         |
@@ -1092,7 +1112,7 @@ tr{break-inside:avoid}
 
   <div class="qbox nobreak">
     <div class="lab">Part 4 · Question 2</div>
-    <p>A team has run instance-killing chaos for eight months. The first two months found a great deal; the last three have found nothing. Leadership concludes the system is now robust and proposes winding the programme down. Separately, an incident last Tuesday was traced to a weekly partner data-load job writing bad rows, surfacing hours later as 500s from an unrelated API.</p>
+    <p>A team has run instance-killing chaos for eight months. The first two months found a great deal; the last three have found nothing. Leadership concludes the system is now robust and proposes winding the programme down. Separately, last week's incident was traced to a month-end billing reconciliation writing a malformed currency field, which surfaced two days later as failed exports from a reporting service nobody had connected to billing.</p>
     <p><b>(a)</b> Give the correct interpretation of &ldquo;we stopped finding things&rdquo;, using the right term for what is happening. <b>(b)</b> Explain why random instance-killing was structurally incapable of finding the Tuesday bug. <b>(c)</b> Name two changes of approach, and explain what you learn from a fault that does <i>not</i> cause a failure.</p>
     <div class="writelines">
       <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
@@ -1113,7 +1133,7 @@ tr{break-inside:avoid}
         <i>Move:</i> start here. While the fault space is densely populated, random targeting is as good as any process and will find something alarming.</div>
       <div class="cell focus"><b>Targeted injection</b>
         FIT on a specific service-to-service call; latency where ordering matters; cunning malevolent intelligence inferring the call graph from traces.<br>
-        <i>Move:</i> go here once random stops paying. The space is sparse and non-uniform, up to 2<sup>2x</sup> faults — so use human reasoning about the call tree, and mine the faults that <i>didn't</i> cause failures.</div>
+        <i>Move:</i> go here once random stops paying. The space is sparse and non-uniform, and 2<sup>n</sup> in the number of service-to-service calls — so use human reasoning about the call tree, and mine the faults that <i>didn't</i> cause failures.</div>
 
       <div class="rowh">PEOPLE</div>
       <div class="cell"><b>Zombie apocalypse</b>
@@ -1166,7 +1186,7 @@ tr{break-inside:avoid}
         nothing in use          canary first       now: NOT NULL, FK
              |                     |
              |            four spans per machine:
-             |            prep / <span class="tks">DRAIN</span> / apply / <span class="tks">READY</span>
+             |            prep / <span class="tk2">DRAIN</span> / apply / <span class="tk2">READY</span>
              |
         <span class="tks">the one failing case: OLD instance + NEW data</span>
         so deploy code FIRST, then migrate
@@ -1183,26 +1203,38 @@ tr{break-inside:avoid}
   </div>
 
   <h3>The question per node — cover the right column</h3>
+
+  <h4>Group 1 — DESIGN</h4>
   <table class="tight">
     <tr><th style="width:44mm">Node</th><th style="width:64mm">Question</th><th>Answer in one line</th></tr>
     <tr><td><b>The &ldquo;during&rdquo; state</b></td><td>Why is designing only for &ldquo;before&rdquo; and &ldquo;after&rdquo; wrong?</td><td>It assumes the system changes in an instantaneous quantum jump. Updating takes time, and users only ever see the middle.</td></tr>
     <tr><td><b>Build pipeline</b></td><td>Where does CI stop, and why is &ldquo;funnel&rdquo; the better word?</td><td>CI stops after a test report and an archive; the pipeline continues into trial deploys, migrations and production. Every stage exists to find a reason to reject the build.</td></tr>
     <tr><td><b>Convergence vs immutable</b></td><td>What's the one-line difference, and which animal is which?</td><td>Repair from an unknown state versus rebuild from a known image. Immutable is for cattle; convergence is for pets.</td></tr>
     <tr><td><b>The delay–risk cycle</b></td><td>Why do review steps make deployments riskier?</td><td>They lengthen the commit-to-production delay, which grows the batch, which is what actually carries the risk.</td></tr>
+      </table>
+
+  <h4>Group 2 — MOVE</h4>
+  <table class="tight">
+    <tr><th style="width:44mm">Node</th><th style="width:64mm">Question</th><th>Answer in one line</th></tr>
     <tr><td><b>Expansion</b></td><td>What single criterion decides whether a change belongs here?</td><td>Nothing currently running uses it. That's why adding a nullable column is safe and adding NOT NULL is not.</td></tr>
     <tr><td><b>Contraction</b></td><td>Why must constraints wait until after rollout?</td><td>Old instances don't know how to satisfy them and would start failing operations that were fine a minute ago — breaking undetectability.</td></tr>
     <tr><td><b>Shim</b></td><td>What is it, how many do you need, and what's the bug to watch?</td><td>Triggers bridging old and new during rollout; roughly six per change (insert, update, delete, both directions); watch for infinite trigger loops.</td></tr>
-    <tr><td><b>Reversed: old instance + new data</b></td><td>Why is this the node to remember?</td><td>It's the only one of four combinations that fails, and it cannot be patched because the old code is already deployed. It dictates the order: roll out code first, then migrate.</td></tr>
+    <tr><td><b>Reversed: old instance + new data</b></td><td>Why is this the node to remember?</td><td>The only one of four combinations that fails, and it can't be patched — the old code is already deployed. It dictates the order: code first, then migrate.</td></tr>
     <tr><td><b>Trickle, then batch</b></td><td>What are the two phases, and the one hard restriction?</td><td>Migrate documents as they're touched, then batch the untouched remainder later. Never run two overlapping trickle migrations against the same document type.</td></tr>
-    <tr><td><b>Reversed: drain</b></td><td>What makes this span unbounded?</td><td>Sticky sessions (timeout plus maximum duration, with no upper bound if bots can't be told from humans), and blocked threads, which look like valuable work and are not.</td></tr>
+    <tr><td><b>Reversed: drain</b></td><td>What makes this span unbounded?</td><td>Sticky sessions (timeout plus maximum duration, unbounded if bots can't be told from humans), and blocked threads, which look like valuable work and are not.</td></tr>
     <tr><td><b>Reversed: ready</b></td><td>Why isn't &ldquo;started&rdquo; the same as &ldquo;ready&rdquo;?</td><td>Caches, JIT warm-up and connection pools come after the socket opens. Start with available=false so the balancer waits.</td></tr>
     <tr><td><b>Canary</b></td><td>What makes the first batch different from the other four?</td><td>You pause on it and ramp traffic gradually while watching for anomalies — errors, latency, RAM — before committing to the rest.</td></tr>
     <tr><td><b>Health check</b></td><td>What should a good one report?</td><td>Application version, runtime version, host IP, and the status of connection pools, caches and circuit breakers.</td></tr>
-    <tr><td><b>Safety is not composable</b></td><td>Give the example in one line.</td><td>Two providers each comfortably inside a 50 ms budget break it when called in sequence — the unreliability is emergent, invisible in either component.</td></tr>
+      </table>
+
+  <h4>Group 3 — PROVE</h4>
+  <table class="tight">
+    <tr><th style="width:44mm">Node</th><th style="width:64mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Safety is not composable</b></td><td>Give the example in one line.</td><td>Two providers each inside a 50 ms budget break it when called in sequence — the unreliability is emergent, invisible in either one.</td></tr>
     <tr><td><b>Drift</b></td><td>Which direction does the gradient push, and why?</td><td>Toward the safety boundary — economic pressure plus people not working at their productivity limit. Highly efficient systems break all at once.</td></tr>
     <tr><td><b>The regulator paradox</b></td><td>State it, and what follows.</td><td>The better a regulator does, the less information it gets about how to improve. So variation must be reintroduced deliberately.</td></tr>
     <tr><td><b>The three injections</b></td><td>Name them and what each uniquely finds.</td><td>Kill (crude, finds plenty); latency (missing fallbacks, and race conditions from reordering); FIT (loss of a whole service in deep call trees).</td></tr>
-    <tr><td><b>Targeting</b></td><td>Why does the strategy have to change over time?</td><td>The fault space starts dense, so random works. It becomes sparse but non-uniform, with up to 2<sup>2x</sup> faults — so reasoned targeting takes over.</td></tr>
+    <tr><td><b>Targeting</b></td><td>Why does the strategy have to change over time?</td><td>The fault space starts dense, so random works. It becomes sparse but non-uniform, and it is 2<sup>n</sup> in the number of service-to-service calls — so reasoned targeting takes over.</td></tr>
   </table>
 </section>
 
@@ -1293,7 +1325,7 @@ tr{break-inside:avoid}
     <tr><td><b>Grain size spectrum</b></td><td>Files (static, PHP, CGI) → archives (rpm, deb, msi, ear, war, exe, jar, dll, gem) → whole machines (AMI, container, VMDK).</td><td>Grain size sets the per-machine clock, and the rollout window is arithmetic on it — 30-minute plan, 60-minute restart is a real and common failure.</td></tr>
     <tr><td><b>Ten years</b></td><td>A reasonable far-future cache expiry for static assets.</td><td>Sets up why cache busting exists at all: you deliberately made the browser stop asking.</td></tr>
     <tr><td><b>50 ms, two providers at 20 ms</b></td><td>Each comfortably inside budget; in sequence a sizable percentage break it.</td><td>The compact proof that safety is not composable — it ends the &ldquo;we tested every service&rdquo; argument.</td></tr>
-    <tr><td><b>2<sup>2x</sup></b></td><td>Worst-case faults to inject with <i>x</i> services.</td><td>Why exhaustive chaos is not available and targeting must become reasoned.</td></tr>
+    <tr><td><b>2<sup>n</sup></b></td><td>The size of the fault search space, where <i>n</i> is the number of service-to-service calls — doubly exponential in the number of services.</td><td>Why exhaustive chaos is not available at any realistic size, and targeting must become reasoned.</td></tr>
     <tr><td><b>0.01% → 0.02%</b></td><td>The monitoring resolution question: could you see that, for Europe but not South America?</td><td>Forces an honest answer about whether you can detect an experiment's effect at all.</td></tr>
     <tr><td><b>Every 10,000th request</b></td><td>A crude first blast-radius control.</td><td>Shows that starting is cheap; you don't need a platform to run experiment one.</td></tr>
     <tr><td><b>50% zombies</b></td><td>The disaster-simulation dose.</td><td>Large enough to break processes, small enough to survive — and it finds the single points of failure that documentation was supposed to cover.</td></tr>
@@ -1341,23 +1373,25 @@ tr{break-inside:avoid}
   <p><b>(c)</b> B gets to run on long-lived VMs and physical hosts without image-build infrastructure. Convergence pairs naturally with <b>manual role mapping</b> ("server 2 is app"); immutable pairs with <b>automatic mapping</b> and IaaS/PaaS ("service X, Y replicas, and the platform places them"). Immutable is for cattle; convergence is for pets.</p>
 
   <h4>Part 2 · Q1 — the Friday migration and the Saturday deploy</h4>
-  <p><b>(a)</b> Two ordering errors. Creating and populating the new table is <b>expansion</b> and is safe before rollout — that part is fine — but <b>dropping the old columns on Saturday afternoon is contraction</b> and must not happen until every instance is on the new code <i>and</i> a grace period has passed with monitoring watched. Dropping the same day as the deploy leaves no room to discover a problem. The second error is more serious: the plan runs a data migration <b>before</b> the code rollout, which is the wrong order.</p>
+  <p><b>(a)</b> Creating and populating the new table is <b>expansion</b> — additive, and nothing running uses the new table yet — so Friday evening is exactly right. Deploying the new code is the <b>rollout</b>. Dropping the old columns is <b>contraction</b>, and that is the one scheduled wrongly: it must wait until every instance is on the new code <i>and</i> a grace period has passed with monitoring watched. Saturday afternoon leaves no room to discover a problem, and no way back if you do.<br>
+  Note what is <i>not</i> wrong here: copying data into a new table before the rollout does not violate &ldquo;deploy the code, then migrate.&rdquo; That rule exists because an old instance may read a <i>document</i> whose shape it has never seen. In a table split, old instances go on reading the old table and never touch the new one, so the copy is safe in advance.</p>
   <p><b>(b)</b> Between Friday and Saturday, old instances are still running and still writing to the old table. Anything written after the copy completed <b>does not exist in the new table</b>. When the new code takes over and reads only the new table, those entities are simply lost — and nothing errors, which is what makes it dangerous.</p>
   <p><b>(c)</b> <b>Shims</b> — database triggers bridging the two structures. An <code>INSERT</code> trigger on the old table extracts the fields and inserts into the new one; an <code>UPDATE</code> trigger on the new table issues the matching update to the old. You need them for <b>insert, update and delete in both directions</b>, so roughly <b>six</b> per change. The bug to watch is the <b>infinite loop</b>: inserting into the old table triggers an insert into the new, which triggers an insert into the old. Remove them afterwards in a new migration, not by hand.</p>
 
-  <h4>Part 2 · Q2 — eleven years of profiles and a nine-hour migration</h4>
-  <p><b>(a)</b> <b>Trickle, then batch.</b> Phase one: ship the new version with a conditional on read — if the document isn't current, upgrade it and save it in the new format, amortising the migration across ordinary requests. Phase two, after it has run in production for a while and the most active documents are already converted, run a batch migration over the remainder. It's safe to run concurrently because no old instances remain. Then push a further deployment removing the conditional.</p>
-  <p><b>(b)</b> Cost: a little extra latency on every request that touches a stale document. Hard restriction: <b>never run two overlapping trickle migrations against the same document type</b> — which may force you to split a larger design change across several releases.</p>
-  <p><b>(c)</b> The alternative is a <b>translation pipeline</b>: chained per-version translators, with the reader detecting the version and injecting the document at the right stage. Two costs over eleven years and six generations: <b>every version permutation must be tested</b>, so old documents stay as seed data indefinitely; and <b>translation time grows linearly</b> as the pipeline deepens. Bonus credit for noting that a format split forces the pipeline to split too.</p>
+
 </section>
 
 <section class="page ans">
   <div class="kicker">Section 9 continued</div>
+  <h4>Part 2 · Q2 — eleven years of profiles and a nine-hour migration</h4>
+  <p><b>(a)</b> <b>Trickle, then batch.</b> Phase one: ship the new version with a conditional on read — if the document isn't current, upgrade and save it in the new format, amortising the migration across ordinary requests. Phase two, once the most active documents are converted, batch-migrate the remainder; it's safe to run concurrently because no old instances remain. Then push a further deployment removing the conditional.</p>
+  <p><b>(b)</b> Cost: a little extra latency on every request that touches a stale document. Hard restriction: <b>never run two overlapping trickle migrations against the same document type</b> — which may force you to split a larger design change across several releases.</p>
+  <p><b>(c)</b> The alternative is a <b>translation pipeline</b>: chained per-version translators, with the reader detecting the version and injecting the document at the right stage. Two costs over eleven years and six generations: <b>every version permutation must be tested</b>, so old documents stay as seed data indefinitely; and <b>translation time grows linearly</b> as the pipeline deepens. Bonus credit for noting that a format split forces the pipeline to split too.</p>
 
   <h4>Part 3 · Q1 — the 30-minute window that took three hours</h4>
   <p><b>(a)</b> <b>Drain</b> and <b>time-to-ready</b>. Rehearsal measured only the <i>apply</i> span — the 90 seconds — which is the one span everybody budgets. Rehearsal didn't reveal the others because a test machine has no real in-flight sessions to drain and a cold cache nobody notices. In production, sticky sessions make drain equal to session timeout plus maximum session duration, with no upper bound at all if bots can't be distinguished from humans, and any blocked threads hold the drain open indefinitely while looking like valuable work.</p>
   <p><b>(b)</b> The 500s are the fourth span. The machines were put back into the load-balancer pool as soon as the process started, but starting a process is not the same as being ready — caches were empty, the JIT unwarmed, database connections not yet established. Whoever arrived first got errors or very long responses.</p>
-  <p><b>(c)</b> A proper <b>health check route</b>, with the instance starting at <b>available=false</b> and only flipping to true when genuinely ready. That fixes the 500s directly, and it fixes the drain because a status change tells the balancer to stop sending new work while existing requests complete — far gentler than yanking the machine from the pool. A good health check reports the <b>application version, the runtime version, the host IP address, and the status of connection pools, caches and circuit breakers</b>.</p>
+  <p><b>(c)</b> Two mechanisms, not one. For the overrun: <b>a &ldquo;good enough&rdquo; drain time limit</b> rather than waiting for the load to fall to zero — at scale you want the limit precisely to make the process predictable, and no health check will bound a drain that sticky sessions have made unbounded. For the 500s: a proper <b>health check route</b>, with the instance starting at <b>available=false</b> and flipping to true only when genuinely ready; the same flag makes the drain graceful, since a status change tells the balancer to stop sending new work while existing requests complete, far gentler than yanking the machine from the pool. A good health check reports the <b>application version, the runtime version, the host IP address, and the status of connection pools, caches and circuit breakers</b>.</p>
 
   <h4>Part 3 · Q2 — the half-updated interface</h4>
   <p><b>(a)</b> <b>Session stickiness</b> is missing. New instances came up in the existing cluster and began taking load as they went healthy, so successive requests from one user were balanced across both versions — page from a new instance, asset or subsequent page from an old one, apparently at random. This is the known cost of spinning new instances into an existing cluster.</p>
@@ -1369,9 +1403,9 @@ tr{break-inside:avoid}
   <p><b>(b)</b> Missing: <b>blast-radius control</b> (there's no victim-selection criterion at all — even something as crude as &ldquo;every 10,000th request&rdquo; would be a start), and <b>tracing plus a definition of healthy</b> (you need to follow a user and a request through the tiers and know whether it ultimately succeeded, and to know whether monitoring could even detect the effect — 0.01% to 0.02% for one region). Also credit <b>a recovery plan</b>: the system may not return to health when the chaos stops. And note that monitoring may itself fail when things get weird, especially if it shares network infrastructure with production traffic.</p>
   <p><b>(c)</b> Start <b>opt-in</b>, not opt-out. Opt-in has much lower adoption, but it creates far less resistance and lets you publicise success stories before moving to opt-out — and for a mature, entrenched architecture it may be the only feasible starting point. The failure mode the email invites is exactly Nora Jones's story: silence was read as consent, chaos was unleashed, QA went down for a week. If you start with opt-out, people may not understand what they're opting out of, or how serious it is that they didn't respond.</p>
 
-  <h4>Part 4 · Q2 — eight months of monkeys, and the Tuesday bug</h4>
+  <h4>Part 4 · Q2 — eight months of monkeys, and the month-end bug</h4>
   <p><b>(a)</b> Finding nothing is <b>not</b> evidence of robustness. The fault space was <b>densely populated</b> at the start, which is why random targeting paid so well; it has become <b>sparse but not uniform</b>. Some services, network segments, and combinations of state and request still hide latent killer bugs. Winding the programme down at exactly this point mistakes exhaustion of the easy half of the search space for having searched it.</p>
-  <p><b>(b)</b> Because it is a <b>search problem with hostile dimensionality</b> and the bug is in a thin, time-dependent slice of it: a job that runs once a week, corrupting data whose effect surfaces hours later in an apparently unrelated service. Random instance-killing samples the wrong dimension entirely — it perturbs instance liveness, not data validity or timing. With <i>x</i> services there can be up to 2<sup>2x</sup> possible faults, so exhaustive random search was never going to reach this one.</p>
+  <p><b>(b)</b> Because it is a <b>search problem with hostile dimensionality</b> and the bug sits in a thin, time-dependent slice of it: a job that runs once a month, corrupting data whose effect surfaces two days later in an apparently unrelated service. Random instance-killing samples the wrong dimension entirely — it perturbs instance liveness, not data validity, and has no way to reach a fault that only exists once a month. The space is 2<sup>n</sup> in the number of service-to-service calls, so exhaustive random search was never going to reach this one.</p>
   <p><b>(c)</b> First, move from random to <b>reasoned targeting</b>: apply knowledge of the system, think about the tree of calls supporting a top-level request, and use other injections — latency (which finds missing fallbacks and order-dependent race conditions) and <b>FIT</b> (which fails a specific service-to-service call in a deep tree). Second, mine traces to build the call graph and choose links to cut — Peter Alvaro's &ldquo;cunning malevolent intelligence&rdquo; — which narrows the space in a few iterations. On faults that don't cause failures: <b>the system did something to prevent it</b>, and the trace shows you where the redundancy lives. That's a positive finding about your real architecture, and studying it is how you learn where the crucial calls actually are.</p>
 
   <div class="box tip nobreak" style="margin-top:14pt">
