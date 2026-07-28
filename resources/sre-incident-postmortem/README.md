@@ -64,7 +64,8 @@ Then check the pages: `python3 ../booklet-template/check-pages.py SRE-Incident-P
 ## Being questioned on this
 
 18 questions — the 8 applied cases and the 10 final-quiz questions — are registered in
-`../competency-progress.json`, each with its ideal answer frozen inline. Say **"drill me"** or
+`../competency-progress.json`, each with its ideal answer frozen inline. Two more sit in `retired`:
+they were reworded in review, before any attempt existed, and the reasons are in `../META.md`. Say **"drill me"** or
 "quiz me on incident response" whenever you want them; there is no schedule. Offline answers can be
 handed over a whole part at a time.
 

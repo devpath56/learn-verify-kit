@@ -348,4 +348,14 @@ least one code, and each code points at the exact artefact to reread.
   and 16 of the same book; there is no overlap of material, and the two booklets never reference each other.
 - **Competency 9 names one framework and nothing else.** The reasoning and the full list of what was left unnamed
   are recorded above, under works referenced. It is a third distinct de-vendoring line, drawn deliberately.
+- **Competency 9 retired two questions the day it was registered**, as competencies 7 and 8 did, and for the
+  same unconditional reason: a materially changed question gets a new id. Both prompts contained the phrase
+  "the source", which points at a text outside the booklet and breaks the no-meta rule; they were reworded and
+  reissued as `p2q2b` and `p4q2b`. Both were caught in review before any attempt existed.
+- **Competency 9's review caught a class of defect the earlier checks missed: conflated timeline facts.** Three
+  separate figures from one worked incident had been welded into single claims that the timeline does not
+  support — when the bespoke rebuild started, when the formal response structure went in, and whether the
+  outage recurred during the four months the weak write-up was pending. All three are now stated as the two
+  facts they actually are. The lesson for future builds: when a case study gives both a narrative and a
+  retrospective timeline, check figures against both, because they can disagree.
 - Competencies 10–13 are unassigned pending sources.
