@@ -21,13 +21,34 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 4 | Distributed Data — Encoding, Replication, Sharding, Unreliability | `ddia-distributed-data/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 5 "Encoding and Evolution", Ch. 6 "Replication", Ch. 7 "Sharding", Ch. 9 "The Trouble with Distributed Systems". | Built · 18 questions registered |
 | 5 | Transactions — Isolation Levels, Serializability, Atomic Commit | `ddia-transactions/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 8 "Transactions". | Built · 18 questions registered |
 | 6 | Browser Networking — Latency, HTTP/1.x, Server-Sent Events, WebSocket | `hpbn-browser-networking/` | Ilya Grigorik, *High Performance Browser Networking*, O'Reilly — Ch. 1 "Primer on Latency and Bandwidth", Ch. 11 "HTTP 1.X", Ch. 16 "Server-Sent Events (SSE)", Ch. 17 "WebSocket". | Built · 18 questions registered |
-| 7 | *unassigned* | — | — | Awaiting source |
+| 7 | Performance Methodology — Concepts, Perspectives, Methods, Statistics | `sysperf-methodology/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 2 "Methodologies". | Built · 18 questions registered |
 | 8 | *unassigned* | — | — | Awaiting source |
 | 9 | *unassigned* | — | — | Awaiting source |
 | 10 | *unassigned* | — | — | Awaiting source |
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 7
+
+Cited within the source chapter and named in the booklet's teaching: Gene Amdahl for the Law of
+Scalability, and Neil Gunther for the Universal Scalability Law (previously the super-serial model) and
+for the queueing-theory definition of time-based utilization; Agner Krarup Erlang as the inventor of
+queueing theory, with Erlang's C formula, Little's Law and Kendall's notation; Adrian Cockcroft for the
+performance-degradation profiles; Richard McDougall for the three-stage drill-down methodology and for
+TazTool; Cary Millsap for Method R; Tom Wilkie for the RED method and for USE and RED implementations
+using Prometheus and Grafana; Jim Gettys by way of the bufferbloat discussion in the wider work; Raj
+Jain for the three types of performance evaluation and for the geometric mean example; Richard Elling
+for static performance tuning; Brian Wong for the capacity-planning definition of utilization; John
+Allspaw, *The Art of Capacity Planning*; Roy Harrington for the Atlas cloud-wide monitoring tool;
+Christopher Williams for the transatlantic-cable latency figure; Craig Hanson and Pat Crain as the
+attributed origin of the performance mantras, learned from Scott Emmons; the Five Whys technique; the
+Netflix cloud as the worked environment for drill-down analysis, auto scaling and monitoring at scale,
+with perfdash and FlameCommander; AWS auto scaling groups and Kubernetes horizontal pod autoscalers; the
+Simple Network Monitoring Protocol; the R project and gnuplot for regression and plotting; the observability
+tools named as examples — iostat, vmstat, mpstat, top, strace, perf, tcpdump, biosnoop, BCC, bpftrace,
+Ftrace, KernelShark, Trace Compass and iperf; Linux PSI pressure metrics and cgroups; and the ZFS Storage
+appliance Analytics as the origin of latency heat maps.
 
 ### Works referenced inside competency 6
 
@@ -225,4 +246,11 @@ least one code, and each code points at the exact artefact to reread.
   supplied; the booklet explains it — loss is TCP's congestion signal, so hiding drops removes the
   backoff. The claim is correct and load-bearing for two registered questions, but it is not traceable
   to the four chapters provided. Recorded here rather than removed.
-- Competencies 7–13 are unassigned pending sources.
+- **Competency 7 also carries the scoped style block** introduced in competency 5, as competency 6 does.
+- **Competency 7's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–6.
+- **Competency 7 names methods and models but no products, tools or organisations.** The source names
+  many — observability tools, monitoring platforms, cloud providers, orchestrators — and the booklet
+  teaches the methodology generically instead, since the method is the transferable part and the tool
+  list is the fastest-decaying part of the chapter. All of those names are recorded above.
+- Competencies 8–13 are unassigned pending sources.
