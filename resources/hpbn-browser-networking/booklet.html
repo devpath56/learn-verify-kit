@@ -1,0 +1,1508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Browser Networking — Study Booklet</title>
+<style>
+:root{
+  --ink:#111111; --soft:#555555; --rule:#b4b4b4; --hair:#d9d9d9;
+  --fill:#f2f2f2; --fill2:#e6e6e6; --fill3:#dadada; --mid:#8c8c8c;
+}
+@page{ size:A4; margin:16mm 15mm 16mm 15mm; }
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+body{
+  font-family:"Charter","Georgia","Times New Roman",serif;
+  color:var(--ink); font-size:10.4pt; line-height:1.44; margin:0;
+}
+h1,h2,h3,h4,.ui{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+h1{font-size:23pt; line-height:1.12; margin:0 0 6pt; letter-spacing:-.4pt}
+h2{font-size:15pt; margin:0 0 4pt; letter-spacing:-.2pt}
+h3{font-size:11.6pt; margin:14pt 0 5pt; letter-spacing:-.1pt}
+h4{font-size:9.6pt; margin:10pt 0 4pt; text-transform:uppercase; letter-spacing:.9pt; color:var(--soft)}
+p{margin:0 0 6pt}
+ul,ol{margin:0 0 7pt; padding-left:17px}
+li{margin:0 0 3pt}
+li > ul{margin-top:3pt}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:9pt; background:var(--fill); padding:.5pt 3pt}
+small{font-size:8.6pt; color:var(--soft)}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.nobreak,.box,.qbox,.sketch,.matrix{break-inside:avoid; page-break-inside:avoid}
+
+/* ---------- cover ---------- */
+.cover{padding-top:24mm}
+.kicker{font-size:9pt; letter-spacing:2.4pt; text-transform:uppercase; color:var(--soft); margin-bottom:10pt}
+.cover .sub{font-size:13pt; color:var(--soft); margin:8pt 0 20pt; line-height:1.35}
+.cover .rule{height:3px; background:var(--ink); width:64px; margin:16pt 0}
+.meta{font-size:9.4pt; color:var(--soft); line-height:1.7}
+.chunkstrip{display:flex; gap:6px; margin:22pt 0 0}
+.chunkstrip div{flex:1; padding:8pt 9pt; background:var(--fill); border-left:3px solid var(--ink);
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; line-height:1.35}
+.chunkstrip b{display:block; font-size:9.6pt; margin-bottom:2pt}
+.chunkstrip .num{display:block; font-size:15pt; font-weight:700; line-height:1; margin-bottom:4pt}
+
+/* ---------- part headers ---------- */
+.chunkhead{padding:11pt 13pt; margin:0 0 12pt; color:#fff; background:var(--ink);
+  display:flex; align-items:flex-start; gap:12pt}
+.chunkhead .big{font-family:Helvetica,Arial,sans-serif; font-size:30pt; font-weight:700; line-height:.92;
+  border:2px solid #fff; padding:2pt 8pt; flex:0 0 auto}
+.chunkhead .n{font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; letter-spacing:2pt; text-transform:uppercase}
+.chunkhead h2{color:#fff; margin:3pt 0 0}
+.chunkhead p{margin:5pt 0 0; font-size:9.4pt}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--rule); padding:9pt 11pt; margin:0 0 9pt}
+.tenth{background:var(--fill); border:1px solid var(--rule); border-left:5px solid var(--ink)}
+.tenth h4{color:var(--ink)}
+.bound{background:#fafafa; border:1px solid var(--hair); border-left:5px solid var(--mid)}
+.quote{background:var(--fill); border:none; border-left:6px double var(--ink); font-style:italic; padding:8pt 11pt}
+.tip{background:#fff; border:1.5px solid var(--ink)}
+.qbox{border:1.5px solid var(--ink); padding:10pt 12pt; margin:0 0 8pt; background:#fff}
+.qbox .lab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.6pt; text-transform:uppercase; color:var(--ink); font-weight:700}
+.qbox p{margin:4pt 0 0}
+.writeline{border-bottom:1px dotted var(--mid); height:15pt}
+.writelines{margin-top:8pt}
+
+/* ---------- tables ---------- */
+table{width:100%; border-collapse:collapse; margin:0 0 9pt; font-size:9.1pt}
+th,td{border:1px solid var(--hair); padding:4.5pt 6pt; text-align:left; vertical-align:top}
+th{background:var(--fill2); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; text-transform:uppercase; letter-spacing:.7pt; color:var(--ink); font-weight:700}
+td b{font-weight:700}
+tr{break-inside:avoid}
+.tight td,.tight th{padding:3.5pt 5pt; font-size:8.8pt}
+
+/* ---------- 2x2 ---------- */
+.matrix{margin:6pt 0 10pt}
+.matrix .ylab{font-family:Helvetica,Arial,sans-serif; font-size:8pt; letter-spacing:1.2pt; text-transform:uppercase; color:var(--soft); margin-bottom:3pt}
+.grid2{display:grid; grid-template-columns:26mm 1fr 1fr; grid-template-rows:auto auto auto; gap:4px}
+.grid2 .corner{}
+.grid2 .colh,.grid2 .rowh{
+  font-family:Helvetica,Arial,sans-serif; font-size:8.4pt; font-weight:700; line-height:1.35;
+  background:var(--fill2); padding:6pt 7pt;
+}
+.grid2 .colh small,.grid2 .rowh small{display:block; margin-top:1.5pt; font-weight:400}
+.grid2 .cell{border:1px solid var(--rule); padding:7pt 8pt; font-size:8.9pt; line-height:1.36}
+.grid2 .cell > b:first-child{display:block; font-family:Helvetica,Arial,sans-serif; font-size:9.2pt; margin-bottom:2.5pt}
+.cell.focus{border:2.5px solid var(--ink); background:var(--fill2)}
+.cell.focus > b:first-child{background:var(--ink); color:#fff; display:block; padding:2pt 5pt; margin:-2pt -3pt 5pt}
+.cell.good{background:#f8f8f8; border-left:4px solid var(--mid)}
+.legend{font-size:8.3pt; color:var(--soft); margin-top:2pt}
+
+/* ---------- sketch ---------- */
+.sketch{border:1px solid var(--rule); padding:11pt 12pt; background:#fcfcfc; margin:0 0 9pt}
+.node{display:inline-block; padding:3pt 6pt; font-family:Helvetica,Arial,sans-serif; font-size:8.6pt;
+  line-height:1.3; margin:2pt 0; border:1px solid var(--ink); background:var(--fill)}
+.n1,.n2,.n3,.n4{background:var(--fill)}
+.nstar{background:var(--ink); color:#fff; border:1px solid var(--ink); font-weight:700}
+.tree{font-family:"SF Mono",Menlo,Consolas,monospace; font-size:8.6pt; line-height:1.7; white-space:pre}
+/* tokens used INSIDE .tree — weight and inversion only, so monospace alignment survives */
+.tree .tk1,.tree .tk2,.tree .tk3,.tree .tk4{font-weight:700}
+.tree .tks{font-weight:700; background:var(--ink); color:#fff}
+.q{color:var(--ink); font-family:Helvetica,Arial,sans-serif; font-size:8.2pt; font-weight:700}
+
+/* ---------- misc ---------- */
+.pill{display:inline-block; font-family:Helvetica,Arial,sans-serif; font-size:7.8pt; letter-spacing:.8pt;
+  text-transform:uppercase; padding:2pt 6pt; background:var(--ink); color:#fff; margin-right:4pt; font-weight:700}
+.p1,.p2,.p3,.p4{background:var(--ink); color:#fff}
+.toc td{border:none; border-bottom:1px dotted var(--hair); padding:5pt 4pt}
+.toc td:last-child{text-align:right; color:var(--soft); font-family:Helvetica,Arial,sans-serif; font-size:8.6pt}
+.ans{font-size:9.2pt}
+.ans h4{margin-top:11pt}
+</style>
+</head>
+<body>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt} section.page:last-of-type{page-break-after:auto}</style>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Browser Networking</h1>
+  <div class="rule"></div>
+  <div class="sub">Why latency, not bandwidth, is the ceiling — what a protocol without multiplexing forces you to do about it, and the two ways to stop paying a round trip for every update.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>Latency is the ceiling</b>The four delays, the speed of light, and the one you cannot buy your way out of.</div>
+    <div><span class="num">2</span><b>What HTTP/1.x makes you do</b>Keepalive, pipelining, six connections, sharding, bundling — all workarounds.</div>
+    <div><span class="num">3</span><b>Push, cheaply</b>Server-Sent Events: one long HTTP response, and what the browser does for free.</div>
+    <div><span class="num">4</span><b>The full socket</b>WebSocket: both directions, binary, and everything the browser stops doing for you.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <div class="box bound">
+    <h4>The habit this subject rewards, specifically</h4>
+    <p>Count round trips. Almost every claim in these pages resolves to a number of times a packet has to cross the network before something appears on screen, and almost every optimisation is an argument about reducing that count. When you meet a technique here, ask two questions: <i>how many round trips does it remove</i>, and <i>what does it cost me somewhere else</i>. Every one of them costs something somewhere else.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — Latency is the ceiling</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — What HTTP/1.x makes you do</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — Push, cheaply: Server-Sent Events</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — The full socket: WebSocket</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move · reverse mapping</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Given a real performance question (&ldquo;the page is slow, should we buy more bandwidth?&rdquo;, &ldquo;why did sharding make mobile worse?&rdquo;, &ldquo;should this feature use polling, SSE or a socket?&rdquo;, &ldquo;why does one big message stall all the others?&rdquo;), you can:</p>
+    <ol>
+      <li><b>Name the delay</b> — propagation, transmission, processing or queuing — and say which of them the proposed fix actually touches.</li>
+      <li><b>Count the round trips</b> before and after. Almost every argument in this subject is settled by that count.</li>
+      <li><b>Prescribe the transport</b> — plain HTTP, SSE, or WebSocket — and name the near-miss you rejected and why.</li>
+      <li><b>State the price.</b> Every technique here trades round trips against sockets, cache granularity, memory, battery, or the browser services you stop receiving.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>Two numbers decide the performance of any network transfer: <b>bandwidth</b>, the maximum throughput of the path, and <b>latency</b>, the time for a packet to get from one end to the other. They are not symmetrical problems. Bandwidth is an engineering and money problem — lay more fibre, light more wavelengths — and it has been improving steadily. Latency is bounded by the speed of light, and we are already within a small constant factor of it, so the most a better cable can buy is a modest improvement. Everything else in this booklet follows from that asymmetry. A protocol that spends an extra round trip per resource is spending the one resource that cannot be manufactured, which is why HTTP/1.x forces a pile of workarounds — reuse the connection, open six of them, shard the domain, bundle the files — and why, when the server needs to send you something, the interesting question is whether you can avoid paying a fresh round trip to ask for it at all. Parts 3 and 4 are the two answers to that: one cheap and text-only, one that gives you the whole socket and charges you every service the browser used to provide.</p>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version — the whole thing at once</h4>
+    <ul>
+      <li>Two things decide how fast the network feels: how <i>wide</i> the pipe is, and how <i>long</i> it takes one thing to get to the other end.</li>
+      <li>You can widen the pipe with money. You cannot make light faster — so distance is a hard floor.</li>
+      <li>So the whole game is: ask fewer times, and don't wait for one answer before asking the next question.</li>
+      <li>Old HTTP can only carry one answer at a time down a connection, so browsers open several and developers glue files together to ask less often.</li>
+      <li>And if the server wants to tell you something, it either keeps one connection open and talks down it, or you open a proper two-way pipe — which is fast, but the browser then stops helping you with caching and compression.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>Latency is the ceiling</b></td><td>Latency versus bandwidth; the four components of delay; the speed of light in fibre and the refractive index; last-mile latency; bufferbloat; bandwidth in the core versus at the edge; why one of the two is solvable and the other is not.</td><td>The floor everything else is built on. Without it, every optimisation in parts 2 to 4 looks arbitrary.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>What HTTP/1.x makes you do</b></td><td>Keepalive and the <i>(N−1) × RTT</i> saving; pipelining and why it failed; head-of-line blocking; six connections per host and self-inflicted denial of service; domain sharding; protocol overhead and cookies; concatenation, spriting and inlining.</td><td>One missing protocol feature — multiplexing — generates every technique here. Seeing them as workarounds rather than best practices is the point.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>Push, cheaply</b></td><td>The EventSource API; the event-stream wire format; what the browser handles for you, including automatic reconnect and last-seen message tracking; recovery strategies on the server; the two hard limits.</td><td>The first answer to &ldquo;the server has something for me&rdquo; that doesn't cost a round trip per update — and it is an ordinary HTTP response, so almost nothing has to change.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>The full socket</b></td><td>The WebSocket API; the HTTP Upgrade handshake; frames versus messages and the binary framing layer; masking; subprotocol negotiation and extensions; head-of-line blocking again; proxies and timeouts; what you give up.</td><td>The most capable transport and the most expensive one. It only makes sense once you know exactly what parts 2 and 3 were buying you for free.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;We may not be able to make the packets travel faster, but we can reduce the distance by strategically positioning our servers closer to the users.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>Latency is the ceiling</h2>
+    <p>Four delays, one of which you can buy your way out of, and one of which is physics.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>&ldquo;Fast internet&rdquo; is really two different things: how much you can send at once, and how long one thing takes to arrive.</li>
+      <li>A wide pipe doesn't help if you have to wait for a reply before you can send the next thing. That waiting is latency.</li>
+      <li>Some of the wait is because the signal has to physically travel. Light in glass does about 200,000 km per second, and you cannot argue with that.</li>
+      <li>Some of it is because pushing bits onto a slow link takes time — that part <i>does</i> get better with a faster connection.</li>
+      <li>And some of it is your packet sitting in a queue inside a router, which is the one nobody expects.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>Posting a parcel. <b>Propagation delay</b> is how long the van takes to drive the distance — set by geography and the speed of the van, and the only way to shorten it is to move the warehouse closer. <b>Transmission delay</b> is how long it takes to load the parcels onto the van at the depot — a bigger loading bay genuinely fixes that, and it has nothing to do with how far the van is going. <b>Processing delay</b> is the few seconds a sorting office spends reading each label. <b>Queuing delay</b> is your parcel sitting in a full sorting office because more arrived than could be handled. Buying a bigger loading bay does nothing for the drive, and the drive is usually what you are waiting for.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Latency</b></td>
+      <td>The time from the source sending a packet to the destination receiving it.</td>
+      <td>New York to London is 5,585 km: 28 ms one way in fibre, 56 ms for the round trip.</td>
+      <td>vs <b>bandwidth</b>, the maximum throughput of the path. They are different quantities with different economics, and conflating them is the single most common mistake in this subject. For most websites, latency is the bottleneck.</td>
+    </tr>
+    <tr>
+      <td><b>Propagation delay</b></td>
+      <td>Time for a message to travel from sender to receiver: <b>distance ÷ signal speed</b>.</td>
+      <td>Light in a vacuum is 299,792,458 m/s. In optical fibre the rule of thumb is <b>200,000,000 m/s</b>, a refractive index of about 1.5.</td>
+      <td>vs <b>transmission delay</b>. Propagation is a function of distance and nothing else; transmission is a function of link rate and nothing else. This is the delay you cannot buy your way out of, and the only lever on it is <b>shorter distance</b> — which is what a content delivery network is for.</td>
+    </tr>
+    <tr>
+      <td><b>Transmission delay</b></td>
+      <td>Time to push all the packet's bits onto the link: <b>packet length ÷ data rate</b>.</td>
+      <td>A 10 Mb file takes <b>10 seconds</b> to put on the wire over a 1 Mbps link and <b>0.1 seconds</b> over a 100 Mbps link.</td>
+      <td>vs propagation again: this one has <b>nothing to do with the distance</b> between client and server. It is also the delay that more bandwidth genuinely fixes, which is why bandwidth upgrades help large transfers and barely help page loads.</td>
+    </tr>
+    <tr>
+      <td><b>Processing delay</b></td>
+      <td>Time for a router to examine the packet header, check for bit-level errors, and determine the outgoing route.</td>
+      <td>Much of this is now done in hardware, so the delays are very small — but they exist, and they are incurred <b>at every hop</b>.</td>
+      <td>vs queuing delay, which is time spent <i>waiting</i> to be processed rather than time spent <i>being</i> processed. More intermediate routers raise processing and transmission delay for each packet; heavier traffic raises queuing delay.</td>
+    </tr>
+    <tr>
+      <td><b>Queuing delay</b></td>
+      <td>Time an incoming packet waits in a router's buffer before it can be processed.</td>
+      <td>If packets arrive faster than the router can handle, they are buffered — and the wait is queuing delay.</td>
+      <td><b>Bufferbloat</b> is this delay gone wrong: routers shipped with very large incoming buffers on the assumption that dropping packets should be avoided at all costs. That breaks TCP's congestion avoidance mechanisms and introduces <b>high and variable</b> latency. Active queue management — the CoDel algorithm — was proposed to address it.</td>
+    </tr>
+    <tr>
+      <td><b>Last-mile latency</b></td>
+      <td>The delay in the first few hops between you and your provider's core network.</td>
+      <td>One regulator's peak-hour measurements: <b>18 ms</b> average for fibre-to-the-home, <b>26 ms</b> for cable, <b>44 ms</b> for DSL — just to reach the nearest measuring node.</td>
+      <td>vs the intuition that crossing oceans is the expensive part. It is often the last few miles, not the continents, where significant latency appears. When choosing a provider for browsing speed, low latency is worth optimising for.</td>
+    </tr>
+    <tr>
+      <td><b>Bandwidth at the edge</b></td>
+      <td>Available throughput is set by the <b>lowest-capacity link</b> anywhere between client and server.</td>
+      <td>Core fibre links carry hundreds of terabits per second — over 400 wavelengths multiplexed at up to 171 Gbit/s each, more than 70 Tbit/s per fibre. The edge is nothing like that.</td>
+      <td>vs assuming a fast link to your provider guarantees end-to-end performance. It does not: any intermediate node can be congested from demand, hardware failure or attack. High variability of both throughput and latency is an inherent property of these networks.</td>
+    </tr>
+    <tr>
+      <td><b>Great-circle path</b></td>
+      <td>The shortest route between two points on the globe — the best case for propagation.</td>
+      <td>New York to Sydney is 15,993 km, giving a 160 ms round trip in fibre along the great circle.</td>
+      <td>vs the real number. No such cable exists, so the packet takes a much longer route, and each extra hop adds routing, processing, queuing and transmission delay. The actual round trip is in the <b>200–300 ms</b> range.</td>
+    </tr>
+  </table>
+
+  <h3>Why the two problems have different futures</h3>
+  <ul>
+    <li><b>Bandwidth is solvable.</b> Add more fibres to a link, deploy more links along congested routes, or improve the multiplexing to push more data through the fibre you already have. Between 2007 and 2011, more than half the added capacity on trans-Pacific cables came from <b>better equipment at both ends of existing fibre</b>, not new cable — and as of 2011 only about <b>20%</b> of deployed subsea capacity was in use. Every medium eventually reaches diminishing returns, but there is no fundamental reason throughput cannot keep increasing.</li>
+    <li><b>Latency is not.</b> Better materials with a lower refractive index and faster routers would help a little, but we are already within roughly 1.5× of the speed of light, so the most that strategy can deliver is a <b>modest ~30% improvement</b>. The alternative is to make the distance shorter, which means laying cable along the great circle — constrained by terrain, politics and cost.</li>
+    <li><b>So you design around it.</b> Reduce round trips, move the data closer to the client, and hide what remains behind caching and pre-fetching. Those are the only three moves, and everything in parts 2 to 4 is one of them.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>The numbers that make it a human problem</h4>
+    <p>Most people reliably report perceptible <b>lag</b> once a delay over <b>100–200 ms</b> is introduced. Past <b>300 ms</b> the interaction is described as sluggish. At <b>1,000 ms</b> many users have already performed a mental context switch — a daydream, or the next task. Set that against a 160 ms round trip to Sydney under ideal conditions and the budget becomes obvious: applications need to respond within hundreds of milliseconds, and the network does not leave much room for error.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — &ldquo;faster internet&rdquo; is not one thing</h4>
+    <p><b>More bandwidth</b> reduces transmission delay. It helps most when you are moving a lot of bytes at once — a video stream, a large download.<br>
+    <b>It does not touch propagation delay</b>, which is set by distance, so it barely helps a page that makes many small requests and waits for each answer. That page is spending round trips, not bytes.<br>
+    <b>The test:</b> if you doubled the link speed, would the thing you are waiting for finish in half the time? If it wouldn't, you have a latency problem, and no amount of capacity will fix it.</p>
+  </div>
+
+  <h3>Anchor sketch — the four delays, and which ones bend</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = the node that matters most</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">   total latency = the sum of four delays, at EVERY hop
+                          |
+  <span class="tks">PROPAGATION</span>   distance / speed of the signal
+        light in vacuum  299,792,458 m/s
+        light in FIBRE  ~200,000,000 m/s  (index ~1.5)
+        NY - London  5,585 km  = 28 ms one way, 56 ms RTT
+        NY - Sydney 15,993 km  = 160 ms RTT on the great
+              circle; 200-300 ms on the cables that exist
+        |
+        +--> the ONLY lever is a shorter distance.
+             that is what a CDN is.
+        |
+  <span class="tk1">TRANSMISSION</span>  packet bits / link data rate
+        a 10 Mb file: 10 s at 1 Mbps, 0.1 s at 100 Mbps
+        nothing whatsoever to do with distance
+        |
+        +--> this is the delay more bandwidth fixes
+        |
+  <span class="tk1">PROCESSING</span>    read the header, check for errors, route
+        mostly hardware now: small, but once per hop
+        |
+  <span class="tk1">QUEUING</span>       waiting in a router's incoming buffer
+        big buffers look kind, break TCP congestion
+        avoidance, and add HIGH and VARIABLE delay
+        = BUFFERBLOAT
+                          |
+                          v
+   bandwidth: more fibre, more links, better multiplexing.
+              an engineering and money problem.
+   latency:   already within ~1.5x of light speed, so a
+              better cable buys ~30% at most.
+              not a money problem. design around it.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Which two delays are functions of distance and link rate respectively, and which is a function of neither?<br>
+      <span class="q">Q</span> A colleague proposes upgrading the office link to fix a slow page. What do you ask first?<br>
+      <span class="q">Q</span> Why does a bigger router buffer make latency <i>worse</i>?
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>More bandwidth</td><td>Lower transmission delay: large transfers finish sooner.</td><td>Money, and nothing at all for propagation delay — so a request-heavy page barely improves.</td><td>You are moving many bytes at once: video, downloads, backups.</td></tr>
+    <tr><td>A content delivery network</td><td>The only real lever on propagation delay — the data is physically closer, so every round trip is shorter.</td><td>Operational complexity, cost, and cache-invalidation discipline.</td><td>Almost always, and especially for globally distributed users.</td></tr>
+    <tr><td>Better fibre and faster routers</td><td>A little propagation delay and a little processing delay.</td><td>Capital expenditure for at most a <b>~30%</b> improvement, because we are already close to the physical limit.</td><td>Rarely a lever available to you; know the ceiling so you can say why.</td></tr>
+    <tr><td>Laying a shorter cable</td><td>Genuinely less distance — the one thing that moves the floor.</td><td>Enormous cost, and constrained by terrain, politics and permission.</td><td>When milliseconds are worth millions. It is done, and it is priced accordingly.</td></tr>
+    <tr><td>Large router buffers</td><td>Fewer dropped packets.</td><td><b>Bufferbloat</b> — TCP's congestion avoidance depends on drops as a signal, so hiding them produces high and variable delay.</td><td>Never as a default. Active queue management is the answer instead.</td></tr>
+    <tr><td>Designing around latency</td><td>Fewer round trips, data closer to the client, and the rest hidden behind caching and pre-fetching.</td><td>Application complexity — you are now doing work the network will not do for you.</td><td>Always. It is the only strategy that scales with distance.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;The connection is slow.&rdquo;</td><td>&ldquo;Slow how — low throughput or high latency? They have different causes and different fixes, and for most pages it's latency.&rdquo;</td></tr>
+    <tr><td>&ldquo;Let's upgrade the bandwidth.&rdquo;</td><td>&ldquo;That reduces transmission delay. If we're waiting on round trips rather than bytes, it will barely move. Where's the time actually going?&rdquo;</td></tr>
+    <tr><td>&ldquo;We're on the other side of the world, that's just how it is.&rdquo;</td><td>&ldquo;Right — 200 to 300 milliseconds round trip in practice. We can't beat that, so we either reduce the number of round trips or move the data closer.&rdquo;</td></tr>
+    <tr><td>&ldquo;A CDN makes the site faster.&rdquo;</td><td>&ldquo;Specifically it cuts propagation delay by shortening the distance. It's the only lever we have on the one delay that isn't a money problem.&rdquo;</td></tr>
+    <tr><td>&ldquo;Our router has a big buffer so nothing gets dropped.&rdquo;</td><td>&ldquo;That's bufferbloat. TCP needs drops as a congestion signal — hiding them gives us high and variable latency instead.&rdquo;</td></tr>
+    <tr><td>&ldquo;The problem must be somewhere in the middle of the internet.&rdquo;</td><td>&ldquo;Check the last mile first. Tens of milliseconds can go before the packet even reaches the provider's core.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A team's dashboard takes 4.2 seconds to become interactive for users in Sydney, against 1.1 seconds in London where the servers are. The page makes 78 requests. Someone proposes upgrading the origin's uplink from 1 Gbps to 10 Gbps, arguing that the origin is &ldquo;clearly saturated&rdquo; because Sydney is four times slower.</p>
+    <p><b>(a)</b> Explain, in terms of the four delays, why the Sydney figure is what it is and why the uplink upgrade will not help. <b>(b)</b> Estimate the floor: state the round-trip time you would expect and the arithmetic that gets you there, and say what the 78 requests do to it. <b>(c)</b> Give the two structurally different fixes available, say which delay each attacks, and name the one thing that would genuinely lower the floor and why nobody does it.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>An office reports that video calls became choppy and web browsing became erratic after the IT team replaced the gateway with a model advertising &ldquo;zero packet loss under load&rdquo;. Throughput tests still show the full contracted line speed. The team's conclusion is that the provider must be throttling.</p>
+    <p><b>(a)</b> Name the most likely cause and explain the mechanism, including why the throughput test looks fine. <b>(b)</b> Explain precisely why a design goal of never dropping packets makes things worse rather than better. <b>(c)</b> Name the class of solution, and separately say why moving the video server closer would not fix this particular problem.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — what each delay depends on</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does it depend on how <i>loaded</i> the path is? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — it is the same on an idle network</div>
+      <div class="colh">Yes — it grows with traffic</div>
+
+      <div class="rowh">Does NOT<br>depend on<br>distance</div>
+      <div class="cell"><b>Transmission and processing</b>
+        Pushing the bits onto the link, then reading the header and routing at each hop.<br>
+        <i>Move:</i> transmission is the one bandwidth genuinely fixes — 10 Mb takes 10 s at 1 Mbps and 0.1 s at 100 Mbps. Processing is mostly hardware now and small, but you pay it once per hop.</div>
+      <div class="cell"><b>Queuing</b>
+        Your packet waiting in a router's incoming buffer because arrivals outpaced service.<br>
+        <i>Move:</i> this is where bufferbloat lives. Oversized buffers hide the drops TCP uses as a congestion signal, so you get high and <i>variable</i> delay instead of a clean backoff. Active queue management, not more buffer.</div>
+
+      <div class="rowh">DEPENDS on<br>distance</div>
+      <div class="cell focus"><b>Propagation</b>
+        Distance divided by signal speed. In fibre, about 200,000 km per second.<br>
+        <i>Move:</i> there is exactly one lever, and it is not money — <b>shorten the distance</b>. That is what a CDN buys. Everything else in this booklet exists because this number cannot be reduced any other way.</div>
+      <div class="cell"><b>The real path, not the great circle</b>
+        Longer routes mean more hops, and every extra hop brings its own processing, transmission and queue.<br>
+        <i>Move:</i> this is why the 160 ms great-circle figure for New York to Sydney is 200–300 ms in practice. Never quote the physics number as the expected number.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the left column is what you get on a quiet network and the right is what load adds. The bottom-left is the focus because it is the only cell where spending money on capacity changes nothing at all — and it is usually the cell you are actually stuck in.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Before proposing a fix, say which delay it reduces.</b> If the answer is &ldquo;transmission&rdquo; and you are waiting on round trips, you have bought nothing. Latency is not a capacity problem, and the only three moves against it are fewer round trips, shorter distance, and hiding it behind work done in advance.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>What HTTP/1.x makes you do</h2>
+    <p>One missing feature — multiplexing — and the pile of workarounds it generates.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Setting up a connection costs a round trip before you've asked for anything. Reusing one connection instead of opening a new one for every file is the single biggest easy win.</li>
+      <li>You'd think you could fire off all your questions at once. You can — but the answers must come back <i>in order</i>, so one slow answer holds up every answer behind it.</li>
+      <li>Because of that, browsers just open six connections at once and hope.</li>
+      <li>Developers then split their files across several hostnames to get more than six, and glue small files together to ask fewer times.</li>
+      <li>None of that is clever. It is all patching around one thing the protocol cannot do: send two answers down one connection at the same time.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A serving hatch with one window. You can queue up and order one dish at a time, waiting at the hatch after each order — that is a connection without reuse, and you walk back and forth for every dish. Keepalive means you stay at the hatch. <b>Pipelining</b> means you shout all your orders at once, which is better — except the hatch is only wide enough to pass one plate at a time and they must come out in the order you asked. So if your first dish takes twenty minutes, the salad that was ready in one minute sits on the counter behind it. That is <b>head-of-line blocking</b>, and the restaurant's answer is not a wider hatch: it is opening six hatches.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Keepalive</b> <span style="white-space:nowrap">(persistent connection)</span></td>
+      <td>Reusing one TCP connection for several HTTP requests. Two names, one feature.</td>
+      <td>Without it, every request costs <b>two round trips</b> — one for the handshake, one for request and response. With it, only the first does.</td>
+      <td>The saving for N requests is <b>(N−1) × RTT</b>, and the average page is now 90-plus resources, so the potential saving is measured in seconds. Enabled by default in HTTP 1.1. Watch your libraries: many default to non-keepalive because it gives a simpler API.</td>
+    </tr>
+    <tr>
+      <td><b>Pipelining</b></td>
+      <td>Dispatching requests without waiting for each response, moving the first-in-first-out queue from the client to the server.</td>
+      <td>Eliminates the idle round trip between responses, and lets the server process requests in parallel.</td>
+      <td>vs <b>multiplexing</b>, which HTTP 1.x does not have. Pipelining reorders <i>when requests are sent</i>; it does not allow response data to be interleaved. That distinction is the whole of the next row.</td>
+    </tr>
+    <tr>
+      <td><b>Head-of-line blocking</b></td>
+      <td>HTTP 1.x requires <b>strict serialisation of responses</b>: each must be returned in full before the next one's bytes can be sent.</td>
+      <td>Client requests HTML (40 ms) and CSS (20 ms) together. The server finishes the CSS first — and must buffer it until the HTML is fully sent.</td>
+      <td>vs the <b>TCP</b> version of the same phrase, where a lost packet blocks every packet with a higher sequence number until it is retransmitted. Same name, different layer. The consequences here: underused links, server buffering costs, and unpredictable client latency.</td>
+    </tr>
+    <tr>
+      <td><b>Six connections per host</b></td>
+      <td>The browser's workaround for the absence of multiplexing: open several TCP sessions to the same origin.</td>
+      <td>Six parallel requests, six parallel server-side processes, and the initial congestion window effectively multiplied by six.</td>
+      <td>vs a solution. It buys parallelism at the cost of sockets, memory and CPU on client, server and every intermediary, plus streams competing for the same bandwidth. The number is a safe middle ground, not a calculation.</td>
+    </tr>
+    <tr>
+      <td><b>Self-inflicted denial of service</b></td>
+      <td>The connection limit protects the server — and can block your own application.</td>
+      <td>Open six parallel downloads to one host and issue a seventh: it hangs until one completes.</td>
+      <td>The trap: a WebSocket, an SSE stream or a hanging request each occupies a <b>full TCP stream even while idle</b>, because there is no multiplexing. Three long-lived connections leave you three ordinary requests.</td>
+    </tr>
+    <tr>
+      <td><b>Domain sharding</b></td>
+      <td>Splitting resources across several hostnames so the browser's per-host limit applies several times.</td>
+      <td>Shards are often CNAME records pointing at the same server: limits are enforced per <b>hostname</b>, not per IP address.</td>
+      <td>vs a free win. Each new hostname costs a DNS lookup, more sockets on both sides, and manual management of where resources live. Overused, it produces many connections that never escape TCP slow-start. There is <b>no formula</b> for the right number — it depends on the page and on each client's bandwidth and latency.</td>
+    </tr>
+    <tr>
+      <td><b>Protocol overhead</b></td>
+      <td>The HTTP metadata carried on every request, always in plain text, uncompressed.</td>
+      <td><b>500–800 bytes</b> per browser-initiated request before cookies. A 15-character JSON body wrapped in 352 bytes of headers is <b>96%</b> overhead.</td>
+      <td>vs the payload, which is often the smaller half. Headers are plain text for backwards compatibility; the standard sets no size limit, though many servers and proxies enforce 8 KB or 16 KB. Cookies are the usual largest offender and the usual forgotten one.</td>
+    </tr>
+    <tr>
+      <td><b>Concatenation · spriting</b></td>
+      <td>Combining several scripts or stylesheets into one resource; combining several images into one composite.</td>
+      <td>The byte delivery is the same as if pipelining worked — you have moved the pipelining logic up into your application.</td>
+      <td>vs free. All the bundled resources share one cache key, so a one-line change invalidates the lot; the bundle may contain code this page never needs; a sprite must be decoded and held in memory whole; and neither CSS nor JavaScript executes until the entire file has arrived.</td>
+    </tr>
+    <tr>
+      <td><b>Resource inlining</b></td>
+      <td>Embedding a resource in the document — script and style blocks, or the <code>data:</code> URI scheme for anything else.</td>
+      <td>Rule of thumb: consider it for resources under <b>1–2 KB</b>, below which the HTTP overhead often exceeds the resource.</td>
+      <td>vs bundling. An inlined resource is <b>part of the page</b>, so it cannot be cached separately by the browser, a CDN or any proxy — inline it on ten pages and it ships ten times. Non-text assets need base64, which costs <b>33%</b> byte expansion.</td>
+    </tr>
+  </table>
+
+  <h3>The arithmetic of a round trip saved</h3>
+  <ul>
+    <li>The minimum cost of one HTTP request over a <b>new</b> TCP connection is <b>two network round trips</b>: one for the handshake, one for the request-response cycle. That is a fixed cost on every non-persistent session, on top of whatever the server takes to produce the answer.</li>
+    <li><b>The faster your server, the more the fixed cost dominates.</b> Halving your server time does nothing to the two round trips.</li>
+    <li>Worked example over a 28 ms one-way link, fetching an HTML document (40 ms of server time) and a CSS file (20 ms): <b>284 ms</b> over two separate connections; <b>228 ms</b> with keepalive, which removes one handshake; <b>172 ms</b> with pipelining, which removes an idle round trip between the two responses. That is a <b>40% reduction from protocol choices alone</b> — and the saving is not fixed. The higher the latency and the more requests, the larger it gets.</li>
+    <li>One vendor reported a <b>3× improvement</b> for users on slower networks after making better use of existing connections through keepalive and pipelining in a desktop client.</li>
+  </ul>
+
+  <h3>Why pipelining failed, precisely</h3>
+  <p>In theory the server could process pipelined requests in parallel and save another 20 ms. In practice, strict response serialisation means it cannot deliver them out of order, and that produces a list of problems the standard gives no guidance on:</p>
+  <ul>
+    <li>A single slow response blocks every request behind it.</li>
+    <li>Servers processing in parallel must <b>buffer</b> the completed responses — and a very large response can exhaust server resources, which is an attack vector.</li>
+    <li>A failed response may terminate the connection, forcing the client to re-request everything after it, which can duplicate processing.</li>
+    <li>Detecting whether pipelining is safe is hard when intermediaries may be present: some abort the connection, others serialise everything.</li>
+  </ul>
+  <p>Consequently browsers ship with it disabled or hidden behind an advanced setting. It remains genuinely useful <b>when you control both ends</b> — your client and your server, your retries and your idempotency, tunnelled over TLS so intermediaries cannot interfere.</p>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — these are workarounds, not best practices</h4>
+    <p><b>Two recommendations are evergreen</b> and will be true under any protocol: eliminate unnecessary network latency, and minimise the bytes transferred. Fewer DNS lookups, fewer requests, a CDN, cache headers, compression, no redirects — all of these follow from those two.<br>
+    <b>Sharding, bundling, spriting and inlining are different.</b> They exist to paper over one missing protocol feature. They are necessary today and you should know them cold, but they are not virtues, and each one buys its round trips with cache granularity, memory or complexity.<br>
+    <b>The tell:</b> if a technique would become pointless the moment the protocol could interleave responses, it is a workaround.</p>
+  </div>
+
+  <h3>Anchor sketch — one missing feature, five consequences</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   HTTP 1.x cannot MULTIPLEX: one response must be sent
+   in full before the next one's bytes can go out
+                          |
+   no keepalive -> 2 RTT per request (handshake, then
+                   request+response). a fixed cost.
+   <span class="tk2">KEEPALIVE</span>    -> 2 RTT for the first, 1 for every
+                   other. saving = (N-1) x RTT, and the
+                   average page is 90+ resources.
+        |
+   <span class="tk2">PIPELINING</span>   -> send them all; the FIFO queue moves
+                   from client to server. saves another
+                   RTT, and allows parallel processing.
+        |
+        +--> <span class="tks">HEAD-OF-LINE BLOCKING</span>  the CSS is ready
+        |    first and must WAIT for the HTML to finish
+        +--> servers must buffer completed responses
+        |    -> an attack vector
+        +--> a failed response can kill the connection
+        +--> intermediaries mangle or serialise it
+        = disabled in browsers. still excellent when you
+          control both ends, tunnelled over TLS.
+        |
+   so the browser opens <span class="tk2">6 CONNECTIONS PER HOST</span>
+        buys: 6 requests in flight, ~6x the initial cwnd
+        costs: sockets, memory, CPU, competing streams
+        and the 7th request simply waits -- which a
+        long-lived stream will happily occupy forever
+        |
+   so you SHARD the domain for more
+        every shard = a DNS lookup + a fresh slow-start
+        no formula exists. hurts high-latency clients most.
+        |
+   so you CONCATENATE, SPRITE and INLINE
+        = pipelining moved up into your application
+        costs: cache granularity, memory, delayed execution
+                          |
+                          v
+   none of the last three are optimisations.
+   they are workarounds for ONE missing feature.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give the keepalive saving as a formula, and say why the number of resources matters.<br>
+      <span class="q">Q</span> Pipelining sends requests in parallel. What exactly still cannot happen, and what four problems follow?<br>
+      <span class="q">Q</span> Name the cost of each of sharding, bundling and inlining — one distinct cost each.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Keepalive</td><td>(N−1) × RTT, no handshake per request, no repeated slow-start.</td><td>Essentially nothing. Idle connections hold resources, which is why intermediaries time them out.</td><td>Always. Check your libraries and proxies actually have it on.</td></tr>
+    <tr><td>Pipelining</td><td>Another round trip removed, and parallel processing on the server.</td><td>Head-of-line blocking, server buffering, fragile behaviour through intermediaries, and complex retry semantics.</td><td>Only when you control client and server, handle aborts and idempotency, and tunnel over TLS.</td></tr>
+    <tr><td>Six connections per host</td><td>Six requests in flight and a much larger effective initial congestion window.</td><td>Sockets and memory everywhere, competition between your own streams, and a hard ceiling that long-lived streams can consume.</td><td>You don't choose it — the browser does. Know what it implies for streaming transports.</td></tr>
+    <tr><td>Domain sharding</td><td>More parallelism than six.</td><td>A DNS lookup per shard, fresh slow-start per connection, and manual resource placement. Overuse actively slows things down.</td><td>Start at zero shards, add carefully, and measure. Very few sites benefit beyond about a dozen connections.</td></tr>
+    <tr><td>Concatenation and spriting</td><td>Fewer requests, less per-request overhead, and back-to-back delivery — pipelining at the application layer.</td><td>One cache key for everything, unused code shipped, whole-bundle invalidation on any change, sprite memory held in full, and execution delayed until the whole file lands.</td><td>Many small blocking resources. Consider splitting a stable core from volatile code.</td></tr>
+    <tr><td>Inlining</td><td>The request disappears entirely.</td><td>Uncacheable as a separate resource, duplicated on every page that inlines it, invalidating the host document on every change, and 33% expansion for binary assets.</td><td>Small, page-specific, rarely-changing resources — roughly under 1–2 KB.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We reuse the connection.&rdquo;</td><td>&ldquo;Keepalive, which saves (N−1) round trips across N requests — and with 90-odd resources on a page that's seconds, not milliseconds.&rdquo;</td></tr>
+    <tr><td>&ldquo;We send all the requests at once.&rdquo;</td><td>&ldquo;Pipelining moves the FIFO queue to the server. Responses still can't interleave, so one slow response blocks everything behind it.&rdquo;</td></tr>
+    <tr><td>&ldquo;Let's turn on pipelining in the browser.&rdquo;</td><td>&ldquo;It's disabled almost everywhere for good reasons — buffering, aborted connections, broken intermediaries. It's a win only when we own both ends and tunnel it.&rdquo;</td></tr>
+    <tr><td>&ldquo;Add more shards and it'll go faster.&rdquo;</td><td>&ldquo;Each shard costs a DNS lookup and a fresh slow-start. There's no formula — start at none, add carefully, and measure. Mobile clients suffer most.&rdquo;</td></tr>
+    <tr><td>&ldquo;We bundled everything into one file.&rdquo;</td><td>&ldquo;Which is application-layer pipelining. The bill is cache granularity: one change invalidates the whole bundle, and nothing executes until it all arrives.&rdquo;</td></tr>
+    <tr><td>&ldquo;We inlined the icons to save requests.&rdquo;</td><td>&ldquo;Then they're part of the document and can't be cached separately, and base64 added a third to their size. Fine under a kilobyte or two, expensive above it.&rdquo;</td></tr>
+    <tr><td>&ldquo;The seventh download just hangs.&rdquo;</td><td>&ldquo;Six connections per host, and our streaming connections are holding some of them. Without multiplexing an idle stream still occupies a full socket.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>A dashboard opens two Server-Sent Event streams and a long-lived polling request to <code>api.example.com</code>, then loads chart data from the same host. Users report that the fourth chart on the page never loads until they close a panel. A developer, seeing the streams are idle most of the time, argues they &ldquo;cost nothing when no data is flowing&rdquo; and proposes adding a fifth stream for notifications.</p>
+    <p><b>(a)</b> Name what is happening and explain the mechanism, including why the streams being idle is irrelevant. <b>(b)</b> Say what the underlying protocol limitation is and why the browser's behaviour here is a deliberate safety feature that has backfired. <b>(c)</b> Give two structurally different fixes, and say what each one costs.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>A team bundles all 40 of its JavaScript modules into one 900 KB file and all 120 of its icons into one sprite sheet. Desktop metrics improved. Mobile metrics got worse, repeat-visit performance got worse, and one engineer reports the app being killed on older handsets. The team's proposal is to shard the bundle across four subdomains so it downloads in parallel.</p>
+    <p><b>(a)</b> Explain each of the three regressions in terms of what bundling actually trades away. <b>(b)</b> Say whether sharding addresses any of them, and justify the answer. <b>(c)</b> Give the changes you would make instead, and state what remains true regardless of protocol.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — fewer requests, or cheaper ones</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does it make each request <i>cheaper</i>? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — the same cost per request</div>
+      <div class="colh">Yes — fewer round trips or bytes each</div>
+
+      <div class="rowh">Does NOT<br>reduce the<br>NUMBER of<br>requests</div>
+      <div class="cell"><b>Run them at once instead</b>
+        Six connections per host; domain sharding.<br>
+        <i>Move:</i> understand that this changes neither the count nor the price — it only overlaps the waiting. And every extra connection costs a socket, and every extra shard costs a DNS lookup and a fresh slow-start. Start at zero shards and measure.</div>
+      <div class="cell"><b>Keepalive and pipelining</b>
+        Same requests, fewer round trips: <i>(N−1) × RTT</i> from reuse, and one more from pipelining.<br>
+        <i>Move:</i> keepalive always. Pipelining only when you own both ends, because responses still cannot interleave. Also here: gzip, which cuts text transfers by 60–80% for one configuration flag.</div>
+
+      <div class="rowh">REDUCES the<br>number of<br>requests</div>
+      <div class="cell"><b>Bundling, spriting, inlining</b>
+        Fewer requests, and the bytes come back to back as if pipelining worked.<br>
+        <i>Move:</i> use it, and price it honestly. You pay in cache granularity, in memory for decoded sprites, in code this page never needed, and in execution that waits for the whole file. Inlining additionally costs 33% for anything binary.</div>
+      <div class="cell focus"><b>Caching, and deleting</b>
+        A cache header that avoids the request entirely; an unused asset removed; a redirect that never happens.<br>
+        <i>Move:</i> this is the only cell that costs nothing elsewhere, and it is the one people skip. <b>No request is faster than a request not made.</b> Expires and ETag first, then fewer resources, then a CDN — and only then start rearranging the ones that remain.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the top-left is where most tuning effort goes and where the least is gained. The two evergreen recommendations — eliminate unnecessary latency, minimise transferred bytes — both live in the bottom-right, and unlike everything else on this page they will still be true under any future protocol.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Ask whether the technique would survive multiplexing.</b> Keepalive, caching, compression and deleting resources would. Sharding, bundling, spriting and inlining would not — they are compensation for a protocol that cannot interleave responses, and each one is paid for in cache granularity, memory or complexity.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>Push, cheaply</h2>
+    <p>Server-Sent Events: one HTTP response that never ends, and how much the browser does for you.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Normally you ask and the server answers. If you want to know the moment something changes, asking over and over is wasteful and always slightly late.</li>
+      <li>Instead the server answers once and simply never finishes: it keeps the connection open and writes new lines as things happen.</li>
+      <li>The format is almost embarrassingly simple — lines beginning <code>data:</code>, separated by blank lines.</li>
+      <li>The browser does the fiddly parts: it splits the messages, tells your code about each one, and if the connection drops it reconnects on its own and says which message it got last.</li>
+      <li>Two catches: the server can talk, but you cannot talk back on it; and it is text only.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A live radio commentary versus phoning the ground every thirty seconds to ask the score. Phoning back repeatedly costs a call each time and you are always up to half a minute behind — that is polling. The commentary is one call that stays open, and you hear each goal the moment it happens. If the line drops, a good service dials back automatically and says &ldquo;you last heard the 41st minute&rdquo;, so nothing is missed. What you cannot do is talk back down the commentary line, and you cannot receive a photograph on it.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Server-Sent Events</b></td>
+      <td>Efficient <b>server-to-client</b> streaming of text-based event data over a single long-lived HTTP connection.</td>
+      <td>Two components: the <code>EventSource</code> interface in the browser, and the <b>event stream</b> data format on the wire.</td>
+      <td>vs rolling your own streaming request. Under the hood SSE is an efficient cross-browser implementation of exactly that — the difference is that the browser handles connection management and message parsing, so your code holds only the business logic.</td>
+    </tr>
+    <tr>
+      <td><b>EventSource</b></td>
+      <td>The browser API: give it a URL, register callbacks, and receive each message as a DOM event.</td>
+      <td><code>onopen</code> when established, <code>onerror</code> on failure, <code>onmessage</code> for untyped events, and <code>addEventListener</code> for a named event type.</td>
+      <td>vs a raw streaming request, which <b>buffers the whole response</b> until the connection drops. An SSE connection can discard processed messages instead of accumulating them, so there are <b>no unbounded buffers</b>. It can also stream from another origin using the same permission workflow as an ordinary cross-origin request.</td>
+    </tr>
+    <tr>
+      <td><b>Event stream format</b></td>
+      <td>The wire protocol: a streaming HTTP response with content type <code>text/event-stream</code>, carrying newline-delimited fields.</td>
+      <td>Four fields. <code>data:</code> — the payload, one or more adjacent lines. <code>event:</code> — an optional type. <code>id:</code> — an optional identifier. <code>retry:</code> — the reconnect interval, in milliseconds.</td>
+      <td>vs a framing protocol with lengths and types. There is no such thing here: <b>event boundaries are marked by newlines</b>, and the payload is the concatenation of the adjacent data fields. If an event has a type, a custom DOM event fires; otherwise the generic message callback is invoked.</td>
+    </tr>
+    <tr>
+      <td><b>Automatic reconnect</b></td>
+      <td>If the connection drops, the browser reestablishes it without any application code.</td>
+      <td>The specification recommends a <b>2–3 second</b> delay, which is the common default, and the server can override it at any time by sending a <code>retry</code> field.</td>
+      <td>vs a reconnect you write yourself, which you would also have to get right for every browser. Note the corollary: the client cannot easily distinguish &ldquo;quiet&rdquo; from &ldquo;dropped&rdquo;, and on a mobile radio the connection is <b>not</b> dropped merely because the radio went idle.</td>
+    </tr>
+    <tr>
+      <td><b>Last-Event-ID</b></td>
+      <td>The browser remembers the ID of the last message it saw and sends it as an HTTP header on reconnect.</td>
+      <td>Message <code>id: 43</code> arrives, the connection drops, and the reconnect request carries <code>Last-Event-ID: 43</code>. The server resumes at 44.</td>
+      <td>vs a guarantee of delivery. The browser does the remembering and the asking; <b>the recovery is entirely the server's job</b>. If lost messages are acceptable, send no IDs and let the client resume. If they are not, assign IDs and keep a local cache to retransmit from. How far back to keep is your decision.</td>
+    </tr>
+    <tr>
+      <td><b>UTF-8 only</b></td>
+      <td>All event source data is UTF-8. SSE is not a mechanism for transferring binary payloads.</td>
+      <td>You can base64 a binary object to make it stream-friendly, at the usual <b>33%</b> byte cost.</td>
+      <td>vs an oversight. It is a deliberate design decision: SSE is a simple, efficient, server-to-client transport for text. If you need binary, the right tool is a WebSocket. Note the mitigation — the stream is an ordinary HTTP response, so it can be <b>gzip compressed</b> like any other.</td>
+    </tr>
+    <tr>
+      <td><b>Server-to-client only</b></td>
+      <td>The client opens the connection and then receives. It cannot send data on it after the handshake.</td>
+      <td>So SSE does not address request streaming — uploading a large file as it is produced, for instance.</td>
+      <td>vs WebSocket, which is bidirectional. This is the first of SSE's two hard limits and the usual reason to reach past it.</td>
+    </tr>
+    <tr>
+      <td><b>SSE as a notification</b></td>
+      <td>Using the stream to say <i>that</i> something exists, and an ordinary request to fetch it.</td>
+      <td>The stream announces a new binary asset; the application dispatches a request to download it.</td>
+      <td>The trade is explicit: you pay <b>one extra round trip</b>, and you get back everything an ordinary HTTP request provides — response caching, transfer encoding, and the rest. A streamed asset cannot be cached by the browser cache at all.</td>
+    </tr>
+  </table>
+
+  <h3>What the wire actually looks like</h3>
+  <p>The client sends an ordinary request with <code>Accept: text/event-stream</code>. The server replies <code>200</code> with <code>Content-Type: text/event-stream</code>, a keepalive connection and chunked transfer encoding — and then simply keeps writing. Everything after that is text:</p>
+  <ul>
+    <li><code>retry: 15000</code> sets the client's reconnect delay to 15 seconds.</li>
+    <li>A line of <code>data:</code> followed by a blank line is a complete message with no type — it triggers the generic message callback.</li>
+    <li>Adding <code>event: foo</code> makes it fire as a custom DOM event of type <code>foo</code> instead.</li>
+    <li>Adding <code>id: 42</code> makes the browser remember it, and send it back on the next reconnect.</li>
+    <li>Two adjacent <code>data:</code> lines are <b>one</b> message with a newline in it, not two messages.</li>
+  </ul>
+  <p>That is the entire protocol. It is trivial to implement on a server, and the reason it is worth learning as a format rather than an API is that the simplicity of the format is exactly what lets the browser take the work off you.</p>
+
+  <div class="box tip">
+    <h4>Two deployment realities worth knowing before you ship it</h4>
+    <p><b>Intermediaries.</b> Proxies and firewalls that are not stream-aware may <b>buffer</b> the event stream, which turns into increased latency or an outright broken connection. The reliable answer is to deliver the stream over TLS, so nothing in the middle is in a position to buffer it.</p>
+    <p><b>Batteries.</b> Real-time push, exactly like polling, can be expensive on a handset. Batch messages so the radio is woken less often, and do not add application-level keepalives you do not need — the connection is not dropped simply because the radio has gone idle.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — low latency here means one specific thing</h4>
+    <p><b>It does not mean</b> the packets travel faster. Switching from polling to a streaming transport does not change the round trip between client and server at all; that is propagation delay and it is set by physics and distance.<br>
+    <b>It means the queuing latency is gone.</b> With polling, a message can be sitting ready on the server and still wait for the next client request — the delay is a function of your polling interval. With a persistent connection the server dispatches it the moment it exists.<br>
+    <b>Say it precisely:</b> streaming eliminates <i>message queuing</i> latency, not <i>propagation</i> latency.</p>
+  </div>
+
+  <h3>Anchor sketch — an HTTP response that never ends</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   an ordinary HTTP request whose response never finishes
+        -> GET /stream    Accept: text/event-stream
+        &lt;- 200 OK         Content-Type: text/event-stream
+                          Transfer-Encoding: chunked
+        ... and then the server just keeps writing
+                          |
+   <span class="tk3">THE FORMAT</span>   four fields, newline-delimited
+        data:   the payload. adjacent lines join into ONE
+                message with a newline between them.
+        event:  optional type -> a custom DOM event
+        id:     optional. the browser REMEMBERS it.
+        retry:  the reconnect delay, in milliseconds
+        (a blank line ends the event. that is all there is.)
+                          |
+   <span class="tk3">WHAT THE BROWSER DOES</span> for you, free
+        parses incrementally, discards processed messages
+              -> no unbounded buffer
+        fires a DOM event per message
+        reconnects on its own (2-3 s recommended default)
+        and sends <span class="tks">LAST-EVENT-ID</span> on the reconnect
+                          |
+   <span class="tk3">WHAT YOU STILL OWE</span>
+        the actual recovery: a server-side cache, IF lost
+              messages matter. no IDs = no recovery, and
+              that is a legitimate choice.
+        gzip on the stream
+        TLS, or middleboxes may buffer your stream
+        batching, or you will wake the radio all day
+                          |
+   <span class="tk3">THE TWO HARD LIMITS</span>
+        SERVER TO CLIENT ONLY -- no request streaming
+        UTF-8 ONLY -- binary costs 33% via base64
+        |
+        +--> so use it as a DOORBELL: stream the
+             notification, fetch the asset with a normal
+             request, and get caching back for one RTT
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Name the four fields and say what a blank line does.<br>
+      <span class="q">Q</span> The browser sends the last-seen ID on reconnect. What does that guarantee, and what doesn't it?<br>
+      <span class="q">Q</span> Give both hard limits and the standard workaround for the second, including its cost.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Polling instead</td><td>Simplicity, and no long-lived connection to keep alive through your infrastructure.</td><td>Message delay bounded by the polling interval, and full HTTP overhead on every poll — hundreds of bytes of headers for nothing much.</td><td>Updates are rare and lateness is genuinely free.</td></tr>
+    <tr><td>Server-Sent Events</td><td>Messages the moment they exist; as little as <b>5 bytes</b> of overhead per message; browser-side parsing, reconnect and last-ID tracking.</td><td>A long-lived connection occupying one of six per host, text only, and one direction only.</td><td>Server-to-client text updates: notifications, feeds, progress, live figures.</td></tr>
+    <tr><td>Assigning event IDs</td><td>The client tells you where it left off, so you can retransmit what it missed.</td><td>You must implement and size a server-side cache, and decide how far back to keep.</td><td>Lost messages actually matter. If they don't, skip IDs entirely — it is a supported choice, not laziness.</td></tr>
+    <tr><td>Base64 over the stream</td><td>Binary data through a text-only transport.</td><td><b>33%</b> byte expansion, and the asset can never be cached because it was streamed.</td><td>Rarely. Prefer the notification-then-fetch pattern, or a WebSocket.</td></tr>
+    <tr><td>Notification then fetch</td><td>Caching, compression and every other HTTP service, on the asset itself.</td><td>One extra round trip per asset.</td><td>Whenever the pushed thing is large, binary, or worth caching.</td></tr>
+    <tr><td>Streaming over TLS</td><td>Intermediaries can no longer buffer or mangle the stream.</td><td>Handshake cost on connect, and certificate management.</td><td>Any real deployment. Buffering middleboxes are the classic SSE failure.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;The server pushes to the browser.&rdquo;</td><td>&ldquo;A single long-lived HTTP response with content type text/event-stream. The browser parses it incrementally and fires a DOM event per message.&rdquo;</td></tr>
+    <tr><td>&ldquo;Streaming is lower latency than polling.&rdquo;</td><td>&ldquo;It removes the queuing latency — the wait for the next poll. Propagation latency is identical; we haven't beaten the speed of light.&rdquo;</td></tr>
+    <tr><td>&ldquo;It reconnects automatically, so we won't lose messages.&rdquo;</td><td>&ldquo;It reconnects and reports the last ID it saw. Actually replaying what was missed is our server's job, and needs a cache.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll stream the thumbnails over it.&rdquo;</td><td>&ldquo;It's UTF-8 only — base64 would cost us a third, and a streamed asset can't be cached. Push a notification and fetch the image normally.&rdquo;</td></tr>
+    <tr><td>&ldquo;The stream works locally but dies in production.&rdquo;</td><td>&ldquo;Classic buffering intermediary. Put it over TLS so nothing in the middle can hold the bytes back.&rdquo;</td></tr>
+    <tr><td>&ldquo;Add a keepalive ping every ten seconds.&rdquo;</td><td>&ldquo;That wakes the radio on mobile for nothing. The connection isn't dropped because the radio went idle — check the infrastructure timeouts first.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>A trading desk streams price updates to browsers over Server-Sent Events. Every client reconnects roughly every 60 seconds, and after each reconnect traders see a gap in the tape. The stream also carries small chart images, base64-encoded into the data field, and the mobile app's battery consumption has become a complaint. The team's proposed fix is a heartbeat message every 5 seconds to &ldquo;keep the connection from dropping&rdquo;.</p>
+    <p><b>(a)</b> Explain the gap: say what the browser does on reconnect and precisely where the responsibility for the missing messages lies. <b>(b)</b> Diagnose the 60-second reconnect cycle and say why the proposed heartbeat is the wrong fix and what it will cost. <b>(c)</b> Give the correct handling for the chart images, with the cost of your approach and two things it buys back.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A team is replacing 5-second polling with a push transport for a job-progress feature: the server emits short text status lines, and at the end a downloadable report. They are choosing between Server-Sent Events and a WebSocket. An architect argues for the WebSocket on the grounds that it &ldquo;will be lower latency&rdquo; and &ldquo;we might want the client to send later&rdquo;.</p>
+    <p><b>(a)</b> Address the latency claim precisely, naming which latency changes and which does not. <b>(b)</b> Name three concrete things SSE gives them for free that they would have to build themselves on a socket. <b>(c)</b> Say how the final report should be delivered under your recommendation, and what would have to change for the WebSocket to become the right answer.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — who is talking, and in what</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is the payload <i>binary</i>? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — text (UTF-8)</div>
+      <div class="colh">Yes — binary</div>
+
+      <div class="rowh">Only the<br>SERVER<br>needs to<br>send</div>
+      <div class="cell focus"><b>Server-Sent Events</b>
+        Notifications, feeds, progress, live figures — anything the server knows first and expresses as text.<br>
+        <i>Move:</i> take it. About 5 bytes of overhead per message, gzip works on the whole stream, and the browser gives you parsing, reconnect and last-ID tracking for nothing. The cost is one of your six connections per host, and no way to talk back.</div>
+      <div class="cell"><b>SSE as a doorbell</b>
+        The push announces that a binary asset exists; an ordinary request goes and gets it.<br>
+        <i>Move:</i> pay the extra round trip. In exchange the asset is cacheable by the browser and any intermediary, gets transfer encoding, and does not cost you the 33% that base64 would.</div>
+
+      <div class="rowh">The CLIENT<br>also needs<br>to send</div>
+      <div class="cell"><b>Depends how often</b>
+        Occasional client messages are ordinary requests — transactional, cacheable, authenticated, free.<br>
+        <i>Move:</i> don't reach for a socket because the client sends <i>sometimes</i>. SSE downward plus normal requests upward is a perfectly good design and keeps every browser service. Reach for a socket when upward messages are frequent and latency-sensitive.</div>
+      <div class="cell"><b>WebSocket</b>
+        Both directions, either type, at any time — the only transport that does all of it.<br>
+        <i>Move:</i> Part 4. Note what the cell costs before you enter it: no caching, no automatic compression, no content type, and head-of-line blocking of your own making.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the top-left cell is far larger than people expect, and the bottom-right far smaller. Most &ldquo;we need a socket&rdquo; requirements are really the top row plus the occasional ordinary request — and choosing the socket for those gives away caching, compression and metadata to buy something you were not going to use.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Ask what the client needs to send, and how often.</b> If the answer is &ldquo;nothing&rdquo; or &ldquo;occasionally, and it can be an ordinary request&rdquo;, a one-way text stream plus normal requests will beat a socket on everything except upward latency — and will keep the caching, compression and reconnection logic you would otherwise be writing yourself.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>The full socket</h2>
+    <p>WebSocket: both directions, text and binary — and every service the browser stops providing.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>This is the closest thing to a plain two-way pipe the browser will give you. Either side can send anything, any time.</li>
+      <li>It starts life as a normal web request that asks to be <i>upgraded</i>. Once the server agrees, HTTP is over and a different protocol takes the wire.</li>
+      <li>Messages are chopped into frames with a tiny header — a handful of bytes instead of the several hundred an ordinary request carries.</li>
+      <li>The catch is that nothing in the middle understands the pipe any more. No caching, no automatic compression, no labels on the data.</li>
+      <li>And the old problem is back: two messages cannot share the pipe at the same time, so one big message stalls the small urgent ones behind it.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A dedicated phone line between two offices, installed by asking the public exchange for it and then never hanging up. It is fast, private and either side can speak at any moment. What you lose the moment it stops being a normal call is everything the public network was quietly doing: no operator who can put a common enquiry through to a recorded answer, no line that compresses your speech, no record of what kind of call it was. And the line carries one conversation at a time — start reading a long document down it and the urgent one-word message waits until you finish.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>WebSocket</b></td>
+      <td><b>Bidirectional, message-oriented</b> streaming of text and binary data. The closest API to a raw network socket in the browser.</td>
+      <td>It is more than a socket: the browser adds connection negotiation, same-origin enforcement, interoperability with HTTP infrastructure, message framing, and subprotocol negotiation.</td>
+      <td>vs a replacement for the others. It is not one. The design intent is to layer <i>custom</i> application protocols — and the price of custom is that the application must supply the state management, compression and caching the browser otherwise provides.</td>
+    </tr>
+    <tr>
+      <td><b>The Upgrade handshake</b></td>
+      <td>The connection begins as an HTTP request carrying <code>Connection: Upgrade</code> and <code>Upgrade: websocket</code>, answered with <b>101 Switching Protocols</b>.</td>
+      <td>Client sends <code>Sec-WebSocket-Version</code> and <code>Sec-WebSocket-Key</code>; server must answer with <code>Sec-WebSocket-Accept</code>, a signed value derived from the key.</td>
+      <td>Why HTTP at all: it makes the protocol compatible with existing infrastructure and lets it run on ports 80 and 443, frequently the only open ports. After the handshake completes there is <b>no further HTTP communication</b> — the WebSocket protocol takes over the connection.</td>
+    </tr>
+    <tr>
+      <td><b>The key/accept exchange</b></td>
+      <td>An auto-generated client challenge, and a signed answer proving the server actually understands the protocol.</td>
+      <td>The key is concatenated with a fixed identifier from the standard, hashed, and base64-encoded back to the client.</td>
+      <td>vs authentication — it is neither. It is a <b>security policy against blind upgrades</b> by servers and intermediaries that would otherwise switch protocols without understanding what they had switched to. It does not protect you from a transparent proxy that quietly modifies data on the wire.</td>
+    </tr>
+    <tr>
+      <td><b>Frame vs message</b></td>
+      <td>A <b>frame</b> is the smallest unit on the wire: a variable-length header plus a payload that may be all or part of a message. A <b>message</b> is the complete sequence of frames making one logical application message.</td>
+      <td>Whether to split a message into frames is the implementation's decision. Your code never sees frames — the callback fires only when the <i>entire</i> message has arrived, even a 1 MB one.</td>
+      <td>vs a stream you must reassemble yourself. That is exactly what the framing layer removes. Header contents: a <code>FIN</code> bit marking the final fragment; a 4-bit <b>opcode</b> — text (1), binary (2), close (8), ping (9), pong (10); a mask bit; a variable-length payload length; and the masking key.</td>
+    </tr>
+    <tr>
+      <td><b>Framing overhead</b></td>
+      <td>The bytes each frame costs you.</td>
+      <td>Payload length is <b>0–125</b> inline; <b>126</b> means the next 2 bytes hold a 16-bit length; <b>127</b> means the next 8 bytes hold a 64-bit length.</td>
+      <td>Server-sent frames cost <b>2–10 bytes</b>. Client frames add a 4-byte masking key, so <b>6–14 bytes</b>. Compare with 500–800 bytes plus cookies for an HTTP 1.x request, and about 5 bytes for an SSE message. None of these include IP, TCP and TLS framing, which adds <b>60–100 bytes per message</b> whatever the application protocol.</td>
+    </tr>
+    <tr>
+      <td><b>Masking</b></td>
+      <td>Every client-to-server frame has its payload masked with a 32-bit key carried in the header.</td>
+      <td>Server-to-client frames are not masked, which is why their overhead is 4 bytes lower.</td>
+      <td>vs encryption — it is not that either, and it protects nobody's confidentiality. It prevents a malicious script on the client from crafting bytes that perform a <b>cache-poisoning attack</b> on intermediaries that do not understand the protocol.</td>
+    </tr>
+    <tr>
+      <td><b>Subprotocol negotiation</b></td>
+      <td>The client advertises an array of application protocol names in the constructor; the server picks exactly one and returns it.</td>
+      <td>After <code>onopen</code>, the application reads the <code>protocol</code> attribute to see what was chosen.</td>
+      <td>vs content negotiation in HTTP. There is <b>no per-message metadata at all</b> here — one bit distinguishes text from binary and nothing else. So if the server supports none of the advertised protocols the handshake is not completed, the error callback fires, and the connection is terminated. Beyond selection, the chosen name has no effect on the API.</td>
+    </tr>
+    <tr>
+      <td><b>Protocol extensions</b></td>
+      <td>New opcodes and data fields that extend the framing layer itself, negotiated in the handshake, invisible to application code.</td>
+      <td>Two were developed: <b>multiplexing</b>, adding a channel ID so several logical connections share one TCP connection; and <b>compression</b>.</td>
+      <td>vs something you can rely on. As of the material here, multiplexing was in no popular browser, and compression support was limited to an older <b>per-frame</b> revision — suboptimal for large messages split across frames, and slated for deprecation in favour of per-message compression that was still experimental. Until that lands, compression is your application's job.</td>
+    </tr>
+    <tr>
+      <td><b>Head-of-line blocking</b> (again)</td>
+      <td>Frames from different messages <b>cannot be interleaved</b> — there is no stream identifier in the framing layer.</td>
+      <td>A large message, even split into many frames, blocks delivery of frames belonging to other messages.</td>
+      <td>vs the HTTP 1.x version in Part 2 — same failure, one layer down, and now it is <i>your</i> message sizes causing it. <code>send()</code> is asynchronous and returns immediately, so a fast return is not delivery: check <code>bufferedAmount</code>, split large messages, and consider your own priority queue rather than dumping everything on the socket.</td>
+    </tr>
+  </table>
+
+  <h3>What you gave up when HTTP stopped</h3>
+  <ul>
+    <li><b>Caching, by anyone.</b> Stream an image over a socket and it will not be cached by the browser, by a CDN, or by any intermediary — so you may pay for the transfer repeatedly and drive far more traffic to origin. The same applies to video, text and everything else.</li>
+    <li><b>Compression.</b> An ordinary request negotiates its transfer encoding; an SSE stream is all text so the whole session can be compressed. A WebSocket carries both text and binary, and compressing a session wholesale makes no sense because the binary parts may already be compressed — so compression has to be per-message, and until the extension is widely available, that means your code.</li>
+    <li><b>Metadata.</b> There are no headers. If the receiver needs to know what a payload is, you must design that in: a fixed format agreed upfront, a consistent header inside the message, or a text message describing the binary message that follows.</li>
+    <li><b>Everything else the browser does with HTTP</b> — authentication, state management, range requests. The handshake <i>can</i> use existing cookies to validate the user and decline the upgrade, and that is the one HTTP service that survives.</li>
+    <li><b>The strategy that follows:</b> use the socket for what is genuinely non-cacheable — real-time updates and control messages — and let those messages trigger ordinary requests for anything an intermediary could usefully hold.</li>
+  </ul>
+
+  <div class="box tip">
+    <h4>Infrastructure will fight you, and it is usually your own</h4>
+    <p>HTTP is optimised for short bursty transfers, so servers, proxies and load balancers are routinely configured to time out idle connections aggressively — precisely the wrong behaviour for a long-lived session. There are three layers: your own routers, balancers and proxies; external proxies you do not control; and the client's own network, which may block this traffic entirely and is the reason to keep a fallback. <b>TLS helps with the middle layer</b> by tunnelling past intermediaries, and in practice significantly raises the success rate of establishing the session — though it does not stop anyone timing out an idle TCP connection. For the layer you own, the timeouts must be raised explicitly: a common proxy defaults to <b>60 seconds</b>, and a common load balancer applies its connect, client and server timeouts only to the initial handshake, after which a separate <b>tunnel</b> timeout governs. Short timeouts are not stupidity — long idle sessions occupy memory and sockets everywhere — so before you add application keepalives, check the infrastructure.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — a socket is not an upgrade over the others</h4>
+    <p><b>It is not faster at the packet level.</b> Switching transports does not decrease the round trip; propagation latency is identical. What it eliminates is queuing latency, in both directions rather than one.<br>
+    <b>It is not a superset.</b> An ordinary request inherits caching, compression, authentication and range requests from a browser that understands the protocol. A socket is opaque by design, and the flexibility <i>is</i> the loss of those services — the same fact, described from two sides.<br>
+    <b>So it is not a default.</b> Pick it when you need frequent, latency-sensitive, bidirectional or binary traffic, and route everything else over HTTP.</p>
+  </div>
+
+  <h3>Anchor sketch — it starts as HTTP and then stops</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   -&gt; GET /socket   Connection: Upgrade . Upgrade: websocket
+      Sec-WebSocket-Version:    13
+      Sec-WebSocket-Key:        an auto-generated challenge
+      Sec-WebSocket-Protocol / -Extensions: what we speak
+   &lt;- 101 Switching Protocols
+      Sec-WebSocket-Accept:     the signed answer
+      ... and from here there is NO more HTTP.
+                          |
+   <span class="tk4">FRAME</span>    the unit on the wire. header + payload.
+            FIN . opcode . mask bit . length . payload
+            opcode: text 1 . binary 2 . close 8 . ping 9 . pong 10
+            length: 0-125 inline, 126 -&gt; 2 more bytes,
+                    127 -&gt; 8 more bytes
+            client frames are MASKED -- anti cache-poisoning,
+            aimed at intermediaries. NOT encryption.
+   <span class="tk4">MESSAGE</span>  the frames that make one application message.
+            your code never sees frames: onmessage fires
+            when the WHOLE message has arrived.
+                          |
+   GAINED   both directions, any time, text AND binary
+            2-10 bytes per server frame, 6-14 from the
+            client, vs 500-800 + cookies for HTTP 1.x
+            (all of it on 60-100 bytes of IP/TCP/TLS)
+                          |
+   <span class="tks">THE BROWSER STOPS HELPING</span>
+            no caching -- not the browser, not a CDN
+            no automatic compression
+            no content-type, no headers, no metadata
+            HEAD-OF-LINE BLOCKING returns: frames from
+            different messages cannot interleave, and
+            send() returns long before anything is sent
+                          v
+   so: the socket carries control and real-time updates,
+       and those updates TRIGGER ordinary HTTP requests
+       for anything worth caching.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Distinguish a frame from a message, and say which one your code sees.<br>
+      <span class="q">Q</span> Why are client frames masked, and what is it <i>not</i> protecting?<br>
+      <span class="q">Q</span> Name three services you stop receiving, and the design that gets them back.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>WebSocket over HTTP requests</td><td>Both directions at any moment, binary and text, and a handful of bytes per message instead of several hundred.</td><td>Caching, compression, metadata and most other browser services — plus a dedicated TCP connection out of your six per host.</td><td>Frequent, latency-sensitive, bidirectional traffic. Not for anything cacheable.</td></tr>
+    <tr><td>Secure WebSocket (over TLS)</td><td>A tunnel intermediaries cannot inspect, buffer or modify — and in practice a much higher success rate for establishing the session.</td><td>Handshake cost and certificate management. It still does not stop anyone timing out an idle connection.</td><td>Every real deployment, and especially mobile, where traffic crosses proxies that may not handle the protocol.</td></tr>
+    <tr><td>Subprotocol negotiation</td><td>Client and server agree, at connect time, on what the opaque bytes mean.</td><td>You must define and version the protocol yourself; if the server matches none of the advertised names, the connection is refused outright.</td><td>Always. It is the cheapest available protection against the two ends drifting apart.</td></tr>
+    <tr><td>A polyfill or real-time framework</td><td>One API across browsers, often with heartbeats, timeouts and automatic reconnection thrown in.</td><td>The fallback transport decides your performance, and the fallbacks are polling, long-polling or a streaming request — all worse. Some libraries need their own server.</td><td>When you must support clients without native support. Check what the fallback actually does before trusting it.</td></tr>
+    <tr><td>Large messages on one socket</td><td>Simplicity.</td><td>Head-of-line blocking: everything queued behind the big message waits, and <code>send()</code> returning is not delivery.</td><td>Never for latency-sensitive traffic. Split messages, watch the buffered amount, and prioritise.</td></tr>
+    <tr><td>Streaming assets over the socket</td><td>No protocol overhead on the bytes, and binary with no encoding penalty.</td><td>Nothing can cache it — not the browser, not a CDN — so you may re-transfer it endlessly and push all the load to origin.</td><td>Only for genuinely non-cacheable data. Otherwise send a notification and fetch it over HTTP.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;It's a socket in the browser.&rdquo;</td><td>&ldquo;Message-oriented and bidirectional, negotiated by an HTTP Upgrade so it works on ports 80 and 443 — and after the 101 there's no HTTP left on the connection.&rdquo;</td></tr>
+    <tr><td>&ldquo;WebSocket is faster.&rdquo;</td><td>&ldquo;It removes queuing latency in both directions and cuts per-message overhead to a few bytes. Propagation latency is unchanged — the packets don't move faster.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll push the images down the socket.&rdquo;</td><td>&ldquo;Then nothing caches them — not the browser, not the CDN. Push the notification and let the client fetch them over HTTP.&rdquo;</td></tr>
+    <tr><td>&ldquo;send() returned, so it's sent.&rdquo;</td><td>&ldquo;It's queued. Check bufferedAmount — messages go in the order queued, so one big payload head-of-line blocks everything behind it.&rdquo;</td></tr>
+    <tr><td>&ldquo;Why is the payload masked?&rdquo;</td><td>&ldquo;Client-to-server only, and it's not encryption — it stops a malicious script poisoning caches in intermediaries that don't understand the protocol.&rdquo;</td></tr>
+    <tr><td>&ldquo;The connection drops after a minute in production.&rdquo;</td><td>&ldquo;Idle timeouts in our own proxy or balancer, most likely — and on a balancer the tunnel timeout is a separate setting from the handshake ones.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll enable compression on the socket.&rdquo;</td><td>&ldquo;Per-message compression isn't broadly available. Compress in the application, and optimise the binary payloads yourself.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>A collaborative map application sends cursor positions and edits over a WebSocket, and also streams map tiles down the same socket as binary messages because &ldquo;binary is free on a socket&rdquo;. Users report that cursors freeze for a second or two whenever the map is panned, and the operations team reports origin bandwidth roughly ten times what was forecast. The proposed fix is to increase the server's send buffer.</p>
+    <p><b>(a)</b> Name the mechanism behind the freezing cursors and say why a bigger send buffer will not fix it. <b>(b)</b> Explain the bandwidth figure — say precisely what stopped happening when the tiles moved onto the socket. <b>(c)</b> Give the redesign, name what each kind of traffic should travel over, and name one client-side check the application should be doing regardless.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>A team ships a WebSocket feature. It works in development. In production, roughly a third of clients never establish a connection at all, and of those that do, many silently die after about a minute. Mobile users are worst affected. The team is on plain <code>ws://</code> behind a proxy and a load balancer they operate, and their fallback is a polyfill library whose default transport is polling.</p>
+    <p><b>(a)</b> Give the most likely cause of the failed connections and the mechanism, and name the single change that addresses most of them. <b>(b)</b> Explain the one-minute deaths and say exactly where to look, including the setting people most often miss. <b>(c)</b> Say why the polyfill is a performance risk rather than a safety net, and what the handshake's key-and-accept exchange does and does not protect against.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — the pipe, and who else can read it</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does the client need to send, frequently? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — the server does the talking</div>
+      <div class="colh">Yes — both ends, at any moment</div>
+
+      <div class="rowh">Something<br>in the<br>MIDDLE<br>should<br>read it</div>
+      <div class="cell"><b>Ordinary HTTP</b>
+        Anything a cache, a CDN or a proxy could usefully hold or transform: assets, documents, media.<br>
+        <i>Move:</i> leave it alone. Caching, compression, authentication and range requests all arrive free because the browser and every intermediary understand the protocol. This is where most bytes belong.</div>
+      <div class="cell focus"><b>You are asking for both. Split it.</b>
+        Real-time interaction <i>and</i> cacheable payloads on one connection.<br>
+        <i>Move:</i> you cannot have both from one pipe — the properties are the same fact seen from two sides. Put control and updates on the socket, and let those messages <b>trigger ordinary requests</b> for anything worth caching. Paying one round trip buys back the browser, the CDN and the compressor.</div>
+
+      <div class="rowh">Nothing in<br>the middle<br>NEEDS to<br>read it</div>
+      <div class="cell"><b>Server-Sent Events</b>
+        Text updates the server knows first and nobody else needs to interpret.<br>
+        <i>Move:</i> one long-lived HTTP response, about 5 bytes a message, and the browser handles parsing, reconnection and last-ID tracking. Cheaper than a socket in every sense that matters here.</div>
+      <div class="cell"><b>WebSocket, properly used</b>
+        Control traffic, cursor positions, game state, custom binary protocols.<br>
+        <i>Move:</i> take it, and accept the bill knowingly — no caching, no automatic compression, no metadata, and head-of-line blocking you now manage yourself through message sizes and the buffered amount.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row is the question almost nobody asks and it decides more than the column. Every free service — a cache, a compressor, an authentication check — is a service that requires something in the middle to understand the payload. A private pipe is fast <i>because</i> nothing in the middle understands it, and that is also the entire bill.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Route by cacheability, not by excitement.</b> The socket should carry what genuinely cannot be cached — updates, control, presence — and should trigger ordinary requests for everything else. A team that streams assets down the socket has bought a few bytes of framing and sold the browser cache, every CDN, and their origin bandwidth.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONSOLIDATION ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch — the whole competency on one page</h2>
+  <p>Three named groups, in the order the story runs: <b>FLOOR</b> &rarr; <b>WORKAROUNDS</b> &rarr; <b>PIPES</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch nobreak" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b> <b>bold = a named node</b> &nbsp;
+      <span class="node nstar">reversed = the one node to remember</span> &nbsp;
+      <span class="q">Q = retrieval cue</span><br>
+      <span style="font-size:8.4pt">The three groups run in order: <b>FLOOR</b> — what cannot be changed ·
+      <b>WORKAROUNDS</b> — what one missing feature costs · <b>PIPES</b> — the two ways to push.</span>
+    </div>
+<div class="tree"><span class="tk1">GROUP 1 - FLOOR . the two numbers, and their economics</span>
+------------------------------------------------------------------
+   BANDWIDTH  throughput. more fibre, more links, better
+              multiplexing. a money problem, and improving.
+   <span class="tks">LATENCY</span>    time to arrive. four delays:
+        propagation  distance / signal speed. fibre is
+                     ~200,000 km/s. ONLY fix: less distance.
+        transmission bits / link rate. the one bandwidth fixes.
+        processing   header, checks, routing. once per hop.
+        queuing      waiting in a buffer. bufferbloat.
+   already within ~1.5x of light speed -> ~30% left, ever.
+   humans notice 100-200 ms, call 300 ms sluggish, and
+   have mentally left by 1,000 ms.
+                                 v
+<span class="tk2">GROUP 2 - WORKAROUNDS . HTTP 1.x cannot multiplex</span>
+------------------------------------------------------------------
+   keepalive    -> saves (N-1) x RTT. N is 90+. always on.
+   pipelining   -> saves one more RTT, then HEAD-OF-LINE
+                   BLOCKING: responses must be sent in full,
+                   in order. disabled in browsers.
+   6 per host   -> parallelism, and a 7th request just waits.
+                   a long-lived stream holds one forever.
+   sharding     -> more parallelism, at a DNS lookup and a
+                   fresh slow-start each. no formula exists.
+   bundling and -> fewer requests, paid for in cache
+   inlining        granularity, memory and delayed execution.
+   evergreen: fewer round trips, fewer bytes. everything
+   else here dies the day the protocol can interleave.
+                                 v
+<span class="tk4">GROUP 3 - PIPES . when the server has something for you</span>
+------------------------------------------------------------------
+   <span class="tk4">SSE</span>  one HTTP response that never ends. text/event-stream.
+        data . event . id . retry, newline-delimited
+        the browser: parses, reconnects, resends LAST-EVENT-ID
+        you: the replay cache, gzip, TLS, batching
+        limits: server-to-client only, UTF-8 only
+   <span class="tk4">WEBSOCKET</span>  HTTP Upgrade -> 101 -> HTTP is over
+        frame (2-14 bytes) vs message (what your code sees)
+        gained: both directions, binary, tiny overhead
+        lost:   caching, compression, metadata -- and
+                head-of-line blocking is back
+   the rule: socket for control and real-time.
+             HTTP for anything worth caching.
+</div>
+  </div>
+
+  <h3>The question per node — cover the right column</h3>
+
+  <h4>Group 1 — FLOOR</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Latency vs bandwidth</b></td><td>Define both in one line each.</td><td>Latency is the time from sending a packet to receiving it; bandwidth is the maximum throughput of the path. Different quantities, different economics.</td></tr>
+    <tr><td><b>Reversed: propagation delay</b></td><td>Why is this the node to remember?</td><td>It is distance divided by signal speed, so no amount of capacity touches it. The only lever is a shorter distance — which is what a CDN is.</td></tr>
+    <tr><td><b>Transmission delay</b></td><td>What is it a function of, and what is it not?</td><td>Packet bits divided by link rate. Nothing to do with distance. 10 Mb takes 10 s at 1 Mbps and 0.1 s at 100 Mbps.</td></tr>
+    <tr><td><b>Bufferbloat</b></td><td>How does avoiding packet loss make things worse?</td><td>TCP uses drops as its congestion signal. Oversized buffers hide them, so you get high and variable delay instead of backoff.</td></tr>
+    <tr><td><b>Last mile</b></td><td>Where does the surprise latency live?</td><td>In the first few hops to the provider's core — tens of milliseconds before the packet is routed anywhere.</td></tr>
+    <tr><td><b>The ceiling</b></td><td>How much better can latency get?</td><td>We are within roughly 1.5× of light speed, so better cable buys about 30% at most. Bandwidth has no such wall.</td></tr>
+  </table>
+
+  <h4>Group 2 — WORKAROUNDS</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Keepalive</b></td><td>Give the saving as a formula.</td><td>(N−1) × RTT across N requests, because only the first pays the handshake round trip. With 90-plus resources that is seconds.</td></tr>
+    <tr><td><b>Head-of-line blocking</b></td><td>What exactly cannot happen in HTTP 1.x?</td><td>Response data cannot be interleaved: each response must be returned in full before the next one's bytes go out. A slow first response blocks all of them.</td></tr>
+    <tr><td><b>Why pipelining failed</b></td><td>Name three reasons.</td><td>Server buffering that can be attacked; a failed response killing the connection and forcing re-requests; and intermediaries that abort or serialise it.</td></tr>
+    <tr><td><b>Six per host</b></td><td>What is the hidden cost for streaming?</td><td>Without multiplexing, an idle long-lived stream still occupies a full connection — so a few of them starve ordinary requests.</td></tr>
+    <tr><td><b>Domain sharding</b></td><td>What does each shard cost?</td><td>A DNS lookup and a fresh TCP slow-start, plus manual management. There is no formula for the right number, and mobile suffers most.</td></tr>
+    <tr><td><b>Bundling and inlining</b></td><td>What are you really trading?</td><td>Requests for cache granularity: one change invalidates the bundle, sprites sit in memory whole, and inlined bytes ship with every page that inlines them.</td></tr>
+    <tr><td><b>The evergreen two</b></td><td>Which recommendations survive any protocol?</td><td>Eliminate unnecessary latency and minimise transferred bytes. Caching, compression, a CDN and deleting resources all follow from those.</td></tr>
+  </table>
+
+  <h4>Group 3 — PIPES</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>SSE on the wire</b></td><td>What is it, mechanically?</td><td>An ordinary HTTP response with content type text/event-stream that never finishes, carrying newline-delimited data, event, id and retry fields.</td></tr>
+    <tr><td><b>Last-Event-ID</b></td><td>What does the browser do, and what is left to you?</td><td>It remembers the last ID and sends it on reconnect. Replaying the missed messages is entirely the server's job, and needs a cache.</td></tr>
+    <tr><td><b>SSE's two limits</b></td><td>Name them and the workaround.</td><td>Server-to-client only, and UTF-8 only. For binary, push a notification and fetch over HTTP — one extra round trip, and caching comes back.</td></tr>
+    <tr><td><b>Queuing vs propagation</b></td><td>Which latency does streaming remove?</td><td>Queuing — the wait for the next poll. Propagation is unchanged; packets do not travel faster.</td></tr>
+    <tr><td><b>Frame vs message</b></td><td>Which does your code see?</td><td>The message. Frames are the wire unit with a 2–14 byte header; the callback fires only when the whole message has arrived.</td></tr>
+    <tr><td><b>Masking</b></td><td>What is it for, and what is it not?</td><td>Client-to-server frames only, to prevent cache-poisoning of intermediaries that do not understand the protocol. It is not encryption.</td></tr>
+    <tr><td><b>What a socket costs</b></td><td>Name three services you lose.</td><td>Caching by browser and CDN, automatic compression, and any payload metadata. Plus head-of-line blocking returns, now caused by your own message sizes.</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <div class="kicker">Section 6 continued · the transferable card</div>
+  <h2>Master 2&times;2 — the decision card you can carry to other problems</h2>
+  <p>Two questions decide which pipe you need, and the second one is the one people skip.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does the other end need to talk back, continuously? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — one direction is enough</div>
+      <div class="colh">Yes — both, at any moment</div>
+
+      <div class="rowh">Something<br>in the<br>MIDDLE<br>should be<br>able to<br>read it</div>
+      <div class="cell"><b>Use the public road</b>
+        Every helper between the two ends — a cache, a compressor, a proxy, an auditor — can only help if it can read what is passing.<br>
+        <i>Move:</i> take the standard channel and accept its shape. You get work done for you by parties you never contracted with, which is the best price there is.</div>
+      <div class="cell focus"><b>You are asking for both. Split the traffic.</b>
+        Real-time back-and-forth <i>and</i> payloads that others should be able to hold.<br>
+        <i>Move:</i> stop looking for one channel that does both — legibility and privacy are the same property seen from opposite sides. Run a fast private channel for the conversation, and let it <b>point at</b> the shared things, which travel the public road.</div>
+
+      <div class="rowh">Nobody in<br>the middle<br>NEEDS to<br>read it</div>
+      <div class="cell"><b>A one-way line, kept open</b>
+        The source knows first and simply reports; the other end only listens.<br>
+        <i>Move:</i> the cheapest thing that beats asking repeatedly. Keep it open rather than reconnecting, and let the standard machinery do the reconnecting and position-tracking for you.</div>
+      <div class="cell"><b>A private channel</b>
+        Both ends talk constantly, in a format only they need to understand.<br>
+        <i>Move:</i> take it knowingly. You have just become responsible for everything the intermediaries were doing — caching, compressing, labelling, and deciding what goes first.</div>
+    </div>
+    <div class="legend"><b>The move that matters:</b> the column is obvious and the row is the one that decides the bill. Every free service is provided by someone in the middle who can read the payload; the moment you make the channel opaque, all of that becomes your job. That is true of a network protocol, an encrypted file store, a private side-channel in an organisation, and a team that stops writing things down.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Count the round trips, then ask who in the middle is allowed to read the payload — the first number decides how fast it can be, and the second decides how much work you have just taken on.</b></p>
+    <p style="margin-top:6pt">It travels. A courier network can only reroute parcels it can identify. A shared document can only be indexed if it is readable. A conversation moved into a private channel is faster for the two people in it and invisible to everyone who might have answered it already. In each case the speed and the loss are the same decision, and the mistake is always the same one: choosing the private channel for traffic that other people were usefully handling for free.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. LOOKUP ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>Latency, bandwidth, and HTTP/1.x</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Doubling the link speed changed nothing.</td><td>You are spending round trips, not bytes — propagation delay, not transmission delay.</td><td>Reduce the number of round trips, or move the data closer with a CDN. Capacity is the wrong lever.</td></tr>
+    <tr><td>Distant users are several times slower for the same page.</td><td>Every round trip costs the propagation delay, and the page makes many.</td><td>Cut requests, cache aggressively, and serve from a nearby location. Expect 200–300 ms round trips at antipodal distances.</td></tr>
+    <tr><td>Latency became high and erratic after a network device change.</td><td>Bufferbloat — oversized buffers hiding the packet drops TCP relies on.</td><td>Active queue management. Note throughput tests will still look fine, which is what makes it confusing.</td></tr>
+    <tr><td>Tens of milliseconds gone before the first named hop.</td><td>Last-mile latency: 18 ms for fibre, 26 ms cable, 44 ms DSL at peak in one measurement.</td><td>Nothing you can fix from the server. Budget for it, and know it varies by technology, topology and time of day.</td></tr>
+    <tr><td>Requests are slow even though the server responds in 5 ms.</td><td>Fixed protocol overhead dominating: two round trips per request without connection reuse.</td><td>Turn on keepalive everywhere, including in your HTTP libraries, which often default to off.</td></tr>
+    <tr><td>Everything stalls behind one slow response.</td><td>Head-of-line blocking — HTTP 1.x cannot interleave response data.</td><td>Nothing within the protocol. Move the slow resource off the critical path, or onto a different connection.</td></tr>
+    <tr><td>The seventh parallel download hangs.</td><td>Six connections per host, with long-lived streams occupying some of them.</td><td>Move streams to a different hostname, reduce their number, or consolidate them into one.</td></tr>
+    <tr><td>Sharding made mobile slower.</td><td>Each shard costs a DNS lookup and a fresh TCP slow-start, and high-latency clients pay both hardest.</td><td>Reduce the shard count. Start from none and add only while measurements improve.</td></tr>
+    <tr><td>A 15-byte API response costs a kilobyte on the wire.</td><td>Uncompressed plain-text headers: 500–800 bytes before cookies.</td><td>Trim cookies first — they are the usual largest offender — and question every custom header.</td></tr>
+    <tr><td>Repeat visits got slower after bundling.</td><td>Lost cache granularity: one change invalidates the whole bundle.</td><td>Split a stable core from volatile code, and target roughly 30–50 KB compressed per script bundle.</td></tr>
+    <tr><td>The app is killed on older handsets.</td><td>A large sprite decoded and held whole in memory: width × height × 4 bytes.</td><td>Stop spriting large images. An 800 × 600 bitmap is about 1.83 MB regardless of the file size.</td></tr>
+    <tr><td>First render is late despite fast downloads.</td><td>Neither CSS nor JavaScript executes until the whole file has arrived.</td><td>Deliver first-paint-critical CSS separately and load the rest incrementally.</td></tr>
+    <tr><td>An inlined asset is being downloaded on every page.</td><td>Inlined resources are part of the document and cannot be cached separately.</td><td>Inline only small, page-specific, stable resources — roughly under 1–2 KB — and bundle the reused ones instead.</td></tr>
+  </table>
+
+  <h3>Streaming transports</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>Updates arrive up to N seconds late, where N is your poll interval.</td><td>Queuing latency — the message was ready and waited for the next request.</td><td>A persistent connection: SSE for text one-way, WebSocket if the client must also send.</td></tr>
+    <tr><td>The stream works locally and dies or lags in production.</td><td>A buffering intermediary that does not understand the stream.</td><td>Deliver it over TLS so nothing in the middle can hold the bytes back.</td></tr>
+    <tr><td>Messages are missing after every reconnect.</td><td>The browser reports the last-seen ID; nothing on the server replays from it.</td><td>Assign event IDs and keep a server-side cache to retransmit from — or decide losses are acceptable and stop sending IDs.</td></tr>
+    <tr><td>Battery drain on mobile with a real-time feature.</td><td>Frequent small pushes waking the radio, often with unnecessary keepalives.</td><td>Batch messages. Remove application keepalives — the connection is not dropped because the radio went idle.</td></tr>
+    <tr><td>Binary data over a text stream costs a third more.</td><td>Base64 expansion, and a streamed asset that no cache can hold.</td><td>Push a notification and fetch the asset over HTTP. One extra round trip buys back caching and transfer encoding.</td></tr>
+    <tr><td>Small urgent messages stall behind a big one.</td><td>Head-of-line blocking on the socket: frames from different messages cannot interleave.</td><td>Split large messages, check <code>bufferedAmount</code> before sending, and keep your own priority queue.</td></tr>
+    <tr><td><code>send()</code> returns instantly but data arrives late.</td><td>It only queues — a fast return is not delivery.</td><td>Monitor the buffered amount and send the next update only when it has drained.</td></tr>
+    <tr><td>Origin bandwidth far above forecast after moving to a socket.</td><td>Assets streamed over the socket are cached by nobody — not the browser, not a CDN.</td><td>Route cacheable payloads back over HTTP and keep the socket for control and updates.</td></tr>
+    <tr><td>A third of clients never connect.</td><td>Intermediaries that do not understand the protocol, or a network blocking it outright.</td><td>Use the secure scheme so the session is tunnelled, and keep a fallback for networks that block it entirely.</td></tr>
+    <tr><td>Connections die after about a minute.</td><td>Idle timeouts in your own proxy or load balancer, tuned for short bursty HTTP.</td><td>Raise them explicitly. On a load balancer, check the separate tunnel timeout — the handshake timeouts do not govern the upgraded connection.</td></tr>
+    <tr><td>The fallback transport is far slower than expected.</td><td>The polyfill defaults to polling or long-polling.</td><td>Check what the library actually falls back to, and hold it to the same performance goals as the native path.</td></tr>
+    <tr><td>The receiver cannot tell what a payload is.</td><td>There is no per-message metadata: one bit distinguishes text from binary.</td><td>Negotiate a subprotocol, and carry your own header inside the message or in a preceding text message.</td></tr>
+  </table>
+
+  <h3>Reverse mapping — you see a technique, what is it there for?</h3>
+  <p>The other direction. Use this when auditing a design rather than diagnosing an incident: for each mechanism you find, say what it was buying and what it does <i>not</i> buy.</p>
+  <table class="tight">
+    <tr><th style="width:52mm">What you find in the design</th><th style="width:52mm">What it counters</th><th>What it does <i>not</i> cover</th></tr>
+    <tr><td>A content delivery network</td><td>Propagation delay — the data is physically closer, so every round trip is shorter.</td><td>The number of round trips. A chatty page is still chatty; it is just chatty over a shorter distance.</td></tr>
+    <tr><td>Keepalive on every client and proxy</td><td>The handshake round trip and repeated slow-start: <i>(N−1) × RTT</i> across N requests.</td><td>Head-of-line blocking. Responses still cannot interleave, so one slow response still blocks the queue.</td></tr>
+    <tr><td>Six connections, or domain sharding</td><td>The absence of multiplexing — it overlaps the waiting instead of removing it.</td><td>The cost per request or the number of them. And each shard adds a DNS lookup and a fresh slow-start.</td></tr>
+    <tr><td>Concatenation and spriting</td><td>Per-request protocol overhead, and the lack of pipelining — the bytes arrive back to back.</td><td>Cache granularity, sprite memory, or execution latency; it makes all three worse.</td></tr>
+    <tr><td>Inlining under a kilobyte or two</td><td>The request entirely, for resources smaller than their own HTTP overhead.</td><td>Reuse across pages. An inlined asset cannot be cached separately, so it ships with every page that inlines it.</td></tr>
+    <tr><td>Gzip on text assets</td><td>Transferred bytes — typically a 60–80% reduction for one configuration flag.</td><td>Round trips, and anything already compressed. It is a bytes lever, not a latency lever.</td></tr>
+    <tr><td>Cache headers and revalidation</td><td>The request itself — the only technique here that costs nothing anywhere else.</td><td>The first visit, and anything genuinely dynamic. Also nothing, if the resource is inlined into a document.</td></tr>
+    <tr><td>Server-Sent Events</td><td>Queuing latency on server-to-client text, at about 5 bytes a message, with reconnection handled for you.</td><td>Propagation latency, client-to-server data, binary payloads, and one of your six connections per host.</td></tr>
+    <tr><td>Event IDs on a stream</td><td>The client's ignorance of where it left off — it will tell you on reconnect.</td><td>The replay itself. Without a server-side cache the ID is reported and nothing is resent.</td></tr>
+    <tr><td>A WebSocket</td><td>Queuing latency in <i>both</i> directions, per-message overhead, and the text-only limit.</td><td>Caching, compression, metadata, and head-of-line blocking — which returns, now driven by your own message sizes.</td></tr>
+    <tr><td>The secure scheme for a socket or stream</td><td>Intermediaries that buffer, modify, or refuse to upgrade the connection.</td><td>Idle timeouts. Anything in the path can still drop a quiet TCP connection, including your own infrastructure.</td></tr>
+    <tr><td>Subprotocol negotiation</td><td>The two ends silently disagreeing about what the opaque bytes mean.</td><td>Per-message metadata. Beyond selecting a name, it has no effect — you still carry your own headers inside messages.</td></tr>
+    <tr><td>Masking on client frames</td><td>A malicious script poisoning caches in intermediaries that do not understand the protocol.</td><td>Confidentiality. It is not encryption, and it does nothing about a transparent proxy modifying data.</td></tr>
+    <tr><td>A polyfill or real-time framework</td><td>Browsers without native support, and often reconnection and heartbeat logic too.</td><td>Performance. The fallback transport — usually polling — decides what you actually get.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. REFERENCE ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:32mm">Number</th><th>What it is</th><th>Why it matters in an argument</th></tr>
+    <tr><td><b>~200,000 km/s</b></td><td>The speed of light in optical fibre — a refractive index of about 1.5, against 299,792 km/s in a vacuum. Real fibre is 1.4 to 1.6.</td><td>The single most useful number here. It converts any distance into a floor nobody can negotiate below.</td></tr>
+    <tr><td><b>56 ms · 160 ms</b></td><td>Round trip in fibre along the great circle: New York to London (5,585 km) and New York to Sydney (15,993 km).</td><td>Two anchors. Quote them when someone proposes a design that needs several round trips per interaction.</td></tr>
+    <tr><td><b>200–300 ms</b></td><td>The <i>actual</i> New York to Sydney round trip over existing networks, against 160 ms on the great circle.</td><td>The gap between physics and cables. Never quote the theoretical number as the expected one.</td></tr>
+    <tr><td><b>100–200 · 300 · 1,000 ms</b></td><td>Perceptible lag · described as sluggish · the user has mentally moved on.</td><td>Turns a latency budget into a product requirement, which is the only form anyone acts on.</td></tr>
+    <tr><td><b>18 · 26 · 44 ms</b></td><td>Peak-hour last-mile latency for fibre-to-the-home, cable and DSL in one regulator's measurements.</td><td>Tens of milliseconds before the packet reaches the provider's core. Budget for the last mile, not just the ocean.</td></tr>
+    <tr><td><b>~30%</b></td><td>The most that better materials and faster routers can improve latency, given we are within ~1.5× of light speed.</td><td>Ends the &ldquo;the network will get faster&rdquo; argument for latency, while leaving it open for bandwidth.</td></tr>
+    <tr><td><b>10 s vs 0.1 s</b></td><td>Time to put a 10 Mb file on the wire over 1 Mbps and over 100 Mbps.</td><td>The cleanest demonstration that transmission delay is about link rate and has nothing to do with distance.</td></tr>
+    <tr><td><b>2 round trips</b></td><td>The minimum cost of one HTTP request over a new TCP connection: handshake, then request and response.</td><td>The fixed cost keepalive removes. The faster your server, the more this dominates.</td></tr>
+    <tr><td><b>(N−1) × RTT</b></td><td>The total latency saved by connection reuse across N requests.</td><td>With 90-plus resources on an average page, the saving is measured in seconds. The best-value line in this booklet.</td></tr>
+    <tr><td><b>284 → 228 → 172 ms</b></td><td>The same two-resource fetch with separate connections, with keepalive, and with pipelining — a 40% reduction.</td><td>Shows protocol choices alone moving a real number, and that the saving grows with latency and request count.</td></tr>
+    <tr><td><b>6 per host</b></td><td>Connections most browsers open to a single origin.</td><td>Explains both the parallelism you get and the seventh request that hangs — including when your own streams hold the slots.</td></tr>
+    <tr><td><b>500–800 bytes</b></td><td>HTTP metadata on every browser-initiated request, before cookies, always plain text.</td><td>Set against a 15-character JSON body wrapped in 352 bytes of headers — 96% overhead — it makes the case for trimming headers and cookies.</td></tr>
+    <tr><td><b>60–80%</b></td><td>Typical size reduction from gzip on text assets.</td><td>The highest benefit-to-effort ratio available: usually a configuration flag.</td></tr>
+    <tr><td><b>33%</b></td><td>Byte expansion from base64 encoding, which turns bytes into ASCII at a 4/3 ratio.</td><td>The tax on inlining binary assets and on pushing binary through a text-only stream.</td></tr>
+    <tr><td><b>1–2 KB · 30–50 KB</b></td><td>Rule-of-thumb ceiling for inlining a resource · target size for a compressed script bundle.</td><td>Two thresholds that settle most bundling arguments without further measurement.</td></tr>
+    <tr><td><b>1.83 MB</b></td><td>Memory for an 800 × 600 decoded image: width × height × 4 bytes, held whole.</td><td>Why spriting can be the thing that kills the app on an older handset, regardless of the file's size on disk.</td></tr>
+    <tr><td><b>~5 bytes</b></td><td>Minimum per-message overhead of an SSE event.</td><td>The reason a text stream is cheaper than anything built on repeated requests.</td></tr>
+    <tr><td><b>2–3 seconds</b></td><td>The recommended and commonly implemented default SSE reconnect delay, overridable by the server.</td><td>Tells you roughly how large a replay gap to expect, and therefore how far back the server cache must reach.</td></tr>
+    <tr><td><b>2–10 · 6–14 bytes</b></td><td>WebSocket framing overhead: server-sent frames, and client frames with their 4-byte masking key.</td><td>Two orders of magnitude below an HTTP 1.x request. The concrete case for a socket on chatty traffic.</td></tr>
+    <tr><td><b>0–125 · 126 · 127</b></td><td>The payload-length field: inline, then 2 further bytes for a 16-bit length, then 8 for a 64-bit length.</td><td>Explains why the frame header is variable-length, and where the 2-to-10-byte range comes from.</td></tr>
+    <tr><td><b>1 · 2 · 8 · 9 · 10</b></td><td>WebSocket opcodes: text, binary, close, ping, pong.</td><td>Enough to read a frame dump, and to know that liveness checks are in the protocol rather than your application.</td></tr>
+    <tr><td><b>60–100 bytes</b></td><td>Combined IP, TCP and TLS framing per message, whatever the application protocol.</td><td>The floor under every overhead comparison in this booklet — worth quoting when a few bytes of framing are being argued over.</td></tr>
+    <tr><td><b>60 seconds</b></td><td>A common proxy default timeout for an idle connection, against the hour a long-lived session may need.</td><td>The first place to look when sockets and streams die at suspiciously round intervals.</td></tr>
+  </table>
+
+  <h3>Glossary — the terms you should be able to define cold</h3>
+  <table class="tight">
+    <tr><th style="width:40mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
+    <tr><td><b>Latency / bandwidth</b></td><td>Time for a packet to arrive / maximum throughput of the path. Different quantities with different economics; for most pages, latency is the bottleneck.</td></tr>
+    <tr><td><b>Propagation delay</b></td><td>Distance ÷ signal speed. The only irreducible delay; the only lever is less distance.</td></tr>
+    <tr><td><b>Transmission delay</b></td><td>Packet bits ÷ link rate. Independent of distance, and the delay more bandwidth actually fixes.</td></tr>
+    <tr><td><b>Processing / queuing delay</b></td><td>Time being handled by a router / time waiting to be. Both are per hop; the second grows with load.</td></tr>
+    <tr><td><b>Bufferbloat</b></td><td>Oversized buffers hiding the packet drops TCP uses as a congestion signal, producing high and variable delay.</td></tr>
+    <tr><td><b>Refractive index</b></td><td>Speed of light in a vacuum ÷ speed in the medium. About 1.5 for fibre; larger means slower.</td></tr>
+    <tr><td><b>Great-circle path</b></td><td>The shortest route between two points on the globe. A lower bound, not a route that exists.</td></tr>
+    <tr><td><b>Last-mile latency</b></td><td>Delay in the first hops to your provider's core. Often larger than the intercontinental portion.</td></tr>
+    <tr><td><b>Wavelength-division multiplexing</b></td><td>Many channels of light in one fibre. Why capacity grows without new cable being laid.</td></tr>
+    <tr><td><b>Keepalive</b></td><td>Reusing one TCP connection for several requests. Saves (N−1) × RTT; enabled by default in HTTP 1.1, often off in libraries.</td></tr>
+    <tr><td><b>Pipelining</b></td><td>Sending requests without waiting for responses, moving the queue to the server. Not multiplexing, and effectively dead in browsers.</td></tr>
+    <tr><td><b>Head-of-line blocking</b></td><td>One slow item blocking everything behind it. Happens in HTTP 1.x responses, in TCP on packet loss, and in WebSocket messages.</td></tr>
+    <tr><td><b>Multiplexing</b></td><td>Interleaving data from several responses or streams on one connection. The feature whose absence generates Part 2.</td></tr>
+    <tr><td><b>Domain sharding</b></td><td>Spreading resources over hostnames to multiply the per-host connection limit. Costs a DNS lookup and a slow-start each.</td></tr>
+    <tr><td><b>Concatenation / spriting</b></td><td>Bundling scripts or images into one resource. Application-layer pipelining, paid for in cache granularity and memory.</td></tr>
+    <tr><td><b>Resource inlining</b></td><td>Embedding a resource in the document. Removes the request; removes separate cacheability with it.</td></tr>
+    <tr><td><b>Server-Sent Events</b></td><td>Server-to-client text streaming over one long-lived HTTP response. Text only, one direction only.</td></tr>
+    <tr><td><b>Event stream format</b></td><td>data, event, id and retry fields, newline-delimited, blank line ends the event. That is the whole protocol.</td></tr>
+    <tr><td><b>Last-Event-ID</b></td><td>The header the browser sends on reconnect, carrying the last ID it saw. Reporting, not replay — the replay is yours.</td></tr>
+    <tr><td><b>Queuing latency</b></td><td>Time a ready message waits before it can be sent. What streaming removes; propagation latency is untouched.</td></tr>
+    <tr><td><b>WebSocket</b></td><td>Bidirectional, message-oriented text and binary streaming, negotiated by HTTP Upgrade. Not a superset of HTTP.</td></tr>
+    <tr><td><b>Frame / message</b></td><td>The wire unit with a 2–14 byte header / the complete logical message your callback receives.</td></tr>
+    <tr><td><b>Masking</b></td><td>Client-to-server payload obfuscation with a 32-bit key, against cache poisoning of naive intermediaries. Not encryption.</td></tr>
+    <tr><td><b>Subprotocol negotiation</b></td><td>Client advertises names, server picks one, or the connection is refused. The only metadata channel a socket has.</td></tr>
+    <tr><td><b>Protocol extension</b></td><td>New opcodes and fields in the framing layer, negotiated at handshake. Multiplexing and compression were the two.</td></tr>
+    <tr><td><b>bufferedAmount</b></td><td>Bytes queued but not yet sent. The check that stops one large message head-of-line blocking the urgent ones.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page ans">
+  <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the Sydney dashboard and the uplink upgrade</h4>
+  <p><b>(a)</b> The Sydney figure is dominated by <b>propagation delay</b>, which is distance divided by signal speed and has nothing to do with anyone's link capacity. Upgrading the origin uplink reduces <b>transmission delay</b> — the time to push bits onto the wire — which is a function of the link's data rate and is independent of distance. Those are different delays with different causes, and the evidence in the question already rules out saturation: London, on the same origin and the same uplink, is fine. If the origin were saturated both would be slow. The remaining two delays, <b>processing</b> and <b>queuing</b>, also grow along the longer route because there are more hops, each reading headers and each with its own buffer.</p>
+  <p><b>(b)</b> The floor: New York to Sydney is 15,993 km and gives 160 ms round trip along the great circle, and the real figure over existing cables is <b>200–300 ms</b>; London to Sydney is a comparable order of magnitude. Take a round trip of roughly 250 ms. The arithmetic is distance ÷ ~200,000 km/s for the one-way time in fibre, doubled — noting that fibre is about 1.5× slower than light in a vacuum. The 78 requests are what turn that into 4.2 seconds: <b>each round trip is spent serially unless the requests overlap</b>, and with six connections per host and no multiplexing they overlap only six at a time. That is roughly thirteen sequential batches of 250 ms before you count server time — which lands in the right neighbourhood. Credit for observing that users are already past the 1,000 ms mark at which they mentally context-switch.</p>
+  <p><b>(c)</b> Two structurally different fixes. <b>Reduce the number of round trips</b> — fewer resources, caching so repeat visits skip requests entirely, bundling, keepalive — which attacks how many times you pay the propagation delay, not the delay itself. And <b>move the data closer</b> with a CDN, which attacks the propagation delay directly and is the only lever on it. The thing that would genuinely lower the floor is <b>a shorter cable along the great circle</b> — and nobody does it here because laying cable is constrained by terrain, politics and cost, and is only justified where milliseconds are worth millions. Also creditable: better fibre and faster routers would help, but we are within about 1.5× of light speed so the ceiling on that strategy is roughly 30%.</p>
+
+  <h4>Part 1 · Q2 — the gateway that never drops a packet</h4>
+  <p><b>(a)</b> <b>Bufferbloat.</b> The new gateway ships with large incoming buffers on the assumption that dropping packets should be avoided at all costs. When arrivals outpace service, packets are queued rather than dropped, and the time they spend in that buffer is <b>queuing delay</b> — which is high and, critically, <b>variable</b>. Throughput looks fine because bufferbloat is not a capacity problem: every byte still arrives, and a throughput test measures exactly that. It measures the wrong quantity for this fault.</p>
+  <p><b>(b)</b> Because TCP's congestion avoidance <b>uses packet loss as its signal</b>. A dropped packet is how the network tells a sender to slow down. A buffer that absorbs the overflow suppresses that signal, so senders keep increasing their rate while the queue grows, and instead of a prompt backoff you get a long and unpredictable queue in front of every packet. The design goal is well-intentioned and the mechanism it breaks is the one that was keeping latency bounded — which is why the fix is not a bigger or a smaller buffer but a smarter one.</p>
+  <p><b>(c)</b> The class of solution is <b>active queue management</b> — algorithms that deliberately manage queue delay rather than maximising buffer occupancy; the CoDel algorithm was proposed for exactly this and is available in modern kernels. Moving the video server closer would not fix it because a CDN reduces <b>propagation</b> delay, and the delay here is <b>queuing</b> delay being introduced by a device inside the office, after the packet has already arrived. Shortening the journey does nothing about a queue at the destination.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 2 · Q1 — the dashboard whose fourth chart never loads</h4>
+  <p><b>(a)</b> The browser opens at most <b>six connections per host</b>, and the two event streams and the long-lived polling request occupy three of them permanently. With the chart requests competing for what remains, the seventh outstanding request to that host simply <b>hangs until one of the earlier ones completes</b> — which is why closing a panel unblocks it. Idleness is irrelevant because HTTP 1.x has <b>no multiplexing</b>: a connection carries one exchange at a time whether or not any bytes are moving, so a stream that has sent nothing for ten minutes is still holding a full TCP stream.</p>
+  <p><b>(b)</b> The underlying limitation is the absence of multiplexing, which is why browsers open several connections at all — and the per-host cap exists as a <b>safety check</b>, so that a client cannot saturate all available resources on a server, intentionally or otherwise. The irony is that the same check enables the reverse: exceed it on the client and all further requests to that host are blocked. Applications built on real-time delivery — sockets, event streams, hanging requests — are exactly the ones that hit it, so you can create a <b>self-imposed denial of service</b> against your own application.</p>
+  <p><b>(c)</b> Two structurally different fixes. <b>Consolidate the streams</b>: carry all the update types over one connection, distinguishing them by event type, so you spend one slot instead of three — costing you a shared failure domain and some multiplexing logic in the application. Or <b>move the streams to a different hostname</b>, so they draw against a separate connection pool — costing an extra DNS lookup, a fresh TCP slow-start, and possibly a fresh TLS handshake, all of which hit high-latency clients hardest. Also creditable: reduce the number of long-lived connections generally, and do not add the fifth.</p>
+
+  <h4>Part 2 · Q2 — the bundle that helped desktop and hurt everything else</h4>
+  <p><b>(a)</b> Three distinct trades. <b>Mobile got worse</b> because a 900 KB bundle must arrive in full before <i>any</i> of it executes — neither CSS nor JavaScript allows incremental execution — so on a high-latency, low-bandwidth link the time to first render is dominated by a transfer that used to be able to start executing in pieces. <b>Repeat visits got worse</b> because all 40 modules now share one cache key: a single change to any one of them invalidates and re-downloads the whole 900 KB. That is the loss of <b>cache granularity</b>, and it is the classic cost of bundling. <b>The app is being killed</b> because a sprite is decoded and held in memory as a bitmap at <b>width × height × 4 bytes</b>, regardless of the compressed file size and regardless of how little of it is on screen — the browser does not clip the unused part out of memory.</p>
+  <p><b>(b)</b> <b>No, and it may make things worse.</b> Sharding multiplies the per-host connection limit; it does not reduce bytes, does not restore cache granularity, and does not reduce memory. It cannot even parallelise <i>this</i> download, because one 900 KB resource is a single request and lives on a single connection. What it does add is a DNS lookup and a fresh TCP slow-start per shard, which penalises exactly the high-latency mobile clients that are already the problem.</p>
+  <p><b>(c)</b> Split the bundle: separate the <b>stable core</b> — frameworks and libraries that rarely change — from volatile application code, so a routine change invalidates only a small bundle; target roughly <b>30–50 KB compressed</b> per script bundle, large enough to amortise per-request overhead and small enough to allow incremental execution; deliver first-paint-critical CSS separately from the rest. Stop spriting the icons at that scale, and inline only the small, page-specific ones — roughly under 1–2 KB, remembering base64 costs 33% and an inlined asset cannot be cached separately. What remains true regardless of protocol: <b>eliminate unnecessary latency and minimise transferred bytes</b>. Bundling and sharding are workarounds for a protocol that cannot interleave responses; caching, compression and deleting resources are not.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 3 · Q1 — the price stream with a gap after every reconnect</h4>
+  <p><b>(a)</b> On reconnect the browser does two things automatically: it <b>reestablishes the connection</b> after the retry interval, and if the server has been assigning IDs it sends the last one it saw back as a <b>Last-Event-ID</b> header. That is the whole of the browser's contribution. <b>Replaying the missed messages is entirely the server's job</b> — it must maintain a local cache of recent events and, on seeing that header, retransmit everything after that ID. A gap after every reconnect means either the server is not sending IDs at all, so the client has nothing to report, or it is sending them and ignoring the header on reconnect. Either way the browser is behaving exactly as designed.</p>
+  <p><b>(b)</b> A reconnect cycle at a suspiciously round 60 seconds points at an <b>idle or read timeout in the infrastructure</b> — a proxy, load balancer or server tuned for short bursty HTTP rather than long-lived streams — or at an intermediary buffering the stream. The heartbeat is the wrong fix because it treats a configuration problem as a protocol problem: it does not raise anyone's timeout, it merely keeps traffic flowing so the timeout is not reached, which is a workaround that has to keep working forever. Its cost is paid by the mobile clients: a message every 5 seconds <b>wakes the radio</b> continuously, which is exactly the real-time push anti-pattern that drains handset batteries, and an SSE connection is not dropped merely because the radio has gone idle. The right sequence is: raise the timeouts you control, put the stream over TLS so intermediaries cannot buffer it, and batch real messages instead of manufacturing filler ones.</p>
+  <p><b>(c)</b> Stop base64-encoding the charts into the stream. The stream is <b>UTF-8 only</b> by design, so binary costs a <b>33%</b> byte expansion, and a streamed asset <b>cannot be cached by the browser cache at all</b>. Instead use the stream as a notification: push a small text message saying a new chart exists and where, and let the application fetch it with an ordinary request. The cost is <b>one extra round trip</b> per image. What it buys back: the asset becomes cacheable by the browser and by any intermediary, and it gets ordinary transfer encoding and compression — plus the 33% goes away. Also creditable: gzip the event stream itself, which is legitimate because it is an ordinary HTTP response.</p>
+
+  <h4>Part 3 · Q2 — choosing a push transport for job progress</h4>
+  <p><b>(a)</b> The claim is wrong as stated. Changing transport <b>does not decrease the round trip</b> between client and server at all — propagation latency is a function of distance and the speed of light and is identical for polling, a stream or a socket. What both persistent transports eliminate is <b>queuing latency</b>: with 5-second polling, a status line can be ready on the server and still wait up to 5 seconds for the next request, whereas a persistent connection lets the server dispatch it the moment it exists. SSE and WebSocket are <b>identical</b> on this axis for server-to-client data; the socket adds nothing here. It only differs for messages travelling the other way.</p>
+  <p><b>(b)</b> Three things SSE gives free that a socket does not. <b>Automatic reconnection</b>, at a default of 2–3 seconds and adjustable by the server with a retry field. <b>Last-seen message tracking</b>, where the browser remembers the ID and reports it on reconnect. And <b>message parsing with no unbounded buffer</b> — the browser finds the boundaries, extracts the payload and fires a DOM event per message, discarding what it has processed. Also creditable: session-wide gzip, which works because the stream is all text and an ordinary HTTP response; and the fact that it is ordinary HTTP, so it deploys through existing infrastructure with no new negotiation.</p>
+  <p><b>(c)</b> The report should be delivered as a <b>notification on the stream plus an ordinary HTTP request</b> to fetch it — one extra round trip, in exchange for a cacheable, compressible, resumable download that any intermediary can serve, and no base64 tax. The WebSocket becomes right when the <b>client</b> needs to send frequently and with low latency — live cancellation, parameter changes during the run, a cursor or control channel — or when the downward data becomes genuinely binary and high-volume. Reaching for it merely because the client <i>might</i> send later trades caching, compression, reconnection and last-ID tracking for a capability nobody is using yet.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 4 · Q1 — the map that freezes when you pan</h4>
+  <p><b>(a)</b> <b>Head-of-line blocking on the socket.</b> Messages are delivered in exactly the order the client and server queue them, and although a message may be split into several frames, <b>frames from different messages cannot be interleaved</b> — there is no stream identifier in the framing layer. So a large tile message occupies the connection until it has been fully sent, and every cursor update queued behind it waits. A bigger send buffer makes it worse rather than better: it lets more large messages queue up ahead of the small ones, which is more of the same problem. The fix is at the application layer — split large messages, check what is already queued, and prioritise.</p>
+  <p><b>(b)</b> The tiles stopped being <b>cacheable</b>. Delivered as ordinary HTTP resources they are held by the browser cache, by any intermediary proxy, and by a CDN, so a panned-over tile is fetched once and a popular tile is served to thousands of users from an edge node. Streamed inside a custom protocol they are opaque: nothing in the middle can identify or store them, so every client fetches every tile every time and all of that traffic terminates at the origin. Roughly ten times the forecast is exactly what losing a cache hierarchy looks like.</p>
+  <p><b>(c)</b> Route by cacheability. <b>Cursor positions, edits, presence and control messages go over the socket</b> — genuinely non-cacheable, latency-sensitive, small, and needed in both directions. <b>Tiles go over ordinary HTTP</b>, fetched by the client, where they are cached by the browser and the CDN and compressed by ordinary negotiation; the socket can carry a message telling the client which tiles to fetch. The client-side check the application should be doing regardless is to <b>monitor <code>bufferedAmount</code></b> before sending: <code>send()</code> is asynchronous and returns immediately, so a fast return is not evidence of delivery, and sending the next update only once the buffer has drained is what keeps a backlog from forming.</p>
+
+  <h4>Part 4 · Q2 — a third of clients never connect</h4>
+  <p><b>(a)</b> The most likely cause is <b>intermediaries that do not understand the protocol</b> — explicit and transparent proxies, firewalls and carrier equipment between the client and the server. Because the connection begins as an HTTP Upgrade, such devices may blindly upgrade without understanding what they upgraded to, buffer frames, modify content, or misclassify the traffic as a compromised HTTP connection and drop it. Mobile clients are worst affected because their traffic crosses the most such equipment. The single change that addresses most of it is to <b>use the secure scheme</b>: negotiating TLS before the Upgrade handshake creates an end-to-end tunnel that intermediaries cannot inspect or alter, and in practice it significantly raises the success rate of establishing the session. Some networks block this traffic outright, which is why a fallback is still needed.</p>
+  <p><b>(b)</b> Deaths at about a minute are <b>idle timeouts in infrastructure the team operates</b>. HTTP is optimised for short bursty transfers, so proxies, load balancers and servers are routinely configured to time out idle connections aggressively — one widely used proxy defaults to 60 seconds — and that is exactly wrong for a long-lived session. Raise the read and write timeouts explicitly on the proxy. The setting most often missed is on the <b>load balancer</b>: its connect, client and server timeouts apply only to the <i>initial HTTP Upgrade handshake</i>, and once the upgrade completes the connection is governed by a separate <b>tunnel</b> timeout that has to be raised on its own. Note also that TLS does not help here — it improves the odds of establishing the session but does not stop anyone timing out an idle TCP connection.</p>
+  <p><b>(c)</b> The polyfill is a performance risk because the hard part of emulation is not the API but the <b>transport</b>: the fallbacks are polling, long-polling or a streaming request, and the library's choice decides what a fallen-back client actually experiences — polling reintroduces both the queuing latency and the full per-request HTTP overhead the socket existed to remove. Always prefer the native interface and hold the fallback to the same performance goals. The key-and-accept exchange in the handshake is a <b>security policy against blind upgrades</b>: it proves the server genuinely understands the requested protocol version rather than having switched protocols without knowing what it switched to. It does <b>not</b> authenticate anyone, does not encrypt anything, and does not protect against a <b>transparent proxy</b> that analyses and modifies data on the wire without announcing itself — which is precisely why the answer to (a) is a tunnel.</p>
+
+  <div class="box tip nobreak" style="margin-top:14pt">
+    <h4>How to score yourself</h4>
+    <p>Two marks, both quick. <b>Completeness:</b> did you name every element, and — for this competency especially — did you name the <i>delay</i> or the <i>service</i> at stake? &ldquo;It'll be faster&rdquo; is not an answer; &ldquo;it removes queuing latency and leaves propagation unchanged&rdquo; is. <b>Phrasing:</b> could you have said it in a design review without hand-waving? If you wrote &ldquo;caching stops working&rdquo; where the key says &ldquo;the payload is opaque, so neither the browser cache nor any CDN can hold it and all the traffic lands on origin&rdquo;, the label is there and the mechanism isn't — and the mechanism is what changes anyone's mind.</p>
+  </div>
+</section>
+
+<!-- ============================== 10. WORKBOOK ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <style>#trk td,#trk th{padding:2.3pt 5pt; font-size:8.1pt} #quiz .writeline{height:13pt} #quiz li{margin-bottom:2pt}</style>
+  <table class="tight" id="trk">
+    <tr>
+      <th style="width:58mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:24mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> Latency vs bandwidth, and why the economics differ</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> The four delays, each with what it depends on</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Speed of light in fibre, and the refractive index</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> Great circle vs the cables that exist</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Bufferbloat, and why avoiding drops backfires</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> Last-mile latency, and the ~30% ceiling</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> The two-round-trip fixed cost of a new connection</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> Keepalive: (N−1) × RTT, and why N matters</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Pipelining, and the four reasons it failed</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> Head-of-line blocking in HTTP 1.x</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> Six per host, and the self-inflicted denial of service</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> Domain sharding, and what each shard costs</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> Protocol overhead: 500–800 bytes, plus cookies</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Bundling and spriting: the four costs</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> Inlining, the 1–2 KB rule and the 33% tax</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Workaround vs evergreen optimisation</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> SSE on the wire: the four fields</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> What the browser does for an event stream</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> Last-Event-ID: reporting versus replay</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> SSE's two hard limits, and the doorbell pattern</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> Queuing latency vs propagation latency</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> The Upgrade handshake and the 101 response</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> Frame vs message, and the header fields</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> Masking: what it defends, and what it doesn't</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>25 ·</b> Framing overhead against SSE and HTTP 1.x</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>26 ·</b> Subprotocol negotiation, and the no-match case</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>27 ·</b> The services a socket stops receiving</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>28 ·</b> bufferedAmount, and blocking returning</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>29 ·</b> TLS, idle timeouts, the tunnel setting</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>30 ·</b> Master matrix — direction × readability</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twenty minutes, write the answers</h3>
+  <ol id="quiz">
+    <li>Name the four components of latency, say what each is a function of, and name the only one that more bandwidth reduces.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain why latency and bandwidth have different futures, giving the physical reason and the approximate ceiling on improving latency.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain bufferbloat: what the designers were trying to achieve, what mechanism it breaks, and why a throughput test looks fine.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the latency saving from connection reuse as a formula, and say why the fixed cost of a new connection matters more the faster your server is.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Define head-of-line blocking in HTTP 1.x, and give three distinct reasons pipelining was abandoned in browsers.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain why six connections per host can produce a denial of service against your own application, and why an idle stream is not free.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name one distinct cost each for domain sharding, bundling and inlining, and say which of the three would still make sense under a protocol that could interleave responses.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Describe the Server-Sent Events wire format and say exactly which parts of the reconnect-and-recover story the browser handles and which you do.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>State which kind of latency a persistent connection removes and which it does not, then give SSE's two hard limits and the standard workaround for the second.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Distinguish a WebSocket frame from a message, and name three services you stop receiving once the connection has been upgraded.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+  </ol>
+</section>
+
+</body>
+</html>

@@ -20,7 +20,7 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 3 | Service Level Objectives & Canarying Releases | `sre-slo-canary/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 2 "Implementing SLOs" by Steven Thurgood and David Ferguson with Alex Hidalgo and Betsy Beyer (pp. 17–42), Ch. 16 "Canarying Releases" by Alec Warner and Štěpán Davidovič with Alex Hidalgo, Betsy Beyer, Kyle Smith and Matt Duftler (pp. 335–351). | Built · 18 questions registered |
 | 4 | Distributed Data — Encoding, Replication, Sharding, Unreliability | `ddia-distributed-data/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 5 "Encoding and Evolution", Ch. 6 "Replication", Ch. 7 "Sharding", Ch. 9 "The Trouble with Distributed Systems". | Built · 18 questions registered |
 | 5 | Transactions — Isolation Levels, Serializability, Atomic Commit | `ddia-transactions/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 8 "Transactions". | Built · 18 questions registered |
-| 6 | *unassigned* | — | — | Awaiting source |
+| 6 | Browser Networking — Latency, HTTP/1.x, Server-Sent Events, WebSocket | `hpbn-browser-networking/` | Ilya Grigorik, *High Performance Browser Networking*, O'Reilly — Ch. 1 "Primer on Latency and Bandwidth", Ch. 11 "HTTP 1.X", Ch. 16 "Server-Sent Events (SSE)", Ch. 17 "WebSocket". | Built · 18 questions registered |
 | 7 | *unassigned* | — | — | Awaiting source |
 | 8 | *unassigned* | — | — | Awaiting source |
 | 9 | *unassigned* | — | — | Awaiting source |
@@ -28,6 +28,25 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 6
+
+Cited within the source chapters and named in the booklet's teaching: the Hibernia Express transatlantic
+cable as the worked example of buying latency; Jim Gettys for coining *bufferbloat*, and the CoDel
+active queue management algorithm proposed against it, described in "Controlling Queue Delay" (*ACM
+Queue*); the US Federal Communications Commission's "Measuring Broadband America" report (February
+2013) for the last-mile figures; Akamai's quarterly broadband reports and Ookla's speedtest.net for edge
+bandwidth; TeleGeography for subsea capacity utilisation; Steve Souders, *High Performance Web Sites*,
+for the fourteen rules, half of them networking optimisations; David Gourley and Brian Totty, *HTTP: The
+Definitive Guide*; Joshua Graessley's WWDC 2012 session "Networking Best Practices" for the iTunes
+keepalive-and-pipelining case study; the HTTP Archive for the ninety-plus resources per page figure;
+Google's PageSpeed team for the 30–50 KB script-bundle target, and Gmail as the worked first-load
+optimisation; the W3C for the EventSource and WebSocket APIs and the IETF HyBi Working Group for the
+WebSocket protocol (RFC 6455), its multiplexing and compression extension drafts, and the X/Open
+handshake headers; "Talking to Yourself for Fun and Profit" (W2SP 2011) for the cache-poisoning attack
+that masking defends against; caniuse.com for browser support status; SockJS and Socket.IO as WebSocket
+polyfills and real-time frameworks; and Nginx and HAProxy as the proxy and load-balancer timeout
+examples.
 
 ### Works referenced inside competency 5
 
@@ -192,4 +211,13 @@ least one code, and each code points at the exact artefact to reread.
   fixed back matter (prescription → what it counters, so a reader can audit a design rather than
   diagnose an incident). Competency 1 has one and competency 5 now has one; the three in between
   drifted. They have not been re-rendered.
-- Competencies 6–13 are unassigned pending sources.
+- **Competency 6 also carries a scoped style block inside its `body.html`**, as competency 5 does —
+  reducing the monospace sketch size, tightening the tracker and quiz, and suppressing the page break
+  after the final section. Competencies 1–4 take all their styling from the shared block.
+- **Competency 6's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–5: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 6's source is four chapters spanning two parts of its book**, joined here on a causal
+  spine rather than presented in book order. The booklet says nothing about that; the ordering is
+  1, 11, 16, 17 as the source presents them, and no chapter is abridged.
+- Competencies 7–13 are unassigned pending sources.

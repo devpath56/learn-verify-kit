@@ -46,3 +46,4 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../sre-slo-canary/` — the third.
 `../ddia-distributed-data/` — the fourth.
 `../ddia-transactions/` — the fifth.
+`../hpbn-browser-networking/` — the sixth.
