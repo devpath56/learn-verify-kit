@@ -19,7 +19,7 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 2 | Design for Deployment & Chaos Engineering | `release-it-ch13-17/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 13 "Design for Deployment" (pp. 241–262), Ch. 17 "Chaos Engineering" (pp. 325–336). The Pragmatic Bookshelf. | Built · 18 questions registered |
 | 3 | Service Level Objectives & Canarying Releases | `sre-slo-canary/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 2 "Implementing SLOs" by Steven Thurgood and David Ferguson with Alex Hidalgo and Betsy Beyer (pp. 17–42), Ch. 16 "Canarying Releases" by Alec Warner and Štěpán Davidovič with Alex Hidalgo, Betsy Beyer, Kyle Smith and Matt Duftler (pp. 335–351). | Built · 18 questions registered |
 | 4 | Distributed Data — Encoding, Replication, Sharding, Unreliability | `ddia-distributed-data/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 5 "Encoding and Evolution", Ch. 6 "Replication", Ch. 7 "Sharding", Ch. 9 "The Trouble with Distributed Systems". | Built · 18 questions registered |
-| 5 | *unassigned* | — | — | Awaiting source |
+| 5 | Transactions — Isolation Levels, Serializability, Atomic Commit | `ddia-transactions/` | Martin Kleppmann with Chris Riccomini, *Designing Data-Intensive Applications*, 2nd ed., O'Reilly — Ch. 8 "Transactions". | Built · 18 questions registered |
 | 6 | *unassigned* | — | — | Awaiting source |
 | 7 | *unassigned* | — | — | Awaiting source |
 | 8 | *unassigned* | — | — | Awaiting source |
@@ -28,6 +28,26 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 5
+
+Cited within the source chapter and named in the booklet's teaching: IBM System R as the first SQL
+database and the origin of the transaction style still in use; the ACID acronym as coined in 1983;
+the BASE label offered as its counterpart; the Post Office Horizon accounting failure as a
+consequence of missing ACID transactions; PostgreSQL, MySQL/InnoDB, Oracle, SQL Server and IBM Db2
+as the isolation-level implementations compared, including the naming divergence around "repeatable
+read"; CockroachDB, TiDB, Spanner, FoundationDB and YugabyteDB as the scaled transactional systems;
+VoltDB/H-Store, Redis and Datomic as the serial-execution implementations, with state machine
+replication; SQL Server's In-Memory OLTP/Hekaton, HyPer and BadgerDB as further serializable
+snapshot isolation implementations; CouchDB, Datomic and LMDB for immutable copy-on-write B-trees;
+Aerospike and the lightweight-transactions feature of Cassandra and ScyllaDB as single-object
+linearizable stores; MongoDB and Redis for atomic document and data-structure operations; the
+X/Open XA standard with the Java Transaction API, JDBC and JMS, and WS-AtomicTransaction; Narayana,
+JOTM, BTM and MSDTC as XA coordinators; ActiveMQ, HornetQ, MSMQ and IBM MQ as XA-capable brokers;
+Kafka and Kafka Streams for internal distributed transactions and exactly-once semantics; the
+SQL/PSM standard and the vendor procedure languages PL/SQL, T-SQL and PL/pgSQL; Rails ActiveRecord
+and Django as ORMs that do not retry aborted transactions; and the Spanner paper for the epigraph on
+the cost of two-phase commit.
 
 ### Works referenced inside competency 4
 
@@ -161,4 +181,11 @@ least one code, and each code points at the exact artefact to reread.
   ruled lines under every question; competency 4 is the first booklet to apply it to the final quiz,
   and the template now carries it. The three earlier booklets predate the change and have not been
   re-rendered.
-- Competencies 5–13 are unassigned pending sources.
+- **Competency 5's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–4: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 5 uses one scoped style block inside its `body.html`**, reducing the monospace sketch
+  size and tightening the tracker and quiz spacing. Every other booklet takes all its styling from the
+  shared block. The scoped rules exist to fit five large sketches onto their pages; if the shared style
+  block is ever revised, check this booklet's sketches first.
+- Competencies 6–13 are unassigned pending sources.

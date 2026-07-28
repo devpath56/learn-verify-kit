@@ -1,0 +1,1387 @@
+<body>
+<style>.tree{font-size:8.05pt; line-height:1.56} .sketch{padding:9pt 10pt}</style>
+
+<!-- ============================== COVER ============================== -->
+<section class="page cover">
+  <div class="kicker">Learn · Verify — offline study booklet</div>
+  <h1>Transactions</h1>
+  <div class="rule"></div>
+  <div class="sub">The promise that lets you pretend crashes and concurrency don't exist — what it actually says, every discount you are sold on it, and what each discount lets through.</div>
+
+  <div class="chunkstrip">
+    <div><span class="num">1</span><b>What a transaction promises</b>ACID, one letter at a time. Single object versus many. Abort and safe retry.</div>
+    <div><span class="num">2</span><b>The weak levels, and what they stop</b>Read committed, snapshot isolation, MVCC.</div>
+    <div><span class="num">3</span><b>What they don't stop</b>Lost updates, write skew, phantoms — and the three roads back to serializable.</div>
+    <div><span class="num">4</span><b>When it spans machines</b>Atomic commit, 2PC, in-doubt locks, and the cheaper alternative.</div>
+  </div>
+
+  <div class="meta" style="margin-top:26pt">
+    Print double-sided, short-edge bind, A4 · 100% scale (no &ldquo;fit to page&rdquo;).<br>
+    Answer key starts at Section 9 — keep a sheet of paper over it.
+  </div>
+</section>
+
+<!-- ============================== HOW TO USE ============================== -->
+<section class="page">
+  <h2>How to use this booklet</h2>
+
+  <h3>The loop, per section</h3>
+  <ol>
+    <li>Read the plain-version box first. If it doesn't land, the rest won't either.</li>
+    <li>Read the teaching. Say each boundary out loud: &ldquo;X is <i>this</i>, its look-alike Y is <i>that</i>.&rdquo;</li>
+    <li>Cover the page. Write the answer to <b>Q1</b> in the blank lines, in your own words, in full sentences. <b>Then</b> check the key.</li>
+    <li>Score yourself on completeness. Then do <b>Q2</b> and note whether it beat Q1.</li>
+    <li>Only then move on.</li>
+  </ol>
+
+  <div class="box tip">
+    <h4>The rule that does most of the work</h4>
+    <p>If you find yourself thinking &ldquo;yes, I know this&rdquo; — that is <i>recognition</i>, and it is not learning. The only evidence that counts is a written answer produced with the page covered.</p>
+  </div>
+
+  <div class="box bound">
+    <h4>The trap this subject sets, specifically</h4>
+    <p>Almost every term here has a look-alike, and several have the <i>same name</i> in different databases. &ldquo;Repeatable read&rdquo; means three different things depending on the vendor; &ldquo;serializable&rdquo; sometimes means snapshot isolation; &ldquo;atomic&rdquo; means one thing in ACID and a different thing in a thread. Whenever you meet a term in these pages, say which of its neighbours it is <i>not</i>. That habit is most of the competency.</p>
+  </div>
+
+  <h3>The spacing schedule</h3>
+  <p>Review at <b>day 1, day 3, day 7, day 16, day 35</b>. On a pass, jump to the next interval. On a fail, reset that item to 1 day. Use the grid at the back; one row per item.</p>
+
+  <h3>What's in here</h3>
+  <table class="toc">
+    <tr><td><b>1</b> — Learning goal and roadmap</td><td>orientation</td></tr>
+    <tr><td><b>2</b> — What a transaction promises</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>3</b> — The weak levels, and what they stop</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>4</b> — What they don't stop, and the three roads back</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>5</b> — When the transaction spans machines</td><td>teaching · questions · matrix</td></tr>
+    <tr><td><b>6</b> — Concept sketch + master matrix</td><td>consolidation</td></tr>
+    <tr><td><b>7</b> — Symptom → diagnosis → move</td><td>working reference</td></tr>
+    <tr><td><b>8</b> — Numbers worth remembering · Glossary</td><td>reference</td></tr>
+    <tr><td><b>9</b> — Answer key</td><td>keep covered</td></tr>
+    <tr><td><b>10</b> — Spaced-review tracker · final quiz</td><td>workbook</td></tr>
+  </table>
+
+</section>
+
+<!-- ============================== 1. GOAL + ROADMAP ============================== -->
+<section class="page">
+  <div class="kicker">Section 1</div>
+  <h2>Learning goal &amp; roadmap</h2>
+
+  <div class="box">
+    <h4>Learning goal — what you should be able to do when you close this</h4>
+    <p>Given a real design or incident (&ldquo;two people booked the same room&rdquo;, &ldquo;the balance went negative and nobody noticed&rdquo;, &ldquo;the totals in this report don't add up&rdquo;, &ldquo;half the cluster is blocked on one stuck transaction&rdquo;), you can:</p>
+    <ol>
+      <li><b>Name the anomaly</b> — dirty read, dirty write, read skew, lost update, write skew, phantom — and say which isolation level would have prevented it.</li>
+      <li><b>Locate the decision</b>: what did the transaction <i>read</i>, what did it <i>decide</i>, and what did it <i>write</i>? Nearly every bug in this competency is a decision made on a premise that stopped being true.</li>
+      <li><b>Prescribe the fix</b> at the right layer — an atomic operation, an explicit lock, a uniqueness constraint, a stronger isolation level, or a redesign around idempotence — and name the near-miss you rejected.</li>
+      <li><b>State the price.</b> Every level above the one you are on costs throughput, latency predictability, or aborts you now have to retry.</li>
+    </ol>
+  </div>
+
+  <h3>The core model in one paragraph</h3>
+  <p>A transaction is a bargain. You group several reads and writes and say &ldquo;treat these as one&rdquo;; in exchange the database promises that a fault mid-way leaves no trace and that concurrent work cannot show you a half-finished state. That promise, honoured in full, is called <b>serializable</b>: the result is as if the transactions had run one at a time. Full serializability has a real cost, so almost every database ships you something cheaper by default and still calls it a transaction. Everything difficult about this subject lives in the gap. The weaker levels each prevent a specific list of anomalies and permit the rest — and the ones they permit cannot be found by testing, because they need unlucky timing to appear. Part 1 is the promise. Part 2 is what the two common discounts do buy you. Part 3 is what they leave on the floor, and the three ways to buy the promise back. Part 4 is what happens to all of it when the transaction has to span more than one machine.</p>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version — the whole thing at once</h4>
+    <ul>
+      <li>A transaction is a way of saying &ldquo;all of this, or none of it&rdquo; — so if something breaks halfway, you can just try again.</li>
+      <li>It's also a way of saying &ldquo;don't let anyone else see my work until I'm finished.&rdquo;</li>
+      <li>Doing that perfectly is slow, so databases sell you a cheaper version and don't always tell you which one.</li>
+      <li>The cheaper versions all have the same shape of bug: you look, you decide based on what you saw, and by the time you write, what you saw isn't true any more.</li>
+      <li>And when the transaction has to cover two machines, someone has to be in charge of deciding it happened — which is fine right up until that someone dies mid-sentence.</li>
+    </ul>
+  </div>
+
+  <h3>The four parts, and why they're in this order</h3>
+  <table>
+    <tr><th style="width:24mm">Part</th><th>What it covers</th><th style="width:50mm">Why here</th></tr>
+    <tr><td><span class="pill p1">1</span><b>What a transaction promises</b></td><td>Atomicity as abortability; consistency as the application's job; isolation as serializability; durability and its limits. Single-object versus multi-object operations, and why multi-object ones are needed at all. Aborts, retries, and the five ways a retry can hurt you.</td><td>You cannot judge a discount without knowing the full price. Every later part is a subtraction from this.</td></tr>
+    <tr><td><span class="pill p2">2</span><b>The weak levels, and what they stop</b></td><td>Read committed: no dirty reads, no dirty writes, and how each is implemented. Read uncommitted. Read skew, and snapshot isolation as the answer. Multiversion concurrency control, visibility rules, and the naming confusion around &ldquo;repeatable read&rdquo;.</td><td>These two levels cover the overwhelming majority of real deployments. Knowing exactly what they guarantee is the practical core.</td></tr>
+    <tr><td><span class="pill p3">3</span><b>What they don't stop</b></td><td>Lost updates and the five ways to prevent them. Write skew as the generalisation. Phantoms, and why an explicit lock has nothing to hold on to. Materialising conflicts. Then the three implementations of serializability: actual serial execution, two-phase locking, and serializable snapshot isolation.</td><td>The anomalies here are the ones that reach production, because no weak level catches them and no test reliably reproduces them.</td></tr>
+    <tr><td><span class="pill p4">4</span><b>When the transaction spans machines</b></td><td>The atomic commitment problem. Two-phase commit, its two points of no return, in-doubt participants and the locks they hold. Coordinator failure. XA and why it disappoints. Database-internal distributed transactions. Exactly-once processing without any of it.</td><td>Atomicity on one node comes down to one disk writing one record. Across nodes it becomes a protocol — and the protocol has a failure mode that stops your application.</td></tr>
+  </table>
+
+  <div class="box quote">
+    &ldquo;We believe it is better to have application programmers deal with performance problems due to overuse of transactions as bottlenecks arise, rather than always coding around the lack of transactions.&rdquo;
+  </div>
+</section>
+
+<!-- ============================== PART 1 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">1</div>
+    <div>
+    <div class="n">Part 1 of 4</div>
+    <h2>What a transaction promises</h2>
+    <p>Four letters, three of which do not mean what the word suggests.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>A transaction is a bundle of changes with a rule attached: either all of them happen, or none of them do.</li>
+      <li>That rule is worth more than it sounds. It means that when something goes wrong, you know <i>nothing</i> happened — so it is safe to just do it again.</li>
+      <li>There is a second rule too: while you're in the middle of your bundle, nobody else gets to see the half-done version.</li>
+      <li>The four famous letters are A, C, I and D. Three of them are misleading names, and one of them isn't really the database's job at all.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>Moving house. You are carrying a stack of plates from the van to the kitchen. <b>Atomicity</b> is the rule that if you drop the stack half-way, you don't end up with three plates in the kitchen and four on the drive — you end up back at the van, able to try again knowing exactly where you stand. <b>Isolation</b> is the rule that nobody walks into the kitchen mid-trip and counts the plates. <b>Durability</b> is the rule that once the plates are on the shelf they stay there. And <b>consistency</b> — &ldquo;there should be eight plates in this house&rdquo; — is a rule you hold in your head. The van doesn't know it, and won't stop you breaking it.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Transaction</b></td>
+      <td>Several reads and writes grouped into one logical unit that either <b>commits</b> or <b>aborts</b>.</td>
+      <td>In a relational database, everything between <code>BEGIN TRANSACTION</code> and <code>COMMIT</code> on one client connection.</td>
+      <td>vs <b>a multi-object API call</b> such as a key-value store's multi-put, which may succeed for some keys and fail for others. Grouping operations is not the same as transaction semantics; without a way to identify the group and undo it, you have neither.</td>
+    </tr>
+    <tr>
+      <td><b>Atomicity (the A)</b></td>
+      <td>If a fault occurs after some of the writes, the transaction is aborted and every write it made so far is discarded.</td>
+      <td>An error updating the unread counter rolls back the email insertion too, so the mailbox and the counter cannot disagree.</td>
+      <td>vs <b>atomicity in multithreaded programming</b>, where it means no other thread can see a half-finished operation. That sense is covered by the letter I here. ACID atomicity is <b>not about concurrency at all</b> — <b>abortability</b> would have been the better word.</td>
+    </tr>
+    <tr>
+      <td><b>Consistency (the C)</b></td>
+      <td>An application-specific invariant that must be true before and after — credits and debits balance, a balance never goes negative.</td>
+      <td>Foreign-key, uniqueness and check constraints declared in the schema; more complex invariants sometimes via triggers or materialized views.</td>
+      <td>vs the <b>four other things the word means</b> — replica consistency, a consistent snapshot, consistent hashing, and linearizability in the CAP theorem. The C is also the odd letter out: it depends on how the application uses the database, not on the database alone. Invariants you never declared cannot be enforced.</td>
+    </tr>
+    <tr>
+      <td><b>Isolation (the I)</b></td>
+      <td>Concurrently executing transactions cannot step on each other. Formalised as <b>serializability</b>: each transaction may pretend it is the only one running.</td>
+      <td>Two clients both incrementing a counter from 42 end at 44, not 43.</td>
+      <td>vs <b>what you actually get</b>. Serializability costs performance, so most databases default to something weaker and still call it isolation — one popular system's isolation level named &ldquo;serializable&rdquo; in fact implements snapshot isolation. The word on the tin is not the guarantee.</td>
+    </tr>
+    <tr>
+      <td><b>Durability (the D)</b></td>
+      <td>Once committed, the data will not be forgotten, even after a crash.</td>
+      <td>On one node: <code>fsync</code> to nonvolatile storage, a write-ahead log for crash recovery, checksums to detect incomplete entries. In a replicated system: copied to some number of nodes before the commit is reported.</td>
+      <td>vs <b>a guarantee</b>. There is no perfect durability, only stacked risk reduction. Disks and their firmware have bugs, <code>fsync</code> is hard to use correctly, a correlated fault can take out every replica at once, and asynchronous replication can lose recent writes at failover. Write to disk <i>and</i> replicate <i>and</i> back up.</td>
+    </tr>
+    <tr>
+      <td><b>Single-object operation</b></td>
+      <td>Atomicity and isolation applied to one row, document or key — implemented with a crash-recovery log and a per-object lock.</td>
+      <td>Writing a 20&nbsp;kB JSON document: no reader sees half of it, a power cut doesn't splice old and new together, an interrupted send doesn't store an unparseable fragment. Also atomic increments and conditional writes.</td>
+      <td>vs <b>a transaction</b>. These are useful and can prevent lost updates on one object, but they give <b>no guarantee across multiple objects</b>. A store offering linearizable reads and conditional writes on single objects has not given you transactions.</td>
+    </tr>
+    <tr>
+      <td><b>Multi-object transaction</b></td>
+      <td>One unit spanning several rows, documents or index entries.</td>
+      <td>Needed when a foreign key must stay valid, when denormalized data must stay in sync with its source, and whenever a <b>secondary index</b> must be updated with the row — the index is a separate object.</td>
+      <td>vs <b>doing it without transactions</b>, which is possible: error handling becomes much more complicated without atomicity, and the lack of isolation produces the concurrency bugs the rest of this booklet is about.</td>
+    </tr>
+    <tr>
+      <td><b>Abort · rollback · retry</b></td>
+      <td>Abandoning a transaction and undoing its writes, so the application can safely try again.</td>
+      <td>A deadlock, an isolation violation, a transient network interruption, a failover.</td>
+      <td>vs <b>best-effort systems</b>, whose philosophy is &ldquo;do as much as possible and don't undo what's done&rdquo; — leaving error recovery to the application. Datastores with leaderless replication typically work this way.</td>
+    </tr>
+  </table>
+
+  <h3>Retrying is the point of aborting — and it can still bite you</h3>
+  <p>Rolling back exists so that a retry is safe, which makes it the single best error-handling mechanism available. It is worth noticing that popular object-relational mapping frameworks do <b>not</b> retry aborted transactions: the error becomes an exception, the user's input is thrown away, and they get an error message. That wastes the whole mechanism. But a retry is not free either:</p>
+  <ul>
+    <li><b>It may have already succeeded.</b> If the commit worked and the acknowledgment was lost, retrying performs it twice — unless you have an application-level deduplication mechanism.</li>
+    <li><b>It can make an overload worse.</b> If the abort was caused by load or contention, retrying adds to the load. Limit the number of retries, use exponential backoff, and treat overload errors differently from other errors.</li>
+    <li><b>It is pointless after a permanent error.</b> Retry after a deadlock, an isolation violation, a temporary network interruption or a failover. Do not retry a constraint violation.</li>
+    <li><b>Side effects outside the database still happen.</b> If the transaction sent an email, aborting doesn't unsend it, and every retry sends another.</li>
+    <li><b>The client can die mid-retry</b>, in which case the data it was trying to write is simply lost.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — what &ldquo;ACID compliant&rdquo; does <i>not</i> tell you</h4>
+    <p><b>It does not</b> tell you which isolation level you get, because implementations of ACID differ from one database to the next and there is a great deal of ambiguity in the meaning of isolation. As a claim, it has become largely a marketing term.<br>
+    <b>It also isn't</b> usefully contrasted with the label sometimes applied to systems that don't meet the criteria — &ldquo;basically available, soft state, eventual consistency&rdquo; — which is vaguer still. The only sensible reading of that label is <i>not ACID</i>, which can mean almost anything.<br>
+    <b>What to ask instead:</b> which isolation level is the default, what is it actually called in this product, and which anomalies does that level permit?</p>
+  </div>
+
+  <h3>Anchor sketch — the four letters, unpacked</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = the node that matters most</span> &nbsp; <span class="q">Q = cover the page and answer this</span></div>
+<div class="tree">    a transaction = many reads and writes, ONE unit
+             it COMMITS or it ABORTS. never half.
+                          |
+  <span class="tk1">ATOMICITY</span>   a fault part-way through discards every
+              write made so far. nothing to do with
+              concurrency.
+              |
+              +--> the honest name is ABORTABILITY, and
+                   that is exactly what makes a RETRY safe
+              |
+  <span class="tk1">CONSISTENCY</span> the invariant is YOURS. the database can
+              enforce only what you declared as a
+              constraint.
+              |
+              +--> the odd letter out: a property of how
+                   the application uses the database
+              |
+  <span class="tks">ISOLATION</span>   concurrent transactions cannot see each
+              other's half-done work.
+              |
+              +--> formalised as SERIALIZABLE -- and this
+                   is the letter everyone quietly discounts
+              |
+  <span class="tk1">DURABILITY</span>  a committed write survives a crash.
+              fsync . write-ahead log . checksums . replicas
+              |
+              +--> no perfect durability exists. stack the
+                   risk reductions; do not trust one.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Which letter covers &ldquo;another client sees my half-finished work&rdquo;, and which covers &ldquo;a crash left my work half-finished&rdquo;?<br>
+      <span class="q">Q</span> Why is C the odd one out, and what happens to an invariant you never declared?<br>
+      <span class="q">Q</span> Name three reasons a retry after an abort can still hurt you.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Use transactions at all</td><td>A large class of errors collapses into &ldquo;abort and try again&rdquo;. You get to ignore partial failure and most concurrency.</td><td>Throughput, and a dependency on getting the isolation level right. Not every application needs them.</td><td>Access patterns are more complex than reading and writing single records — which is most of the time.</td></tr>
+    <tr><td>Single-object atomic operations instead</td><td>Concurrency-safe increments and conditional writes with no transaction and no read-modify-write cycle in your code.</td><td>Nothing across objects. And not every change can be expressed as one — arbitrary text editing, for instance.</td><td>The invariant genuinely lives inside one object.</td></tr>
+    <tr><td>Declaring invariants as constraints</td><td>The database enforces them for you, including against code you didn't write.</td><td>Complex invariants are hard or impossible to express this way, and constraints spanning several objects usually aren't supported at all.</td><td>Always, for the ones that fit: uniqueness, foreign keys, value checks.</td></tr>
+    <tr><td>Durability by disk</td><td>Survives a crash of the process and the machine.</td><td>If the machine dies, the data is intact but <b>inaccessible</b> until you fix it or move the disk.</td><td>Alongside replication, never instead of it.</td></tr>
+    <tr><td>Durability by replication</td><td>The system stays <i>available</i> through a machine failure.</td><td>A correlated fault can take out every replica at once, and asynchronous replication can lose recent writes at failover.</td><td>Alongside disk writes and backups.</td></tr>
+    <tr><td>Automatic retry of aborted transactions</td><td>Simple, effective error handling — the reason rollback exists.</td><td>Double execution if an acknowledgment was lost; a worse outage under contention; nothing at all for side effects outside the database.</td><td>For transient errors, with bounded retries and backoff.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;It's all-or-nothing.&rdquo;</td><td>&ldquo;That's ACID atomicity, which is really abortability — the guarantee that lets us retry safely. It says nothing about concurrency; that's the I.&rdquo;</td></tr>
+    <tr><td>&ldquo;The database keeps our data consistent.&rdquo;</td><td>&ldquo;It enforces the invariants we declared as constraints. The ones we didn't declare are our problem — the C in ACID is a property of how we use it.&rdquo;</td></tr>
+    <tr><td>&ldquo;We're on an ACID database, so we're fine.&rdquo;</td><td>&ldquo;Which isolation level, and what's it called here? Most defaults are well below serializable, and the naming is inconsistent between products.&rdquo;</td></tr>
+    <tr><td>&ldquo;The write is committed, so it's safe.&rdquo;</td><td>&ldquo;It's durable to the extent our stack is. Disk plus replication plus backups — perfect durability doesn't exist, and a correlated fault can take every replica.&rdquo;</td></tr>
+    <tr><td>&ldquo;We do a multi-put, so it's atomic.&rdquo;</td><td>&ldquo;A multi-object API isn't transaction semantics. That call can succeed for some keys and fail for others and leave us partially updated.&rdquo;</td></tr>
+    <tr><td>&ldquo;It failed, so we'll just run it again.&rdquo;</td><td>&ldquo;Only if the error was transient and there are no external side effects — and we need deduplication in case the commit actually succeeded and the ack was lost.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 1</div>
+    <p>A team stores each order as a single document and also maintains a separate <code>order_totals</code> summary row per customer, plus a secondary index on order status. They have no multi-object transactions — the store offers atomic single-document updates and a conditional write, which they describe as &ldquo;atomic, so we're covered&rdquo;. Support reports two recurring issues: totals that don't match the sum of a customer's orders, and orders that appear when filtering by status but not when listed directly.</p>
+    <p><b>(a)</b> Name the two guarantees they believe they have and say precisely what each one does and does not cover. <b>(b)</b> Explain the mechanism behind <i>each</i> of the two reported symptoms. <b>(c)</b> The team proposes retrying any failed write until it succeeds. Give two distinct reasons this does not fix the problem, one of which must not depend on the network.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 1 · Question 2</div>
+    <p>A payments service runs on a database advertised as ACID compliant. During an incident review, an engineer says: &ldquo;the database guarantees consistency, so a negative balance is impossible&rdquo;. A second engineer says: &ldquo;and it's durable, so once we return 200 to the client the money has definitely moved&rdquo;. Neither statement is safe as stated.</p>
+    <p><b>(a)</b> Correct the first statement, naming what the database will and will not enforce and what the team must do about it. <b>(b)</b> Correct the second, giving two distinct ways a committed write can still be lost. <b>(c)</b> The service sends a confirmation email inside the transaction and retries the whole transaction on any error. Name the specific hazard and say what has to change.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — how many objects, how many clients</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is more than one <i>client</i> involved? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">One client at a time</div>
+      <div class="colh">Several clients concurrently</div>
+
+      <div class="rowh">ONE<br>object</div>
+      <div class="cell good"><b>Already solved for you</b>
+        Storage engines almost universally give atomicity and isolation on a single object: a crash-recovery log, plus a lock so only one thread touches it.<br>
+        <i>Move:</i> nothing. No reader ever sees half a document, and a power cut doesn't splice old and new values together.</div>
+      <div class="cell"><b>Atomic operations and conditional writes</b>
+        An increment done by the database, or a write that applies only if the value hasn't changed since you read it.<br>
+        <i>Move:</i> use them, and stop writing read-modify-write cycles in application code. This prevents lost updates <b>on that object</b> — and gives you nothing across objects.</div>
+
+      <div class="rowh">MANY<br>objects</div>
+      <div class="cell"><b>Atomicity is what you need</b>
+        A fault part-way through leaves the mailbox and the counter disagreeing, or a foreign key dangling.<br>
+        <i>Move:</i> a multi-object transaction, so an error rolls the whole thing back and you can retry knowing nothing took effect. Note that a secondary index makes almost every write multi-object whether you meant it or not.</div>
+      <div class="cell focus"><b>Where this whole booklet lives</b>
+        Several clients, several objects each. Every anomaly in parts 2 and 3 needs exactly this shape.<br>
+        <i>Move:</i> you need A <b>and</b> I together, and you must know which grade of I you are actually getting. Assume the default is well below serializable until you have checked the product's own name for it.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> going down is what atomicity is for; going right is what isolation is for. People routinely reach for a bottom-left tool in a bottom-right situation — &ldquo;we use an atomic increment, so we're safe&rdquo; — and the tool is real, it just doesn't cover the axis they're on.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Say which letter you are relying on.</b> A crash mid-way is the A; another client seeing half your work is the I; an invariant nobody declared is nobody's job. Most arguments about &ldquo;is this safe?&rdquo; are two people relying on different letters without saying so.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 2 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">2</div>
+    <div>
+    <div class="n">Part 2 of 4</div>
+    <h2>The weak levels, and what they stop</h2>
+    <p>Read committed, snapshot isolation, and the machinery underneath both.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>The safest setting is slow, so databases offer cheaper settings that block <i>some</i> problems.</li>
+      <li>The cheapest useful one says: you'll never see someone's unfinished work, and you'll never scribble over it.</li>
+      <li>But it lets you look at different parts of the database at different moments — so you can add up numbers that were never all true at once.</li>
+      <li>The next one up fixes that by giving your whole transaction a photograph of the database taken when it started.</li>
+      <li>The photograph is made by keeping several old copies of every row and hiding the ones that are too new for you.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>You're auditing a shop's stock by walking round with a clipboard. <b>Read committed</b> is the rule that you only count items that have actually been put on the shelf, never ones still in someone's arms. Fine — but you count aisle 1 at ten past, aisle 7 at half past, and in between a box was moved from 7 to 1. You counted it twice, and every single number you wrote down was true when you wrote it. <b>Snapshot isolation</b> is being handed a photograph of the whole shop taken the moment you walked in. You count from the photo. Nothing you count moves, and other people keep shopping the whole time.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Dirty read</b></td>
+      <td>Seeing data written by a transaction that has not yet committed.</td>
+      <td>User 1 sets x = 3 and hasn't committed; user 2 reads x and gets 3.</td>
+      <td>vs <b>read skew</b>, where everything you read <i>was</i> committed. Preventing dirty reads matters for two reasons: you'd otherwise see some of a transaction's rows and not others, and you'd be able to read data that is later rolled back — which forces <b>cascading aborts</b> of everyone who read it.</td>
+    </tr>
+    <tr>
+      <td><b>Dirty write</b></td>
+      <td>Overwriting a value that another transaction has written but not yet committed.</td>
+      <td>Two people buying the same car: one wins the update to the listing, the other wins the update to the invoice, so the car goes to one and the bill to the other.</td>
+      <td>vs a <b>lost update</b>, where the earlier write <i>had</i> committed — so it isn't a dirty write, it's still wrong for a different reason. Almost all transaction implementations prevent dirty writes; far fewer prevent lost updates.</td>
+    </tr>
+    <tr>
+      <td><b>Read committed</b></td>
+      <td>The basic isolation level: <b>no dirty reads</b> and <b>no dirty writes</b>. The default in several major databases.</td>
+      <td>Dirty writes are prevented with <b>row-level locks</b> held until commit or abort. Dirty reads are prevented by remembering both the old committed value and the new uncommitted one, and serving readers the old one.</td>
+      <td>vs preventing dirty reads <b>with read locks</b>, which is possible and is what some databases do, but works badly: one long-running write transaction makes read-only transactions queue behind it, so a slowdown in one part of the application shows up in a completely unrelated part.</td>
+    </tr>
+    <tr>
+      <td><b>Read uncommitted</b></td>
+      <td>Weaker still: prevents dirty writes but <b>not</b> dirty reads.</td>
+      <td>Returns the latest written value immediately, even from an uncommitted transaction.</td>
+      <td>It's cheaper because the database needn't store two versions of the row. It <i>reduces the probability</i> of lost updates without preventing them — which is not a guarantee you can build on.</td>
+    </tr>
+    <tr>
+      <td><b>Read skew</b> <span style="white-space:nowrap">(nonrepeatable read)</span></td>
+      <td>Seeing different parts of the database at different points in time.</td>
+      <td>$500 in each of two accounts. A transfer of $100 runs while you look; you see one account before the money arrives ($500) and the other after it left ($400), so $1,000 looks like $900.</td>
+      <td>vs a <b>dirty read</b> — nothing here was uncommitted. Both balances were genuinely committed at the moment they were read. This is why read skew is considered acceptable under read committed. Note the word <b>skew</b> is overloaded; elsewhere it means an unbalanced workload, here it means a timing anomaly.</td>
+    </tr>
+    <tr>
+      <td><b>Snapshot isolation</b></td>
+      <td>Each transaction reads from a <b>consistent snapshot</b>: everything committed at the moment it started, and nothing later.</td>
+      <td>Essential for backups, which take hours and would otherwise mix old and new parts, and for analytical queries and integrity checks that scan large parts of the database.</td>
+      <td>vs <b>serializable</b>. It is not serializable, however it is labelled: it permits write skew and, in some implementations, lost updates. Also vs the <b>SQL standard's repeatable read</b> — the standard predates snapshot isolation and defines something that looks superficially similar.</td>
+    </tr>
+    <tr>
+      <td><b>Multiversion concurrency control (MVCC)</b></td>
+      <td>Keeping several committed versions of each row side by side, so different transactions can see the database at different points in time.</td>
+      <td>Each row carries an <code>inserted_by</code> and a <code>deleted_by</code> transaction id. An update is internally a delete plus an insert. A garbage collector removes versions no transaction can still see.</td>
+      <td>vs the <b>two-version</b> trick used for read committed alone (old committed value plus new uncommitted one). MVCC is the generalisation of it. Its defining performance property: <b>readers never block writers, and writers never block readers</b> — write locks still prevent dirty writes, but reads take no locks at all.</td>
+    </tr>
+    <tr>
+      <td><b>Repeatable read</b></td>
+      <td>A name, not a guarantee.</td>
+      <td>In one database it means snapshot isolation; in another it means an MVCC implementation weaker than snapshot isolation; in a third it means serializability.</td>
+      <td>The SQL standard's definition is ambiguous and imprecise, several databases implement things they all call repeatable read with big differences between them, and most don't satisfy the formal research definition. Treat the phrase as a prompt to go and read the specific product's documentation.</td>
+    </tr>
+  </table>
+
+  <h3>How a consistent snapshot is actually decided</h3>
+  <p>Every transaction gets a unique, always-increasing transaction id when it starts. Every row it writes is tagged with that id. When a transaction reads, the database decides which row versions are visible to it:</p>
+  <ol>
+    <li>At the start of the transaction, the database lists all <b>other transactions in progress</b> at that moment. Writes by those transactions are ignored <b>even if they subsequently commit</b>.</li>
+    <li>Writes by transactions with a <b>later id</b> are ignored, regardless of whether they have committed.</li>
+    <li>Writes by <b>aborted</b> transactions are ignored, whenever the abort happened. This is convenient: an aborting transaction's rows don't need removing immediately, because the visibility rule already filters them out and the garbage collector can clean up later.</li>
+    <li>Everything else is visible.</li>
+  </ol>
+  <p>Put the other way round, a row is visible if the transaction that <i>inserted</i> it had already committed when the reader started, and it is either not marked for deletion or the transaction that requested the deletion had not committed when the reader started. Because values are never updated in place — a new version is inserted instead — the snapshot costs only a small overhead, and a long-running transaction can keep reading values everyone else considers long gone.</p>
+
+  <div class="box tip">
+    <h4>Two things that follow from &ldquo;never update in place&rdquo;</h4>
+    <p><b>Indexes need care.</b> The common approach is for each index entry to point at one version of a row, with versions chained together; a query using the index walks the chain for a version that is both visible and matching. When the garbage collector removes invisible versions, the corresponding index entries go too.</p>
+    <p><b>There is a second design.</b> Some databases use an immutable, copy-on-write B-tree: a write copies each modified page and every parent up to the root, so every write transaction creates a <b>new tree root</b>, and a root <i>is</i> a consistent snapshot. Unaffected pages are shared. No transaction-id filtering is needed at all — but a background compaction and garbage-collection process is.</p>
+  </div>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — &ldquo;committed&rdquo; is not &ldquo;consistent&rdquo;</h4>
+    <p><b>Read committed guarantees</b> that every individual value you read was committed at the moment you read it.<br>
+    <b>It does not guarantee</b> that the values were all committed <i>at the same moment</i> — and a set of individually-true numbers can be jointly impossible. That is the whole of read skew, and it is why a backup or an integrity check taken under read committed can be permanently wrong: restore it, and the disappearing money becomes real.</p>
+  </div>
+
+  <h3>Anchor sketch — the visibility ladder</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">  <span class="tk2">READ UNCOMMITTED</span>
+       you can see writes nobody ever committed
+       cheaper: no second version of the row to keep
+       |
+       v
+  <span class="tk2">READ COMMITTED</span>       (the default in many databases)
+       no DIRTY READS  -- serve the old committed value
+                          while the new one is in flight
+       no DIRTY WRITES -- row locks, held to commit/abort
+       |
+       +--> but every read happens at a DIFFERENT moment
+       |
+       +--> <span class="tks">READ SKEW</span>  $500 + $400 = $900, and $100
+       |    looks gone. every number was true.
+       |    the SET of them never was.
+       |
+       v
+  <span class="tk2">SNAPSHOT ISOLATION</span>
+       the whole transaction reads ONE moment: everything
+       committed when it started, nothing after
+       |
+       +--> built on <span class="tk2">MVCC</span>: many versions per row, each
+       |    tagged with the id of the transaction that
+       |    wrote it; an update is a delete plus an insert
+       |
+       +--> readers never block writers,
+       |    writers never block readers
+       |
+       +--> and it is called "repeatable read" in one
+            product and "serializable" in another
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Give the two guarantees of read committed, and how each is implemented.<br>
+      <span class="q">Q</span> Why is read skew not a dirty read, and why is it intolerable for a backup?<br>
+      <span class="q">Q</span> State the four visibility rules, or at least the two-clause version of them.
+    </div>
+  </div>
+
+  <h3>Trade-offs</h3>
+  <table class="tight">
+    <tr><th style="width:36mm">Decision</th><th>Buys you</th><th>Costs you</th><th style="width:34mm">Choose it when</th></tr>
+    <tr><td>Read committed</td><td>No dirty reads, no dirty writes, very little overhead. Widely the default.</td><td>Read skew, lost updates, write skew and phantoms all remain possible.</td><td>Short transactions that read and write a single object, or where a momentary inconsistent view is genuinely harmless.</td></tr>
+    <tr><td>Preventing dirty reads with read locks</td><td>Simplicity — one lock mechanism for reads and writes.</td><td>One long write transaction blocks every reader of that row, so a slowdown propagates into unrelated parts of the application.</td><td>Rarely. Keeping the old committed value is the better implementation and the more common one.</td></tr>
+    <tr><td>Read uncommitted</td><td>Slightly cheaper: no need to store a second version of the row.</td><td>Dirty reads, and therefore cascading aborts. Only <i>reduces the probability</i> of lost updates.</td><td>Almost never for application data.</td></tr>
+    <tr><td>Snapshot isolation</td><td>Read skew gone. Long read-only queries — backups, analytics, integrity checks — run on a frozen, coherent view while writes continue.</td><td>Storage and garbage collection for old versions. Write skew still possible. Lost-update behaviour varies by product.</td><td>Almost always worth it over read committed, and it is the highest level some products offer.</td></tr>
+    <tr><td>Long-running read transactions under MVCC</td><td>A perfectly coherent view of an old moment, for as long as you like.</td><td>The database must retain every version that transaction might still need, so garbage collection stalls and storage grows.</td><td>Analytics and backups — but watch the age of the oldest open snapshot.</td></tr>
+  </table>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;It read half-finished data.&rdquo;</td><td>&ldquo;A dirty read. Read committed prevents it — and the reason it matters is cascading aborts as much as the confusing view.&rdquo;</td></tr>
+    <tr><td>&ldquo;The two totals didn't match.&rdquo;</td><td>&ldquo;Read skew. Each value was committed when we read it, but they were read at different moments, so the set was never simultaneously true. Snapshot isolation fixes it.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll take the backup at 3 a.m. when it's quiet.&rdquo;</td><td>&ldquo;Quiet doesn't help — the backup takes hours. Without a consistent snapshot the inconsistencies become permanent the moment we restore from it.&rdquo;</td></tr>
+    <tr><td>&ldquo;We're on repeatable read, so reads are repeatable.&rdquo;</td><td>&ldquo;Repeatable read means three different things across products. Which does ours implement — snapshot isolation, something weaker, or actual serializability?&rdquo;</td></tr>
+    <tr><td>&ldquo;Reads are slow because writes are locking them.&rdquo;</td><td>&ldquo;Under MVCC that shouldn't happen — readers never block writers and writers never block readers. If it is happening, we're taking read locks somewhere.&rdquo;</td></tr>
+    <tr><td>&ldquo;The old rows are still on disk.&rdquo;</td><td>&ldquo;Expected under MVCC — an update is a delete plus an insert, and garbage collection can't reclaim a version any open snapshot might still need. Check for a long-running transaction.&rdquo;</td></tr>
+  </table>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 1</div>
+    <p>A nightly job exports the whole database to a file for regulatory reporting. It runs at read-committed isolation and takes about four hours. Auditors report that the exported ledger does not balance: a handful of transfers appear to have a debit with no matching credit, or the reverse. The team's proposed fix is to run the export at 3 a.m. &ldquo;when almost nothing is happening&rdquo;, and to re-run it if the totals don't match.</p>
+    <p><b>(a)</b> Name the anomaly and explain why no value in the export was ever wrong. <b>(b)</b> Say why both parts of the proposed fix are the wrong shape of solution. <b>(c)</b> Name the isolation level that solves it, describe the mechanism that implements it, and state the operational cost the team should watch for once they switch.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 2 · Question 2</div>
+    <p>Two services share a database. Service A runs short write transactions. Service B runs a five-minute read-only reconciliation query every hour. After a migration, Service A's p99 latency becomes spiky, and every spike lines up with Service B's query. Separately, the storage team reports the table's on-disk size growing steadily even though row counts are flat, and a colleague suggests that this proves the snapshot mechanism is leaking.</p>
+    <p><b>(a)</b> Under a correct MVCC implementation, what should the relationship between B's reads and A's writes be, and what does the observed blocking tell you about how the database is configured? <b>(b)</b> Explain the disk growth without assuming a bug, and name the specific thing to look for. <b>(c)</b> The team wants B to keep its coherent view but stop affecting A. Say what you would change and what you would monitor.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>2&times;2 — how many moments, and how clean</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: can the transaction see <i>uncommitted</i> data? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes</div>
+      <div class="colh">No — committed values only</div>
+
+      <div class="rowh">MANY<br>moments<br>in one<br>transaction</div>
+      <div class="cell"><b>Read uncommitted</b>
+        Sees the latest written value even from a transaction still in flight.<br>
+        <i>Move:</i> avoid for application data. It buys only the storage of a second row version, and it hands you dirty reads and cascading aborts in exchange.</div>
+      <div class="cell focus"><b>Read committed</b>
+        Every value you read was committed — and they were committed at different times.<br>
+        <i>Move:</i> know exactly what this is worth. No dirty reads, no dirty writes. But read skew is <i>permitted here by design</i>, so anything that scans broadly — a backup, an integrity check, a report — is unsafe at this level.</div>
+
+      <div class="rowh">ONE<br>moment</div>
+      <div class="cell"><b>Incoherent</b>
+        A snapshot of a moment that includes writes nobody has committed is not a snapshot of any state the database was ever in.<br>
+        <i>Move:</i> none — this cell tells you that &ldquo;consistent snapshot&rdquo; already implies &ldquo;committed only&rdquo;. The two ideas are not independent.</div>
+      <div class="cell"><b>Snapshot isolation</b>
+        The whole transaction reads the database as it stood when the transaction began.<br>
+        <i>Move:</i> take it for anything long or broad. Implemented with MVCC, so reads never take locks. Remember what it still permits: write skew always, and lost updates in some products.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the column is about <i>cleanliness</i> and the row is about <i>coherence</i>, and they are different axes — which is exactly the confusion the focus cell exists to break. Read committed is perfectly clean and completely incoherent, and people assume the first buys the second.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Ask how many moments your transaction is looking at.</b> If it reads more than one thing and the relationship between them matters, read committed is not enough, however committed each value was. Anything that scans, sums, reconciles or backs up needs a single moment.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 3 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">3</div>
+    <div>
+    <div class="n">Part 3 of 4</div>
+    <h2>What they don't stop</h2>
+    <p>Lost updates, write skew, phantoms — and the only three ways to buy the promise back.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>Every remaining bug has the same three steps: look at something, decide based on what you saw, then write.</li>
+      <li>By the time you write, what you saw may have changed — and your decision was based on the old version.</li>
+      <li>If both people were changing the <i>same</i> thing, there are five different ways to stop it.</li>
+      <li>If they were changing <i>different</i> things, almost none of those ways work, because there's no shared thing to guard.</li>
+      <li>And if the thing they checked for was something that <i>didn't exist yet</i>, you can't even lock it — there's nothing there to lock.</li>
+      <li>Which leaves three ways to get the real guarantee: do one at a time, lock everything, or let everyone run and cancel the ones that turned out wrong.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A hospital ward needs at least one doctor on call. Two doctors are on, both feel ill, and both open the rota app at the same instant. Each one's app checks &ldquo;are there two or more on call?&rdquo; — yes, both times — so each one is allowed to sign off. Each writes to <i>their own</i> row. Both writes succeed. Nobody is on call. No rule was broken by either transaction on its own, no one overwrote anyone, and if the two had happened a second apart the second doctor would have been refused. That is write skew, and only the strongest isolation level catches it.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Lost update</b></td>
+      <td>Two transactions do a <b>read-modify-write</b> cycle on the same object; the second write does not include the first's modification, so it is clobbered.</td>
+      <td>Two increments of a counter at 42 leave it at 43. Also: two people editing a wiki page, each sending the whole page back; adding an element to a list inside a JSON document.</td>
+      <td>vs a <b>dirty write</b>, where the first write hadn't committed. Here it had. Nothing was overwritten mid-flight — the second transaction simply read a value that was current, and wrote a value derived from it after someone else had moved on.</td>
+    </tr>
+    <tr>
+      <td><b>Write skew</b></td>
+      <td>Two transactions read the same objects, then update <b>different</b> objects, and the pair together violates an invariant neither broke alone.</td>
+      <td>Both on-call doctors check &ldquo;≥ 2 on call&rdquo;, both see 2, and each takes <i>themselves</i> off call.</td>
+      <td>vs a <b>lost update</b>, which is the special case where the different transactions update the <i>same</i> object. Write skew is the generalisation. The consequence is practical: single-object atomic operations don't help, and the lost-update detection built into some snapshot-isolation implementations does not detect it.</td>
+    </tr>
+    <tr>
+      <td><b>Phantom</b></td>
+      <td>A write in one transaction changes the result of a <b>search query</b> in another.</td>
+      <td>Checking there is no overlapping booking for a room, then inserting one. Checking a username is free, then taking it. Checking a balance stays positive, then inserting a spend.</td>
+      <td>vs write skew on <b>existing rows</b>, where the rows the decision depended on are already there and can be locked. Here the query looks for the <b>absence</b> of matching rows, so an explicit lock has nothing to attach to. Snapshot isolation avoids phantoms in read-only queries; in read/write transactions they produce the hardest cases of write skew.</td>
+    </tr>
+    <tr>
+      <td><b>Atomic write operation</b></td>
+      <td>An update the database performs itself, removing the read-modify-write cycle from your code.</td>
+      <td><code>UPDATE counters SET value = value + 1 WHERE key = 'foo'</code>. Also document-local modifications and data-structure operations in other stores.</td>
+      <td>Usually the best solution <b>when your change fits</b>. It doesn't fit arbitrary text editing. Object-relational mappers make it easy to write an unsafe read-modify-write cycle by accident instead — a bug that testing rarely finds.</td>
+    </tr>
+    <tr>
+      <td><b>Explicit lock</b> <span style="white-space:nowrap">(<code>SELECT … FOR UPDATE</code>)</span></td>
+      <td>The application locks the rows it is about to depend on, forcing concurrent readers of those rows to wait.</td>
+      <td>A multiplayer game where a move must satisfy rules that can't be expressed as a query: lock the piece's row, validate, update.</td>
+      <td>vs relying on the database to notice. This works, but you must reason it through — it is easy to forget a lock somewhere and reintroduce the race. Locking several objects also risks <b>deadlock</b>; databases detect that and abort one transaction, which the application must retry.</td>
+    </tr>
+    <tr>
+      <td><b>Automatic lost-update detection</b></td>
+      <td>Let the cycles run in parallel, detect the lost update, abort the loser and make it retry.</td>
+      <td>Several snapshot-isolation implementations do this and it composes efficiently with the snapshot machinery.</td>
+      <td>vs assuming <b>every</b> product does. At least one major engine's repeatable-read level does not detect lost updates — which is why some authors argue it doesn't provide snapshot isolation at all. The advantage of detection is that it needs no special code, so you cannot forget it; the cost is that you must handle aborts.</td>
+    </tr>
+    <tr>
+      <td><b>Conditional write</b> <span style="white-space:nowrap">(compare-and-set)</span></td>
+      <td>Apply the update only if the value hasn't changed since you read it; otherwise it has no effect and you retry.</td>
+      <td><code>UPDATE wiki_pages SET content = 'new' WHERE id = 1234 AND content = 'old'</code>, or the same with a version-number column you increment — sometimes called <b>optimistic locking</b>.</td>
+      <td>vs assuming it is always safe. Check that the update took effect and retry if not. Note also a subtlety: many MVCC implementations make an exception to the visibility rules so that concurrently-written values <i>are</i> visible when evaluating the <code>WHERE</code> clause of an <code>UPDATE</code> or <code>DELETE</code>, even though they are invisible elsewhere in the snapshot.</td>
+    </tr>
+    <tr>
+      <td><b>Materializing conflicts</b></td>
+      <td>Creating rows whose only purpose is to be locked, so a phantom becomes an ordinary lock conflict.</td>
+      <td>A table of every room and every 15-minute slot for the next six months. A booking transaction locks the relevant slot rows first, then checks and inserts.</td>
+      <td>vs a real solution. It is hard and error-prone to work out how to materialise a given conflict, and it leaks a concurrency-control mechanism into your data model. Treat it as a <b>last resort</b> when nothing else is possible; a serializable isolation level is preferable in most cases.</td>
+    </tr>
+    <tr>
+      <td><b>Serializability</b></td>
+      <td>The strongest isolation level: the result is the same as if the transactions had run one at a time.</td>
+      <td>If each transaction is correct on its own, it stays correct under concurrency. All the race conditions in this booklet are prevented.</td>
+      <td>vs snapshot isolation, whatever the vendor calls it. Three implementations exist and no more: <b>actual serial execution</b>, <b>two-phase locking</b>, and <b>serializable snapshot isolation</b>.</td>
+    </tr>
+    <tr>
+      <td><b>Actual serial execution</b></td>
+      <td>Run one transaction at a time on a single thread. Serializable by definition, because there is no concurrency to control.</td>
+      <td>Feasible because RAM became cheap enough to hold the active dataset, and because operational transactions are short. Transactions must be submitted whole, as <b>stored procedures</b>, not statement-by-statement.</td>
+      <td>vs the interactive style. If the database waits for the application to send the next statement, single-threaded throughput is dreadful — most of the time is network round trips. Modern implementations use general-purpose languages rather than vendor-specific procedure dialects.</td>
+    </tr>
+    <tr>
+      <td><b>Two-phase locking (2PL)</b></td>
+      <td>Shared locks for readers, exclusive for writers; all locks held until the transaction ends. A <b>growing</b> phase acquires and a <b>shrinking</b> phase releases, and they must not overlap.</td>
+      <td>The standard way to implement serializability for around thirty years, and still the serializable level in some products.</td>
+      <td>vs <b>2PC</b>, which is a completely different thing — atomic commit across nodes, not isolation. Also vs snapshot isolation's mantra: under 2PL <b>writers block readers and readers block writers</b>, which is precisely the property MVCC was built to avoid.</td>
+    </tr>
+    <tr>
+      <td><b>Predicate lock · index-range lock</b></td>
+      <td>A lock on <i>all objects matching a search condition</i>, including ones that don't exist yet — which is what makes 2PL prevent phantoms. The index-range form is a cheaper approximation.</td>
+      <td>Locking &ldquo;bookings for room 123 between noon and 1 p.m.&rdquo;. Approximated by locking the index entry for room 123, or a range of a time index.</td>
+      <td>vs a row lock, which cannot cover rows that don't exist. Predicate locks perform badly when many are active, so most systems approximate. It is <b>safe to over-approximate</b> — locking a bigger set than necessary — and the safe fallback when no suitable index exists is a shared lock on the whole table.</td>
+    </tr>
+    <tr>
+      <td><b>Serializable snapshot isolation (SSI)</b></td>
+      <td>Snapshot isolation plus a detector: let transactions run without blocking, and at commit time abort any whose execution wasn't serializable.</td>
+      <td>Comparatively new. Used by single-node databases, distributed databases and embedded engines.</td>
+      <td>vs 2PL, which is <b>pessimistic</b> — wait whenever something might go wrong. SSI is <b>optimistic</b> — proceed and check at the end. Optimism performs badly under high contention, because a large share of transactions abort and the retries add load to a system already near capacity.</td>
+    </tr>
+  </table>
+
+  <h3>The five ways to prevent a lost update — and what each assumes</h3>
+  <ol>
+    <li><b>Atomic write operations.</b> Best when the change can be expressed as one. Implemented by locking the object exclusively while it is read, or by running all such operations on one thread.</li>
+    <li><b>Explicit locks</b> in application code. Works, needs care, and brings deadlock risk.</li>
+    <li><b>Automatic detection</b>, then abort and retry. Least error-prone, because you cannot forget it — but product-dependent.</li>
+    <li><b>Conditional writes</b> (compare-and-set), including the version-number variant. The option available when there are no transactions at all.</li>
+    <li><b>Conflict resolution after the fact</b>, in replicated systems. Locks and conditional writes all assume <b>a single up-to-date copy of the data</b>, which multi-leader and leaderless replication cannot provide. Instead, concurrent writes create conflicting versions — siblings — which application code or special data structures merge. Merging prevents lost updates when the updates are <b>commutative</b>: incrementing a counter and adding to a set are; a conditional write is not. And be aware that last-write-wins, the default conflict resolution in many replicated databases, is itself prone to lost updates.</li>
+  </ol>
+
+  <h3>Why write skew is worse, and where the options run out</h3>
+  <ul>
+    <li>Every example follows the same three steps. A <code>SELECT</code> checks whether a requirement holds; the application decides what to do based on the answer; it writes. <b>The write changes the precondition of the decision</b> — re-run the <code>SELECT</code> afterwards and you get a different answer. (The steps can also come in a different order: write first, then query, then decide whether to commit.)</li>
+    <li><b>Atomic single-object operations don't help</b>, because multiple objects are involved.</li>
+    <li><b>Automatic lost-update detection doesn't help either.</b> Write skew is not detected at the snapshot-isolation levels of the major products, whatever those levels are named. Preventing it automatically requires true serializable isolation.</li>
+    <li><b>Constraints usually can't express it.</b> &ldquo;At least one doctor on call&rdquo; spans multiple rows, and most databases have no built-in support for multi-object constraints — though triggers or materialized views can sometimes be pressed into service. Where a constraint <i>does</i> fit, use it: for claiming a username, a plain uniqueness constraint solves the problem outright, and the second transaction is aborted for violating it.</li>
+    <li><b>The second-best option is an explicit lock</b> on the rows the decision depends on — and this works for the doctors, because the row being updated in step 3 was one of the rows returned in step 1.</li>
+    <li><b>It does not work for the others.</b> Room booking, the username, the game position and the double-spend all check for the <b>absence</b> of rows matching a condition. If the query returns nothing, there is nothing for the lock to attach to. That is a phantom, and it is where you either materialise a conflict or go serializable.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — write skew is not a lost update, and a phantom is not an anomaly on its own</h4>
+    <p><b>A lost update</b> is two transactions writing the same object. <b>Write skew</b> is two transactions reading the same objects and writing different ones — the general case, of which a lost update is the special case where the objects coincide.<br>
+    <b>A phantom</b> is not itself the bug; it is the <i>mechanism</i> that makes certain write skews unfixable by locking. The bug is still write skew. Saying &ldquo;we have a phantom problem&rdquo; is only useful if you go on to say which decision was invalidated.</p>
+  </div>
+
+  <h3>Anchor sketch — where each anomaly lives, and what stops it</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">   every remaining bug has ONE shape:
+        SELECT  ->  decide  ->  WRITE
+   and the write changes what that SELECT would
+   now return. the premise expired.
+                     |
+     +---------------+----------------+
+     |                                |
+  same object                    DIFFERENT objects
+     |                                |
+  <span class="tk3">LOST UPDATE</span>                      <span class="tk3">WRITE SKEW</span>
+  42 + 1 + 1 = 43                  two doctors both read
+     |                             "2 on call", each takes
+  five fixes:                      only THEMSELVES off
+   atomic operation                     |
+   SELECT FOR UPDATE               was there a row to lock?
+   auto-detection                       |
+   compare-and-set                +-----+------+
+   merge siblings (if             |            |
+     commutative)                yes           no
+                                  |            |
+                          lock the rows    <span class="tks">PHANTOM</span>
+                          you read --      the check was for
+                          works for the    ABSENCE. nothing
+                          doctors          exists to lock.
+                                                |
+                                          materialise the
+                                          conflict (ugly,
+                                          last resort)
+                                          or go SERIALIZABLE
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Say why write skew is the general case and a lost update the special one.<br>
+      <span class="q">Q</span> Two of the five lost-update fixes fail for write skew. Which two, and why?<br>
+      <span class="q">Q</span> Which of the write-skew examples is solved by a plain uniqueness constraint, and why don't the others yield to one?
+    </div>
+  </div>
+
+  <h3>The three roads to serializable, side by side</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Approach</th><th>How it works</th><th>What it costs</th><th style="width:38mm">Where it breaks down</th></tr>
+    <tr>
+      <td><b>Actual serial execution</b></td>
+      <td>One transaction at a time on a single thread. No conflict detection needed at all. Requires transactions submitted whole as stored procedures, with the active dataset in memory. Read-only work can run outside the loop on a snapshot.</td>
+      <td>Throughput limited to one CPU core. Transactions must be short and fast, because one slow one stalls everything. Stored procedures are harder to debug, version, test and monitor than application code, and badly written ones hurt a shared database far more than a shared app server.</td>
+      <td>High write throughput. You can shard to get a thread per core, but any transaction touching several shards must run in lockstep across them, and cross-shard throughput is orders of magnitude lower and doesn't improve by adding machines.</td>
+    </tr>
+    <tr>
+      <td><b>Two-phase locking</b></td>
+      <td>Shared and exclusive locks on every object touched, held until the transaction ends. Predicate or index-range locks extend this to rows that don't exist yet, which is what makes it prevent phantoms.</td>
+      <td>Reduced concurrency by design: if two transactions might conflict, one waits. Unstable latency, and very bad high percentiles under contention. A transaction reading a whole table takes a shared lock on the whole table, so the database is effectively unavailable for writes to it meanwhile. Deadlocks are much more frequent than at weaker levels, and each one throws away a transaction's work.</td>
+      <td>Any contended workload, and any workload mixing long reads with writes. This is why it stopped being the default.</td>
+    </tr>
+    <tr>
+      <td><b>Serializable snapshot isolation</b></td>
+      <td>Snapshot isolation, plus tracking of two things: reads that ignored an uncommitted write which later committed, and writes that affect data another transaction has already read. The second acts as a <b>tripwire</b>, not a lock — it notifies rather than blocks. At commit, a transaction that acted on an expired premise is aborted.</td>
+      <td>Bookkeeping overhead, tunable by granularity: fine tracking aborts fewer transactions but costs more; coarse tracking is cheaper and aborts more than strictly necessary. And you must handle aborts and retries.</td>
+      <td>High contention, where the abort rate climbs and retries add load to an already loaded system. Long read/write transactions are likely to conflict and abort — though long read-only transactions are fine.</td>
+    </tr>
+  </table>
+
+  <div class="box tip">
+    <h4>Why SSI waits until commit to abort</h4>
+    <p>When a transaction reads a value while ignoring another transaction's uncommitted write, the database could abort it there and then. It doesn't, for three reasons. The reader might turn out to be <b>read-only</b>, in which case there is no write skew to worry about and no reason to abort at all — and at read time the database doesn't yet know. The writer might still <b>abort</b>, in which case the read was never stale. And the writer might simply not have committed by the time the reader commits. Deferring the decision avoids unnecessary aborts, which is what preserves snapshot isolation's support for long-running reads.</p>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 1</div>
+    <p>A ticketing system holds a fixed pool of seats. To sell a seat, a transaction counts unsold seats in the section, and if the count is above zero, inserts a sale row. Under load, sections occasionally oversell by one or two. An engineer proposes locking the counted rows with <code>SELECT … FOR UPDATE</code>. Separately, the same system has a &ldquo;seat notes&rdquo; field that agents edit by reading the whole note, appending a line and writing it back; notes occasionally lose an agent's line.</p>
+    <p><b>(a)</b> Name both anomalies, say which one is the general case, and explain why. <b>(b)</b> Say whether the proposed <code>FOR UPDATE</code> fix works for the overselling, and justify the answer mechanically. <b>(c)</b> Give the most appropriate fix for the lost note lines and one alternative, and say what each assumes about the data.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 3 · Question 2</div>
+    <p>A team decides to move to serializable isolation. Their workload is: many short read/write transactions on a small hot set of rows, plus a few long analytical reads. They have two candidate databases — one implementing serializability with two-phase locking, one with serializable snapshot isolation — and a third proposal to run everything through single-threaded stored procedures. Their stated goals are &ldquo;predictable p99 latency&rdquo; and &ldquo;no application changes&rdquo;.</p>
+    <p><b>(a)</b> Predict the specific failure each of the three options will show on <i>this</i> workload. <b>(b)</b> Say which goal is unachievable regardless of choice, and why. <b>(c)</b> Name the property of their workload that most determines the answer, and say what you would measure before committing.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;One of the two updates disappeared.&rdquo;</td><td>&ldquo;A lost update — two read-modify-write cycles on the same object, and the second clobbered the first. Atomic operation, conditional write, or an explicit lock.&rdquo;</td></tr>
+    <tr><td>&ldquo;Both requests passed the check and both went through.&rdquo;</td><td>&ldquo;Write skew. They read the same rows and wrote different ones, so nothing was overwritten and nothing is detected. Only serializable prevents it automatically.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll just lock the rows we checked.&rdquo;</td><td>&ldquo;Only if the check was for rows that exist. If it checks for their absence, the lock has nothing to attach to — that's a phantom.&rdquo;</td></tr>
+    <tr><td>&ldquo;Snapshot isolation detects lost updates, so we're fine.&rdquo;</td><td>&ldquo;Some implementations do and at least one doesn't — and none of them detect write skew. Those are separate questions.&rdquo;</td></tr>
+    <tr><td>&ldquo;We turned on serializable and everything got slow.&rdquo;</td><td>&ldquo;Which implementation? Under 2PL that's reduced concurrency and lock waits by design. Under SSI it would show up as an abort rate, not as blocking.&rdquo;</td></tr>
+    <tr><td>&ldquo;Optimistic concurrency control is better.&rdquo;</td><td>&ldquo;Better when there's spare capacity and contention is low. Under high contention the aborts and retries add load to a system already at its limit.&rdquo;</td></tr>
+    <tr><td>&ldquo;We'll add a table of lock rows.&rdquo;</td><td>&ldquo;Materialising conflicts. It works, but it's error-prone and it leaks concurrency control into the data model — last resort, after serializable has been ruled out.&rdquo;</td></tr>
+  </table>
+
+  <h3>2&times;2 — same object or not, and is there anything to lock</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does the decision depend on rows that <i>exist</i>? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">Yes — the rows are there to be read</div>
+      <div class="colh">No — it checks for their <i>absence</i></div>
+
+      <div class="rowh">Both write<br>the SAME<br>object</div>
+      <div class="cell"><b>Lost update</b>
+        Two read-modify-write cycles on one row; the second clobbers the first. 42 goes to 43, not 44.<br>
+        <i>Move:</i> five options, and you should be able to name all five. Prefer an atomic write operation; fall back to a conditional write, an explicit lock, or automatic detection. In a replicated system without a single up-to-date copy, merge siblings — and only if the operations are commutative.</div>
+      <div class="cell"><b>Rare in practice</b>
+        Two transactions can't easily contend on the same row while both having concluded that no such row exists.<br>
+        <i>Move:</i> nothing to learn here — but notice <i>why</i> the cell is thin. &ldquo;Absence&rdquo; almost always means each transaction goes on to create its own new row, which puts it in the cell below.</div>
+
+      <div class="rowh">They write<br>DIFFERENT<br>objects</div>
+      <div class="cell"><b>Write skew you can lock</b>
+        The doctors: both read the on-call rows, each updates their own. The rows the decision rested on are the rows being changed.<br>
+        <i>Move:</i> serializable is the right answer; <code>SELECT … FOR UPDATE</code> on the rows read is the workable second-best, because those rows exist and can be locked.</div>
+      <div class="cell focus"><b>Write skew via a phantom</b>
+        The room booking, the username, the double-spend. The check is &ldquo;nothing matches this condition&rdquo;, and the write makes something match it.<br>
+        <i>Move:</i> the lock has nothing to hold. A uniqueness constraint solves the narrow case where one exists. Otherwise: materialise the conflict as rows that can be locked — ugly, error-prone, last resort — or use a serializable level, which is what predicate and index-range locks were invented for.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the row tells you whether ordinary lost-update tooling applies at all; the column tells you whether locking is even physically possible. The bottom-right is the focus because it is the only cell where the usual advice — &ldquo;just lock what you read&rdquo; — is not merely weak but meaningless.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Find the decision, then ask what would change its answer.</b> Every anomaly here is a write that invalidates someone else's <code>SELECT</code>. If the invalidating write creates a row that didn't exist, no lock can save you and you are choosing between a constraint, a materialised conflict, and serializable isolation.</p>
+  </div>
+</section>
+
+<!-- ============================== PART 4 ============================== -->
+<section class="page">
+  <div class="chunkhead">
+    <div class="big">4</div>
+    <div>
+    <div class="n">Part 4 of 4</div>
+    <h2>When the transaction spans machines</h2>
+    <p>Atomic commit, two-phase commit, and the in-doubt participant that holds your locks.</p>
+    </div>
+  </div>
+
+  <div class="box tenth nobreak">
+    <h4>Tenth-grader version</h4>
+    <ul>
+      <li>On one machine, &ldquo;it committed&rdquo; means one disk finished writing one small record. That's the whole trick.</li>
+      <li>On several machines, you can't just tell them all to commit — some might succeed and some might fail, and you can't take back a commit once other people have read it.</li>
+      <li>So you ask first: &ldquo;can you definitely do this?&rdquo; Everyone who says yes has given up the right to say no later.</li>
+      <li>Then one machine writes down the decision, and from that moment it must be carried out, no matter how many retries it takes.</li>
+      <li>The nasty case is the machine that says yes and then hears nothing. It can't guess. And while it waits, it's holding locks that nobody else can get past.</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h4>The everyday version</h4>
+    <p>A wedding. The officiant asks each partner separately whether they want to marry the other; each says &ldquo;I do&rdquo;. After both answers, the officiant pronounces them married and the fact is announced to everyone. If either says no, the ceremony is off. The key detail is what &ldquo;I do&rdquo; costs: before it, you are free to refuse; after it, you cannot retract it. If you faint immediately afterwards and never hear the pronouncement, you are still married — you just have to ask the officiant later which way it went.</p>
+  </div>
+
+  <h3>The terms, each with its look-alike</h3>
+  <table class="tight">
+    <tr><th style="width:30mm">Term</th><th style="width:44mm">Plain definition</th><th style="width:48mm">Concrete example</th><th>Boundary — what it gets confused with</th></tr>
+    <tr>
+      <td><b>Distributed transaction</b></td>
+      <td>A transaction whose participants are more than one node.</td>
+      <td>Touching several shards of a sharded database, or a global secondary index whose entry lives on a different node from the row.</td>
+      <td>The <b>concurrency-control</b> half is broadly the same as on one node — serial execution on shards, 2PL, distributed serializability checkers for SSI. It is <b>atomicity</b> that becomes a new problem, and that is what this part is about.</td>
+    </tr>
+    <tr>
+      <td><b>Atomic commitment</b></td>
+      <td>Ensuring the nodes in a transaction <b>either all commit or all abort</b>, never a mixture.</td>
+      <td>Necessary because a commit cannot be retracted: once committed on one node the data is visible to other transactions, and someone may already have read it.</td>
+      <td>vs sending a commit request to every node and hoping. Some nodes may hit a constraint violation, some requests may be lost and time out, and some nodes may crash before their commit record is written and roll back on recovery.</td>
+    </tr>
+    <tr>
+      <td><b>Single-node commit point</b></td>
+      <td>On one machine, the transaction is committed the instant the <b>commit record</b> reaches disk, after the data.</td>
+      <td>Crash before it and the writes roll back on recovery; crash after and the transaction is committed.</td>
+      <td>The thing worth noticing: it is <b>one device</b> — the controller of one disk on one node — that makes the commit atomic. That is what disappears when the transaction spans machines.</td>
+    </tr>
+    <tr>
+      <td><b>Two-phase commit (2PC)</b></td>
+      <td>An algorithm for atomic commit across nodes, using a <b>coordinator</b> (transaction manager) and <b>participants</b>. Phase 1 asks everyone to prepare; phase 2 tells everyone the decision.</td>
+      <td>The coordinator is often a library inside the application process rather than a separate service.</td>
+      <td>vs <b>2PL</b>, which shares two letters and nothing else: 2PL provides serializable isolation on one node, 2PC provides atomic commit across nodes. Keep them entirely separate in your head.</td>
+    </tr>
+    <tr>
+      <td><b>Prepare · the yes vote</b></td>
+      <td>On receiving prepare, a participant makes sure it can commit <b>under all circumstances</b>: it writes all transaction data to disk and checks constraints and conflicts. Then it answers yes.</td>
+      <td>A crash, a power failure or a full disk is not an acceptable excuse for refusing later.</td>
+      <td>The yes vote <b>surrenders the right to abort</b> without actually committing. That is the first point of no return, and it is what one-phase commit lacks.</td>
+    </tr>
+    <tr>
+      <td><b>The commit point</b></td>
+      <td>The coordinator collects all votes, decides, and <b>writes the decision to its own log on disk</b>. That write is the commit point.</td>
+      <td>After it, commit or abort requests go out — and if any fails or times out the coordinator must retry <b>forever</b>.</td>
+      <td>The second point of no return. Notice what it reduces to: the commit point of a distributed transaction is an ordinary single-node atomic commit, on the coordinator. If a participant crashed after voting yes, it commits when it recovers — it cannot refuse.</td>
+    </tr>
+    <tr>
+      <td><b>In doubt (uncertain)</b></td>
+      <td>A participant that has voted yes and then lost contact with the coordinator. It may not abort and may not commit.</td>
+      <td>The coordinator decided to commit and reached one participant before crashing; the other has no idea which way it went.</td>
+      <td>vs a timeout being useful. A timeout does not help here: unilaterally aborting risks disagreeing with a peer that committed, and unilaterally committing risks the reverse. The participants could in principle ask each other how they voted, but that is <b>not part of the protocol</b>. The only way out is to wait for the coordinator to recover.</td>
+    </tr>
+    <tr>
+      <td><b>Blocking atomic commit</b></td>
+      <td>The property that the protocol can get stuck waiting for a recovery. 2PC is blocking.</td>
+      <td>An alternative three-phase protocol exists.</td>
+      <td>vs a fix. The three-phase alternative assumes a network with <b>bounded delay</b> and nodes with <b>bounded response times</b>; in real systems with unbounded delay and process pauses it cannot guarantee atomicity. The practical answer is to replace the single-node coordinator with a fault-tolerant consensus protocol.</td>
+    </tr>
+    <tr>
+      <td><b>XA</b></td>
+      <td>A long-standing standard for 2PC across <b>heterogeneous</b> technologies — different vendors' databases, message brokers.</td>
+      <td>Not a network protocol: a C API for talking to a transaction coordinator, with bindings in other languages. Widely implemented by relational databases and message brokers.</td>
+      <td>vs <b>database-internal</b> distributed transactions, where every participant runs the same software. Internal ones can use any protocol and optimise freely, and they often work quite well. XA is a <b>lowest common denominator</b>: it cannot detect deadlocks across systems, and it does not work with SSI, because both would need standardised cross-system protocols that don't exist.</td>
+    </tr>
+    <tr>
+      <td><b>Heuristic decision</b></td>
+      <td>An escape hatch letting a participant unilaterally commit or abort an in-doubt transaction without the coordinator's decision.</td>
+      <td>Offered by many XA implementations for catastrophic situations.</td>
+      <td>&ldquo;Heuristic&rdquo; here is a euphemism for <b>probably breaking atomicity</b>, since it violates the system of promises the protocol rests on. Not for regular use.</td>
+    </tr>
+    <tr>
+      <td><b>Exactly-once semantics</b></td>
+      <td>An operation takes effect once even if a crash forces a retry.</td>
+      <td>Acknowledging a message to a broker if and only if the database writes for processing it committed.</td>
+      <td>vs needing 2PC for it. You can get the same result with <b>only database-local transactions</b>, by recording processed message IDs and making the processing idempotent. That is usually the better answer.</td>
+    </tr>
+  </table>
+
+  <h3>Why the in-doubt state is the real problem</h3>
+  <ul>
+    <li>A transaction holds <b>row-level exclusive locks</b> on everything it modified, to prevent dirty writes — and under 2PL it also holds shared locks on everything it read. Those locks cannot be released until it commits or aborts.</li>
+    <li>So an in-doubt transaction <b>holds its locks for as long as it is in doubt</b>. If the coordinator takes twenty minutes to restart, the locks are held for twenty minutes. If the coordinator's log is lost, they are held until a human resolves it.</li>
+    <li>Meanwhile no other transaction can modify those rows, and depending on the isolation level may not even read them. Large parts of the application can become unavailable.</li>
+    <li>Rebooting the database does <b>not</b> clear it: a correct implementation must preserve an in-doubt transaction's locks across restarts, or it would risk violating atomicity.</li>
+    <li><b>Orphaned</b> in-doubt transactions do occur in practice — cases where the coordinator can never determine the outcome, because its log was lost or corrupted. Then an administrator must examine each transaction's participants, find out whether any has already committed or aborted, and apply the same outcome to the rest: a lot of manual work, under time pressure, during a serious outage.</li>
+    <li>And where the coordinator is a library inside the application process, the coordinator dies when the application server dies, and its log lives on that server's local disk — which makes that disk as important as the databases themselves.</li>
+  </ul>
+
+  <div class="box bound nobreak">
+    <h4>Concept boundary — two very different things called &ldquo;distributed transactions&rdquo;</h4>
+    <p><b>Database-internal:</b> every participant runs the same software. Free to use a better protocol, replicate the coordinator, let the coordinator and shards talk directly, replicate the shards so a single fault doesn't force an abort, and pair atomic commit with a concurrency-control protocol that supports cross-shard deadlock detection and consistent reads. These often work well, and modern distributed databases are built on them.<br>
+    <b>Heterogeneous:</b> participants are different technologies. Constrained to the lowest common denominator, with the coordinator typically inside the application, and the application code itself is a single point of failure that replicating the coordinator does not fix.<br>
+    Criticism of &ldquo;distributed transactions&rdquo; usually means the second. Applying it to the first is a category error.</p>
+  </div>
+
+  <h3>Anchor sketch — the two points of no return</h3>
+  <div class="sketch nobreak">
+    <div class="legend" style="margin-bottom:6pt"><b>Legend:</b> <b>bold = a named node</b> &nbsp; <span class="node nstar">reversed = focus node</span> &nbsp; <span class="q">Q = self-test cue</span></div>
+<div class="tree">  the problem: all commit, or all abort. never a mixture,
+  because a commit cannot be retracted -- someone has
+  already read it.
+                          |
+  <span class="tk4">PHASE 1</span>   coordinator -> "can you commit?"  (prepare)
+            participant writes ALL its data to disk and
+            checks every constraint, then votes YES
+            |
+            +--> POINT OF NO RETURN 1: a yes surrenders
+                 the right to abort, without committing.
+                 a crash or a full disk is no longer an
+                 acceptable excuse.
+            |
+  <span class="tk4">PHASE 2</span>   coordinator writes its DECISION to its own
+            disk log
+            |
+            +--> POINT OF NO RETURN 2: that write IS the
+                 commit point -- an ordinary single-node
+                 commit. after it: retry forever.
+            |
+            v
+       commit / abort  ->  every participant
+                          |
+  and if the coordinator dies between the two?
+            |
+            +--> the participant is <span class="tks">IN DOUBT</span>. it cannot
+                 guess: aborting may disagree with a peer
+                 that committed, and committing may
+                 disagree with one that aborted.
+            |
+            +--> it waits. and it HOLDS ITS LOCKS while
+                 it waits -- across restarts, and until a
+                 human intervenes if the log is lost.
+</div>
+    <div style="margin-top:8pt; font-size:8.9pt; line-height:1.6">
+      <span class="q">Q</span> Name both points of no return and say what each one gives up.<br>
+      <span class="q">Q</span> Why doesn't a timeout rescue an in-doubt participant?<br>
+      <span class="q">Q</span> Why is holding locks the thing that turns a stuck transaction into an outage?
+    </div>
+  </div>
+
+  <h3>Exactly-once, without any of this</h3>
+  <p>The headline use of heterogeneous distributed transactions is committing a message acknowledgment and the database writes for processing it as one unit, so a message is effectively processed exactly once. You don't need it. Four steps, using only transactions inside the database:</p>
+  <ol>
+    <li>Give every message a unique ID and keep a table of processed IDs. On receiving a message, begin a database transaction and check for its ID. <b>Already there?</b> Acknowledge to the broker and drop it.</li>
+    <li>Not there: insert it, process the message — including any other database writes, in the same transaction — and commit.</li>
+    <li>Once the commit succeeds, acknowledge the message to the broker.</li>
+    <li>Once acknowledged, delete the ID (in a separate transaction).</li>
+  </ol>
+  <p>Every crash point is covered. Crash before the commit and the transaction aborts, so the broker redelivers. Crash after committing but before acknowledging and the broker redelivers, but the retry finds the ID and drops it. Crash after acknowledging but before deleting the ID and you have left a stale row, which costs a little storage and nothing else. And if a retry arrives while the first attempt is still open, a <b>uniqueness constraint</b> on the ID table stops both from inserting it. What this really does is make the processing <b>idempotent</b>; atomicity across the broker and the database was never required.</p>
+  <p>Note the honest limit: this is not an argument that internal distributed transactions are useless. They remain valuable for the <i>scalability</i> of exactly this pattern — letting the message IDs live on one shard and the processed data on others, with atomic commit across them.</p>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 1</div>
+    <p>An order service writes to a relational database and publishes to a message broker from different vendors. To avoid publishing orders that were never persisted, the team wraps both in a distributed transaction using the standard cross-technology protocol, with the coordinator running as a library inside the order service. During a deploy, several order-service pods are killed mid-transaction. Within minutes, unrelated parts of the product start timing out, and the incident lasts far longer than the deploy.</p>
+    <p><b>(a)</b> Name the state those transactions are in and explain precisely why a timeout cannot resolve it. <b>(b)</b> Explain the mechanism by which killing an order-service pod caused <i>unrelated</i> features to fail, and say why restarting the databases would not have helped. <b>(c)</b> Name the escape hatch an operator might reach for, and state exactly what it costs.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <div class="qbox nobreak">
+    <div class="lab">Part 4 · Question 2</div>
+    <p>Following that incident, an architect proposes: &ldquo;distributed transactions are fundamentally broken — we should ban two-phase commit across the company.&rdquo; Another engineer objects that the company's new sharded database uses two-phase commit internally for every cross-shard write and has been entirely reliable. The team also still needs the guarantee that a message is processed exactly once.</p>
+    <p><b>(a)</b> Adjudicate: state the distinction the proposed ban misses, and give three concrete things the reliable case can do that the failed one cannot. <b>(b)</b> Design the exactly-once processing without any cross-technology atomic commit, and say what each step protects against. <b>(c)</b> Say what property your design actually achieves, and name one thing internal distributed transactions would still buy you.</p>
+    <div class="writelines">
+      <div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div><div class="writeline"></div>
+    </div>
+  </div>
+
+  <h3>Say it so you understand it &rarr; say it like an expert</h3>
+  <table class="tight">
+    <tr><th style="width:50%">Say it this way to <i>understand</i> it</th><th>Say it this way to sound like an <i>expert</i></th></tr>
+    <tr><td>&ldquo;We'll commit on both and roll back if one fails.&rdquo;</td><td>&ldquo;You can't roll back a commit — once it's committed another transaction may already have read it. That's why atomic commitment needs a prepare phase.&rdquo;</td></tr>
+    <tr><td>&ldquo;It's stuck, so we'll time it out and abort.&rdquo;</td><td>&ldquo;It's in doubt. Aborting risks disagreeing with a participant that committed. Only the coordinator's log can decide it.&rdquo;</td></tr>
+    <tr><td>&ldquo;2PC and 2PL are the same family.&rdquo;</td><td>&ldquo;Different things entirely — 2PL is serializable isolation on one node, 2PC is atomic commit across nodes. The names are an accident.&rdquo;</td></tr>
+    <tr><td>&ldquo;Why is the whole app down? It was one stuck transaction.&rdquo;</td><td>&ldquo;Because it holds its locks while in doubt, and those survive a restart by design. Anything touching those rows blocks.&rdquo;</td></tr>
+    <tr><td>&ldquo;Three-phase commit fixes the blocking.&rdquo;</td><td>&ldquo;Only under bounded network delay and bounded response times. We have neither, so it can't guarantee atomicity here. Replicate the coordinator with consensus instead.&rdquo;</td></tr>
+    <tr><td>&ldquo;Distributed transactions don't work.&rdquo;</td><td>&ldquo;Across heterogeneous technologies they're a lowest common denominator with the application as a single point of failure. Database-internal ones are a different animal and work well.&rdquo;</td></tr>
+    <tr><td>&ldquo;We need 2PC for exactly-once message processing.&rdquo;</td><td>&ldquo;We need idempotence. A processed-message-ID table with a uniqueness constraint gets us there with database-local transactions only.&rdquo;</td></tr>
+  </table>
+
+  <h3>2&times;2 — who the participants are, and who holds the decision</h3>
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: is the coordinator replicated and independently reachable? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — one coordinator, often in the app process</div>
+      <div class="colh">Yes — replicated, with automatic failover</div>
+
+      <div class="rowh">ALL ONE<br>database<br>(same<br>software)</div>
+      <div class="cell"><b>Fixable by design</b>
+        One coordinator, but participants that all speak the same protocol.<br>
+        <i>Move:</i> nobody should stay here — every constraint that forces the compromise is absent.</div>
+      <div class="cell good"><b>Database-internal, done properly</b>
+        Coordinator replicated by consensus with automatic failover; coordinator and shards communicate directly; shards themselves replicated so one fault doesn't force an abort; atomic commit coupled to a concurrency-control protocol that can detect cross-shard deadlocks and give consistent reads.<br>
+        <i>Move:</i> this is what a modern sharded database does for a cross-shard write, and it is why criticism of &ldquo;distributed transactions&rdquo; doesn't land here.</div>
+
+      <div class="rowh">DIFFERENT<br>technologies</div>
+      <div class="cell focus"><b>The trap</b>
+        Cross-vendor atomic commit with the coordinator as a library inside the application. Kill the app process and its coordinator dies with it, leaving participants in doubt, holding locks, across restarts.<br>
+        <i>Move:</i> avoid. If you cannot, treat the coordinator's local disk as production state — because it is — and know that the recovery path ends at a human deciding each transaction by hand.</div>
+      <div class="cell"><b>Better, and still limited</b>
+        Replicating the coordinator removes one failure mode and not the decisive one: the coordinator and participants can only communicate <i>through the application code</i>, so that code remains a single point of failure.<br>
+        <i>Move:</i> recognise the ceiling. Cross-technology commit is a lowest common denominator — no cross-system deadlock detection, no SSI. Reach for idempotence instead.</div>
+    </div>
+    <div class="legend"><b>Read it as:</b> the column is the fix everyone reaches for; the row decides the outcome. Only the top row can also close the gap between coordinator and participants — which is why the same algorithm has an excellent reputation inside a database and a poor one between products.</div>
+  </div>
+
+  <div class="box tip nobreak">
+    <h4>Carry-out rule from this part</h4>
+    <p><b>Before reaching for atomic commit across systems, ask whether idempotence would do.</b> Most of the time the requirement is &ldquo;this must take effect exactly once&rdquo;, not &ldquo;these must commit together&rdquo; — and a unique ID with a uniqueness constraint buys the first without any of the second's failure modes.</p>
+  </div>
+</section>
+
+<!-- ============================== 6. CONSOLIDATION ============================== -->
+<section class="page">
+  <div class="kicker">Section 6</div>
+  <h2>Concept sketch — the whole competency on one page</h2>
+  <p>Three named groups, in the order the story runs: <b>PROMISE</b> &rarr; <b>DISCOUNT</b> &rarr; <b>DISTANCE</b>. Every node carries a question. Cover the answers, walk the map, and each answer hands you the next question.</p>
+
+  <div class="sketch nobreak" style="padding:13pt">
+    <div class="legend" style="margin-bottom:9pt">
+      <b>Legend:</b>
+      <span class="node">PROMISE — what you were sold</span>
+      <span class="node">DISCOUNT — what you were given</span>
+      <span class="node">DISTANCE — when it spans machines</span>
+      <span class="node nstar">reversed = the one node to remember</span>
+      <span class="q">Q = retrieval cue</span>
+    </div>
+<div class="tree"><span class="tk1">GROUP 1 - PROMISE . what a transaction is for</span>
+------------------------------------------------------------------
+   many reads and writes, ONE unit: commit or abort
+        +--> <span class="tk1">A</span>  abortability. a fault discards everything.
+        |       nothing to do with concurrency.
+        +--> <span class="tk1">C</span>  YOUR invariant. only what you declared.
+        +--> <span class="tk1">I</span>  formalised as SERIALIZABLE -- and quietly
+        |       discounted by almost every default
+        +--> <span class="tk1">D</span>  survives a crash. no perfect durability.
+   single object -> the engine already gives you A and I
+   many objects  -> a real transaction (and a secondary
+                    index makes almost every write many)
+                                 v
+<span class="tk2">GROUP 2 - DISCOUNT . what the weak levels leave out</span>
+------------------------------------------------------------------
+   <span class="tk2">READ COMMITTED</span>  no dirty reads . no dirty writes
+        lets through READ SKEW -- every value was committed,
+        the SET of them never was
+   <span class="tk2">SNAPSHOT ISOLATION</span>  one moment, via MVCC
+        readers never block writers, and the reverse
+        lets through LOST UPDATE (sometimes) and
+        <span class="tks">WRITE SKEW</span> (always)
+   the shape of every one of them:
+        SELECT -> decide -> WRITE, and the write kills
+        the premise the decision rested on
+        same object     -> lost update. five fixes.
+        different ones  -> write skew. lock what you read.
+        checked ABSENCE -> phantom. nothing exists to lock.
+   three roads back: serial execution . 2PL . SSI
+                                 v
+<span class="tk4">GROUP 3 - DISTANCE . when one disk is no longer enough</span>
+------------------------------------------------------------------
+   on one node, ONE disk writing ONE commit record makes the
+   commit atomic. across nodes, that device is gone.
+   <span class="tk4">2PC</span>  prepare -> vote yes (cannot abort now)
+        coordinator writes decision (cannot change now)
+        commit -> retry forever
+        +--> coordinator dies between them: IN DOUBT, and
+        |    holding locks, across restarts
+        +--> across different technologies: lowest common
+             denominator, the app is the failure point
+   ask first: would <span class="tk4">IDEMPOTENCE</span> have done instead?
+</div>
+  </div>
+
+  <h3>The question per node — cover the right column</h3>
+
+  <h4>Group 1 — PROMISE</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Transaction</b></td><td>What is it, precisely?</td><td>Several reads and writes treated as one logical unit that either commits or aborts — so a fault means you can retry knowing nothing took effect.</td></tr>
+    <tr><td><b>Atomicity</b></td><td>Why is the name misleading?</td><td>It has nothing to do with concurrency. It means a fault part-way through discards every write so far — abortability. Concurrency is the I.</td></tr>
+    <tr><td><b>Consistency</b></td><td>Why is it the odd letter out?</td><td>The invariant is the application's. The database enforces only what you declared as a constraint; anything else is your job.</td></tr>
+    <tr><td><b>Durability</b></td><td>What can still go wrong after a commit?</td><td>A correlated fault taking every replica, a disk or firmware bug, misused <code>fsync</code>, or asynchronous replication losing recent writes at failover. Stack the risk reductions.</td></tr>
+    <tr><td><b>Single vs multi-object</b></td><td>When does one become the other without you noticing?</td><td>As soon as there is a secondary index — the index is a separate object, so the record can appear in one index and not another.</td></tr>
+    <tr><td><b>Retry after abort</b></td><td>Name three ways it hurts.</td><td>It may have already succeeded and the ack was lost; under contention it worsens the overload; and side effects outside the database — an email — happen again.</td></tr>
+  </table>
+
+  <h4>Group 2 — DISCOUNT</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Read committed</b></td><td>What are its two guarantees, and how is each built?</td><td>No dirty reads — serve the old committed value while the new one is uncommitted. No dirty writes — row locks held until commit or abort.</td></tr>
+    <tr><td><b>Read skew</b></td><td>Why is it not a dirty read?</td><td>Everything read was committed. They were just committed at different moments, so the set was never simultaneously true.</td></tr>
+    <tr><td><b>Snapshot isolation</b></td><td>What does it give and what does it still permit?</td><td>Gives one moment for the whole transaction, via MVCC. Still permits write skew always, and lost updates in some products.</td></tr>
+    <tr><td><b>MVCC visibility</b></td><td>When is a row visible?</td><td>If the transaction that inserted it had committed when the reader started, and it is either not marked deleted or the deleting transaction had not committed by then.</td></tr>
+    <tr><td><b>Lost update</b></td><td>Name the five fixes.</td><td>Atomic write operation; explicit lock; automatic detection; conditional write; merging siblings in a replicated system, if the operations commute.</td></tr>
+    <tr><td><b>Reversed: write skew</b></td><td>Why is this the node to remember?</td><td>It is the general case — two transactions read the same rows and write different ones. No weak level detects it, no atomic operation covers it, and only true serializability prevents it automatically.</td></tr>
+    <tr><td><b>Phantom</b></td><td>Why can't you lock your way out?</td><td>The decision rested on rows <i>not</i> existing, so there is nothing for the lock to attach to. Use a constraint, materialise the conflict, or go serializable.</td></tr>
+    <tr><td><b>The three roads</b></td><td>Name them and one failure each.</td><td>Serial execution — one core, and cross-shard throughput doesn't scale. 2PL — lock waits and terrible high percentiles. SSI — abort storms under contention.</td></tr>
+  </table>
+
+  <h4>Group 3 — DISTANCE</h4>
+  <table class="tight">
+    <tr><th style="width:40mm">Node</th><th style="width:60mm">Question</th><th>Answer in one line</th></tr>
+    <tr><td><b>Atomic commitment</b></td><td>Why can't you just commit on each node?</td><td>Some may hit a constraint violation, lose the request, or crash before their commit record — and a commit cannot be retracted once another transaction has read it.</td></tr>
+    <tr><td><b>The prepare vote</b></td><td>What does a yes cost the participant?</td><td>The right to abort. It must have written everything to disk and checked every constraint, so a crash or full disk is no longer an excuse.</td></tr>
+    <tr><td><b>The commit point</b></td><td>Where exactly is it?</td><td>The moment the coordinator's decision reaches its own disk log — an ordinary single-node atomic commit. After that, retry forever.</td></tr>
+    <tr><td><b>In doubt</b></td><td>Why can't the participant decide?</td><td>Aborting might disagree with a peer that committed; committing might disagree with one that aborted. Only the coordinator's log resolves it.</td></tr>
+    <tr><td><b>Held locks</b></td><td>Why does one stuck transaction become an outage?</td><td>It holds its row locks the whole time it is in doubt, preserved across restarts by design, so anything touching those rows blocks.</td></tr>
+    <tr><td><b>Internal vs heterogeneous</b></td><td>Why does the same algorithm have two reputations?</td><td>Internally you can replicate the coordinator, let it talk to shards directly, and pair it with real concurrency control. Across technologies you get a lowest common denominator with the application as a single point of failure.</td></tr>
+    <tr><td><b>Idempotence</b></td><td>What does it replace, and how?</td><td>Cross-technology atomic commit for exactly-once processing: record processed message IDs with a uniqueness constraint, and use only database-local transactions.</td></tr>
+  </table>
+
+</section>
+
+<section class="page">
+  <div class="kicker">Section 6 continued · the transferable card</div>
+  <h2>Master 2&times;2 — the decision card you can carry to other problems</h2>
+  <p>Two counts decide which tool you need: how many <b>things</b> the rule spans, and how many <b>systems</b> those things live in. It works outside databases too.</p>
+
+  <div class="matrix nobreak">
+    <div class="ylab">Columns: does the rule cross a system boundary? &rarr;</div>
+    <div class="grid2">
+      <div class="corner"></div>
+      <div class="colh">No — one system owns everything</div>
+      <div class="colh">Yes — two or more systems involved</div>
+
+      <div class="rowh">The rule<br>spans ONE<br>thing</div>
+      <div class="cell"><b>Use the built-in operation</b>
+        A counter, a status flag, a single record's contents. The owner can change it in one indivisible step, or refuse the change if it has moved since you looked.<br>
+        <i>Move:</i> an atomic operation or a conditional write. No transaction, no protocol, no coordination — and most people reach straight past it for something heavier.</div>
+      <div class="cell"><b>Make it idempotent</b>
+        One effect that must happen exactly once across a boundary you don't control — a payment taken, a message processed, an email sent.<br>
+        <i>Move:</i> give the effect a unique ID, record the IDs you have handled, enforce it with a uniqueness constraint. Retries become free and the two systems never had to agree.</div>
+
+      <div class="rowh">The rule<br>spans MANY<br>things</div>
+      <div class="cell focus"><b>A transaction — and name the grade</b>
+        The invariant relates several things: a total and its parts, a rota and its members, a booking and a room.<br>
+        <i>Move:</i> group them, then answer the question everyone skips — <i>which</i> guarantee are you buying? If the work reads, decides, then writes, anything below serializable will eventually let both sides through.</div>
+      <div class="cell"><b>Agree first, or don't try</b>
+        Several things, several systems, and they must move together.<br>
+        <i>Move:</i> a prepare-then-decide protocol is the only honest way, and it works when one authority owns every participant. When they are independent, expect the stuck-in-doubt case — most such requirements are the cell above in disguise.</div>
+    </div>
+    <div class="legend"><b>The move that matters:</b> people jump to the bottom-right because the requirement <i>sounds</i> like &ldquo;these must happen together&rdquo;. Say it out loud as an invariant first — if it is really &ldquo;this must take effect exactly once&rdquo;, you are in the top-right and you need an ID, not a protocol.</div>
+  </div>
+
+  <div class="box tenth nobreak" style="margin-top:12pt">
+    <h4>The thumb rule, in one sentence</h4>
+    <p style="font-size:11.5pt; line-height:1.5"><b>Name the invariant, count the things it spans and the systems it crosses — then find the moment where something is read, a decision is made, and a write follows.</b></p>
+    <p style="margin-top:6pt">It travels. A warehouse checking stock before promising a delivery, two schedulers assigning the same room, a committee where every member individually approves an overspend that is only unaffordable in total — all the same shape: a check, a decision, and a write that invalidates the check. The fix is always one of the same four: make it one thing, make it idempotent, group it and demand the real guarantee, or accept that someone has to be asked first.</p>
+  </div>
+</section>
+
+<!-- ============================== 7. LOOKUP ============================== -->
+<section class="page">
+  <div class="kicker">Section 7</div>
+  <h2>Symptom &rarr; diagnosis &rarr; move</h2>
+  <p>Cover the middle and right columns and work down the left.</p>
+
+  <h3>Isolation anomalies</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>A report's totals don't reconcile, but every individual figure checks out.</td><td>Read skew — the values were read at different moments.</td><td>Run it under snapshot isolation so the whole query sees one moment. Watch the age of the oldest open snapshot afterwards.</td></tr>
+    <tr><td>A restored backup has permanently inconsistent data.</td><td>The backup was taken without a consistent snapshot, over hours of live writes.</td><td>Snapshot isolation for the backup transaction. &ldquo;Run it when it's quiet&rdquo; does not help — the window is the whole backup.</td></tr>
+    <tr><td>A reader saw data that was later rolled back.</td><td>Dirty read — the isolation level is below read committed.</td><td>Move to read committed. Note the knock-on: anything that read uncommitted data has to be aborted too.</td></tr>
+    <tr><td>A sale was recorded against one buyer and the invoice against another.</td><td>Dirty write — two transactions interleaved their writes to different rows.</td><td>Read committed prevents it, using row locks held until commit or abort. Almost every implementation already does.</td></tr>
+    <tr><td>Two increments produced one increment.</td><td>Lost update — concurrent read-modify-write cycles.</td><td>Use the database's atomic operation. Failing that: a conditional write, an explicit lock, or a level that detects lost updates.</td></tr>
+    <tr><td>Two edits to the same document, one silently disappeared.</td><td>Lost update on a whole-value rewrite.</td><td>A conditional write on the previous content, or a version-number column. Check the update took effect and retry if not.</td></tr>
+    <tr><td>Both requests passed the same check and both committed.</td><td>Write skew — they read the same rows and wrote different ones.</td><td>Serializable isolation. Second-best, if the checked rows exist: lock them with <code>SELECT … FOR UPDATE</code>.</td></tr>
+    <tr><td>Two bookings for the same room and time.</td><td>Write skew via a phantom — the check was for the absence of rows.</td><td>Serializable. If unavailable, materialise the conflict as lockable slot rows, knowing it's a last resort.</td></tr>
+    <tr><td>Two accounts created with the same username.</td><td>The same phantom, in the one shape a constraint fits.</td><td>A uniqueness constraint. The second transaction aborts on violation, which is exactly what you want.</td></tr>
+    <tr><td>Reads are blocking behind writes.</td><td>Read locks are in use — either the read-committed implementation that takes them, or 2PL.</td><td>Under MVCC this shouldn't happen. Check the isolation level and the read-committed implementation setting.</td></tr>
+    <tr><td>Table size grows while row count is flat.</td><td>MVCC retaining old versions that some open snapshot might still need.</td><td>Find the long-running transaction holding the oldest snapshot. This is expected behaviour, not a leak.</td></tr>
+    <tr><td>The same isolation level behaves differently on two products.</td><td>The naming problem — &ldquo;repeatable read&rdquo; and &ldquo;serializable&rdquo; are used for different guarantees.</td><td>Check which anomalies the specific product's level permits, not what it is called.</td></tr>
+  </table>
+
+  <h3>Serializability and distributed commit</h3>
+  <table class="tight">
+    <tr><th style="width:48mm">What you observe</th><th style="width:56mm">Most likely diagnosis</th><th>What to do</th></tr>
+    <tr><td>High percentiles collapsed after enabling serializable.</td><td>2PL: reduced concurrency by design, plus deadlocks throwing away work.</td><td>Expect it under contention. Consider an SSI implementation, whose cost appears as aborts rather than blocking.</td></tr>
+    <tr><td>Writes to a table stop entirely while a report runs.</td><td>2PL taking a shared lock on the whole table for a full scan.</td><td>Run long reads on a snapshot instead of inside the serializable workload.</td></tr>
+    <tr><td>A surge of transaction aborts under load, with no blocking.</td><td>SSI plus high contention — optimistic concurrency control failing where it is weakest.</td><td>Shorten read/write transactions, reduce contention with commutative atomic operations, or leave headroom so retries don't compound.</td></tr>
+    <tr><td>One slow transaction halted all transaction processing.</td><td>Actual serial execution — a single thread, so one slow transaction stalls everything.</td><td>Keep transactions short and the working set in memory. Move long read-only work out onto a snapshot.</td></tr>
+    <tr><td>Cross-shard writes are orders of magnitude slower.</td><td>Serial execution across shards must run in lockstep, and coordination dominates.</td><td>Shard so transactions stay within one shard. Adding machines will not fix cross-shard throughput.</td></tr>
+    <tr><td>A transaction is stuck and cannot be aborted.</td><td>In doubt — it voted yes and lost the coordinator.</td><td>Recover the coordinator so it can read its log. Do not time it out: only the log knows the decision.</td></tr>
+    <tr><td>Unrelated features are timing out during an incident.</td><td>An in-doubt transaction holding row locks, blocking everything that touches those rows.</td><td>Same fix. Restarting the databases will not release them — a correct implementation preserves them across restarts.</td></tr>
+    <tr><td>The coordinator's log is lost and transactions can't be resolved.</td><td>Orphaned in-doubt transactions.</td><td>Manual resolution: for each, find whether any participant already committed or aborted, and apply the same outcome to the rest.</td></tr>
+    <tr><td>Someone proposes forcing the stuck transactions through.</td><td>A heuristic decision.</td><td>Understand what it means — probably breaking atomicity. Catastrophes only, never routine.</td></tr>
+    <tr><td>A message was processed twice after a crash.</td><td>Processing that isn't idempotent, retried after an ambiguous failure.</td><td>Record processed message IDs with a uniqueness constraint, and acknowledge only after the database transaction commits.</td></tr>
+    <tr><td>Someone proposes three-phase commit to stop the blocking.</td><td>An assumption of bounded network delay and bounded response times.</td><td>Neither holds here. Replicate the coordinator with a consensus protocol instead.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 8. REFERENCE ============================== -->
+<section class="page">
+  <div class="kicker">Section 8</div>
+  <h2>Numbers worth remembering</h2>
+  <table class="tight">
+    <tr><th style="width:32mm">Number</th><th>What it is</th><th>Why it matters in an argument</th></tr>
+    <tr><td><b>42 &rarr; 43, not 44</b></td><td>Two concurrent increments of a counter.</td><td>The smallest complete demonstration of a lost update, and the reason read committed is not enough — the second write wasn't dirty, it was just stale.</td></tr>
+    <tr><td><b>$500 + $400 = $900</b></td><td>Read skew during a $100 transfer between two accounts holding $500 each.</td><td>Every figure was committed when read. Use it whenever someone says &ldquo;but the data was committed&rdquo;.</td></tr>
+    <tr><td><b>2 doctors &rarr; 0 on call</b></td><td>Write skew: both check &ldquo;at least two on call&rdquo;, both see 2, each takes themselves off.</td><td>The canonical case where nothing was overwritten, no rule was broken individually, and only serializability prevents it.</td></tr>
+    <tr><td><b>20 kB</b></td><td>The JSON document used to motivate single-object atomicity.</td><td>Makes concrete what the storage engine already guarantees: no unparseable fragment, no spliced old-and-new value, no partially updated read.</td></tr>
+    <tr><td><b>Around 30 years</b></td><td>How long two-phase locking was the only widely used way to get serializability.</td><td>Explains why weak isolation became normal: for decades the only alternative had unacceptable performance.</td></tr>
+    <tr><td><b>1975 · 1983</b></td><td>The first SQL database, whose transaction style is still recognisable today; and the year the ACID acronym was coined.</td><td>Fifty years of near-identical semantics is why the vocabulary is shared — and the 1983 acronym is why arguments about the letters are still arguments about definitions.</td></tr>
+    <tr><td><b>1991 · 2008</b></td><td>The cross-technology 2PC standard, and the first description of serializable snapshot isolation.</td><td>The gap explains the field's mood: the distributed-transaction standard is old and constrained; the good isolation algorithm is recent, which is why weak levels are still everywhere.</td></tr>
+    <tr><td><b>~1,000 per second</b></td><td>Reported cross-shard write throughput for a serial-execution database.</td><td>Orders of magnitude below its single-shard rate, and it cannot be increased by adding machines. The number that decides whether serial execution suits you.</td></tr>
+    <tr><td><b>32-bit, ~4 billion</b></td><td>Transaction ids in one major MVCC implementation, and where they overflow.</td><td>Shows that the id is a real, finite resource with a cleanup process behind it — not an abstract label.</td></tr>
+    <tr><td><b>15 minutes, six months</b></td><td>The granularity and horizon of a materialised-conflict table: every room &times; every slot, created in advance.</td><td>Makes the ugliness concrete. You are pre-creating rows that hold no data, purely to have something to lock.</td></tr>
+    <tr><td><b>20 minutes</b></td><td>How long locks are held if the coordinator takes 20 minutes to restart.</td><td>The clearest statement of why in-doubt is an availability problem and not just a correctness one.</td></tr>
+    <tr><td><b>30% to 80%</b></td><td>Share of SSDs developing at least one bad block in their first four years.</td><td>Ends &ldquo;it's committed, so it's safe&rdquo;. Durability is stacked risk reduction, not a guarantee.</td></tr>
+    <tr><td><b>32,768 hours</b></td><td>The point at which a firmware bug caused a family of drives to fail.</td><td>A correlated fault: identical drives installed together fail together, taking every replica at once.</td></tr>
+    <tr><td><b>Over 20 years</b></td><td>How long one well-regarded database used <code>fsync</code> incorrectly.</td><td>The most economical argument that durability primitives are hard to use correctly, even for experts.</td></tr>
+  </table>
+
+  <h3>Glossary — the terms you should be able to define cold</h3>
+  <table class="tight">
+    <tr><th style="width:40mm">Term</th><th>Definition, and the line that separates it from its neighbour</th></tr>
+    <tr><td><b>Transaction</b></td><td>Reads and writes grouped into one unit that commits or aborts. A multi-object API call is not one.</td></tr>
+    <tr><td><b>Atomicity</b></td><td>A fault discards every write made so far — abortability. Not the multithreaded sense, which is isolation.</td></tr>
+    <tr><td><b>Consistency (ACID)</b></td><td>Your invariant, enforced only where you declared it as a constraint. One of at least five meanings of the word.</td></tr>
+    <tr><td><b>Isolation</b></td><td>Concurrent transactions don't interfere. Formalised as serializability; almost never what the default gives you.</td></tr>
+    <tr><td><b>Durability</b></td><td>Committed data survives a crash — by disk, log, checksum and replication. Perfect durability does not exist.</td></tr>
+    <tr><td><b>Dirty read / dirty write</b></td><td>Reading uncommitted data / overwriting uncommitted data. Read committed prevents both.</td></tr>
+    <tr><td><b>Cascading abort</b></td><td>The consequence of allowing dirty reads: anything that read data later rolled back must be aborted too.</td></tr>
+    <tr><td><b>Read committed</b></td><td>No dirty reads, no dirty writes. Permits read skew, lost updates, write skew and phantoms.</td></tr>
+    <tr><td><b>Read uncommitted</b></td><td>Prevents dirty writes only. Reduces the probability of lost updates without preventing them.</td></tr>
+    <tr><td><b>Read skew (nonrepeatable read)</b></td><td>Different parts of the database seen at different moments. Every value committed; the set never true at once.</td></tr>
+    <tr><td><b>Snapshot isolation</b></td><td>One consistent moment for the whole transaction. Not serializable, whatever the product calls it.</td></tr>
+    <tr><td><b>MVCC</b></td><td>Several committed versions per row, filtered by transaction id. Readers never block writers, writers never block readers.</td></tr>
+    <tr><td><b>Repeatable read</b></td><td>A name meaning snapshot isolation, something weaker, or serializability, depending on the product. Go and check.</td></tr>
+    <tr><td><b>Lost update</b></td><td>Concurrent read-modify-write cycles on the same object; the second clobbers the first. Five distinct fixes.</td></tr>
+    <tr><td><b>Optimistic locking</b></td><td>A conditional write using a version-number column. Not a lock at all — a retry loop.</td></tr>
+    <tr><td><b>Write skew</b></td><td>Reading the same objects and writing different ones. The general case of lost update; only serializability prevents it automatically.</td></tr>
+    <tr><td><b>Phantom</b></td><td>A write that changes another transaction's search result. Deadly when the search was for the absence of rows.</td></tr>
+    <tr><td><b>Materializing conflicts</b></td><td>Pre-creating rows purely to be locked. A last resort that leaks concurrency control into the data model.</td></tr>
+    <tr><td><b>Serializability</b></td><td>The result is as if transactions ran one at a time. Three implementations exist: serial execution, 2PL, SSI.</td></tr>
+    <tr><td><b>Two-phase locking (2PL)</b></td><td>Shared and exclusive locks held to transaction end; a growing phase then a shrinking phase. Writers block readers.</td></tr>
+    <tr><td><b>Predicate / index-range lock</b></td><td>A lock on everything matching a condition, including rows that don't exist. Over-approximating is safe; the fallback is a table lock.</td></tr>
+    <tr><td><b>Serializable snapshot isolation (SSI)</b></td><td>Snapshot isolation plus commit-time detection of expired premises. Optimistic; fails by aborting, not by blocking.</td></tr>
+    <tr><td><b>Two-phase commit (2PC)</b></td><td>Atomic commit across nodes: prepare, then decide. Unrelated to 2PL despite the name.</td></tr>
+    <tr><td><b>In doubt</b></td><td>Voted yes, lost the coordinator. Cannot decide alone, and holds its locks — across restarts — until resolved.</td></tr>
+    <tr><td><b>Heuristic decision</b></td><td>A participant resolving an in-doubt transaction unilaterally. A euphemism for probably breaking atomicity.</td></tr>
+    <tr><td><b>Idempotence</b></td><td>Applying an operation twice has the same effect as once. Delivers exactly-once semantics without cross-system atomic commit.</td></tr>
+  </table>
+</section>
+
+<!-- ============================== 9. ANSWER KEY ============================== -->
+<section class="page ans">
+  <div class="kicker">Section 9 — keep covered until you've written your own answers</div>
+  <h2>Answer key</h2>
+
+  <h4>Part 1 · Q1 — the store that is &ldquo;atomic, so we're covered&rdquo;</h4>
+  <p><b>(a)</b> They have <b>single-object atomicity and isolation</b> — no reader sees a half-written document, a crash doesn't splice old and new values, an interrupted write doesn't persist a fragment — and an <b>atomic conditional write</b>, which prevents lost updates on one object by applying the change only if the value hasn't moved since they read it. Both are genuine and both are <b>scoped to one object</b>. Neither says anything about two objects changing together, which is precisely what they need. A store offering linearizable reads and conditional writes on single objects has not given anyone transactions.</p>
+  <p><b>(b)</b> The mismatched totals are a <b>multi-object atomicity failure</b>: the order document and the summary row are separate objects, so a fault after one write and before the other leaves them permanently disagreeing, and without atomicity nobody can tell which writes took effect. The index symptom is the same fault in a place people forget: <b>a secondary index is a separate database object</b>, so without isolation a record can appear in one index and not another because the second index update hasn't happened yet. Credit for noting that this makes almost every write multi-object whether the team intended it or not.</p>
+  <p><b>(c)</b> First reason, not depending on the network: <b>retrying does not undo the write that already succeeded</b>. Without atomicity there is nothing to roll back, so a retry of the pair re-applies the half that worked and can double-count the summary — this is the &ldquo;best effort, won't undo what it has done&rdquo; posture, and error recovery is now the application's problem. Second reason: <b>the write may have succeeded with the acknowledgment lost</b>, so the retry performs it twice unless they add application-level deduplication. Also creditable: retrying is pointless after a permanent error such as a constraint violation, and retrying under contention makes an overload worse.</p>
+
+  <h4>Part 1 · Q2 — two unsafe statements about ACID</h4>
+  <p><b>(a)</b> The database enforces the invariants that were <b>declared as constraints</b> — a check constraint on the balance column would genuinely prevent a negative value. It cannot enforce an invariant nobody declared, and it cannot express many complex invariants at all, particularly those spanning multiple rows. The C in ACID therefore depends on how the application uses the database and is not a property of the database alone: if the rule matters, declare it, and where it can't be declared, the application must define its transactions so they preserve it. (Extra credit for noting that the word has at least five meanings and that &ldquo;ACID compliant&rdquo; tells you almost nothing about which isolation level you have.)</p>
+  <p><b>(b)</b> Two of: a <b>correlated fault</b> — a power outage, or a bug that crashes every node on the same input — losing anything held only in memory across all replicas at once; <b>asynchronous replication</b> discarding recent writes when the leader becomes unavailable; a <b>storage-level failure</b>, since drives can violate their guarantees on sudden power loss, firmware has bugs, disk data can silently corrode, and <code>fsync</code> is genuinely hard to use correctly; or the data being intact but <b>inaccessible</b> because the machine holding it is dead. The general point: there is no perfect durability, only risk-reduction techniques — disk, replication, backups — that should be used together.</p>
+  <p><b>(c)</b> The hazard is a <b>side effect outside the database</b>. Aborting the transaction rolls back the writes but does not unsend the email, so every retry sends another. The fix is to move the send out of the transaction and make it idempotent — record the intent inside the transaction, send afterwards keyed on something unique so a repeat send can be suppressed. Credit for noting the general rule: retry only after transient errors, bound the retries with exponential backoff, and remember that a retry can also duplicate the work if the commit succeeded and the acknowledgment was lost.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 2 · Q1 — the four-hour export that doesn't balance</h4>
+  <p><b>(a)</b> <b>Read skew</b>, also called a nonrepeatable read. Under read committed each read returns a value that was committed at the instant it was read — so no individual value in the export was ever wrong. The problem is that the export reads different parts of the database at different moments, and a transfer that lands between two of those moments is seen from one side only: the debit is captured after it happened and the matching credit before it did, or the reverse. The set of values was never simultaneously true, even though every element of it was.</p>
+  <p><b>(b)</b> Running at 3 a.m. treats the problem as a probability, but the exposure window is the <b>whole four hours</b> of the export, not a busy period — a single transfer anywhere in it produces the defect, and quiet hours only make it rarer and therefore harder to catch. Re-running on mismatch is worse: it is a detection mechanism dressed as a fix, and it only works for imbalances that happen to be detectable by totals. A skewed export whose figures happen to balance is still wrong, and this class of error becomes <b>permanent</b> the moment anyone restores or reports from it.</p>
+  <p><b>(c)</b> <b>Snapshot isolation.</b> The mechanism is multiversion concurrency control: every transaction gets an always-increasing id, every written row is tagged with the id of the writer, an update is internally a delete plus an insert, and visibility rules hide writes from transactions that were in progress when the reader started, writes from later ids, and writes from aborted transactions. So the export reads the database exactly as it stood when it began, while writes continue unblocked — readers never block writers and writers never block readers. The operational cost to watch: the database must retain every row version the long-running export might still need, so <b>garbage collection stalls and storage grows</b> for as long as the snapshot is open. Monitor the age of the oldest open transaction.</p>
+
+  <h4>Part 2 · Q2 — the reconciliation query that shouldn't block anything</h4>
+  <p><b>(a)</b> Under MVCC the relationship should be <b>no relationship at all</b>: reads take no locks, so readers never block writers and writers never block readers — that is the defining performance property of snapshot isolation. Observed blocking therefore says the reads are taking locks, which means the database is not serving B from a snapshot: either the read-committed implementation in use prevents dirty reads with <b>read locks</b> rather than by keeping the old committed value, or B is running under two-phase locking, where a large scan takes a shared lock over everything it reads and writers must wait for it.</p>
+  <p><b>(b)</b> It is the expected consequence of never updating in place. Under MVCC an update is a delete plus an insert, so modified rows accumulate versions; a version can only be garbage-collected once <b>no open transaction could still need it</b>. B's five-minute snapshot pins every version that existed when it started, so five minutes of write traffic is retained on every run, and any transaction left open longer pins proportionally more. Flat row counts with growing size is the signature, not a contradiction. Look for the <b>oldest open transaction</b> — that one number explains the retention.</p>
+  <p><b>(c)</b> Put B on <b>snapshot isolation</b> so its coherent view costs no locks — that is exactly the workload snapshot isolation exists for, alongside backups and integrity checks. If the blocking came from a read-committed implementation using read locks, change that setting rather than weakening B's guarantee. Monitor the age of the oldest open snapshot and the growth of dead row versions, since the cost has moved from latency to storage and garbage-collection lag, and a query that hangs now costs disk instead of blocking writers.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 3 · Q1 — overselling seats and losing note lines</h4>
+  <p><b>(a)</b> The overselling is <b>write skew</b>; the vanishing note lines are a <b>lost update</b>. Write skew is the general case: two transactions read the same objects and then update <i>different</i> objects, so nothing is overwritten and no single transaction breaks the rule. A lost update is the special case where the different transactions happen to update the <b>same</b> object, so the second write clobbers the first. In the seats example each transaction counts the same rows and then inserts <i>its own</i> sale row; in the notes example both agents read and rewrite the same field.</p>
+  <p><b>(b)</b> <b>No.</b> The check is a <code>COUNT</code> over unsold seats and the write is an <code>INSERT</code> of a new sale row — the transaction checks for a condition and then creates a row that changes the result of that condition. That is a <b>phantom</b>. <code>SELECT … FOR UPDATE</code> can only attach locks to rows the query returned, and here the decisive rows are the ones that <i>do not exist yet</i>, so there is nothing to lock. (Contrast the on-call doctors, where the row updated in step 3 was one of the rows returned in step 1 — there the lock does work.) The real options are serializable isolation, which is what predicate and index-range locks were invented for; or materialising the conflict as pre-created lockable rows, one per seat, which is ugly and a last resort; or, if the invariant can be expressed as one, a constraint.</p>
+  <p><b>(c)</b> Best fix for the notes: an <b>atomic write operation</b> if appending can be expressed as one — the database performs the change without a read-modify-write cycle in application code, which is the usual best answer when it fits. It may not fit arbitrary text, so the alternative is a <b>conditional write</b> (compare-and-set) on the previous content or on a version-number column, checking afterwards that the update took effect and retrying if not. What each assumes: the atomic operation assumes the change is expressible as a database-side operation on one object; the conditional write assumes there is a <b>single up-to-date copy</b> of the value to compare against — which is exactly what multi-leader or leaderless replication cannot give you, where you would instead merge conflicting versions and can only prevent lost updates if the operations commute. Also creditable: an explicit lock, or a level that detects lost updates automatically.</p>
+
+  <h4>Part 3 · Q2 — choosing an implementation of serializability</h4>
+  <p><b>(a)</b> <b>Two-phase locking:</b> the hot rows are exactly where 2PL hurts — every transaction that might conflict waits for the other, latency becomes unstable and very bad at high percentiles, and deadlocks (much more frequent at this level) throw away completed work and force retries. The long analytical reads make it worse: a transaction reading large parts of a table takes a shared lock over it, so writes to that table stop until the read commits. <b>SSI:</b> no blocking, but a small hot set means high contention, and optimistic concurrency control degrades precisely there — a large share of transactions abort at commit and the retries add load to a system already near capacity. <b>Serial execution:</b> throughput is capped at one CPU core; one slow transaction stalls every other; and the whole workload must be rewritten as stored procedures submitted in advance, since an interactive statement-at-a-time transaction would leave the single thread waiting on the network.</p>
+  <p><b>(b)</b> <b>&ldquo;No application changes&rdquo; is unachievable.</b> Every route to serializability changes what the application must do. Under 2PL and SSI the transaction can be aborted — for deadlock or for a serialization failure — so the application must detect aborts and retry them, which is the very thing many frameworks fail to do by default. Under serial execution the change is larger still: the transaction has to be submitted whole as a stored procedure. Predictable p99 is achievable, but only by choosing the implementation whose cost shows up as aborts rather than as waiting.</p>
+  <p><b>(c)</b> <b>Contention on the hot set</b> — how many concurrent transactions touch the same rows, and how long each read/write transaction stays open. That single property flips the answer: with low contention and spare capacity, optimistic concurrency control outperforms pessimistic; with high contention it collapses into abort storms while 2PL merely queues. Measure the concurrent access rate to the hot rows, the duration distribution of read/write transactions, and current headroom. Also worth measuring: whether the long reads can be moved onto a snapshot outside the serializable workload, which improves every option, and whether contention can be reduced by expressing hot updates as commutative atomic operations.</p>
+</section>
+
+<section class="page ans">
+  <div class="kicker">Section 9 continued</div>
+
+  <h4>Part 4 · Q1 — the deploy that took out unrelated features</h4>
+  <p><b>(a)</b> Those transactions are <b>in doubt</b> (uncertain): each participant received a prepare request and voted yes, which surrendered its right to abort, and then lost the coordinator before hearing the decision. A timeout cannot resolve it because the participant has no information about the outcome — if it unilaterally aborts it may end up inconsistent with a participant that committed, and if it unilaterally commits it may end up inconsistent with one that aborted. Participants could in principle poll each other, but that is <b>not part of the protocol</b>. The only correct resolution is to wait for the coordinator to recover and read its log, which is exactly why the coordinator writes its decision to disk before sending anything.</p>
+  <p><b>(b)</b> Because a transaction holds <b>row-level exclusive locks</b> on everything it modified (and, under two-phase locking, shared locks on everything it read) until it commits or aborts — so an in-doubt transaction holds its locks for the entire time it is in doubt. Any other transaction touching those rows blocks, and depending on the isolation level may be blocked even from reading them, so features with no connection to orders stop working. Restarting the databases does not help: a correct implementation must <b>preserve an in-doubt transaction's locks across restarts</b>, because releasing them would risk violating atomicity. The incident outlasted the deploy because the coordinator was a library <i>inside the order-service process</i> — when the pod died the coordinator died with it, and its log sits on that server's local disk, making that disk part of the durable system state.</p>
+  <p><b>(c)</b> A <b>heuristic decision</b>: many implementations of the cross-technology standard let a participant unilaterally commit or abort an in-doubt transaction without a decision from the coordinator. The cost, stated plainly, is that &ldquo;heuristic&rdquo; is a euphemism for <b>probably breaking atomicity</b> — it violates the system of promises the protocol rests on, so participants can end up disagreeing permanently. It exists for catastrophes, not for routine recovery.</p>
+
+  <h4>Part 4 · Q2 — banning two-phase commit</h4>
+  <p><b>(a)</b> The ban conflates two different things. <b>Database-internal</b> distributed transactions have participants all running the same software; <b>heterogeneous</b> ones span different technologies and must interoperate through a standard. Three concrete things the internal case can do: <b>replicate the coordinator</b>, with automatic failover to another coordinator node — commonly using a consensus algorithm — so a single crash doesn't leave anyone in doubt; let the <b>coordinator and shards communicate directly</b>, without going through application code, which removes the application as a single point of failure; and <b>couple atomic commitment to a real concurrency-control protocol</b>, giving cross-shard deadlock detection and consistent reads across shards. A fourth: replicate the participating shards so a fault in one doesn't force an abort. The heterogeneous case can do none of these, because it is a lowest common denominator — it cannot even detect deadlocks across systems, and it does not work with serializable snapshot isolation, since both would need standardised cross-system protocols.</p>
+  <p><b>(b)</b> Use only database-local transactions. <b>1.</b> Give every message a unique ID and keep a table of processed IDs; on receiving a message, begin a transaction and check for the ID — if present, acknowledge and drop, which protects against a redelivery of something already done. <b>2.</b> If absent, insert it, do the processing and its database writes in the <i>same</i> transaction, and commit — so a crash before commit aborts everything and the broker redelivers safely. <b>3.</b> Acknowledge to the broker only after the commit succeeds — so a crash between commit and acknowledgment leads to a redelivery that step 1 will drop. <b>4.</b> Delete the ID afterwards, in a separate transaction — a crash here leaves a stale row that costs a little storage and nothing else. A <b>uniqueness constraint</b> on the ID table covers the remaining case, where a retry arrives while the first attempt is still open: both cannot insert the same ID.</p>
+  <p><b>(c)</b> It achieves <b>idempotence</b> — processing the same message twice has the same effect as processing it once — and idempotence is what delivers exactly-once semantics here. Atomicity across the broker and the database was never actually required. What internal distributed transactions would still buy: <b>scalability of this same pattern</b>, letting the message-ID table live on one shard and the data updated by processing live on others, with atomic commit across those shards.</p>
+
+  <div class="box tip nobreak" style="margin-top:14pt">
+    <h4>How to score yourself</h4>
+    <p>Two marks, both quick. <b>Completeness:</b> did you name every element, and — for this competency especially — did you name the <i>boundary</i>? Nearly every term here has a look-alike, and an answer that gets the term right while confusing it with its neighbour is worth less than it feels. <b>Phrasing:</b> could you have said it in a design review without hand-waving? If you wrote &ldquo;the isolation level was too weak&rdquo; where the key says &ldquo;both transactions read the same rows and wrote different ones, so nothing was overwritten and nothing was detected&rdquo;, the label is there and the mechanism isn't — and the mechanism is what changes anyone's mind.</p>
+  </div>
+</section>
+
+<!-- ============================== 10. WORKBOOK ============================== -->
+<section class="page">
+  <div class="kicker">Section 10</div>
+  <h2>Spaced-review tracker</h2>
+  <p>Review at <b>day 1, 3, 7, 16, 35</b>. Write the date in the box when you pass. On a fail, reset that row to a 1-day interval and start again.</p>
+
+  <style>#trk td,#trk th{padding:2.3pt 5pt; font-size:8.1pt} #quiz .writeline{height:13pt} #quiz li{margin-bottom:2pt}</style>
+  <table class="tight" id="trk">
+    <tr>
+      <th style="width:58mm">Item</th>
+      <th>Day 1</th><th>Day 3</th><th>Day 7</th><th>Day 16</th><th>Day 35</th><th style="width:24mm">Fails</th>
+    </tr>
+    <tr><td><b>1 ·</b> Atomicity as abortability, and what it isn't</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>2 ·</b> Why C is the odd letter out</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>3 ·</b> Durability's four failure modes</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>4 ·</b> Single-object guarantees, and where they stop</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>5 ·</b> Why a secondary index makes a write multi-object</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>6 ·</b> The five hazards of retrying an aborted transaction</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>7 ·</b> Read committed: two guarantees, two implementations</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>8 ·</b> Why read locks are the bad way to stop dirty reads</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>9 ·</b> Dirty read vs dirty write vs cascading abort</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>10 ·</b> Read skew, and why $900 was never wrong</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>11 ·</b> The two workloads read skew makes permanent</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>12 ·</b> MVCC: ids, insert/delete markers, garbage collection</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>13 ·</b> The visibility rules, in the two-clause form</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>14 ·</b> Readers never block writers — and what it implies</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>15 ·</b> Why &ldquo;repeatable read&rdquo; is not an answer</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>16 ·</b> Lost update: all five preventions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>17 ·</b> What the fifth prevention assumes that the others don't</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>18 ·</b> Write skew as the general case</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>19 ·</b> Phantoms, and why FOR UPDATE has nothing to hold</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>20 ·</b> Materialising conflicts, and why it's a last resort</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>21 ·</b> Serial execution: what it needs, where it stops</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>22 ·</b> 2PL: growing/shrinking, predicate and index-range locks</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>23 ·</b> SSI: the two detections, and why it waits to abort</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>24 ·</b> Pessimistic vs optimistic, and when each wins</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>25 ·</b> 2PC: the two points of no return</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>26 ·</b> In doubt: why no timeout helps, and why locks are the problem</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>27 ·</b> Internal vs heterogeneous distributed transactions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>28 ·</b> Exactly-once by idempotence, all four steps</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td><b>29 ·</b> Master matrix — things spanned × systems crossed</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h3>Final quiz — no notes, twenty minutes, write the answers</h3>
+  <ol id="quiz">
+    <li>Explain why ACID atomicity would have been better named abortability, and say which letter covers a concurrent client seeing your half-finished work.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Give the two guarantees of read committed and how each is implemented — including the implementation that is possible but works badly, and exactly why it does.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain read skew with a concrete example, say why nothing that was read was uncommitted, and name two workloads for which it is intolerable.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Describe how MVCC gives a transaction a consistent snapshot: what is tagged on each row, what an update really is, and the two-clause rule for whether a row is visible.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name all five ways to prevent a lost update, and say what the fifth assumes that the other four do not.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Define write skew, say why it is the general case of the lost update, and name two lost-update preventions that do not work against it.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Explain what a phantom is and why an explicit lock on the rows you read cannot help, then give the remaining options and say which is preferred.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Name the three implementations of serializability and give the specific workload that defeats each one.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>State the two points of no return in two-phase commit, say what each one surrenders, and explain why a participant in doubt may not decide for itself.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+    <li>Design exactly-once message processing without atomic commit across the broker and the database, and say what property it actually achieves.<div class="writelines"><div class="writeline"></div><div class="writeline"></div></div></li>
+  </ol>
+</section>
+
+</body>
+</html>
