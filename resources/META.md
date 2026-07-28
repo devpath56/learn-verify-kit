@@ -16,7 +16,7 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | # | Competency | Booklet | Source | Status |
 |---|---|---|---|---|
 | 1 | Stability Antipatterns & Stability Patterns | `release-it-ch4-5/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 4 "Stability Antipatterns" (pp. 31–90), Ch. 5 "Stability Patterns" (pp. 91–125). The Pragmatic Bookshelf. | Built · 18 questions registered |
-| 2 | *unassigned* | — | — | Awaiting source |
+| 2 | Design for Deployment & Chaos Engineering | `release-it-ch13-17/` | Michael T. Nygard, *Release It! Design and Deploy Production-Ready Software*, 2nd ed. — Ch. 13 "Design for Deployment" (pp. 241–262), Ch. 17 "Chaos Engineering" (pp. 325–336). The Pragmatic Bookshelf. | Built · 18 questions registered |
 | 3 | *unassigned* | — | — | Awaiting source |
 | 4 | *unassigned* | — | — | Awaiting source |
 | 5 | *unassigned* | — | — | Awaiting source |
@@ -28,6 +28,15 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 11 | *unassigned* | — | — | Awaiting source |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 2
+
+Cited within the source chapters and named in the booklet's teaching: Sidney Dekker, *Drift into
+Failure* (the safety / economy / capacity boundaries); Gerald Weinberg, *General Principles of
+Systems Design* (the fundamental regulator paradox); Nassim Taleb, *Antifragile*; the principles of
+chaos engineering (principlesofchaos.org); Netflix's Simian Army and Chaos Automation Platform;
+Peter Alvaro's work on inferring fault-injection targets from traces; Nora Jones's account of a
+first chaos rollout; Charity Majors on green dashboards.
 
 ### Works referenced inside competency 1
 
@@ -111,4 +120,7 @@ least one code, and each code points at the exact artefact to reread.
   frozen in `competency-progress.json`, so the questions are gradeable — but they are deliberately
   *not* printed in the booklet, which keeps the offline quiz honest. If a future booklet prints
   quiz answers, note the change here.
-- Competencies 2–13 are unassigned pending sources.
+- **Competency 2's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competency 1: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- Competencies 3–13 are unassigned pending sources.

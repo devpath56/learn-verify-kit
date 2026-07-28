@@ -42,3 +42,4 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 ## Reference build
 
 `../release-it-ch4-5/` — the first booklet produced from this template.
+`../release-it-ch13-17/` — the second.
