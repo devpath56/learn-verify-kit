@@ -26,8 +26,47 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 9 | Incident Response & Postmortems — Structure, Mitigation, Practice, Learning | `sre-incident-postmortem/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 9 "Incident Response" by Jennifer Mace, Jelena Oertel, Stephen Thorne and Arup Chakrabarti with Jian Ma and Jessie Yang (pp. 175–194), Ch. 10 "Postmortem Culture: Learning from Failure" by Daniel Rogers, Murali Suriar, Sue Lueder, Pranjal Deo and Divya Sudhakar with Gary O'Connor and Dave Rensin (pp. 195–223). | Built · 18 questions registered |
 | 10 | Large-Scale Change & Deprecation — Constraint, Economics, Machinery, Removal | `swe-lsc-deprecation/` | Titus Winters, Tom Manshreck & Hyrum Wright (eds.), *Software Engineering at Google: Lessons Learned from Programming Over Time*, O'Reilly — Ch. 22 "Large-Scale Changes" by Hyrum Wright, edited by Lisa Carey, with the "Testing LSCs" section by Adam Bender; Ch. 15 "Deprecation" by Hyrum Wright, edited by Tom Manshreck. | Built · 18 questions registered |
 | 11 | Working at Wider Scope — Perspective, Terrain, Big Projects, Passive Influence | `staff-wider-scope/` | Tanya Reilly, *The Staff Engineer's Path: A Guide for Individual Contributors Navigating Growth and Change*, O'Reilly — Ch. 2 "Three Maps", Ch. 5 "Leading Big Projects", Ch. 7 "You're a Role Model Now (Sorry)". | Built · 18 questions registered |
-| 12 | *unassigned* | — | — | Awaiting source |
+| 12 | Raising the People Around You — Advice, Teaching, Guardrails, Opportunity | `staff-influence-at-scale/` | Tanya Reilly, *The Staff Engineer's Path: A Guide for Individual Contributors Navigating Growth and Change*, O'Reilly — Ch. 8 "Good Influence at Scale". | Built · 18 questions registered |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 12
+
+Cited within the source chapter and named or described in the booklet's teaching: the many named colleagues and
+writers quoted — the principal engineer whose scope is measured in thousands of engineers, the director who
+defines mentoring as sharing your experience, the author and coach quoted repeatedly on advice that undermines,
+on delegating wrapped gifts, and on naming how you can help; the engineer who recommends reviewing code in
+passes; the management consultant whose talk supplies the reflexive objection to a supplied solution; the
+executive who framed handing over work as giving away your building blocks; the professor who set out the four
+parts of sponsorship; the founder whose remark on hiring supplies the mirror image of meritocracy; the
+consultant who recommends putting the right solution physically in people's way; and the pair whose talk
+recounts the origin of a data-centre safety system. The employers and products used as illustrations — the
+company whose volunteers posted one-page testing advice in toilet stalls, the engineering blog that carried the
+review-in-passes advice, the company whose style-guide site supplies the definition of a style guide, the
+published technology register whose rings mark each technology's standing, the data-centre safety system and
+its reboot and decommissioning limits, the question-and-answer site offered as a place to link a specific post,
+and the language exercise set named as a good example of a guided walkthrough; the two smart-pointer types used
+in the worked review comment; the book on management quoted in a footnote, the organisation offering further
+recommendations on giving feedback, and the talk platform on which the coaching advice was delivered; and the
+cross-references to other chapters of the same book.
+
+The booklet names **the coined concept vocabulary and nothing else** — no companies, no products, no internal
+tools, no publications, no conferences and no individuals. This is a sixth distinct de-vendoring line, and the
+narrowest so far: competency 7 named nothing, 8 named the industry-standard organisations that were a section's
+subject, 9 named one vendor-neutral framework, 10 named a law and a set of language properties, 11 named an
+eponymous model and a dated law, and 12 names only terms of art. The terms it does keep are the ones where the
+name is the transferable unit: the three tiers and four mechanisms themselves; shadowing, pairing and reverse
+shadowing; rubber duck debugging; change management; paved roads; in-group favouritism and the mirror-image
+coinage for a supposed meritocracy; and the four parts of sponsorship, given as the four verbs rather than
+attributed. Everything else is described by what it does — the worked review comment becomes "don't use this
+pointer type, use that one", the published technology register becomes "each technology marked with its
+standing, from adopt through to hold", the safety system becomes "presubmits and configuration checkers", and
+the volunteers posting testing advice keep the practice and lose the employer and the programme name.
+
+**One deliberate exception is recorded here.** The idiom for handing over responsibility keeps its original
+wording, which contains a toy brand, on the same grounds that competency 10 kept an eponymous law: the phrase
+is the unit of vocabulary and is not separable from the brand inside it, and it carries no product
+recommendation or decay risk. If a future reader judges that wrong, the fix is to replace the phrase wholesale
+rather than to paraphrase around it, since a half-named idiom is worse than either alternative.
 
 ### Works referenced inside competency 11
 
@@ -328,6 +367,19 @@ least one code, and each code points at the exact artefact to reread.
 
 ## Known gaps
 
+- **Competency 12's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–11: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 12 is 59 pages from a single 46-page chapter** — a much higher expansion ratio than any
+  earlier booklet, where two chapters produce 45–50 pages. The cause is the source's density rather than
+  its length: it sets out four mechanisms across three tiers and names roughly forty discrete practices,
+  each of which needs a definition, an example and a boundary. Nothing is abridged to hit a page count,
+  and the booklet says nothing about any of this.
+- **Competency 12 carries competency 11's relaxation of `nobreak` on anchor sketches**, plus a scoped
+  padding override on the four carry-out boxes so that each part's closing rule sits with its 2×2 rather
+  than alone on a page. The ink-based page check reports zero flagged pages of 59.
+- **Competency 12's tracker has 40 rows**, as competency 11's does, against the 32–36 that decision J's
+  recalibration predicts. The same reasoning applies: the heuristic is a guide to coverage, not a cap.
 - **Competency 11 retired one question the day it was registered.** `p3q1` asked the reader to *name*
   a hazard that the booklet never names — the risk that a team has agreed to help because it believes the
   project will also deliver something else it cares about is taught as an unnamed clause in the Exploring
