@@ -367,6 +367,20 @@ least one code, and each code points at the exact artefact to reread.
 
 ## Known gaps
 
+- **Competency 12 retired two questions the day it was registered.** `p1q1` built its three situations out
+  of the source's own worked anecdotes — the "message the director" advice, the yes/no answer that cost an
+  hour, and the bare "that other library would also work here" review comment — so it tested recognition of
+  examples the reader had just been taught rather than transfer to unseen cases, which decision E1 forbids.
+  Reissued as `p1q1b` with three structurally different situations: advice whose cost depends on employment
+  standing rather than organisational distance, an answer that is accurate and harmful rather than merely
+  incomplete, and a review comment phrased as a question. `p2q2` part (b) told the reader to follow "the
+  structure of the worked example", pointing them back at the taught learning path instead of asking them to
+  generate one from the principle; reissued as `p2q2b`. Both caught in review before any attempt was recorded.
+- **Competency 12 adds one shared-style candidate.** Its scoped block keeps a table's header row with the
+  first data row (`table tr:first-child{break-after:avoid}`), which removed four Part-opener pages that ended
+  with a lone "The terms, each with its look-alike" header and a third of a page of white space. The
+  ink-based page check cannot see that defect, since a header row sits below the floor it measures. If the
+  shared style block is ever revised, this rule belongs in it rather than in one booklet.
 - **Competency 12's printed final quiz also has no answers in the booklet**, by the same deliberate
   choice as competencies 1–11: the ten ideals are frozen in `competency-progress.json` so the questions
   are gradeable, but they are not printed, which keeps the offline quiz honest.
