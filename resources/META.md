@@ -328,6 +328,11 @@ least one code, and each code points at the exact artefact to reread.
 
 ## Known gaps
 
+- **Competency 11 retired one question the day it was registered.** `p3q1` asked the reader to *name*
+  a hazard that the booklet never names — the risk that a team has agreed to help because it believes the
+  project will also deliver something else it cares about is taught as an unnamed clause in the Exploring
+  row, so part (b) demanded a term no reader could retrieve. Reissued as `p3q1b` with (b) rewritten to ask
+  for the risk and the stage at which it must be surfaced. Caught in review before any attempt was recorded.
 - **Competency 11's printed final quiz also has no answers in the booklet**, by the same deliberate
   choice as competencies 1–10: the ten ideals are frozen in `competency-progress.json` so the questions
   are gradeable, but they are not printed, which keeps the offline quiz honest.
