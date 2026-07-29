@@ -27,7 +27,39 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 10 | Large-Scale Change & Deprecation — Constraint, Economics, Machinery, Removal | `swe-lsc-deprecation/` | Titus Winters, Tom Manshreck & Hyrum Wright (eds.), *Software Engineering at Google: Lessons Learned from Programming Over Time*, O'Reilly — Ch. 22 "Large-Scale Changes" by Hyrum Wright, edited by Lisa Carey, with the "Testing LSCs" section by Adam Bender; Ch. 15 "Deprecation" by Hyrum Wright, edited by Tom Manshreck. | Built · 18 questions registered |
 | 11 | Working at Wider Scope — Perspective, Terrain, Big Projects, Passive Influence | `staff-wider-scope/` | Tanya Reilly, *The Staff Engineer's Path: A Guide for Individual Contributors Navigating Growth and Change*, O'Reilly — Ch. 2 "Three Maps", Ch. 5 "Leading Big Projects", Ch. 7 "You're a Role Model Now (Sorry)". | Built · 18 questions registered |
 | 12 | Raising the People Around You — Advice, Teaching, Guardrails, Opportunity | `staff-influence-at-scale/` | Tanya Reilly, *The Staff Engineer's Path: A Guide for Individual Contributors Navigating Growth and Change*, O'Reilly — Ch. 8 "Good Influence at Scale". | Built · 18 questions registered |
-| 13 | *unassigned* | — | — | Awaiting source |
+| 13 | Automated Testing — Suite Design, Unit Tests, Test Doubles, Larger Tests | `swe-testing/` | Titus Winters, Tom Manshreck & Hyrum Wright (eds.), *Software Engineering at Google: Lessons Learned from Programming Over Time*, O'Reilly — Ch. 11 "Testing Overview" by Adam Bender, Ch. 12 "Unit Testing" by Erik Kueffler, Ch. 13 "Test Doubles" by Andrew Trenk and Dillon Bly, Ch. 14 "Larger Testing" by Joseph Graves; all edited by Tom Manshreck. | Built · 18 questions registered |
+
+### Works referenced inside competency 13
+
+Cited within the source chapters and named or described in the booklet's teaching: the employer whose practices
+the four chapters describe, and the internal systems, programmes and people named throughout — the web server
+whose 2005 adoption of engineer-driven testing was the watershed, the volunteer group that drove the change, the
+orientation class, the five-level certification programme, the one-page advice sheets posted in restroom stalls,
+the project-health scoring tool, the continuous-build systems that preceded and replaced one another, the
+security scanner, the request-tracing framework, the annual disaster-recovery war game, the continuous
+fault-injection system, the video-upload verification channel and the press coverage it attracted, and the
+monorepo along with its two billion lines and twenty-five million weekly lines of change; the testing libraries
+and frameworks named for each language — the assertion libraries, the mocking frameworks for three languages,
+the nested-naming and specification frameworks, the two dependency-injection frameworks, the build system, and
+the static-analysis annotation that forbids mocking a type; the two public consumer-driven contract-testing
+tools, and the chaos-engineering tool popularised elsewhere; the products used as illustrations — the search
+engine and its result pages, the mail service, the maps interface, the advertising systems and their real-time
+bidding volumes, the two browsers, and the video platform; the pyramid's originator and the book it appeared in;
+the 2013 outage caused by an untested network configuration push; the recording artist whose lyric supplies the
+name of the rule about testing what you do not want to break; the published rater guidelines; and the many
+cross-references to other chapters of the same book.
+
+The booklet names **the concepts and one eponymous law**, and nothing else. Hyrum's Law is named on exactly the
+grounds competency 10 used for it and competency 11 used for the Westrum typology: an eponymous law is durable,
+transferable vocabulary. Everything else is described by what it does — the mocking frameworks become "a mocking
+framework", the assertion libraries become "an assertion library given only a boolean" versus "one given the
+subject", the request-tracing framework becomes "a trace across the call chain", the annotation becomes nothing
+at all, and the rule about testing what you do not want to break is stated as the rule rather than by its
+nickname. No companies, no products, no internal tools or programmes, no individuals beyond the one eponym, no
+books, and no programming languages: where a language property carried a teaching point it is described as the
+property, following the line competency 10 set. This is the seventh distinct de-vendoring line and it sits
+alongside competency 12's as the narrowest in the set — the difference being that competency 12 named coined
+concept vocabulary only, while this one adds a single eponymous law and drops the rest.
 
 ### Works referenced inside competency 12
 
@@ -367,6 +399,22 @@ least one code, and each code points at the exact artefact to reread.
 
 ## Known gaps
 
+- **Competency 13's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–12: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 13's source is four chapters, and the booklet is 60 pages.** Each chapter becomes one part,
+  which is the first time the set's four-part spine has mapped one-to-one onto the source's own chapter
+  division; the spine still runs causally — what a suite is for, how to write a test that never needs
+  touching, what to do when the real dependency will not fit, and what none of it can see. Nothing is
+  abridged to hit a page count.
+- **Competency 13 sets its whole-subject sketch two-thirds of a point smaller than its part sketches**
+  (7.15pt against 8.05pt), because that map covers four chapters and would otherwise spill a short tail
+  onto a page of its own. Competencies 5–12 use a single reduced size throughout.
+- **Competency 13's tracker has 40 rows**, as competencies 11 and 12 do, against the 32–36 that decision J's
+  recalibration predicts. The same reasoning applies: the heuristic is a guide to coverage, not a cap.
+- **The set is now complete: 13 of 13 built, 234 questions registered.** Decision J's tracker heuristic,
+  the ink-based page check and the de-vendoring lines are all recorded per competency above; if the set is
+  ever extended, competencies 11–13 are the ones whose conventions are most current.
 - **Competency 12 retired two questions the day it was registered.** `p1q1` built its three situations out
   of the source's own worked anecdotes — the "message the director" advice, the yes/no answer that cost an
   hour, and the bare "that other library would also work here" review comment — so it tested recognition of

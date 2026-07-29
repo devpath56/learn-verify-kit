@@ -3,8 +3,8 @@
   "what_this_is": "Answer-level log for the printed competency booklets. One file for the whole 13-competency set. Questions are asked ONLY from the banks below, never invented. Separate from the repo-root progress.json, which logs concepts taught in conversation.",
   "set": {
     "size": 13,
-    "registered": 12,
-    "remaining": 1
+    "registered": 13,
+    "remaining": 0
   },
   "bank_scope": "applied + quiz only — the 8 three-part applied cases and the 10 final-quiz questions per booklet (18). Concept-sketch node questions stay in the printed booklet as self-test cues but are not tracked.",
   "conventions": {
@@ -35,7 +35,7 @@
     "phrasing": "had it, couldn't say it in expert terms - go back to the plain/expert table"
   },
   "set_rollup": {
-    "untested": 216,
+    "untested": 234,
     "shaky": 0,
     "comfortable": 0,
     "gaps": {
@@ -51,7 +51,7 @@
       "online": 0,
       "offline": 0
     },
-    "questions_total": 216
+    "questions_total": 234
   },
   "competencies": [
     {
@@ -3323,6 +3323,269 @@
           "retired_reason": "Part (b) instructed the reader to follow \"the structure of the worked example\", pointing them back at the taught day-one/day-two learning path instead of requiring them to generate it from the principle. Reissued as p2q2b asking for the days and what each deliberately teaches."
         }
       ]
+    },
+    {
+      "id": "swe-testing",
+      "index": 13,
+      "title": "Automated Testing — Suite Design, Unit Tests, Test Doubles, Larger Tests",
+      "booklet": "resources/swe-testing/",
+      "registered": "2026-07-29",
+      "parts": [
+        "What a suite is for",
+        "Tests that never need changing",
+        "Standing in for the real thing",
+        "What small tests cannot tell you"
+      ],
+      "rollup": {
+        "untested": 18,
+        "shaky": 0,
+        "comfortable": 0,
+        "gaps": {
+          "name": 0,
+          "mechanism": 0,
+          "boundary": 0,
+          "price": 0,
+          "phrasing": 0
+        },
+        "weakest": null
+      },
+      "questions": [
+        {
+          "id": "swe-testing.p1q1",
+          "type": "applied",
+          "where": "Part 1 · Question 1",
+          "prompt": "A payments team's suite has 4,000 tests. Most exercise the whole service through its HTTP surface with a real database container and a real message broker; the team is proud that this catches “real” problems. The suite takes 55 minutes and is run nightly rather than per change. Roughly forty tests fail on any given night for reasons nobody can reproduce, so the team's rule is to rerun the build twice and merge if it goes green either time. Coverage sits at 84% against a target of 80% and has not moved in a year. When a shared library team changed a date-parsing helper last month, the payments service began rejecting valid transactions in production; the payments team's tests all passed, and they have asked the library team to be more careful. (a) Classify the typical test on both axes and name the suite's shape, giving the two properties that shape is known for. (b) Work out what the nightly failures imply about trust, using the stated arithmetic and threshold, and assess the rerun rule. (c) The coverage figure is being read as evidence of health. Give the two separate reasons it is weak evidence, and state what should be asked instead. (d) Assign responsibility for the date-parsing incident under the stated rule, and say what the payments team owes as a result.",
+          "ideal": "(a) The typical test is broad in scope — it validates the interaction of several distinct parts rather than the logic of one class or method — and large in size, since it runs a real database and a real message broker as separate processes and is not confined to a single machine. The suite's shape is the ice cream cone: many end-to-end tests and few integration or unit tests. Two properties attach to it: such suites tend to be slow, unreliable and difficult to work with, and the pattern often appears in projects that start as prototypes and are quickly rushed to production, never stopping to address testing debt. (b) Forty spurious failures in four thousand tests is 1% flakiness, which is exactly the stated danger line: as you approach 1% flakiness the tests begin to lose value, because it does not take needing to investigate many flakes before a team loses trust in the test suite — after which engineers stop reacting to test failures, eliminating any value the suite provided. The rerun rule is a legitimate technique misapplied. Rerunning failures automatically is effectively trading processor cycles for engineering time, and at low levels of flakiness that trade-off makes sense — but this is not a low level, and in any case rerunning a test is only delaying the need to address the root cause. Worse, a rule that merges on either green is the operational definition of no longer reacting to failures at all. (c) First, coverage measures only that a line was invoked, not what happened as a result — it is possible to exercise a lot of lines with a few tests while never checking that each line does anything useful. The figure here is additionally inflated, because coverage should be measured from small tests only, to avoid the coverage inflation that occurs when executing larger tests, and this suite is almost entirely large. Second, like other metrics it quickly becomes a goal unto itself: a bar set at 80% is treated as a ceiling rather than a floor, which is precisely why the number has not moved in a year. What should be asked instead is behavioural: do you have confidence that everything your customers expect to work will work; do you feel confident you can catch breaking changes in your dependencies; are your tests stable and reliable? Trying to answer “do we have enough tests?” with a single number ignores a lot of context and is unlikely to be useful. (d) Responsibility sits with the payments team. The rule is to test everything that you don't want to break — if you want confidence that a system exhibits a particular behaviour, the only way to be sure is to write an automated test for it — and it is stated in exactly this situation: if unrelated infrastructure changes pass all of your tests but still break your team's product, you are on the hook for fixing it and adding the additional tests. So the team owes the fix and the missing test on the date-parsing behaviour it was relying on, rather than a request for more care from the library team.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p1q2",
+          "type": "applied",
+          "where": "Part 1 · Question 2",
+          "prompt": "A team is splitting a monolith into services and rewriting its tests. A helper called waitForReady(), used by roughly 600 tests, sleeps for 400 milliseconds before checking a status flag. A new test validates a rendering path in a date-picker widget and needs a real browser to exercise a single code path; a reviewer objects that “a unit test must be small”. Another new test exercises a request handler's parsing, validation and business logic in one go, with in-process stand-ins for the datastore and the file system; the same reviewer objects that it is “too broad to be small”. Separately, a security researcher found a flaw last quarter by feeding the login form deliberately malformed sequences nobody had considered; the team's response was to fix the bug. (a) Compute the cost of the sleeping helper across the suite, name the antipattern, and give the recommended replacement including its safeguard. (b) Adjudicate both of the reviewer's objections, using the correct definitions, and say what general point the pair of cases illustrates. (c) Name the kind of testing the researcher performed, give its defining property, and state the step the team omitted. (d) The team wants a target mix for the rewritten suite. Give it with the reasoning for the shape, and name the one thing the largest tests should not be relied on for.",
+          "ideal": "(a) Six hundred tests at 400 milliseconds each is 240 seconds — four minutes — added to every single run of the suite. The antipattern is unnecessary speed limits introduced by sleep and timeout functions, which are often used as naive heuristics before checking the result of nondeterministic behaviour: half a second here or there does not seem dangerous, but embedded in a widely used utility it soon adds minutes of idle time to every run. The recommended replacement is to actively poll for the state transition with a frequency closer to microseconds, and the safeguard is to combine that with a timeout value in case the test fails to reach a stable state. (b) Both objections are wrong, and they are wrong in opposite directions. The date-picker test is narrow in scope — it validates a single code path in one component — but must be medium in size, because running an entire browser is required; the material gives this case directly, noting that modern web frameworks bundle markup and script together so that testing a component like a date picker often requires running an entire browser even to validate a single code path. The request-handler test is the mirror image: broad in scope, since it covers parsing, request validation and business logic, yet small in size, because it uses doubles to stand in for all out-of-process dependencies like a database or filesystem. The general point is the one the reviewer is missing: size and scope are interrelated but distinct concepts. Narrow tests tend to be small and broad tests tend to be medium or large, but this is not always the case — and “unit test” names a scope, not a size. (c) The researcher performed exploratory testing: a fundamentally creative endeavour in which someone treats the application under test as a puzzle to be broken, perhaps by executing an unexpected set of steps or by inserting unexpected data. Its defining property is that the specific problems to be found are unknown at the start — they are gradually uncovered by probing commonly overlooked code paths or unusual responses. The omitted step is the one that makes it pay twice: as soon as an exploratory test discovers an issue, an automated test should be added to prevent future regressions, so that a flaw found once by a human can then be checked continuously and at scale. (d) The target is roughly 80% narrow-scoped unit tests validating the majority of the business logic, 15% medium-scoped integration tests validating interactions between two or more components, and 5% end-to-end tests validating the entire system — by test case count, with every team's mix a little different. The reasoning: unit tests form an excellent base because they are fast, stable, dramatically narrow the scope and reduce the cognitive load required to identify all the possible behaviours a class or function has, and because they make failure diagnosis quick and painless; the recommended mix is determined by two goals, engineering productivity and product confidence, and favouring unit tests gives high confidence quickly and early in development. What the largest tests should not be relied on for is stated plainly: larger tests act as sanity checks as the product develops; they should not be viewed as a primary method for catching bugs.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p2q1",
+          "type": "applied",
+          "where": "Part 2 · Question 1",
+          "prompt": "An inventory service has a class that reserves stock. Its tests were written by opening up two private methods, computeReservationKey and writeLedgerRow, and asserting directly on the serialised row string. A third test verifies, using a mocking framework, that ledger.append() is called exactly once with a given argument. Last week an engineer renamed the two methods, moved them into a helper class and changed the row separator from a comma to a tab — behaviour visible to no caller. Nineteen tests failed. In the same week a genuine bug shipped: a reservation is written to the ledger and then removed by a cleanup path a few lines later, and no test noticed. The team's proposal is a rule that private methods must not be renamed without checking the tests first. (a) Name the category of failure the nineteen breakages belong to, distinguish it from its look-alike, and say which of the four kinds of change this was and what the breakages therefore prove. (b) State the practice that would have prevented them, give the argument for why it works, and say what “public” means here. (c) Explain precisely why the mocking-framework test did not catch the shipped bug, name both directions in which such a test fails, and give the alternative. (d) Assess the team's proposed rule.",
+          "ideal": "(a) The nineteen breakages are brittleness: a brittle test is one that fails in the face of an unrelated change to production code that does not introduce any real bug. Its look-alike is a flaky test, which fails nondeterministically, without any change to production code at all — same loss of trust, different cause and different cure. The change described is a pure refactoring: the internals changed and the interface did not. Since tests should not need to change during a pure refactoring, and their whole role in that case is to ensure the refactoring did not change behaviour, breakage proves one of exactly two things — either the change is affecting the system's behaviour and is not a pure refactoring, or the tests were not written at an appropriate level of abstraction. Here the interface was untouched, so it is the second. (b) The practice is to test via public APIs: write tests that invoke the system being tested in the same way its users would, calling its public surface rather than its implementation details. The argument is definitional — if tests work the same way as the system's users, then by definition a change that breaks a test might also break a user; such tests form explicit contracts, and testing only those contracts means you are free to do whatever internal refactoring you want without having to worry about making tedious changes to tests. “Public” in this context means the API exposed by that unit to third parties outside of the team that owns the code, which does not always align with the notion of visibility provided by some programming languages. (c) The test verifies that a specific call was made against a collaborator, and such tests fail in two directions. If a bug causes the record to be deleted shortly after it was written, the test passes even though we would have wanted it to fail — which is exactly the shipped bug, since the reservation was written and then removed by a cleanup path a few lines later. And if the system is refactored to call a slightly different API to write an equivalent record, the test fails even though we would have wanted it to pass. The alternative is to test directly against the state of the system: perform the action and then read the state back, which more accurately expresses what we care about — the state of the system under test after interacting with it. (d) The proposed rule entrenches the defect. It treats the internal structure as something the tests are entitled to depend on, which is precisely what makes them brittle, and it accepts a permanent tax on refactoring — over time that friction makes a team reticent to perform necessary refactoring to keep a codebase healthy. It also concedes the automation: if a set of tests needs to be manually tweaked by engineers for each change, calling it an “automated test suite” is a bit of a stretch. The correct move is to rewrite the tests against the public surface and to assert on resulting state — after which the rename, the extraction and the separator change would have broken nothing, and the deletion bug would have failed a test.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p2q2",
+          "type": "applied",
+          "where": "Part 2 · Question 2",
+          "prompt": "A suite contains one test per production method. testApplyDiscount is 60 lines long and now asserts five different outcomes; it was extended three times as the method grew. Every test calls checkCartConsistent(cart) as its last line, a helper that runs eleven assertions. Setup constructs a cart containing an item priced at 1299, and a test named testApplyDiscount asserts a total of 1104 with no indication of where either number came from. One test builds its expected receipt line by concatenating a currency symbol, a formatted amount and a suffix, then asserts equality against the same expression rebuilt from the same parts. When the suite fails, the report reads expected <true> but was <false>. (a) Name the structural mistake behind the 60-line test, define the alternative unit, and give three reasons the alternative reads better. (b) Take the shared helper and the setup values together: name what each damages, and give the corrective rule for each. (c) The receipt test asserts against an expression built the same way as the code under test. Say what has gone wrong, name the rule it breaks, and state what should be tolerated instead. (d) Rewrite the failure message so it is diagnosable, and name the three things a good message carries.",
+          "ideal": "(a) The mistake is framing tests around methods — matching the structure of the tests to the structure of the code, such that every production method has a corresponding test method. It is convenient at first and degrades: as the method being tested grows more complex, its test also grows in complexity and becomes more difficult to reason about, and it naturally encourages unclear tests because a single method often does a few different things under the hood and might have several tricky edge and corner cases. The alternative unit is the behaviour: any guarantee that a system makes about how it will respond to a series of inputs while in a particular state, expressible as given, when and then — and the mapping between methods and behaviours is many-to-many. Three reasons behaviour-driven tests read better: they read more like natural language, allowing them to be naturally understood rather than requiring laborious mental parsing; they more clearly express cause and effect because each test is more limited in scope; and because each is short and descriptive, they make it easier to see what functionality is already tested and encourage engineers to add new streamlined test methods instead of piling onto existing ones. (b) The catch-all helper damages intent and localisation: tests using a fixed validation strategy are less behaviour driven, it becomes much more difficult to determine the intent of any particular test and to infer what exact case the author had in mind, and when bugs are introduced such helpers make them more difficult to localise because they will frequently cause a large number of tests to start failing. The corrective rule: the best validation helper methods assert a single conceptual fact about their inputs, and earn their place when that condition is conceptually simple but requires looping or conditional logic that would reduce clarity inside the test body. The setup values damage completeness: a test that depends on a particular value defined in setup seems incomplete because a reader needs to go hunting to discover where it came from. The corrective rule: tests that explicitly care about particular values should state those values directly, overriding the default defined in the setup method if need be — the result contains slightly more repetition and is far more descriptive and meaningful. (c) The test builds its expectation the same way the code builds the result, so both can be wrong in the same way and the test cannot detect it. The rule broken is don't put logic in tests: clear tests are trivially correct upon inspection, and logic — operators, loops, conditionals — means you need to do a bit of mental computation to determine the result instead of just reading it off the screen; the worked case is a single string concatenation that concealed a doubled separator until the value was written out in full. And if you feel like you need to write a test to verify your test, something has gone wrong. What should be tolerated instead is duplication: writing the whole expected value out, since duplicating it is a small price to pay for making the test more descriptive and meaningful — stick to straight-line code over clever logic. (d) A good failure message clearly expresses the desired outcome, the actual outcome, and any relevant parameters. A rewrite: “Expected a cart total of 1104 after applying the 15% discount to an item priced 1299, but the total was 1299.” Note why the generic form arises: an assertion that receives only a boolean value can only give a generic message such as “expected true but was false”, whereas one that explicitly receives the subject of the assertion can report what the value actually was.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p3q1",
+          "type": "applied",
+          "where": "Part 3 · Question 1",
+          "prompt": "A notifications service decides which subscribers to email and records each send. Its tests construct the system with framework-created doubles for the subscriber store, the template renderer, the delivery client and the audit log. A typical test declares six canned return values, calls notifyAll(), and finishes by verifying that deliveryClient.send() was called and that subscriberStore.findActive() was called. The team reports that the tests are fast and that they break constantly — a recent change that split findActive() into two calls failed 140 tests with no behaviour change. Separately, production has been silently dropping sends for a fortnight: the delivery client returns a receipt object whose accepted flag the service never checks, and every canned return value in the suite sets that flag to true. The subscriber store's owning team publishes no fake; nobody has asked them for one. (a) Name the two techniques in use and say, for each, exactly what a green test here is claiming. (b) Explain the 140 failures using the correct term, and name the general property being asserted instead of the intended one. (c) Explain how the suite stayed green for a fortnight, naming the specific danger and the guarantee stubbing cannot give. (d) Give the four moves available when no fake exists, in order, and say who should own the fake and where in the code it belongs.",
+          "ideal": "(a) Two techniques are in use. Stubbing — giving behaviour to a function that otherwise has no behaviour of its own, by specifying exactly what values it returns — supplies the six canned values. Interaction testing — validating how a function is called without actually calling the implementation of the function — supplies the two verifications. A green test claims correspondingly less at each. With stubbing, it claims the system behaved correctly on the assumption that the author's beliefs about the dependencies were accurate, because with stubbing there is no way to ensure the function being stubbed behaves like the real implementation. With interaction testing, it claims only that certain functions were called as expected: it cannot tell you that the system under test is working properly, and it requires you to make an assumption about the behaviour of the code. (b) The 140 failures are the signature of change-detector tests — tests that overuse interaction testing and therefore fail in response to any change to the production code, even if the behaviour of the system under test remains unchanged. What is being asserted instead of the intended behaviour is implementation detail: to validate that a function was called, you are exposing to the test that the system under test calls this function, which leaks implementation details of production code into the tests and is what makes them brittle. (c) Two failures compound. The interaction check on the delivery call proves the call happened, and the primary issue with interaction testing is precisely that it can only validate that certain functions are called — it cannot establish that the send succeeded. And the stubbing hardcodes part of the contract: every canned receipt sets the accepted flag true, which is the danger that tests become less effective — you will be forced to duplicate the details of the contract, and there is no way to guarantee that the contract is correct, that is, that the stubbed function has fidelity to the real implementation. There is a further consequence here: with stubbing there is no way to store state, so the test could not have queried the delivery client for what had actually been recorded even if it had wanted to. (d) Four moves, in order. First, ask the owners of the API to create a fake — they may not be familiar with the concept, or may not realise the benefit it provides to users of their API. Second, if they are unwilling or unable, write your own, which can be done by wrapping all calls to the API in a single class and then creating a fake version of that class; this is often much simpler than faking the entire API, since you generally need only a subset of its behaviour. Third, settle on using a real implementation and accept its trade-offs. Fourth, resort to other test double techniques and accept theirs. On ownership and placement: the team that owns the real implementation should write and maintain the fake, because whenever the behaviour of the real implementation changes the fake must be updated to match; and to limit how many exist, a fake should typically be created only at the root of the code that isn't feasible for use in tests — for a database, at the database API itself rather than for each class that calls it.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p3q2",
+          "type": "applied",
+          "where": "Part 3 · Question 2",
+          "prompt": "A team is writing tests for a booking engine. Four dependencies are in play. A money type with no dependencies, which the team has replaced with a double because “doubles are the standard here”. A pricing library that is real, deterministic, and adds 1.2 milliseconds per case across 900 cases; the team wants to double it. A seat-allocation component that reads the system clock and occasionally produces a different result for the same input, causing about one failure a week. And a payments gateway with an official in-memory fake, which the team has not adopted because their tests need to exercise the rare “issuer declined after authorisation” path, which the fake cannot produce. The team also wants to prove that its new cache reduces reads of the seat map from three to one per booking. (a) Rule on the money type and the pricing library, giving the criterion for each and the arithmetic where it applies. (b) Rule on the seat-allocation component: name the two causes of its behaviour, and give the stated test for whether flakiness warrants a response. (c) The team's objection to the fake is legitimate. Name the technique that answers it, state the two constraints that keep it honest, and say what the fake should do about the path it does not support. (d) Rule on the cache requirement: name the technique, justify it against the general preference, and give the restriction on which functions it may be applied to.",
+          "ideal": "(a) The money type: use the real one. A real implementation is preferred if it is fast, deterministic and has simple dependencies, and the case is given by name — a real implementation should be used for a value object, with the examples including an amount of money, a date, a geographical address, or a collection class. “Doubles are the standard here” is not a criterion. The pricing library: keep it real. The arithmetic is 1.2 milliseconds across 900 cases, which is 1.08 seconds added to the whole suite. There is no exact answer on how slow is too slow — it depends on whether engineers feel a loss in productivity and on how many tests use the implementation, since one second extra per test case may be reasonable if there are five test cases but not if there are 500 — and for borderline situations it is often simpler to use a real implementation until it becomes too slow to use, at which point the tests can be updated. Roughly a second across the whole suite is not that point. (b) The seat allocator is nondeterministic: a test is nondeterministic if its outcome can change even when the system under test remains unchanged, and nondeterminism leads to flakiness. Two causes are named in this material and both apply: a real implementation that is more complex is likelier to be nondeterministic — for instance where output depends on thread execution order — and code that relies on the system clock, since the output can differ depending on the current time; the stated fix for the latter is that instead of relying on the system clock, a test can use a test double that hardcodes a specific time. The test for whether flakiness warrants a response: if use of a real implementation rarely causes flakiness it might not warrant a response, because there is little disruption to engineers — but if flakiness happens often, it might be time to replace the real implementation with a test double. (c) The technique is stubbing, which is appropriate here for the reason that distinguishes it: because a function's behaviour is defined inline in the test, stubbing can simulate a wide variety of return values or errors that might not be possible to trigger from a real implementation or a fake. Two constraints keep it honest: each stubbed function should have a direct relationship with the test's assertions, so its purpose is clear; and a test should typically stub out a small number of functions, because stubbing many leads to less clear tests and can be a sign that stubbing is being overused, or that the system under test is too complex and should be refactored. So keep the fake for everything else and stub only the declined-after-authorisation path. On the fake itself: a fake might not need to have 100% of the functionality of its corresponding real implementation, especially if such behaviour is not needed by most tests — for example, error handling code for rare edge cases — and in that case it is best to have the fake fail fast, raising an error if an unsupported code path is executed, which communicates to the engineer that the fake is not appropriate in this situation. (d) The technique is interaction testing, justified by the second warranted case: differences in the number or order of calls to a function would cause undesired behaviour, and it is useful because it could be difficult to validate this behaviour with state testing — the worked example being this one, verifying that a caching feature reduces the number of calls to a database. The general restriction is to perform interaction testing only for state-changing functions — those with side effects on the world outside the system under test — since for non-state-changing functions the check is usually redundant, given that the system under test will use the return value to do other work that you can assert. A seat-map read is non-state-changing, so this case is precisely the exception the second warranted condition carves out: the call count itself is the behaviour under test. And when writing it, avoid overspecification — verify the minimum necessary for the behaviour in question.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p4q1",
+          "type": "applied",
+          "where": "Part 4 · Question 1",
+          "prompt": "A logistics platform ships weekly. All 9,000 of its unit tests passed before a release that took the fleet offline for six hours. The cause was a routing table in a configuration file, checked into a separate repository with no review, whose format the binary had stopped accepting two releases earlier. In the same period: a partner's address-validation service began returning a new error code that the platform's hand-written double had never produced, so the handling path had never run; a promotional event drove twelve times normal traffic and the dispatch queue collapsed in a way no component exhibited alone; and a customer discovered that sorting by delivery window returned results in an order the platform had never specified but several integrators had come to depend on. The team's plan is to raise unit test coverage from 78% to 95%. (a) Match each of the four incidents to the gap it demonstrates, naming the gap and its mechanism. (b) Two of the four have a named practice attached in this material. Give both practices and say precisely what each one prevents. (c) The sorting incident has a name. Give it, state what it says about the effective contract, and explain why more unit tests cannot close it. (d) Assess the coverage plan against the diagnosis, and say what the team should be building instead.",
+          "ideal": "(a) The routing table: configuration issues. Unit tests cover code within a binary, but that binary is typically not completely self-sufficient in terms of how it is executed — there is usually a deployment configuration or starter script, and production instances have their own configuration files; issues with these files, or with the compatibility between the state they define and the binary, can lead to major user issues, and unit tests alone cannot verify this compatibility. The partner's new error code: unfaithful doubles. When a heavyweight dependency is replaced it becomes possible that the replacement and the doubled thing do not agree: the engineer writing the test defines the double, and usually did not write the thing being doubled and can be misinformed about its actual behaviour, so the understanding of the contract is invalid. Worse, doubles become stale — if the double is invisible to the author of the real implementation and that implementation changes, there is no signal that the test should be updated. The twelvefold traffic: issues under load. Such testing requires sending large volumes of traffic, which does not fit a typical unit test — and load and stress handling are highly emergent properties: complex behaviours that belong to the overall system but not the individual members, which is why no component exhibited the collapse alone. The sorting order: unanticipated behaviours. Unit tests are limited by the imagination of the engineer writing them — they can only test for anticipated behaviours and inputs, while the issues users find are mostly unanticipated. (b) Two practices. For configuration: keep it in version control as well as your code, because then changes to configuration can be identified as the source of bugs rather than introducing random external flakiness, and can be built into large tests — precisely what a separate unreviewed repository prevents. For doubles: if teams provide fakes for their own services, this concern is mostly alleviated, since a fake maintained by the owning team tracks real behaviour instead of encoding a consumer's guess. (c) The sorting incident is an instance of Hyrum's Law: even if we could test 100% for conformance to a strict specified contract, the effective user contract applies to all visible behaviours, not just a stated one, and it is unlikely that unit tests alone test for all visible behaviours not specified in the public API. More unit tests cannot close it, because you can only write a test for a behaviour you have thought of — and these are by definition the ones nobody specified. The type of larger test that does address it is differential comparison, which detects unanticipated side effects without requiring anyone to state the expectation in advance. (d) The plan is aimed at the wrong axis: none of the four incidents is a defect in code logic inside a binary, which is what unit tests and coverage bear on — and coverage only measures that a line was invoked, not what happened as a result. What the diagnosis calls for is a set of larger tests, each putting back a different removed thing: deployment configuration testing, really a smoke test — if the system under test starts successfully the test passes, and if not it fails; a fake for the partner service, requested from its owners; performance, load and stress testing built to look as close to production as possible; and differential regression testing for the unanticipated — plus the configuration file into version control.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.p4q2",
+          "type": "applied",
+          "where": "Part 4 · Question 2",
+          "prompt": "A team is asked to build automated coverage for a checkout journey spanning a web front end, a cart service, a pricing service, an inventory service and an external tax provider. Their design: one test that drives a real browser against the shared staging environment, calls the tax provider's live sandbox, seeds data by writing rows straight into the inventory database, and waits with a 30-second sleep between steps. It runs for 40 minutes, fails roughly a third of the time, and reports failures as “assertion failed” with a stack trace from the browser driver. It is scheduled after deployment to staging. Nobody is named as its owner; the three teams involved each assume one of the others maintains it. (a) Name the two conflicting properties of a system under test, say where this design sits on each, and give the consequence of running it after deployment. (b) Identify the two boundaries at which this system should be cut, giving the specific reason for each. (c) Take the direct database seeding and the sleeps together: name what each one breaks, and give the replacement for the sleeps together with the failure mode they cause under load. (d) The failure output and the ownership arrangement are both defects. Give the three things a good larger-test failure must do, and state the rule about ownership and what happens without it.",
+          "ideal": "(a) Hermeticity — isolation from usages and interactions other than the test in question, giving the least exposure to concurrency and infrastructure flakiness — and fidelity, accuracy in reflecting the production system. These two factors are often in direct conflict. This design sits at low hermeticity, since shared staging and a live external sandbox mean the test might conflict with other simultaneous uses, bought with high environmental fidelity. Scheduling it after deployment is decisive: such tests cannot run until the code reaches that environment, so they cannot block its release — the system under test is too late. (b) Two boundaries. Between front end and back end: user interface tests are notoriously unreliable and costly, since interfaces often change in look-and-feel ways that make the tests brittle but do not actually impact the underlying behaviour and often have asynchronous behaviours that are difficult to test — so where the back end provides a public interface, split the tests there and use it to drive the end-to-end tests. The third-party boundary: such systems might not have a public shared environment for testing, and there can be a cost with sending traffic to a third party, so it is not recommended to have automated tests use a real third-party API — that dependency is an important seam at which to split tests. (c) Direct database seeding breaks the seeding-interface point: writing directly to a datastore might bypass triggers and checks performed by the actual binaries that perform the writes, so the state may be one production could never produce. The sleeps break the speed and flakiness guidance: naive tests use time-based sleeps to wait for nondeterministic action, but real production users want to wait as little as possible, so tests should react the way they would. The replacements: polling at a frequency closer to microseconds, with a timeout; an event handler; or a subscription to a notification system. The failure mode under load is a spiral: tests relying on sleeps all start failing when the fleet running them becomes overloaded, and that spirals, because they are then rerun more often, increasing the load further. (d) Three things. Clearly identify what the failure is: the worst case is an error that just says “assertion failed” and a stack trace, where a good one anticipates the runner's unfamiliarity and gives context. Minimise the effort of identifying the root cause, since a stack trace is not useful when the call chain spans process boundaries — produce a trace across that chain, or automation that narrows the culprit. And provide support and contact information. On ownership: larger tests must have documented owners who can review changes and be counted on for support when the test fails; without one, the test is harder to update, failures take longer to resolve — and the test rots. Integration tests belong to the project lead and feature tests to a feature owner — empowered, able to maintain it, and incentivised to.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z01",
+          "type": "quiz",
+          "where": "Final quiz · 1",
+          "prompt": "Give the four components of the most basic automated check, name both reasons for having such checks at all, and state where a body of them gets its worth and what follows when that worth is lost.",
+          "ideal": "Four parts: one behaviour being examined, a definite value handed to it, a result or effect you can observe, and surroundings you control, such as a single isolated process. Two motivations: preventing defects from reaching users, whose cost climbs — often steeply — the later they surface; and, said to matter just as much, making it possible to alter the software confidently, whether restructuring it, adding to it, or redesigning it, so the faster you intend to move the more you need quick verification. Where the worth of a collection of them resides is unambiguous: in whether the engineers around it believe it. Should checking turn into a drain that steadily produces drudgery and doubt, that belief evaporates and people begin routing around it — at which point the collection has become a net negative, worse than possessing none at all, because it still costs maintenance and investigation while protecting nothing, and it has stopped anybody from inspecting the system by hand.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z02",
+          "type": "quiz",
+          "where": "Final quiz · 2",
+          "prompt": "Define the two independent ways a check is categorised, give the three grades of each, and supply one example in each direction where the two grades diverge.",
+          "ideal": "The first classification is what a check may consume and do — one process and usually one thread, with no pausing, no reading or writing of external storage, no calls that block, hence no network and no disk; or a single machine, permitting several processes, threads and blocking calls to that machine only; or anywhere at all, spanning machines. The second is how much of the codebase a check is meant to certify, which is not the same as how much of it gets run: a lone class or routine; the meeting points of a few components; or several distinct pieces together, including behaviour that emerges and is expressed by no single routine. They correlate without being the same thing, and both directions of divergence occur. A check certifying a whole request endpoint — its parsing, its input validation, its business rules — stays in the cheapest resource class provided everything crossing a process boundary is replaced by a stand-in. Conversely, a check certifying one path through a single date-selection widget must climb a resource class, because exercising that path at all demands a whole browser.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z03",
+          "type": "quiz",
+          "where": "Final quiz · 3",
+          "prompt": "State the recommended proportions and the reasoning behind that shape, name both malformed distributions with what produces each, and say what the broadest checks should not be counted on to do.",
+          "ideal": "Roughly four fifths narrowly aimed at business logic, about a seventh covering how components meet, and around a twentieth covering the assembled whole — counted by number of cases, and varying by team. The narrow ones belong at the bottom because they finish quickly, behave consistently, sharply reduce how much behaviour you must hold in your head, and make working out what broke quick and painless; the balance follows from wanting both engineering throughput and confidence in the product, and the narrow ones deliver confidence soonest. Two deformations. One has a great many whole-system checks and few of anything else, producing collections that are sluggish, untrustworthy and unpleasant, and it typically arises where something built as a prototype was hurried into service without the testing debt ever being settled. The other has plenty at both extremes and almost nothing between, which is less damaging but still surfaces failures at the widest level that a middle layer would have caught sooner; its cause is coupling so tight that individual dependencies cannot be stood up on their own. And the widest checks are sanity checks on a developing product — they are explicitly not the principal instrument for finding defects.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z04",
+          "type": "quiz",
+          "where": "Final quiz · 4",
+          "prompt": "Work through the sums that make sporadic failures expensive, give the proportion at which people stop believing the results, explain why automatic repetition is not a cure, and say why branching and repetition are barred from check code.",
+          "ideal": "A one-in-a-thousand chance of a spurious red, spread over ten thousand executions in a day, yields ten investigations a day, each stealing time from more productive work. The proportion at which belief collapses is around one percent: it takes surprisingly few false alarms before a team stops trusting the collection, and once people cease responding to red results, whatever protection existed is gone. Automatic repetition is not a remedy but a purchase — machine time exchanged for human time, sensible while the rate is low — because re-running merely postpones confronting whatever causes the inconsistency in the first place, and the usual culprits are inside the checks themselves: wall-clock readings, the order threads happen to run in, network delay, and matters further down still. Branching and repetition are excluded from check code for a structural reason: nothing verifies the verifier, so reading it by eye is the only inspection it ever receives, and any construct requiring you to compute a result mentally can itself harbour a defect and obscures what went wrong when it does fail.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z05",
+          "type": "quiz",
+          "where": "Final quiz · 5",
+          "prompt": "List the four categories of modification to production code, say which one ought to require editing existing checks and why that one costs more, and state the two possible conclusions when a restructuring breaks something.",
+          "ideal": "Restructuring internals without altering the exposed surface; adding capability; correcting a defect; and altering what the software promises to do. Only the last should oblige you to edit existing checks, and it costs more than the other three combined in effort elsewhere, because consumers have built on the present behaviour and any alteration has to be coordinated with them to avoid confusion or breakage — editing a check here means you are breaking a promise that was actually made, whereas edits in the other three cases mean you were leaning on a promise nobody ever made. When restructuring breaks something, exactly two readings are available: either the work was not purely a restructuring and did alter observable behaviour, or the checks were written at an unsuitable level of abstraction — reaching into machinery rather than exercising the surface.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z06",
+          "type": "quiz",
+          "where": "Final quiz · 6",
+          "prompt": "Explain why exercising a component the way its consumers do is the strongest defence against fragility, define what counts as a consumer-facing surface here, and give the three heuristics for deciding what constitutes a testable component.",
+          "ideal": "Because doing so means a broken check implies a consumer who would also break, which converts the check into a promise that was genuinely made rather than an accidental one; the corollary is that you are then free to rearrange internals however you like without tedious edits, and the checks double as worked examples for consumers. What counts as consumer-facing here is the surface a component presents to parties beyond the team that owns it, which need not coincide with whatever a language's visibility keywords declare. Three heuristics for delimiting a component. Something existing purely to serve one or two other classes is not a component in its own right and should be exercised through those. Anything intended to be picked up without consulting its owners almost certainly is one and deserves direct exercise, approached as its consumers would. And a general-purpose utility reachable only by its owners also counts, with the duplication that produces being worthwhile — without it, retiring one consumer could silently open a hole.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z07",
+          "type": "quiz",
+          "where": "Final quiz · 7",
+          "prompt": "Contrast checking the resulting condition of a system with checking the sequence of calls it made, give both ways the latter misleads, and name the two circumstances that justify it plus the category of function it should be limited to.",
+          "ideal": "Examining the condition means invoking the software and then looking at what it has become; examining the sequence means confirming it performed an expected series of operations on its collaborators. The second misleads twice over. If a defect erases the effect immediately afterwards, the sequence was still performed, so the check reports success where you wanted failure. And if the software is rearranged to accomplish an equivalent effect through a slightly different call, the sequence differs, so the check reports failure where you wanted success. Two circumstances nonetheless justify it. When examining the condition is impossible because neither the genuine article nor a faithful lightweight substitute can be used, it supplies at least some assurance. And when how many times, or in what order, something is invoked is itself the behaviour at stake — confirming that a caching layer cuts repeat reads, for instance. Confine it to operations that alter the world beyond the software being examined; for operations that merely report and change nothing, the check is generally superfluous, since the software will use what came back to do something you can examine directly.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z08",
+          "type": "quiz",
+          "where": "Final quiz · 8",
+          "prompt": "Rank the four options for a dependency from most to least faithful, say what a passing result licenses you to assert at each, and give the three requirements that make a lightweight stand-in trustworthy.",
+          "ideal": "From most faithful downward: the genuine article; a lightweight working substitute; a canned answer; and a record that a call occurred. With the genuine article, success means the behaviour truly happened, because the instructions executed are the ones that will execute in service. With a lightweight substitute the claim is the same, provided the substitute honours the agreement, since the software being examined cannot distinguish it. With a canned answer, success means the behaviour happened only if the author's belief about the collaborator was accurate — nothing confirms that belief, and no condition is retained, so nothing can be read back. With a call record, success means only that an attempt was made, which is compatible with the operation achieving nothing or being undone immediately. Three requirements make a lightweight substitute trustworthy: it must match the agreement of what it replaces — same results and same changes of condition for the same inputs, though only insofar as the checks can perceive; it must be built and kept current by whoever owns the genuine article, at the deepest point that cannot itself be used; and it must carry checks of its own, ideally one set exercised against both it and the genuine article.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z09",
+          "type": "quiz",
+          "where": "Final quiz · 9",
+          "prompt": "Name the three harms caused by leaning too heavily on hardcoded return values, give the symptom that reveals you have gone too far, and state the situation where the practice is nonetheless the correct one.",
+          "ideal": "Three harms. The checks stop being legible, because the extra lines defining the canned behaviour crowd out what the check is for and are opaque to anyone unfamiliar with the internals. They become fragile, because specifying those returns leaks internal arrangement into the check, so a change in how something is built forces an edit even though nothing consumers can see has altered. And they become weaker, because nothing ensures the canned answer resembles what the collaborator would really produce — you have restated a fragment of an agreement with no means of confirming it — and because no condition is retained, so you cannot store something and then retrieve it. The symptom that you have gone too far is having to trace the software's execution in your head to work out why particular returns were canned at all. The situation where it remains the right instrument is manoeuvring the software into a specific condition, and especially producing returns or errors that neither the genuine article nor a lightweight substitute could be induced to produce — with each canned value tied to something the check asserts, and only a few per check.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        },
+        {
+          "id": "swe-testing.z10",
+          "type": "quiz",
+          "where": "Final quiz · 10",
+          "prompt": "Enumerate the five blind spots of narrow checks, name the three qualities that broader ones sacrifice along with the two organisational difficulties they add, and give the pair of properties of a stood-up environment that pull against each other.",
+          "ideal": "Five blind spots: substitutes that do not match what they replace, since whoever writes the check usually did not write the thing replaced and the substitute silently drifts as the original evolves; settings and startup files, which sit outside the compiled artefact and are the leading source of serious outages; behaviour appearing only at volume, which is a property of the assembled whole rather than of any member; anything nobody thought of, since a narrow check can only cover what its author imagined, while what consumers actually depend on extends to every observable behaviour rather than the declared one; and behaviour arising only from the parts running together, deliberately excluded because that exclusion is what buys the speed. Broader checks give up all three of the qualities that make a check pleasant to live with — trustworthiness, quickness, and the ability to be run at volume — and add two problems that are about people: no single obvious owner, so they decay; and no shared way of building or running them, so they get bypassed during sweeping changes and cannot be taught once. The pair of properties that fight each other in a stood-up environment are its separation from everything except the check in hand, and its resemblance to the real deployment.",
+          "status": "untested",
+          "streak": 0,
+          "last_verdict": null,
+          "last_attempted": null,
+          "miss_codes": [],
+          "attempts": []
+        }
+      ],
+      "retired": []
     }
   ]
 }

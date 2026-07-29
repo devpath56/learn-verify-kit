@@ -53,6 +53,7 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../swe-lsc-deprecation/` — the tenth.
 `../staff-wider-scope/` — the eleventh.
 `../staff-influence-at-scale/` — the twelfth.
+`../swe-testing/` — the thirteenth.
 
 ## Checking a rendered booklet
 
