@@ -25,9 +25,54 @@ Thirteen core competencies, one booklet each. Every booklet is built from the sc
 | 8 | Benchmarking — What the Number Is, How It Lies, Which Kind, and Active Analysis | `sysperf-benchmarking/` | Brendan Gregg, *Systems Performance: Enterprise and the Cloud*, 2nd ed., Addison-Wesley — Ch. 12 "Benchmarking". | Built · 18 questions registered |
 | 9 | Incident Response & Postmortems — Structure, Mitigation, Practice, Learning | `sre-incident-postmortem/` | Betsy Beyer, Niall Richard Murphy, David K. Rensin, Kent Kawahara & Stephen Thorne (eds.), *The Site Reliability Workbook*, O'Reilly — Ch. 9 "Incident Response" by Jennifer Mace, Jelena Oertel, Stephen Thorne and Arup Chakrabarti with Jian Ma and Jessie Yang (pp. 175–194), Ch. 10 "Postmortem Culture: Learning from Failure" by Daniel Rogers, Murali Suriar, Sue Lueder, Pranjal Deo and Divya Sudhakar with Gary O'Connor and Dave Rensin (pp. 195–223). | Built · 18 questions registered |
 | 10 | Large-Scale Change & Deprecation — Constraint, Economics, Machinery, Removal | `swe-lsc-deprecation/` | Titus Winters, Tom Manshreck & Hyrum Wright (eds.), *Software Engineering at Google: Lessons Learned from Programming Over Time*, O'Reilly — Ch. 22 "Large-Scale Changes" by Hyrum Wright, edited by Lisa Carey, with the "Testing LSCs" section by Adam Bender; Ch. 15 "Deprecation" by Hyrum Wright, edited by Tom Manshreck. | Built · 18 questions registered |
-| 11 | *unassigned* | — | — | Awaiting source |
+| 11 | Working at Wider Scope — Perspective, Terrain, Big Projects, Passive Influence | `staff-wider-scope/` | Tanya Reilly, *The Staff Engineer's Path: A Guide for Individual Contributors Navigating Growth and Change*, O'Reilly — Ch. 2 "Three Maps", Ch. 5 "Leading Big Projects", Ch. 7 "You're a Role Model Now (Sorry)". | Built · 18 questions registered |
 | 12 | *unassigned* | — | — | Awaiting source |
 | 13 | *unassigned* | — | — | Awaiting source |
+
+### Works referenced inside competency 11
+
+Cited within the source chapters and named or described in the booklet's teaching: the many named colleagues,
+interviewees and writers the source quotes — among them the friends and colleagues credited for the warnings
+about thinking out loud and speaking carefully, the engineer credited with "a new person can always see the
+problems", the operations lead credited with "the objectives that are always true", the engineer who coined
+"glue work" (the author herself), the advisor who named "radiating intent", the writer who named "innovation
+tokens", the engineer who named cover-your-ass engineering, the sociologist whose typology of organisational
+cultures the culture section rests on, the author of the 1957 law of triviality, the essayists quoted on
+checklists, on editing prose, on the passive voice, on staff engineers writing code, on scouting and
+cartography, on speaking up in hard situations, on complexity as a cost, and on programs that humans can
+understand; the employers and products used as illustrations — a search engine unreachable through unreliable
+providers, a monitoring company taken down by an outage at a cloud provider it did not use, a browser the
+vendor believed nobody used, the container orchestrator whose vocabulary is the mental-models example, the
+service-mesh and microservices framing, the proxy named in a pattern-matching anecdote; the community forums,
+conferences, newsletters and reports listed as ways to keep industry perspective; the books quoted or cited —
+on travel, on domain-driven design and its "ubiquitous language", on checklists, on pragmatic programming, on
+debugging teams and the shadow org chart, on object-oriented design, on refactoring, and on software
+engineering integrated over time; the strategy game whose technology tree is the long-term-thinking analogy,
+and the musical from which "the room where it happens" is taken; the professional body whose engineering
+grades supply the 8/10/15/20-year figures; the research group whose findings link high-trust cultures to
+delivery performance; the incident command system's origin in fire departments; the forum abbreviation for
+"explain it like I'm five"; the lean-manufacturing term for walking the floor; the community whose social
+rules named feigned surprise; the compliance regimes and date-handling deadlines used as examples of external
+forces on old systems; the report on warning future generations away from buried waste; and the many
+cross-references to other chapters of the same book.
+
+The booklet names **one eponymous typology, one dated law, one vendor-neutral emergency framework, one standard
+acronym, and the coined concept vocabulary** — and nothing else. The typology of organisational cultures is
+named after its author on the same grounds competency 10 names Hyrum's Law and competency 7 names Amdahl's:
+an eponymous model is durable vocabulary. The 1957 law of triviality and the word "bikeshedding" are named for
+the same reason, without naming the person; the incident command system is named on the precedent set in
+competency 9; and RACI is a standard acronym rather than anyone's product. Coined concept terms that have
+entered general use — glue work, radiating intent, innovation tokens, the watermelon project, cover-your-ass
+engineering, the shadow org chart, the fog of war, the local maximum, paved roads and goat tracks, chasms,
+fortresses, disputed territory and uncrossable deserts — are named because the name is the transferable part.
+Everything else is described by what it does: no companies, no products, no internal tools, no individuals
+beyond the one eponym, no books, no conferences and no publications. The strategy game is "the strategy game
+the analogy comes from"; the container orchestrator is "a new domain deluging you with terms"; the two options
+for a phrase are given without the source that supplied them. This is a fifth distinct line: competency 7 named
+nothing, competency 8 named the industry-standard organisations that were a section's subject, competency 9
+named one vendor-neutral framework, competency 10 named a law and a set of language properties, and competency
+11 names an eponymous model, a dated law and a body of coined vocabulary. The rule behind all five is the same
+— name what is durable and transferable, describe what is a brand.
 
 ### Works referenced inside competency 10
 
@@ -283,6 +328,21 @@ least one code, and each code points at the exact artefact to reread.
 
 ## Known gaps
 
+- **Competency 11's printed final quiz also has no answers in the booklet**, by the same deliberate
+  choice as competencies 1–10: the ten ideals are frozen in `competency-progress.json` so the questions
+  are gradeable, but they are not printed, which keeps the offline quiz honest.
+- **Competency 11's source is three chapters, not two, and it is 62 pages — the longest booklet in the
+  set.** The earlier builds settle at 45–50 pages from two chapters; three chapters of comparable
+  density produce proportionally more. The booklet says nothing about that, and no part is abridged
+  to hit a page count. If the set is ever printed as one volume, this is the outlier to plan for.
+- **Competency 11 relaxes `nobreak` on every anchor sketch**, where competencies 5–10 relaxed it only
+  on the one or two sketches taller than a page. Its five sketches are large enough that keeping them
+  atomic stranded a following block on three separate pages; letting them flow removed all of it and
+  saved two pages. The trade is that a sketch may now split across a page turn. The ink-based page
+  check (`booklet-template/check-pages.py`) reports zero flagged pages for the result.
+- **Competency 11's tracker has 40 rows**, against the 32–36 that decision J's recalibration predicts
+  for a 45–50 page build. The extra rows are the third chapter's material; the heuristic is a guide to
+  coverage, not a cap, and every row maps to teaching that carries a registered question or a boundary.
 - **Competency 1's printed final quiz has no answers in the booklet.** The ten quiz questions were
   written with only the eight applied cases keyed in section 9. Their ideal answers now exist,
   frozen in `competency-progress.json`, so the questions are gradeable — but they are deliberately
