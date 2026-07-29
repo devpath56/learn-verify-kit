@@ -402,7 +402,7 @@ least one code, and each code points at the exact artefact to reread.
 - **Competency 13's printed final quiz also has no answers in the booklet**, by the same deliberate
   choice as competencies 1–12: the ten ideals are frozen in `competency-progress.json` so the questions
   are gradeable, but they are not printed, which keeps the offline quiz honest.
-- **Competency 13's source is four chapters, and the booklet is 60 pages.** Each chapter becomes one part,
+- **Competency 13's source is four chapters, and the booklet is 61 pages.** Each chapter becomes one part,
   which is the first time the set's four-part spine has mapped one-to-one onto the source's own chapter
   division; the spine still runs causally — what a suite is for, how to write a test that never needs
   touching, what to do when the real dependency will not fit, and what none of it can see. Nothing is
@@ -412,6 +412,26 @@ least one code, and each code points at the exact artefact to reread.
   onto a page of its own. Competencies 5–12 use a single reduced size throughout.
 - **Competency 13's tracker has 40 rows**, as competencies 11 and 12 do, against the 32–36 that decision J's
   recalibration predicts. The same reasoning applies: the heuristic is a guide to coverage, not a cap.
+- **Competency 13 retired three questions the day it was registered**, the largest number in the set,
+  all for the same reason: they reproduced the source's own worked examples, so they tested recognition
+  rather than transfer, which decision E1 forbids. `p1q2` asked the reader to adjudicate exactly the two
+  cases the chapter uses to illustrate size and scope diverging — a date-picker component needing a whole
+  browser for one code path, and a server endpoint covering parsing, validation and business logic while
+  staying small because everything out-of-process is doubled. Reissued as `p1q2b` with a single-method
+  conversion that cannot avoid reading a large offset file from disk, and a whole report pipeline that stays
+  small because every collaborator is in-process. `p2q1` took its refactoring triplet (rename, extract to a
+  helper class, change the serialisation format) and its shipped-bug mechanic (a record written and then
+  deleted shortly afterwards) straight from chapter 12's central examples; reissued as `p2q1b` with a
+  different set of internal changes and a bug where the call is made but never committed. `p3q2` part (d)
+  reused the chapter's sole worked case for call-count interaction testing, a cache reducing database reads;
+  reissued as `p3q2b` with a de-duplicating wrapper collapsing repeat calls to an external provider. The
+  three original ids are in `retired` with their reasons and are never reused. The teaching text keeps all
+  three source examples — the constraint is on questions, not on exposition.
+- **Competencies 9–13 use four-part questions where decision E2 specifies three.** E2's shape is (a) name
+  it, (b) explain the mechanism, (c) prescribe and reject the near miss; these five booklets add a (d) that
+  asks the reader to rule on a proposal or a plan stated in the scenario. It has been the pattern since
+  competency 9 and is deliberate — the fourth part is where a stated bad plan gets assessed, which is the
+  hardest thing to fake — but E2 was never updated to record it. Competencies 1–8 follow E2 as written.
 - **The set is now complete: 13 of 13 built, 234 questions registered.** Decision J's tracker heuristic,
   the ink-based page check and the de-vendoring lines are all recorded per competency above; if the set is
   ever extended, competencies 11–13 are the ones whose conventions are most current.

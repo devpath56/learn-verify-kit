@@ -1,6 +1,6 @@
 # Tests That Earn Their Keep — printable study booklet
 
-- `SWE-Testing-Study-Booklet.pdf` — 60 pages, A4, grayscale, print-ready.
+- `SWE-Testing-Study-Booklet.pdf` — 61 pages, A4, grayscale, print-ready.
 - `booklet.html` — the rendered source. Self-contained: no images, no external CSS, no fonts to fetch.
 - `body.html` — the content alone; `booklet.html` is this plus the shared style block.
 
