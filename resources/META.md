@@ -431,7 +431,9 @@ least one code, and each code points at the exact artefact to reread.
   it, (b) explain the mechanism, (c) prescribe and reject the near miss; these five booklets add a (d) that
   asks the reader to rule on a proposal or a plan stated in the scenario. It has been the pattern since
   competency 9 and is deliberate — the fourth part is where a stated bad plan gets assessed, which is the
-  hardest thing to fake — but E2 was never updated to record it. Competencies 1–8 follow E2 as written.
+  hardest thing to fake. E2 itself is left as written — three parts — with the deviation recorded
+  alongside it in `booklet-template/BUILDING-A-SET.md` §1.5 rather than absorbed into the rule, so that
+  this note keeps documenting a real divergence. Competencies 1–8 follow E2 as written.
 - **Competency 13 shipped for one build with the wrong `<title>`.** Its head block was copied from
   competency 5's rendered booklet rather than from `booklet-template/skeleton.html`, so the PDF's
   document title read "Stability Antipatterns & Stability Patterns" while every page of the body was

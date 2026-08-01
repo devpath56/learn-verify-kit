@@ -13,9 +13,12 @@ Three things make the method work, and none of them are domain-dependent:
 3. **Pre-registered grading.** The ideal answer is frozen *before* an attempt exists.
 
 **On the decision ids.** Entries labelled `A1`–`J` are stable anchors. They are cited from
-`META.md` and from booklet READMEs across the set — a note recording a deliberate deviation says
-"against decision J" or "which decision E1 forbids". Renumber them and those citations dangle. New
-decisions extend a series; they never renumber it.
+`META.md` and from this folder's README — a note recording a deliberate deviation says "against
+decision J" or "which decision E1 forbids". Renumber them and those citations dangle, and **changing
+a rule's text without changing its id is worse than renumbering**: the citation still resolves, but
+to a rule that no longer says what the citing note assumed. New decisions extend a series; they
+never renumber it, and an existing decision's substance is amended only deliberately and with the
+citing notes updated in the same change.
 
 Companion file: `skeleton.html`, the greyscale print scaffold with these decisions already encoded
 as empty structure. Copy it, fill the `{{placeholders}}`, render.
@@ -176,7 +179,7 @@ file (§3.3). This keeps the offline quiz honest — gradeable, but not self-che
 |---|---|---|
 | I1 | Format | **One self-contained HTML file** — no external CSS, fonts, images or scripts. A booklet that fetches anything is a booklet that breaks on a plane. |
 | I2 | Page setup | A4 portrait, 16mm/15mm margins, ~10.4pt serif body with sans headings. Print instruction on the cover: **100% scale, no "fit to page"**, duplex short-edge. |
-| I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Use **one `.page` section per part**, not one per sub-topic — every forced break is a chance for the preceding page to end early, and a long table spilling one row into a section of its own is the usual cause of an orphan. Set **`h3 { break-after: avoid }`** so a sub-heading can never end a page, and **`table tr:first-child { break-after: avoid }`** so a header row can never end one either. When a rule pushes a tall sketch to the next page and leaves the preceding one short, shorten the sketch — do not remove the rule. |
+| I3 | Pagination | `break-inside: avoid` on every box, question, sketch, matrix and table row. Use **one `.page` section per part**, not one per sub-topic — every forced break is a chance for the preceding page to end early, and a long table spilling one row into a section of its own is the usual cause of an orphan. Set **`h3 { break-after: avoid }`** so a sub-heading can never end a page, and **`table tr:first-child { break-after: avoid }`** so a header row can never end one either. **Break at part boundaries and let the rest flow.** When a rule pushes a tall sketch to the next page and leaves the preceding one short, shorten the sketch — do not remove the rule. |
 
 ```sh
 chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
@@ -194,7 +197,7 @@ the copy upstream**, never by inserting filler.
 
 | # | Decision | Rule |
 |---|---|---|
-| I6 | Register the question bank | Extract the **8 applied cases + 10 quiz questions** into the progress file as a new competency entry, with stable ids and a **frozen ideal stored inline for every one** (§3.3). Concept-sketch node questions stay in the booklet as cues and are not tracked. If the printed answer key doesn't cover the final quiz, write those ideals here, before any attempt exists. **A booklet whose bank isn't registered cannot be quizzed, so it isn't finished.** |
+| I6 | Register the question bank | Extract the **8 applied cases + 10 quiz questions** into the progress file as a new competency entry, with stable ids (`<competency-id>.<local-id>`) and a **frozen ideal stored inline for every one** (§3.3). Concept-sketch node questions stay in the booklet as cues and are not tracked. If the printed answer key doesn't cover the final quiz, write those ideals here, before any attempt exists. **A booklet whose bank isn't registered cannot be quizzed, so it isn't finished.** |
 | I7 | Record provenance in the set spine | Add the competency's row to `META.md` — source, edition, chapters and page range, plus the works it cites. This is the only place provenance is allowed to exist (G1), so skipping it loses the information rather than tidying it. |
 
 Then write the folder README: contents table, parts list, spine paragraph, a note on scope, a note
@@ -210,7 +213,7 @@ on styling, printing instructions, the regeneration command, and how to get quiz
 |---|---|---|
 | G1 | **No provenance, no method rationale, no construction commentary.** No "built from", no citations for the study method, no explanation of why the booklet is shaped this way. | This lives **once**, in the meta file for the whole set. Repeating it in every booklet costs the reader paper on every print to say one thing once. |
 | G2 | **No per-fact confidence tagging** — nothing like "each number is tagged published / extrapolated / invented". | If a number isn't trustworthy enough to print unqualified, don't print it. Tagging offloads your editorial job onto the reader. |
-| G3 | **No kit-internal vocabulary** — no step labels, no tool names, no word for the unit of a booklet. The reader sees the subject, never the machinery. | Internal vocabulary makes the reader decode the tool instead of the topic. |
+| G3 | **No kit-internal vocabulary** — no step labels, no tool or skill names, no word for the unit of a booklet (in the calibrating set the banned words were "chunk" and "competency"). The reader sees the subject, never the machinery. | Internal vocabulary makes the reader decode the tool instead of the topic. |
 | G4 | **No trailing offers.** End on a quiz, not on "want me to…". | An offer at the end converts a study session into a conversation. |
 | G5 | **No numbers without a use.** A number earns its place only if it wins an argument. | Trivia crowds out the numbers that matter. |
 
@@ -403,20 +406,21 @@ None is optional. Each exists because something shipped without it.
 | # | Gate | Rule |
 |---|---|---|
 | I4 | Rasterise and look | **Never trust the HTML.** Check at minimum a part opener, a matrix page, a sketch page and the cover, as images. |
-| I5 | Ink-based orphan check | Rasterise every page; flag any whose ink stops above **45% of page height**. Fix upstream, never with filler. |
+| I5 | Ink-based orphan check | Run **`check-pages.py BOOKLET.pdf`** (in this folder): it rasterises every page and flags any whose ink stops above **45% of page height**. Fix upstream, never with filler. |
 | I8 | Answer-key ⇄ bank sync | Re-extracted prompts and ideals must be **byte-identical** to the stored copies, and **no quiz ideal may appear anywhere in the booklet**. |
 | I9 | Hedge diff against the source | Every hedge the source uses stays. Every number matches. No personal habit generalised into a rule. |
-| I10 | Legend ⇄ artwork | Legends describe what is actually rendered. **Exactly one** inverted token per sketch, **exactly one** focus cell per 2×2. |
+| I10 | Legend ⇄ artwork | A legend describes the styles actually rendered: if the trees use bold for named nodes the legend may not say "boxed", and if it says one node is reversed then exactly one must be. **Exactly one** inverted token per sketch, **exactly one** focus cell per 2×2. **Check on the rasterised page**, and count mechanically. |
 | I11 | Metadata gate | Check the document title and everything else living **above `<body>`**. |
 | I12 | Structural counts and scans | Section counts, question boxes vs answer-key entries, write-lines present; **zero** emoji, colour hue, kit-internal vocabulary, personal data or filesystem paths. |
-| I13 | Independent review | A different reader, against the source, briefed adversarially — before shipping. |
+| I13 | Independent review | A different reader, given **the rendered PDF** and the source, briefed adversarially — before shipping. |
 
 The five that need more than a line:
 
 **I5 — the ink check.** Character counting is not sufficient, and was the check until competency 8:
 a page carrying only ruled write-lines extracts as *zero* characters, and a heading stranded at the
-foot of a page extracts as fine. Both slipped through. Keep a text pass as a second signal, and
-separately assert no page's last line is a heading.
+foot of a page extracts as fine. Both slipped through. Keep a text pass as a second signal —
+**flag any page under ~800 extracted characters** — and separately assert no page's last line is a
+heading.
 
 *Known blind spot:* the check cannot see a page ending in a lone table header row, because a header
 sits below the 45% floor. Guard it in CSS instead (I3). *Two trimming traps:* an "edit" that reflows
@@ -431,8 +435,8 @@ occurs in the rendered text — this is what keeps the unprinted final quiz genu
 **I9 — the hedge diff.** For every prescriptive or quantitative claim, compare the booklet's
 certainty against the source's. Anything the source qualifies — "probably", "almost certainly",
 "often", "we recommend", "our experience suggests", "mostly", "one way to think about this" —
-**stays qualified**. The hardest defect to notice, because the sentence still reads well and reads
-*better* without the hedge.
+**stays qualified**. The **easiest defect to introduce and the hardest to notice**, because the
+sentence still reads well and reads *better* without the hedge.
 
 **I11 — the metadata gate.** This exists because a booklet shipped with another booklet's `<title>`
 in its PDF metadata: its head block had been copied from a sibling rather than from the template.
@@ -463,13 +467,21 @@ where they are the right tool; the constraint is on questions only.
 | 4 parts | ~6 pages each |
 | Back matter | ~14 pages |
 | Retrieval load | 8 applied + ~14 sketch-node cues + 10 quiz questions |
-| Tracker rows | One per independently testable idea, not one per term. **32–36** for a 45–50 page booklet; **~40** once past 55 pages |
+| Tracker rows | One per independently testable idea, not one per term. The first build calibrated this at ~18 for a ~30-page booklet; the 45–50 page builds since have settled at **32–36**, which is the figure to use for a four-part booklet of that length. |
 
 If a part runs past **8 pages**, the grouping axis (B2) is wrong — you have two parts pretending to
 be one. If a part is under **4 pages**, it is a section of another part.
 
 Deviate where the material demands it, and **record the deviation in the meta file**. An unrecorded
 deviation is indistinguishable from an error six months later.
+
+**What the calibrating set actually did, which is not the rule.** Competencies 11, 12 and 13 ran to
+59–62 pages and used **40** tracker rows, above what J predicts. All three are recorded in `META.md`
+as deviations, and they are deliberate — the heuristic is a guide to coverage, not a cap. Left here
+as an observation rather than folded into J, because promoting observed practice into the rule it
+deviates from would quietly retire three recorded deviations and make the notes citing J read as
+though they documented compliance. **When practice and rule diverge, change one of them on purpose
+and update the citations — never let the rule drift toward the practice.**
 
 ---
 
