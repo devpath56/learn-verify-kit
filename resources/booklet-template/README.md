@@ -4,16 +4,19 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 
 | File | What it is |
 |---|---|
-| `BUILDING-A-SET.md` | The generalised playbook for standing up a **whole set** in any domain: picking the competencies for a role, the build pipeline, where meta details live, the progress-file schema, the grading loop, and the numbered verification gates. Read this first if you are starting a new set. |
-| `DECISIONS.md` | The decision skeleton for **one booklet** — every choice that shapes it, with the rule that resolves it and the failure mode if you resolve it wrong. |
-| `skeleton.html` | The grayscale print scaffold with those decisions already encoded as empty structure. Copy, fill the `{{placeholders}}`, render. |
+| `BUILDING-A-SET.md` | **The playbook — read this first, and everything is in it.** Defining a set for a role, the full build pipeline, every decision A–J with the rule that resolves it and the failure mode if you resolve it wrong, where meta details live, the progress-file schema and grading loop, and the numbered verification gates. |
+| `skeleton.html` | The greyscale print scaffold with those decisions already encoded as empty structure. Copy, fill the `{{placeholders}}`, render. |
+| `check-pages.py` | The ink-based orphan check (gate I5). |
+
+This README is an index, not a second copy of the rules. Every rule lives in `BUILDING-A-SET.md`
+and nowhere else — a rule with two homes is a rule that will drift.
 
 ## Building one
 
-1. Work through `DECISIONS.md` sections A–C and settle scope, the four parts, and the grouping axis
-   **before** writing any teaching copy. Getting B2 wrong costs a rewrite, not an edit.
-2. Copy `skeleton.html` to `resources/<competency>/booklet.html` and fill it.
-   The Part block is written once — duplicate it four times.
+1. **Part 0 and §1.2** — settle scope, the four parts and the grouping axis **before** writing any
+   teaching copy. Getting B2 wrong costs a rewrite, not an edit.
+2. Copy `skeleton.html` to `resources/<competency>/booklet.html` and fill it. The Part block is
+   written once — duplicate it four times.
 3. Render:
 
    ```sh
@@ -22,25 +25,21 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
      file://$PWD/booklet.html
    ```
 
-4. Register the question bank into `../competency-progress.json` (decision I6) — 18 questions with
-   stable ids and a frozen ideal inline for each — and add the competency's provenance row to
-   `../META.md` (decision I7). The booklet isn't finished until both are done.
-5. Verify per decision I4/I5: rasterise a part opener, a matrix page, a sketch page and the cover
-   and look at them; then flag any page under ~800 characters and fix the orphan upstream.
+4. Run every gate in **Part 4** (I4–I13). Nothing ships until they all pass.
+5. Register the bank, record provenance, write the folder README — **§1.9**. A booklet whose bank
+   isn't registered cannot be quizzed, so it isn't finished.
 
-## Non-negotiables
+## Checking a rendered booklet
 
-- **Grayscale only.** No hue anywhere; inversion means focus and nothing else; no emoji.
-- **No meta.** No provenance, no method rationale, no construction commentary, no per-fact
-  confidence tags. All of that lives once, in the SSOT meta section for the competency set.
-- **Every part carries** a tenth-grader box, a term table with a boundary column, an anchor sketch,
-  two retrieval questions on unseen cases, and one 2×2.
-- **Answers live at the back**, never on the question page.
-- **The question bank is registered** in `../competency-progress.json` — 18 questions, stable ids,
-  ideal answers frozen inline before anyone attempts them.
-- **Provenance is recorded** in `../META.md`, and nowhere else.
+```sh
+python3 check-pages.py ../<folder>/<Booklet>.pdf
+```
 
-## Reference build
+Rasterises every page and flags any whose ink stops above 45% of the page height — gate I5. It
+catches what counting extracted characters cannot: a page holding only ruled write-lines, and a page
+holding only a heading. Its one blind spot, and the CSS that covers it, are recorded under I5.
+
+## Reference builds
 
 `../release-it-ch4-5/` — the first booklet produced from this template.
 `../release-it-ch13-17/` — the second.
@@ -55,14 +54,3 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 `../staff-wider-scope/` — the eleventh.
 `../staff-influence-at-scale/` — the twelfth.
 `../swe-testing/` — the thirteenth.
-
-## Checking a rendered booklet
-
-```sh
-python3 check-pages.py ../<folder>/<Booklet>.pdf
-```
-
-Rasterises every page and flags any whose ink stops above 45% of the page height — the orphan check
-required by decision I5. It catches what counting extracted characters cannot: a page holding only
-ruled write-lines, and a page holding only a heading.
-

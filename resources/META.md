@@ -390,7 +390,7 @@ least one code, and each code points at the exact artefact to reread.
 |---|---|
 | `META.md` | This file. Provenance and method for the whole set. |
 | `competency-progress.json` | One file for all 13 banks: every tracked question, its frozen ideal, status, streak, miss codes, attempt history. |
-| `booklet-template/` | `DECISIONS.md` (the transferable build decisions) and `skeleton.html` (the grayscale scaffold). |
+| `booklet-template/` | `BUILDING-A-SET.md` (the playbook — how to define a set, build a booklet, and run the progress log, with every decision A–J inline) and `skeleton.html` (the grayscale scaffold). |
 | `<competency>/` | One folder per booklet: `booklet.html`, the rendered PDF, a README. |
 | `../attempts/` | Graded attempt records — the verbatim evidence behind the counts. |
 | `../progress.json` | Separate log, for concepts taught in conversation rather than from a booklet. |
