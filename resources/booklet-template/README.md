@@ -4,7 +4,8 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 
 | File | What it is |
 |---|---|
-| `DECISIONS.md` | The decision skeleton — every choice that shapes a booklet, with the rule that resolves it and the failure mode if you resolve it wrong. Read this first. |
+| `BUILDING-A-SET.md` | The generalised playbook for standing up a **whole set** in any domain: picking the competencies for a role, the build pipeline, where meta details live, the progress-file schema, the grading loop, and the numbered verification gates. Read this first if you are starting a new set. |
+| `DECISIONS.md` | The decision skeleton for **one booklet** — every choice that shapes it, with the rule that resolves it and the failure mode if you resolve it wrong. |
 | `skeleton.html` | The grayscale print scaffold with those decisions already encoded as empty structure. Copy, fill the `{{placeholders}}`, render. |
 
 ## Building one
