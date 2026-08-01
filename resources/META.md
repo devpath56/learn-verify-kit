@@ -432,6 +432,18 @@ least one code, and each code points at the exact artefact to reread.
   asks the reader to rule on a proposal or a plan stated in the scenario. It has been the pattern since
   competency 9 and is deliberate — the fourth part is where a stated bad plan gets assessed, which is the
   hardest thing to fake — but E2 was never updated to record it. Competencies 1–8 follow E2 as written.
+- **Competency 13 shipped for one build with the wrong `<title>`.** Its head block was copied from
+  competency 5's rendered booklet rather than from `booklet-template/skeleton.html`, so the PDF's
+  document title read "Stability Antipatterns & Stability Patterns" while every page of the body was
+  about testing. It is invisible on paper and visible in every PDF reader's title bar and in the file's
+  metadata. Corrected. Worth a check on any future build, because the ink-based page check cannot see it
+  and neither can a structural count: **the title lives above `<body>`, which is the one region of the
+  file the verification pass never reads.**
+- **`booklet-template/skeleton.html` had drifted three CSS rules behind what all thirteen booklets use.**
+  Two 2x2 selectors had been tightened to `> b:first-child` so that bold text inside a cell's body is not
+  mistaken for its heading, and `.cell.good` had gained a left rule so the "good" quadrant is
+  distinguishable without relying on its fill. All three were fixed in a booklet and never carried back.
+  Synced; the skeleton head and a rendered booklet head are now identical apart from the title placeholder.
 - **The set is now complete: 13 of 13 built, 234 questions registered.** Decision J's tracker heuristic,
   the ink-based page check and the de-vendoring lines are all recorded per competency above; if the set is
   ever extended, competencies 11–13 are the ones whose conventions are most current.
