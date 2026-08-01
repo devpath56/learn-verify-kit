@@ -7,6 +7,8 @@ Reusable scaffold for building a printable Learn·Verify booklet for any core co
 | `BUILDING-A-SET.md` | **The playbook — read this first, and everything is in it.** Defining a set for a role, the full build pipeline, every decision A–J with the rule that resolves it and the failure mode if you resolve it wrong, where meta details live, the progress-file schema and grading loop, and the numbered verification gates. |
 | `skeleton.html` | The greyscale print scaffold with those decisions already encoded as empty structure. Copy, fill the `{{placeholders}}`, render. |
 | `check-pages.py` | The ink-based orphan check (gate I5). |
+| `TRANSFER-KIT.md` | **Generated — do not edit.** The single-file transfer edition: execution protocol for a Claude Code agent + the full playbook + both tools embedded as extractable artifacts. Regenerate with `compile-transfer.py`. |
+| `compile-transfer.py` | Builds `TRANSFER-KIT.md` from the three sources above. |
 
 This README is an index, not a second copy of the rules. Every rule lives in `BUILDING-A-SET.md`
 and nowhere else — a rule with two homes is a rule that will drift.
