@@ -23,6 +23,23 @@ citing notes updated in the same change.
 Companion file: `skeleton.html`, the greyscale print scaffold with these decisions already encoded
 as empty structure. Copy it, fill the `{{placeholders}}`, render.
 
+**Transferring this playbook.** This file is the method, not the toolkit — it *names* the scaffold
+and the page gate but does not *contain* them. Send three files together, or the recipient stalls at
+§1.8 with nothing to copy:
+
+1. `BUILDING-A-SET.md` — this file.
+2. `skeleton.html` — the scaffold. Without it, the recipient must reconstruct ~420 lines of print
+   CSS from the prose in F1–F6 and I1–I3, which is a rewrite, not a transfer.
+3. `check-pages.py` — gate I5. The spec (rasterise, 45% floor) is written below, but the shipped
+   script is the tested implementation.
+
+Environment: a headless Chromium/Chrome (the render command in §1.8), `python3`, and `pdftoppm`
+(poppler-utils — `check-pages.py` shells out to it). Everything else is created fresh per set:
+`META.md` from §2.2, `competency-progress.json` from the schema in §3.2 — both writable from this
+file alone. Smoke-test a transfer the way you would a build: in a clean directory holding only the
+bundle, fill a dozen placeholders, render, run the gate, seed the progress file. If any of those
+four steps needs a file not in the bundle, the bundle is short.
+
 ---
 
 # Part 0 · Define the set
