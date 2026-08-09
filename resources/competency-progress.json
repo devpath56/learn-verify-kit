@@ -160,7 +160,8 @@
           "last_verdict": null,
           "last_attempted": null,
           "miss_codes": [],
-          "attempts": []
+          "attempts": [],
+          "taught_before_attempt": "2026-08-09 — the synchronized-cache story was taught in chat on request, before this question was ever asked. A later attempt therefore measures recall after teaching, not cold recall. Weight it accordingly and do not read a pass here as equivalent to a cold pass."
         },
         {
           "id": "release-it-stability.p3q1",
