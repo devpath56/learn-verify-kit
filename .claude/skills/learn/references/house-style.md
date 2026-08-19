@@ -55,6 +55,23 @@ Rules that make this honest:
 ## Endings
 - **No trailing questions.** No "want me to…?" chatter. When the concept is understood, **end** — cap with a short quiz, not an offer.
 
+## Specificity — examples are specified, never gestured at
+
+An example that a learner cannot check is not an example. Two rules, both blocking.
+
+- **Concrete named values.** Every example carries real identifiers and real numbers — `activity B, dur 2, ES 3, LF 6`, not "a task with some slack". A placeholder (`X`, `foo`, "some value") in a teaching example is a failure.
+- **Behaviour is written in EARS.** Every behavioural claim inside an example — what the system does, when, and what happens when it does not — is written as an EARS requirement, never as loose prose. Loose prose is where ambiguity hides: *"how late a task can be"* does not say **be what**, and the learner cannot tell a late START from a long RUN.
+
+| EARS pattern | template | use it for |
+|---|---|---|
+| ubiquitous | The `<system>` shall `<response>`. | an always-true property or a definition |
+| event-driven | **When** `<trigger>`, the `<system>` shall `<response>`. | a discrete thing happening |
+| state-driven | **While** `<state>`, the `<system>` shall `<response>`. | a condition that holds over a span |
+| unwanted | **If** `<condition>`, **then** the `<system>` shall `<response>`. | the failure case, stated on purpose |
+| optional | **Where** `<feature>`, the `<system>` shall `<response>`. | behaviour that exists only in some configurations |
+
+**Every EARS example is followed by a worked table with at least one row that VIOLATES the requirement.** A requirement no row can break is a restatement, not a spec — the violating row is the proof the requirement has teeth.
+
 ## Pre-send gate (run silently before every learner-facing message)
 Block the send until all pass:
 - [ ] Opened example-first, no jargon before the plain explanation
@@ -66,3 +83,6 @@ Block the send until all pass:
 - [ ] Teaching a chunk? -> TWO retrieval questions on distinct new cases, delivered ONE AT A TIME (Q2 only after Q1 is scored) (procedure: learn steps 5-8)
 - [ ] Teaching output is nested bullets + tables only? -> no labeled prose intro sections, no sentences floating outside a bullet
 - [ ] Rendering a sketch (anchor or concept)? -> meaning-bearing visual encoding present (per-chunk/role color token + one-line legend + one marked ⭐ focus node), not a bare monochrome ASCII tree
+- [ ] Every example carries concrete named values (real identifiers, real numbers) — no `X`/`foo`/"some value" placeholders
+- [ ] Every behavioural claim inside an example is written as an EARS requirement (ubiquitous / When / While / If-then / Where), not as loose prose
+- [ ] Every EARS requirement shown is followed by a worked table containing at least one row that VIOLATES it
