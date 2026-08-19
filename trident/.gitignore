@@ -1,4 +1,0 @@
-# Raw, unsanitized incident logs — personal specifics stay local, never committed.
-failures.local.jsonl
-*.local.jsonl
-failures/*.local.jsonl
