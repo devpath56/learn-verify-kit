@@ -80,6 +80,55 @@
       "last_score": 4.3,
       "last_reviewed": "2026-07-17",
       "next_review": "2026-07-18"
+    },
+    {
+      "topic": "PreToolUse hook: gate position + blocking authority",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-08-20",
+      "next_review": "2026-08-23",
+      "gaps": {
+        "boundary": 1
+      },
+      "weakest": "boundary",
+      "attempts": []
+    },
+    {
+      "topic": "Hook matchers: matcher (name) vs if (arguments)",
+      "depth_reached": "partial",
+      "last_score": "fail",
+      "last_reviewed": "2026-08-20",
+      "next_review": "2026-08-21",
+      "gaps": {
+        "boundary": 2,
+        "name": 1
+      },
+      "weakest": "boundary",
+      "attempts": []
+    },
+    {
+      "topic": "PreToolUse I/O contract: exit codes + stdout/stderr channels",
+      "depth_reached": "partial",
+      "last_score": "fail",
+      "last_reviewed": "2026-08-20",
+      "next_review": "2026-08-21",
+      "gaps": {
+        "mechanism": 2
+      },
+      "weakest": "mechanism",
+      "attempts": []
+    },
+    {
+      "topic": "Three tiers of guarantee: hook / permission rules / pre-send gate",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-08-20",
+      "next_review": "2026-08-23",
+      "gaps": {
+        "mechanism": 1
+      },
+      "weakest": "mechanism",
+      "attempts": []
     }
   ]
 }
