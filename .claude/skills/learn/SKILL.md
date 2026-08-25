@@ -20,7 +20,7 @@ The most-cited review of study techniques rates only two methods "high utility":
 ## Before you teach
 
 1. **Scope + disambiguate.** Default to the software/tech reading. If the term genuinely spans domains, don't guess — flag it and offer a pick-list of the DISTINCT meanings (max 3 options, under 10 words each). Let the learner pick, then continue.
-2. **Research (web) if unfamiliar or possibly stale.** Pull authoritative sources, reconcile them, cite inline `[Source: Title — URL — date]`. Feed the teaching; never dump raw results. No web tools → teach from known ground, flag uncertainty. Don't teach from a shaky prior. **For any metric/rule with asymmetric or exclusionary behavior** ("checks X but not Y," "penalizes Z"), don't stop at the first generic summary — a plain "measures how well it does X" phrasing can silently hide a penalty/exclusion clause that changes real scoring outcomes.
+2. **Research (web) if unfamiliar or possibly stale.** Pull **practitioner** sources, reconcile them, cite inline `[Source: Title — URL — date]`. A practitioner source is a working engineer's book, bliki or conference talk. Journal papers, standards bodies and vendor pages are rejected for the taught domain (house-style → Audience). Feed the teaching; never dump raw results. No web tools → teach from known ground, flag uncertainty. Don't teach from a shaky prior. **For any metric/rule with asymmetric or exclusionary behavior** ("checks X but not Y," "penalizes Z"), don't stop at the first generic summary — a plain "measures how well it does X" phrasing can silently hide a penalty/exclusion clause that changes real scoring outcomes.
 3. **Chunk + preview.** Break into <=4 chunks (working memory caps ~4). **Show a 3-bullet preview of the chunks BEFORE teaching chunk 1**, so the learner sees where the lesson is going.
 
 ## The loop (one pass per chunk)
@@ -29,11 +29,12 @@ For EACH chunk:
 1. **Open with the tenth-grader version.** Before any example or term, give a **🎓 Tenth-grader version**: 2–4 ultra-plain, jargon-free bullets that convey the gist to a smart 15-year-old. No expert terms here — those come next. Then move into the real teaching.
 2. **Teach it — example first.** Concrete everyday example → the idea → the expert term. Bullets, not paragraphs. Add a small anchor sketch when the chunk is structural. (Plain-language-first; run the `revise` self-check on yourself before sending.)
 3. **Name + define + example + boundary for every term.** No name-dropping: each term or fix gets a plain definition, a concrete example, and its boundary vs the neighbor it's confused with. If a confusable cousin exists, name it and draw the line.
-4. **Derive, don't assert (conditional).** For design / "why is it this way" chunks, derive from ground truths. Skip for rote/vocabulary — it only adds load there.
-5. **Test — ask Q1.** Ask **one** retrieval prompt on a NEW case, in the learner’s own words. Recognition ("make sense?") is not retrieval. Withhold the answer. Wait for the learner to answer before doing anything else.
-6. **Score Q1, then ask Q2.** Score their Q1 answer (step 7). *Then* ask **Q2 — the same concept, a different NEW case.** Withhold the answer; wait for them to answer. Never ask Q2 before Q1 is answered and scored.
-7. **Score Q2, then advance.** Score their Q2 answer (step 8) and add a one-line **improvement note** (did Q2 beat Q1?). Only after Q2 is scored do you move to the next chunk.
-8. **How to score** (per house-style): a one-line **completeness** score (+ what’s missing) and the **plain/expert two-column table** capturing the key ideas in plain vs. expert phrasing. Very brief. No bare bullet "lingo check."
+4. **Price it for both readers.** Name which reader each claim serves. Wherever ICP1 (principal IC, short on review bandwidth) and ICP2 (founder, short on wall clock) read the same fact in opposite directions, put that inversion in a divergence table. Mark every term `ICP1` / `ICP2` / `both`. See house-style → Audience.
+5. **Derive, don't assert (conditional).** For design / "why is it this way" chunks, derive from ground truths. Skip for rote/vocabulary — it only adds load there.
+6. **Test — ask Q1.** Ask **one** retrieval prompt on a NEW case, in the learner’s own words. Recognition ("make sense?") is not retrieval. Withhold the answer. Wait for the learner to answer before doing anything else.
+7. **Score Q1, then ask Q2.** Score their Q1 answer (step 8). *Then* ask **Q2 — the same concept, a different NEW case.** Withhold the answer; wait for them to answer. Never ask Q2 before Q1 is answered and scored.
+8. **Score Q2, then advance.** Score their Q2 answer (step 9) and add a one-line **improvement note** (did Q2 beat Q1?). Only after Q2 is scored do you move to the next chunk.
+9. **How to score** (per house-style): a one-line **completeness** score (+ what’s missing) and the **plain/expert two-column table** capturing the key ideas in plain vs. expert phrasing. Very brief. No bare bullet "lingo check."
 
 ## After the last chunk
 
@@ -55,6 +56,9 @@ For EACH chunk:
 - Testing recall of the exact words just shown (recognition in disguise).
 - A mnemonic that isn't actually recallable — drop it.
 - Ending with trailing questions instead of a quiz.
+- Teaching a claim with one reading when ICP1 and ICP2 would read it in opposite directions.
+- Citing a journal paper, a standards body or a vendor page for the taught domain.
+- Introducing a term neither ICP1 nor ICP2 would recognize.
 
 ## Output
 

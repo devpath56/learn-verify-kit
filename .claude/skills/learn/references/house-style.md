@@ -15,6 +15,30 @@ These rules govern HOW the kit talks to the learner, across all skills. Goal: th
 - **No name-dropping.** Every term or fix you introduce gets three things: a plain **definition**, a concrete **example**, and its **boundary** vs the neighbor it's confused with. Naming without exemplifying is a failure (e.g. saying "loop closure" with no example).
 - **Draw boundaries.** When a concept has a confusable neighbor (registration vs conflation), name the neighbor and give the one-line difference. A concept isn't learned until it's told apart from its look-alikes (discrimination / contrast learning).
 
+## Audience — every claim is priced for two named readers
+
+The same true sentence lands differently depending on who is short of what. A concept is not taught until the learner can say **who each claim serves**.
+
+| id | the reader | what is scarce | what is abundant | the expensive failure | horizon |
+|---|---|---|---|---|---|
+| **ICP1** | a principal IC inside a large engineering org | coordination and review bandwidth | headcount, infra, historical data | building the wrong thing **well** | quarters to years |
+| **ICP2** | a founder shipping against a near deadline | wall clock and runway | willingness to throw work away | building nothing **complete** | days to weeks |
+
+Three rules, all blocking:
+
+- **Name the divergence, not just the fact.** Where ICP1 and ICP2 read the same number in opposite directions, that inversion *is* the teaching, and it goes in a table. A concept taught with no divergence row is taught to nobody in particular.
+- **Practitioner sources only, for the taught domain.** A source is a working engineer's book, bliki, or conference talk. A journal paper, a standards body (ISO / IEEE), and a vendor page are all rejected: ICP1 does not cite them in a review, and ICP2 has never opened one. Prefer the name a reader nods at without being told the definition (`Hyrum's Law`, `blast radius`, `the wrong abstraction`) over the name a paper coined (`CBO`, `RFC`, `WMC`). **Scope:** this governs the domain being taught. The kit's own learning-science citations are exempt, because they justify the method, not the content.
+- **The term table carries a recognition column.** Every term is marked `ICP1` / `ICP2` / `both`. A term neither reader recognizes cannot be used in a room, and it comes out of the lesson.
+
+**When** a taught claim reads differently for ICP1 than for ICP2, the chunk shall carry a divergence table naming both readings.
+
+| Claim in the chunk | ICP1 reads | ICP2 reads | Verdict |
+|---|---|---|---|
+| a module with one importer costs nothing to push work out of | one importer means unused; delete it | correct for now, no callers yet; ship | PASS — both readings named |
+| deep modules are better than shallow ones | a coordination bill coming due next quarter | premature at one engineer | PASS — the inversion is the row |
+| deep modules are better than shallow ones | better | better | **VIOLATES** — one reading twice, no divergence, no reader named |
+
+
 ## Hide the machinery
 - The learner sees the concept, never the kit's internals. No step labels ("Step 0 · Research"), no internal tags, no metric/system vocab in user-facing text. **Domain jargon = teach it; system-internals = hide it.**
 
@@ -89,3 +113,6 @@ Block the send until all pass:
 - [ ] Every example carries concrete named values (real identifiers, real numbers) — no `X`/`foo`/`some value` placeholders
 - [ ] Every behavioural claim inside an example is written as an EARS requirement (ubiquitous / When / While / If-then / Where), not as loose prose
 - [ ] Every EARS requirement shown is followed by a worked table containing at least one row that VIOLATES it
+- [ ] Teaching a chunk? -> every claim that reads differently for ICP1 vs ICP2 carries a divergence table naming BOTH readings
+- [ ] Citing a source for the TAUGHT domain? -> it is a practitioner book / bliki / conference talk, never a journal paper, standards body or vendor page
+- [ ] Introducing a term? -> it is marked `ICP1` / `ICP2` / `both`; a term neither reader recognizes is cut

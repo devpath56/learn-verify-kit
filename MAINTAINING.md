@@ -12,7 +12,7 @@ Everything you need to evolve this kit lives in this repo. No external context r
   revise/         Recall Rubric + self-check   → references/certification-gate.md
   concept-sketch/ dual-coded sketch + decision card  → references/recall-rubric.md
   track/          session log + spaced review
-tests/regression-cases.md   30 guardrail tests, one per real error
+tests/regression-cases.md   32 guardrail tests, one per real error
 attempts/         graded attempt records — evidence behind progress.json
 progress.json     the revise-DB for chat-taught concepts: schedule + miss-code gap counts
 resources/competency-progress.json
@@ -59,6 +59,8 @@ Every rule traces to a real failure caught during the kit's hardening. Don't und
 | Record the gap, not just the verdict | A log of scores with no miss type — shows a trend, never a growth area | R-28 |
 | Graded attempts filed verbatim to `attempts/` | Feedback that lives only in the conversation and dies with it | R-29 |
 | Booklet questions drawn only from the registered bank | Inventing a question with no frozen ideal, so the verdict is an impression | R-30 |
+| Practitioner sources only for the taught domain | Citing Parnas/C&K/McCabe/ISO for an architecture framework — accurate, and unquotable by either reader | R-31 |
+| Audience lens: price every claim for ICP1 and ICP2 | A chunk with one reading, so a number reads as good news to a founder and as dead code to a principal IC, and the lesson says neither | R-32 |
 
 ## Releasing
 1. Run the behavioral suite; fix any regression.
