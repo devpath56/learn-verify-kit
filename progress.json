@@ -129,6 +129,77 @@
       },
       "weakest": "mechanism",
       "attempts": []
+    },
+    {
+      "topic": "Agent harness: five layers + deterministic steps stay in code",
+      "depth_reached": "partial",
+      "last_score": "fail",
+      "last_reviewed": "2026-08-24",
+      "next_review": "2026-08-25",
+      "gaps": {
+        "mechanism": 2,
+        "price": 1,
+        "boundary": 1
+      },
+      "weakest": "mechanism",
+      "attempts": [
+        "attempts/2026-08-24-agent-harness-five-layers.md"
+      ]
+    },
+    {
+      "topic": "Retrieval as a subagent (iterative loop vs one-shot RAG)",
+      "depth_reached": "recall ✓",
+      "last_score": "partial",
+      "last_reviewed": "2026-08-24",
+      "next_review": "2026-08-25",
+      "gaps": {
+        "mechanism": 1,
+        "price": 1
+      },
+      "weakest": "mechanism",
+      "attempts": [
+        "attempts/2026-08-24-retrieval-as-a-subagent.md"
+      ]
+    },
+    {
+      "topic": "Tool-boundary guardrails + agents as first-class principals",
+      "depth_reached": "partial",
+      "last_score": "fail",
+      "last_reviewed": "2026-08-24",
+      "next_review": "2026-08-25",
+      "gaps": {
+        "mechanism": 2,
+        "price": 1
+      },
+      "weakest": "mechanism",
+      "attempts": [
+        "attempts/2026-08-24-tool-boundary-and-identity.md"
+      ]
+    },
+    {
+      "topic": "Continuous eval: rubrics vs generic metrics + Agent Optimizer",
+      "depth_reached": "partial",
+      "last_score": "fail",
+      "last_reviewed": "2026-08-24",
+      "next_review": "2026-08-25",
+      "gaps": {
+        "mechanism": 2,
+        "phrasing": 1
+      },
+      "weakest": "mechanism",
+      "attempts": [
+        "attempts/2026-08-24-continuous-eval-and-optimizer.md"
+      ]
+    },
+    {
+      "topic": "Decision card: guard where the failure enters, compare to the original ask",
+      "depth_reached": "card issued",
+      "last_score": "not-yet",
+      "last_reviewed": "2026-08-24",
+      "next_review": "2026-08-25",
+      "gaps": {},
+      "weakest": null,
+      "attempts": []
     }
   ]
 }
