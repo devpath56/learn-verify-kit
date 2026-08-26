@@ -134,61 +134,67 @@
       "topic": "Agent harness: five layers + deterministic steps stay in code",
       "depth_reached": "partial",
       "last_score": "fail",
-      "last_reviewed": "2026-08-24",
-      "next_review": "2026-08-25",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
       "gaps": {
-        "mechanism": 2,
-        "price": 1,
-        "boundary": 1
+        "mechanism": 5,
+        "price": 4,
+        "boundary": 2
       },
       "weakest": "mechanism",
       "attempts": [
-        "attempts/2026-08-24-agent-harness-five-layers.md"
+        "attempts/2026-08-24-agent-harness-five-layers.md",
+        "attempts/2026-08-26-inference-and-runtime.md"
       ]
     },
     {
       "topic": "Retrieval as a subagent (iterative loop vs one-shot RAG)",
       "depth_reached": "recall ✓",
-      "last_score": "partial",
-      "last_reviewed": "2026-08-24",
-      "next_review": "2026-08-25",
+      "last_score": "pass",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-29",
       "gaps": {
         "mechanism": 1,
         "price": 1
       },
       "weakest": "mechanism",
       "attempts": [
-        "attempts/2026-08-24-retrieval-as-a-subagent.md"
+        "attempts/2026-08-24-retrieval-as-a-subagent.md",
+        "attempts/2026-08-26-context-and-retrieval.md"
       ]
     },
     {
       "topic": "Tool-boundary guardrails + agents as first-class principals",
       "depth_reached": "partial",
-      "last_score": "fail",
-      "last_reviewed": "2026-08-24",
-      "next_review": "2026-08-25",
+      "last_score": "partial",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
       "gaps": {
-        "mechanism": 2,
-        "price": 1
+        "mechanism": 4,
+        "price": 2,
+        "phrasing": 1
       },
       "weakest": "mechanism",
       "attempts": [
-        "attempts/2026-08-24-tool-boundary-and-identity.md"
+        "attempts/2026-08-24-tool-boundary-and-identity.md",
+        "attempts/2026-08-26-identity-and-tool-boundary.md"
       ]
     },
     {
       "topic": "Continuous eval: rubrics vs generic metrics + Agent Optimizer",
       "depth_reached": "partial",
-      "last_score": "fail",
-      "last_reviewed": "2026-08-24",
-      "next_review": "2026-08-25",
+      "last_score": "partial",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
       "gaps": {
-        "mechanism": 2,
-        "phrasing": 1
+        "mechanism": 3,
+        "phrasing": 1,
+        "boundary": 1
       },
       "weakest": "mechanism",
       "attempts": [
-        "attempts/2026-08-24-continuous-eval-and-optimizer.md"
+        "attempts/2026-08-24-continuous-eval-and-optimizer.md",
+        "attempts/2026-08-26-observability-and-governance.md"
       ]
     },
     {
@@ -200,6 +206,18 @@
       "gaps": {},
       "weakest": null,
       "attempts": []
+    },
+    {
+      "topic": "Denominator blindness: the instrument cannot see the failure population",
+      "depth_reached": "recall ✓",
+      "last_score": "pass",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
+      "gaps": {},
+      "weakest": null,
+      "attempts": [
+        "attempts/2026-08-26-observability-and-governance.md"
+      ]
     }
   ]
 }
