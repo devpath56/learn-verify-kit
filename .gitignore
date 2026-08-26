@@ -1,2 +1,9 @@
 .DS_Store
 *.zip
+
+# Session working state. NEVER COMMITTED, and the reason is specific: thread-ledger.jsonl carried
+# nine identity strings and an absolute home path, untracked and not ignored, in a PUBLIC repo — one
+# `git add -A` from being permanent. Untracked-and-unignored is the dangerous state, because it is
+# invisible to `git diff` and swept up by the first bulk add.
+runs/
+.claude/*.log

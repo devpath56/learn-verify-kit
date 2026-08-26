@@ -39,8 +39,15 @@ For EACH chunk:
 ## After the last chunk
 
 1. **Consolidate.** Call `concept-sketch` for the recall scaffold, AND emit a transferable **decision card** — a thumb rule or small 2×2 the learner can apply to other problems in other domains. Hand the card to `track` for the revision deck.
-2. **Space it — automatically.** Immediately invoke `track` to log every concept just taught. On the Claude Code surface that means write + commit + **merge `progress.json` to the default branch** (see `track` → "File-backed persistence") **without waiting for the user to type "track."** Then offer re-tests. The durable write must never depend on the learner remembering to trigger it.
-3. **Cap with a short quiz.** End the session with a final quiz — never a trailing "want me to…" question.
+2. **Stamp the competency as delivered, if one backs this lesson.** If the material maps to a
+   registered competency, run `node progress-store.mjs --taught --topic <competency-id>` before
+   anything else at consolidation. `lint-bank`'s `taught-before-drilled` law refuses a competency
+   carrying attempts with no `taught_at`, and the field is written by nothing else — a lesson that
+   ends without it leaves `drill` able to quiz material the record says was never delivered. First
+   delivery wins: re-teaching does not reset the date, so a re-teach today cannot excuse an attempt
+   from last week.
+3. **Space it — automatically.** Immediately invoke `track` to log every concept just taught. On the Claude Code surface that means write + commit + **merge `progress.json` to the default branch** (see `track` → "File-backed persistence") **without waiting for the user to type "track."** Then offer re-tests. The durable write must never depend on the learner remembering to trigger it.
+4. **Cap with a short quiz.** End the session with a final quiz — never a trailing "want me to…" question.
 
 ## Anti-patterns (refuse these)
 

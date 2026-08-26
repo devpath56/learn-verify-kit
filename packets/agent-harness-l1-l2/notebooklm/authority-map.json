@@ -1,0 +1,189 @@
+{
+  "$comment": "Competency-authority map for the agent-harness L1/L2 packet. Gated by advisor-builder engine/authority_map.py --check. Written after CF-026: the first pass at this packet cited four authorities from recall, and 0 of 18 questions carried a source field. Every source below was opened and read before it was written down; the `verified` block records what was actually on the page and when.",
+  "map_id": "agent-harness-l1-l2",
+  "role": "agent-harness practitioner, inference (L1) and runtime (L2)",
+  "derived_by": "operator-directed source hunt, read through the browser, 2026-08-26",
+  "derivations": 3,
+  "derivations_required": 3,
+  "b1_met": true,
+  "ratified_by_operator": false,
+  "$ratification_note": "B5 is deliberately NOT met. The operator accepts requirements; the writer does not self-certify. Nothing downstream may treat this as ratified until he says so.",
+  "cartridges": ["ic-principal-swe"],
+
+  "competencies": [
+    {
+      "id": "ah-l1",
+      "cartridge": "ic-principal-swe",
+      "name": "L1 inference — what the model itself contributes",
+      "track": "ic",
+      "layer": "101",
+      "decision": "when a run fails, was it the model or the thing around it?",
+      "authority_declared": "NVIDIA NOOA is the only source here that HOLDS THE MODEL FIXED and varies the harness, which is the one experiment that can answer this question at all",
+      "sources": [
+        {"source": "nvidia-noaa-harness", "why": "same model, double-digit benchmark swing from harness design alone — the measurement that makes L1 and L2 separable rather than a figure of speech"},
+        {"source": "dsh-docs", "why": "Minimal mode is a two-tool agent (persistent bash + str_replace_editor): a deliberately thin harness, which is the control condition for measuring a model"}
+      ]
+    },
+    {
+      "id": "ah-l2-term",
+      "cartridge": "ic-principal-swe",
+      "name": "L2 runtime — who terminates the loop",
+      "track": "both",
+      "layer": "101",
+      "decision": "the run is going; what stops it, and who owns that decision?",
+      "authority_declared": "the four sources DISAGREE, and the disagreement is the lesson: Nygard bounds a callee that never stops, Young reports an agent that stops too eagerly, Anthropic 2024 offers a max-iteration cap, DeepSeek makes the loop a swappable plugin",
+      "sources": [
+        {"source": "release-it-stability", "slices": ["c01"], "files": ["c01_release-it_ch4-5_stability.txt"], "why": "the caller-side Timeout and the Circuit Breaker: termination imposed from outside because the callee will never do it"},
+        {"source": "anthropic-long-running", "why": "the documented failure runs the OTHER way — the agent declares victory early — and the fix is a completion predicate the agent does not own"},
+        {"source": "anthropic-effective-agents", "why": "states the plain fallback: stopping conditions such as a maximum number of iterations, to maintain control"},
+        {"source": "dsh-docs", "why": "loops are listed as a plugin alongside models and tools, so termination becomes a configuration choice rather than a property of the model"}
+      ]
+    },
+    {
+      "id": "ah-l2-boundary",
+      "cartridge": "ic-principal-swe",
+      "name": "L2 runtime — framework versus harness",
+      "track": "lead",
+      "layer": "201",
+      "decision": "adopt a framework, or build the harness thin and keep the seams?",
+      "authority_declared": "Anthropic argues down from abstraction; DeepSeek and NVIDIA both argue for an inspectable substrate, one via plugins and one via plain Python — three practitioner answers, not one",
+      "sources": [
+        {"source": "anthropic-effective-agents", "why": "frameworks 'often create extra layers of abstraction that can obscure the underlying prompts and responses, making them harder to debug'"},
+        {"source": "dsh-docs", "why": "AGENT = MODEL + HARNESS, stated as an identity, with every capability swappable in configuration"},
+        {"source": "nvidia-noaa-harness", "why": "collapses the boundary into syntax: a method body of `...` is completed by an LLM loop, a normal body runs as deterministic Python"}
+      ]
+    }
+  ],
+
+  "sources": {
+    "$note": "`verified` is not decoration. It is the receipt that this row was read rather than recalled, and it is what CF-026 exists to force.",
+
+    "nvidia-noaa-harness": {
+      "title": "Six Agent Harness Capabilities for Higher Model Performance (NVIDIA Labs Object-Oriented Agents, NOOA)",
+      "author": "Ricardo Silveira Cabral and Paul Furgale, distinguished research scientists, NVIDIA",
+      "url": "https://developer.nvidia.com/blog/six-agent-harness-capabilities-for-higher-model-performance/",
+      "published": "2026-07-27",
+      "genre": "practitioner-corpus",
+      "audience": "ICP1 and ICP2 both — it is the only source that prices harness design in benchmark points AND in tokens, which is the pair of currencies the two readers each care about separately",
+      "ranking_criterion": "it runs the controlled experiment: the model is held fixed and the harness is varied, and the swing is reported in both score and token cost. Every other source here asserts that the harness matters; this one measures how much.",
+      "provenance": "operator",
+      "on_disk": false,
+      "acquisition": "read in the browser 2026-08-26; not ingested into a cartridge corpus",
+      "verified": {
+        "at": "2026-08-26",
+        "how": "opened and read in the browser pane",
+        "quotes": [
+          "The harness is the architecture surrounding the model. How it renders context, executes actions, manages state, and decides when a task is done shapes outcomes just as much as the model itself.",
+          "Harness design alone can account for double-digit swings in benchmark results and significant differences in token cost, with the same underlying model.",
+          "Programmable loop engineering: Orchestration loops are ordinary Python, writable by developers and by the model itself.",
+          "A standard Python method whose body is an ellipsis is completed at runtime by an LLM-driven loop. Method with a normal body run as ordinary, deterministic Python."
+        ],
+        "numbers": "SWE-bench Verified, GPT-5.5: NOOA 82.2% at 29 LLM calls / ~1.1M tokens per task; comparison harnesses 78.2% at 66 calls / 2.2M tokens, and 78.6% at 29 calls / 1.3M tokens. Median session peaks 22-72k prompt tokens against a 200-400k window, so no compaction pass is needed."
+      },
+      "caveat": "NVIDIA's own engineering blog reporting NVIDIA's framework. The benchmark numbers are self-reported and the comparison harnesses are unnamed in the post. Read the technical report before quoting the delta as settled."
+    },
+
+    "dsh-docs": {
+      "title": "DeepSeek Harness (dsh) — developer preview site and developer documentation",
+      "author": "DeepSeek",
+      "url": "https://deepseek.com/harness/en/",
+      "also": ["https://deepseek-harness.github.io/deepseek-harness/en/guide/quickstart", "https://github.com/deepseek-ai/deepseek-harness"],
+      "published": "2026-08-13",
+      "genre": "reference-specification",
+      "audience": "ICP2 first — a founder can read the plugin list and know exactly which pieces are hers to own; ICP1 second, as the vocabulary for arguing about a build-versus-adopt boundary in review",
+      "ranking_criterion": "it is the only source that ENUMERATES the harness rather than describing it: models, tools, skills, sessions, sandboxes, storage, loops, scheduling and the UI are named as separately swappable plugins, so 'what is the runtime' has a checkable answer instead of a metaphor",
+      "provenance": "operator",
+      "on_disk": false,
+      "acquisition": "read in the browser 2026-08-26; not ingested into a cartridge corpus",
+      "verified": {
+        "at": "2026-08-26",
+        "how": "opened the preview site and the developer docs in the browser pane",
+        "quotes": [
+          "AGENT = MODEL + HARNESS",
+          "The model is the soul of an agent. A harness lets an agent understand its environment, use tools, and keep working in real-world settings.",
+          "Plugins provide every agent capability, including models, tools, skills, sessions, sandboxes, storage, loops, scheduling, and the UI.",
+          "Everything the model sees is recorded in an append-only session log: system prompts, reasoning, tool calls and results, subagent scheduling, and every context injection."
+        ],
+        "numbers": "v0.1 developer preview, MIT licence. Four runtime modes: Standard, Code, Minimal (persistent bash + str_replace_editor only), Creator."
+      },
+      "caveat": "DEVELOPER PREVIEW, and the project says so in capitals: compatibility-breaking changes are expected and the core plugins and APIs are still moving. Teach the ARCHITECTURE, which is the durable part; do not teach the API surface, which will not survive."
+    },
+
+    "anthropic-long-running": {
+      "title": "Effective harnesses for long-running agents",
+      "author": "Justin Young, Engineering at Anthropic",
+      "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "published": "2025-11-26",
+      "genre": "practitioner-corpus",
+      "audience": "ICP2 — it is a field report on getting an agent to keep working across many context windows, which is the founder's actual problem; ICP1 will recognise the fix as a checklist the implementer may not edit",
+      "ranking_criterion": "it reports the failure that runs OPPOSITE to the one everyone expects. The agent does not run away; it looks around, sees progress, and declares the job done. A source that inverts the reader's prior earns its place ahead of one that confirms it.",
+      "provenance": "operator",
+      "on_disk": false,
+      "acquisition": "read in the browser 2026-08-26; not ingested into a cartridge corpus",
+      "verified": {
+        "at": "2026-08-26",
+        "how": "opened and read in the browser pane",
+        "quotes": [
+          "a later agent instance would look around, see that progress had been made, and declare the job done",
+          "It is unacceptable to remove or edit tests because this could lead to missing or buggy functionality.",
+          "Claude marks features as done prematurely."
+        ],
+        "numbers": "the claude.ai clone example expands one prompt into over 200 end-to-end features in a JSON file, all initially marked failing; coding agents may only flip the `passes` field."
+      }
+    },
+
+    "anthropic-effective-agents": {
+      "title": "Building effective agents",
+      "author": "Engineering at Anthropic",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "published": "2024-12-19",
+      "genre": "practitioner-corpus",
+      "audience": "both — it is the shared vocabulary. The workflow-versus-agent split is the phrasing ICP1 and ICP2 are both most likely to have already met, which makes it the cheapest common ground to argue from.",
+      "ranking_criterion": "it draws the boundary that the whole L1/L2 distinction rests on — predefined code paths versus the model directing its own process — and it is the boundary the other three sources each redraw differently",
+      "provenance": "operator",
+      "on_disk": false,
+      "acquisition": "read in the browser 2026-08-26; not ingested into a cartridge corpus",
+      "verified": {
+        "at": "2026-08-26",
+        "how": "opened and read in the browser pane",
+        "quotes": [
+          "Workflows are systems where LLMs and tools are orchestrated through predefined code paths.",
+          "Agents, on the other hand, are systems where LLMs dynamically direct their own processes and tool usage, maintaining control over how they accomplish tasks.",
+          "The task often terminates upon completion, but it's also common to include stopping conditions (such as a maximum number of iterations) to maintain control.",
+          "they often create extra layers of abstraction that can obscure the underlying prompts and responses, making them harder to debug"
+        ]
+      },
+      "caveat": "STALE BY THE PUBLISHER'S OWN ADMISSION. The post carries a banner: much of the tooling landscape described has changed since December 2024. The DEFINITIONS are what is being cited here; the tooling list is not."
+    },
+
+    "release-it-stability": {
+      "title": "Release It! — Stability Antipatterns and Stability Patterns (Timeouts, Circuit Breaker, Bulkheads, Fail Fast)",
+      "author": "Michael T. Nygard",
+      "genre": "expository-book",
+      "audience": "ICP1 — this is the vocabulary a principal IC's reviewers already argue in. A founder can skip it; a principal IC who calls a retry storm anything other than a cascading failure will be corrected in review.",
+      "ranking_criterion": "it is the only source here that treats termination as a PROPERTY OF THE CALLER, arrived at from production incidents rather than from agent design, which is what lets the packet ask whether an agent loop is a new problem or an old one wearing new words",
+      "provenance": "builder",
+      "on_disk": true,
+      "acquisition": "already ingested into the ic-principal-swe cartridge corpus as slice c01, digest-accepted (12 files, 186,429 words); DISK",
+      "verified": {
+        "at": "2026-08-26",
+        "how": "term-counted against the on-disk extracted text and the page index, not recalled",
+        "quotes": [
+          "The timeout is a simple mechanism allowing you to stop waiting for an answer once you think it will not come."
+        ],
+        "numbers": "book.index.jsonl, 785 indexed pages. Densest content pages for the termination question: c01 pages 104-110 (Timeouts, then Circuit Breaker). Term counts across the corpus: timeout 108, circuit breaker 68, blocked thread 42, fail fast 32, bulkhead 26, unbounded/runaway 21. c02 pages 345-358 also match on these terms but are the BACK-OF-BOOK INDEX, not content, and are excluded."
+        },
+      "caveat": "COPYRIGHTED BOOK TEXT. The extracted corpus stays local and is never committed to the public packet repo and never uploaded. What travels is the citation and the page range; the reader brings their own copy."
+    }
+  },
+
+  "operator_supplied": [
+    {"source": "dsh-docs", "verdict": "accept", "note": "operator: 'read the deepseek latest harness documentation, that should be the biggest authority source on harness, it was a big news this week'"},
+    {"source": "nvidia-noaa-harness", "verdict": "accept", "note": "operator: 'include the nvidia new agent architecture as python function which is going to disrupt langchain and other agent frameworks'. Recorded correction: the operator placed this in the last week; the post is dated 2026-07-27. The third-party NOOA commentary is what appeared this month."},
+    {"source": "langchain-comparison", "verdict": "decline", "reason": "the operator framed NOOA as disrupting LangChain, so LangChain is the natural comparison — but every LangChain-versus-harness piece surfaced was a vendor blog or an SEO aggregator (Atlan, Arize, FutureAGI, MindStudio, Credal, deepseekharness.io), and house-style rejects vendor pages and marketing for the taught domain. Declined for want of a practitioner source, NOT because the comparison is uninteresting. Reopen if a working engineer writes it up."},
+    {"source": "arxiv-harness-papers", "verdict": "decline", "reason": "three arXiv papers on harness architecture surfaced in the same searches. House-style rejects academic sources for the taught domain — the operator's standing instruction, given verbatim: 'this is academic sources. use practicioner, no academic no marketing.'"}
+  ],
+
+  "unmapped_sources": [],
+  "spec_gaps": ["no source here has been ingested into a cartridge corpus except release-it-stability; the other four are read-and-cited, which is honest but is not extraction. Track 2 should run web_map.py over the four URLs so the quotes above become checkable against stored text with a recorded sha256."]
+}

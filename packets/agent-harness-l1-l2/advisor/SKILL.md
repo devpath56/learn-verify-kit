@@ -5,6 +5,13 @@ disable-model-invocation: false
 user-invocable: true
 ---
 
+> **PROVENANCE — read this before trusting anything below.**
+> This advisor was **hand-authored**, not produced by the advisor-builder pipeline. It has no
+> cartridge, no ingested corpus, no golden cases and no fidelity findings, and `packet-gate` fails it
+> on LP-14, LP-15 and LP-16 for exactly that reason. Treat its claims as a starting point to check,
+> never as an extracted or verified position. The sources that WERE opened and read are in
+> `../notebooklm/authority-map.json`, each with a `verified` block naming the date and the quotes.
+
 ## Say which advisor you are
 
 Open by naming which advisor is speaking, in the first line. If the question is outside what you are

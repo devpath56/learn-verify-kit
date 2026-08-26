@@ -1,5 +1,96 @@
 # Learn-Verify Kit
 
+## Test it end to end in five minutes
+
+The one competency wired end to end today is **`agent-harness-l1-l2`** — inference and runtime,
+18 questions. Everything below is a real run, not a demo.
+
+### 1 · Check the machinery, before trusting anything it says
+
+```
+node tests/lint-bank.mjs          # 6 laws over the question bank
+node tests/test-lint-bank.mjs     # proves each law can actually fail
+node tests/test-progress-store.mjs
+```
+
+All three exit 0. If `lint-bank` fails, a question has lost its frozen ideal and `drill` would grade
+against nothing.
+
+### 2 · Look at the curve before you start
+
+```
+node progress-store.mjs
+```
+
+Expect **UNEVALUABLE** on both topics: `1 attempt(s) — a slope needs two points`. The two files in
+`attempts/` are **declared baselines** transcribed from a handoff, not observations. That is the
+honest starting state, and it is what step 5 changes.
+
+### 3 · START a Claude Code session on this directory
+
+**Start one here — do not switch an existing session into it.** Skills load at session start, so a
+session that began elsewhere has none of this kit's. `Skill(drill)` returns `Unknown skill` and
+nothing tells you why. That is `R-33`.
+
+### 4 · Learn it first, then be quizzed
+
+```
+teach me agent-harness-l2-runtime
+```
+
+`learn` researches, chunks, teaches each chunk plain-language-first, then asks **two** recall
+questions per chunk and scores each before moving on. That is where the competency triplet gets
+built: decision situation, heuristic, concept depth.
+
+**`drill` comes after, not before.** It is the checker half — it draws questions verbatim from the
+registered bank and cannot invent one, which is exactly why it is useless on material nobody has
+delivered. Asking it first verifies a learner on content they were never taught (`R-34`), and
+`lint-bank`'s `taught-before-drilled` law now refuses a bank with attempts recorded and no
+`taught_at` (`R-35`).
+
+Once taught:
+
+```
+quiz me on agent-harness-l1-l2
+```
+
+### 5 · Answer one badly on purpose
+
+Give the term without the causality — say *"the cap is too high"* and stop. Grading is against an
+ideal frozen when the question was registered, so it should come back partial with a **miss code**,
+most likely `mechanism`. That is the miss this packet exists to attack.
+
+### 6 · Record the attempt, then read the curve again
+
+```
+node progress-store.mjs --record --topic agent-harness-l2-runtime \
+  --question agent-harness-l1-l2.p1q1 --hit 3 --of 8 --miss mechanism,price --by isha
+
+node progress-store.mjs
+```
+
+The topic now reads **measured**, with `(1 declared)` beside it — one point observed, one asserted.
+
+### What should refuse you
+
+| Try this | It must say |
+|---|---|
+| drop `--by` | `assigned_by is required — a grade with no grader cannot be audited` |
+| `--by claude` | the point is recorded but does **not** count: `none observed` |
+| `--hit 9 --of 8` | `hit exceeds of` |
+| raise the score with the same miss codes | `suspect — hit rate rose while mechanism share did not fall` |
+
+The third row is the one that matters. **A number that only ever goes up is a number nobody is
+testing**, and `--by claude` is refused because the first version of this metric was graded by the
+same process that wrote it.
+
+### What is honestly not done
+
+- No human has answered a bank question yet, so every slope you see is seeded from step 6.
+- Only `agent-harness-l1-l2` is wired. The other 13 competencies have banks but no packet rules.
+
+---
+
 A drop-in skill bundle that turns Claude into a **quizzing tutor**, not a summarizer. It researches a concept, teaches it until you can recall it cold, scores your brainstorms, stress-tests your understanding, self-checks its own answers for plain language, and keeps a running log of what you learn so you can quiz yourself on it later.
 
 **The whole experience runs in chat** — claude.ai or Cowork. Nothing to install, no hooks, no config. You talk, it teaches and tests. The one thing rendered as a visual is the **concept sketch**, published as a self-contained inline visual (Artifact / SVG) on surfaces that can show one; its retrieval questions are always delivered as text.
