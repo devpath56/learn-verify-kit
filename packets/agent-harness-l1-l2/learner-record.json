@@ -1,0 +1,86 @@
+{
+  "packet": "agent-harness-l1-l2",
+  "learner_id": "learner-01",
+  "privacy_note": "Pseudonymous by design. This repo is public and its CLAUDE.md forbids personal data. Do NOT commit real names, handles, or verbatim attempt text here. Verbatim attempts belong in the learner's own private repo; only rolled-up scores travel.",
+  "carried_from": {
+    "source": "handoff document, re-teach session 2026-08-26",
+    "attempt_files_present_on_this_machine": false,
+    "note": "The attempts/2026-08-26-*.md files named in the handoff are not on this machine. Rolled-up scores and miss counts are carried; verbatim attempts are referenced, not copied."
+  },
+  "slope": {
+    "definition": "slope = (hit_rate_now - hit_rate_prev) / days_between. Units: hit-rate points per day.",
+    "second_signal": "mechanism_share = mechanism misses / total misses. The packet target is to drive this DOWN, not to drive hit_rate up.",
+    "why_two": "hit_rate can rise while mechanism_share is flat, which means questions got easier, not that the learner got better. A rise in hit_rate with a flat mechanism_share is treated as suspect."
+  },
+  "baseline_2026_08_26": {
+    "overall": "5 concepts, 2 pass, 2 partial, 1 fail",
+    "heaviest_miss_every_row": "mechanism"
+  },
+  "topics": [
+    {
+      "topic": "L2 agent runtime — loop termination + framework vs harness",
+      "in_scope": true,
+      "hit_rate": 0.125,
+      "hit_rate_detail": "Q1 0/6, Q2 1/2",
+      "gaps": { "mechanism": null, "price": null, "boundary": null },
+      "gaps_note": "L1 and L2 share ONE row in the learner's progress.json (mechanism 5, price 4, boundary 2). Those counts are combined and CANNOT be split. Any per-layer miss count for L1 or L2 is a number the log does not contain.",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
+      "verdict": "genuinely weakest — honest attempts, near-empty returns, failed two consecutive sessions",
+      "action": "re-teach",
+      "open_gap": "who terminates a loop and how the cap is sized; framework != harness"
+    },
+    {
+      "topic": "L1 inference — fallback as undeclared model swap",
+      "in_scope": true,
+      "hit_rate": 0.1,
+      "hit_rate_detail": "Q1 1/4, Q2 0/4, mini 0/2",
+      "gaps": { "mechanism": null, "price": null, "boundary": null },
+      "gaps_note": "same shared row as L2 — not separable",
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
+      "verdict": "UNDER-MEASURED, not failed. All three copy-paste answers landed here, so the layer was barely tested.",
+      "action": "re-test before trusting any number on this row",
+      "open_gap": "trace the fallback-as-undeclared-model-swap chain end to end, unaided"
+    },
+    {
+      "topic": "L3 observability & governance — denominator blindness",
+      "in_scope": false,
+      "hit_rate": 0.2,
+      "hit_rate_detail": "Q1 0/4, Q2 1/1",
+      "gaps": { "mechanism": 3, "boundary": 1, "phrasing": 1 },
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
+      "verdict": "improving fast — failed the mechanism, generalised it to a different surface ~30s later",
+      "action": "spacing only"
+    },
+    {
+      "topic": "L4 identity — tool boundary",
+      "in_scope": false,
+      "hit_rate": 0.5,
+      "hit_rate_detail": "Q1 2/4, Q2 1.5/3",
+      "gaps": { "mechanism": 4, "price": 2, "phrasing": 1 },
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-27",
+      "verdict": "half-held — 'missing tool-response check' was produced word for word on 24 Aug and scored partial both times; the label is produced, the content is not",
+      "action": "state what the checkpoint inspects and when, WITHOUT using the phrase 'tool-response check'"
+    },
+    {
+      "topic": "L5 context — retrieval as a subagent",
+      "in_scope": false,
+      "hit_rate": 1.0,
+      "hit_rate_detail": "Q1 2/2, Q2 2/2",
+      "gaps": { "mechanism": 1, "price": 1 },
+      "last_reviewed": "2026-08-26",
+      "next_review": "2026-08-29",
+      "verdict": "solid — transferred a layer-2 control onto a layer-5 structure unprompted, which is stronger evidence than the score",
+      "action": "leave alone until 2026-08-29"
+    }
+  ],
+  "session_rules_learned_about_this_learner": [
+    "Keep questions to ONE OR TWO LINES. The first three answers of 2026-08-26 were verbatim pastes of the teaching material, all following long chunks. After chunk length was cut and questions reduced to one line, every subsequent answer was reasoned, and both clean passes came after the cut.",
+    "Weight questions toward 'trace it, step by step' and away from 'name the layer'. mechanism is one habit, not five knowledge gaps.",
+    "The checker names the miss code, never the learner."
+  ],
+  "checker_caveat": "Grading was done by the same agent that wrote the questions and taught the material. Frozen ideals live in questions.jsonl so the arrangement can be checked rather than trusted. If hit_rate rises while mechanism_share does not fall, treat the rise as suspect."
+}

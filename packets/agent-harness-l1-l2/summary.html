@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Harness L1 · L2 — Competency Packet</title>
+<style>
+:root{
+  --bg:#fbfaf8; --ink:#17181a; --mute:#5d6165; --line:#e2ddd6; --card:#ffffff;
+  --icp1:#1f5f8b; --icp1bg:#e8f1f7; --icp2:#8a4b1f; --icp2bg:#faefe4;
+  --accent:#17181a; --code:#f2efea;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131416; --ink:#eceae6; --mute:#9ba0a6; --line:#2c2e32; --card:#1a1c1f;
+  --icp1:#7fb6dd; --icp1bg:#16262f; --icp2:#d9a06b; --icp2bg:#2c2018;
+  --accent:#eceae6; --code:#212327;
+}}
+:root[data-theme="dark"]{
+  --bg:#131416; --ink:#eceae6; --mute:#9ba0a6; --line:#2c2e32; --card:#1a1c1f;
+  --icp1:#7fb6dd; --icp1bg:#16262f; --icp2:#d9a06b; --icp2bg:#2c2018;
+  --accent:#eceae6; --code:#212327;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:48px 24px 96px}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.1;letter-spacing:-.02em;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 8px;font-size:15px}
+h2{font-size:13px;letter-spacing:.11em;text-transform:uppercase;color:var(--mute);
+  margin:56px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);font-weight:600}
+h3{font-size:19px;margin:32px 0 8px;letter-spacing:-.01em}
+p{margin:0 0 12px}
+code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code);
+  padding:1px 5px;border-radius:4px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 16px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:480px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:0 0 14px}
+.rule{border-left:3px solid var(--accent);padding:2px 0 2px 16px;margin:14px 0;font-size:17px;font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.p1,.p2{border-radius:10px;padding:14px 16px;font-size:14.5px}
+.p1{background:var(--icp1bg);border:1px solid var(--icp1)}
+.p2{background:var(--icp2bg);border:1px solid var(--icp2)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:700;margin-bottom:5px}
+.p1 .tag{color:var(--icp1)} .p2 .tag{color:var(--icp2)}
+.pill{display:inline-block;font-size:11.5px;padding:2px 9px;border:1px solid var(--line);
+  border-radius:999px;color:var(--mute);margin:0 5px 5px 0}
+ul{margin:0 0 12px;padding-left:20px} li{margin:0 0 6px}
+.foot{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--mute);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Agent Harness — L1 &amp; L2</h1>
+<p class="sub">A tightly scoped competency packet. Two layers, three concepts, two readers.</p>
+<p><span class="pill">101 competency</span><span class="pill">201 proficiency</span><span class="pill">practitioner sources only</span><span class="pill">v0.1 thin</span></p>
+
+<h2>Why only two layers</h2>
+<div class="card">
+<div class="tw"><table>
+<thead><tr><th>Layer</th><th>Hit rate</th><th>Verdict</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td><strong>L2 runtime</strong></td><td>0.125</td><td>Genuinely weakest. Honest attempts, near-empty returns, failed two consecutive sessions.</td><td>Re-teach</td></tr>
+<tr><td><strong>L1 inference</strong></td><td>0.10</td><td>Under-measured, not failed. All three copy-paste answers landed here.</td><td>Re-test first</td></tr>
+<tr><td>L3 observability</td><td>0.20</td><td>Improving fast. Out of scope.</td><td>Spacing only</td></tr>
+<tr><td>L4 identity</td><td>0.50</td><td>Half-held. Out of scope.</td><td>Deferred</td></tr>
+<tr><td>L5 context</td><td>1.00</td><td>Solid. Out of scope.</td><td>Leave alone</td></tr>
+</tbody>
+</table></div>
+<p style="margin:0"><strong>The cross-cutting finding:</strong> <code>mechanism</code> is the heaviest miss on <em>every</em> row. The correct term gets produced and the answer stops before the causality. That is one habit, not five knowledge gaps. More terms will not move it; only tracing chains will.</p>
+</div>
+
+<h2>The three competencies</h2>
+
+<h3>C1 · Who terminates the loop <span class="pill">L2</span></h3>
+<div class="rule">Size the cap from the p99 of healthy runs. Never from the incident.</div>
+<p>A summarizer times out at 190 turns. The team sets <code>max_turns: 200</code>. That is the number that just failed, so it licenses 199 turns of the same runaway.</p>
+<div class="tw"><table>
+<thead><tr><th></th><th>Timeout</th><th>Cap</th></tr></thead>
+<tbody>
+<tr><td>Ends</td><td>a run that is <strong>stuck</strong></td><td>a run that is <strong>working and will not stop</strong></td></tr>
+<tr><td>Fires on</td><td>no progress</td><td>too much progress</td></tr>
+<tr><td>Miss it and</td><td>requests hang</td><td>the bill arrives</td></tr>
+</tbody>
+</table></div>
+<div class="two">
+<div class="p1"><span class="tag">ICP1 reads</span>An un-budgeted spend authorization with no named owner. A cap nobody is paged for is a config value, not a control.</div>
+<div class="p2"><span class="tag">ICP2 reads</span>The blast radius of one demo. There is no p99 yet — use the cost of one bad run you can absorb.</div>
+</div>
+
+<h3>C2 · Framework is not harness <span class="pill">L2</span></h3>
+<div class="rule">Anything that must survive the swap is harness. Everything else is framework.</div>
+<div class="tw"><table>
+<thead><tr><th></th><th>Orchestration</th><th>Governance</th></tr></thead>
+<tbody>
+<tr><td>Decides</td><td>what runs <strong>next</strong></td><td>what may run <strong>at all</strong>, and what is recorded</td></tr>
+<tr><td>Lives in</td><td>the framework</td><td>the harness</td></tr>
+<tr><td>Survives a swap</td><td>no</td><td>must</td></tr>
+</tbody>
+</table></div>
+<p>The failure is silent, not loud. After the swap the run still succeeds — it is simply no longer governed, so no pass/fail test has anything to assert on.</p>
+<div class="two">
+<div class="p1"><span class="tag">ICP1 reads</span>A control implemented as a framework callback was never a control. Name the team that owns it after the swap.</div>
+<div class="p2"><span class="tag">ICP2 reads</span>Pick the framework last. Direct API calls until the loop itself is the bottleneck.</div>
+</div>
+
+<h3>C3 · The undeclared model swap <span class="pill">L1</span></h3>
+<div class="rule">Log the model that answered, never the model you asked for.</div>
+<p>The request carries an alias, <code>gpt-4o</code>. The response carries a resolved id, <code>gpt-4o-2024-11-20</code>. Record the alias only and a provider rotation is invisible <em>by construction</em> — the field never changes, so no alert can exist for it. This is a missing dimension, not a missing alert.</p>
+<div class="tw"><table>
+<thead><tr><th></th><th>Fallback</th><th>Silent swap</th></tr></thead>
+<tbody>
+<tr><td>Is</td><td>a model change you declared</td><td>a model change with no event</td></tr>
+<tr><td>Leaves behind</td><td>a fired-fallback signal on the trace</td><td>nothing</td></tr>
+</tbody>
+</table></div>
+<div class="two">
+<div class="p1"><span class="tag">ICP1 reads</span>An unpinned alias is an un-reviewed dependency upgrade shipping continuously to production. Pin it, gate the bump behind evals.</div>
+<div class="p2"><span class="tag">ICP2 reads</span>Pinning costs you the improvements too. Pin nothing, log the resolved id, name the day quality moved.</div>
+</div>
+
+<h2>101 → 201</h2>
+<div class="tw"><table>
+<thead><tr><th></th><th>101 competency</th><th>201 proficiency</th></tr></thead>
+<tbody>
+<tr><td>Asks for</td><td>the heuristic and why it holds</td><td>the <strong>cue</strong> that told you which situation this is</td></tr>
+<tr><td>Good answer</td><td>states the mechanism chain</td><td>states one action and what would kill it</td></tr>
+<tr><td>Failure mode</td><td>recites the term, skips the causality</td><td>compares four options and commits to none</td></tr>
+</tbody>
+</table></div>
+<p>201 uses Recognition-Primed Decision as its frame: read the situation as typical, take the one action it hands you, then simulate where it breaks. Five slots per answer — <strong>cues · expectancies · plausible goal · typical action · killer simulation</strong>. An answer missing the killer simulation is a 101 answer with confidence added.</p>
+
+<h2>How progress is measured</h2>
+<div class="card">
+<ul>
+<li><strong>slope</strong> = (hit_rate now − hit_rate prev) ÷ days between. Units: hit-rate points per day.</li>
+<li><strong>mechanism_share</strong> = mechanism misses ÷ total misses. The packet target is to drive this <em>down</em>.</li>
+<li><strong>Why two.</strong> Hit rate can rise while mechanism_share stays flat, which means the questions got easier, not that the learner got better. A rise with a flat mechanism_share is treated as suspect.</li>
+</ul>
+</div>
+
+<h2>Source policy</h2>
+<div class="two">
+<div class="p1"><span class="tag">Accepted</span>Practitioner trade books, personal engineering blogs, conference talks. Nygard · Google SRE · Majors, Fong-Jones &amp; Miranda · Winters et al. · Hyrum Wright · Beck · Ousterhout · Larson · Reilly · Anthropic Engineering · Hickey · Metz · Yegge.</div>
+<div class="p2"><span class="tag">Rejected by rule</span>Journal papers, standards bodies (ISO, IEEE, ACM proceedings), vendor marketing pages. ICP1 does not cite them in review; ICP2 has never opened one.</div>
+</div>
+<p>One declared exception: Gary Klein's RPD is the <em>method frame</em> for the 201 cases, not practitioner material about agents, and it is not taught as content.</p>
+
+<h2>What is in the packet</h2>
+<div class="tw"><table>
+<thead><tr><th>File</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>101-competency.md</code></td><td>Three competencies: decision situation, heuristic, concept depth, boundary, both readers</td></tr>
+<tr><td><code>201-proficiency.md</code></td><td>Three RPD cases with all five slots worked</td></tr>
+<tr><td><code>questions.jsonl</code></td><td>Nine questions with ideals frozen before any attempt exists</td></tr>
+<tr><td><code>learner-record.json</code></td><td>Carried-forward standing, slope definition, session rules</td></tr>
+<tr><td><code>advisor/</code></td><td><code>icp-advisor</code> — one question, two verdicts, closed source list</td></tr>
+<tr><td><code>notebooklm/PODCAST-SOURCE.md</code></td><td>Debate source + the Customize prompt for a ~30-minute Audio Overview</td></tr>
+</tbody>
+</table></div>
+
+<p class="foot"><strong>Honest limits of v0.1.</strong> The advisor is hand-authored, not run through the advisor-builder pipeline — no source extraction, no golden cases, no fidelity findings. Nothing here is gated by an executed check; the packet is documentation plus a frozen question bank. Grading is still done by the same agent that wrote the questions, which is why the ideals are frozen in a file rather than held in a conversation.</p>
+
+</div>
+</body>
+</html>

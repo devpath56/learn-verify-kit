@@ -1,0 +1,22 @@
+{
+  "skill": "icp-advisor",
+  "skill_file": "SKILL.md",
+  "sources_file": "SOURCES.md",
+  "scope": ["agent harness: inference (L1)", "agent runtime (L2)"],
+  "out_of_scope": ["general software design — defer to ousterhout-guru", "business strategy, positioning, revenue"],
+  "source_policy": {
+    "accept": ["practitioner trade book", "personal engineering blog", "conference talk"],
+    "reject": ["journal paper", "standards body (ISO / IEEE / ACM proceedings)", "vendor marketing page"],
+    "why": "ICP1 does not cite them in review and ICP2 has never opened one"
+  },
+  "expected_sections": ["ICP1 verdict", "ICP2 verdict", "Where they invert", "Say it to sound expert"],
+  "closed_vocab": [
+    "circuit breaker", "error budget", "blast radius", "Hyrum's Law", "unpinned alias",
+    "resolved model id", "framework vs harness", "orchestration vs governance",
+    "the Beyonce Rule", "context cost", "unknown unknowns"
+  ],
+  "refusal_rule": "If the question is outside the agent harness, say so in the first line and name the advisor that fits.",
+  "provenance": "Shape mirrors advisor-builder cartridges (manifest + skill + closed_vocab + expected_sections). This is the v1 thin cut: hand-authored, NOT run through the advisor-builder pipeline. v2 rebuilds it as a real cartridge with source extraction, golden cases and fidelity findings.",
+  "built": "2026-08-26",
+  "version": "0.1-thin"
+}

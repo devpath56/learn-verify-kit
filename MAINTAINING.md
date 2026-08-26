@@ -13,6 +13,8 @@ Everything you need to evolve this kit lives in this repo. No external context r
   concept-sketch/ dual-coded sketch + decision card  → references/recall-rubric.md
   track/          session log + spaced review
 tests/regression-cases.md   32 guardrail tests, one per real error
+tests/lint-bank.mjs         the question bank's six laws, bound to an exit code
+tests/test-lint-bank.mjs    proves each law can fail; breaks are mutations of the live bank
 attempts/         graded attempt records — evidence behind progress.json
 progress.json     the revise-DB for chat-taught concepts: schedule + miss-code gap counts
 resources/competency-progress.json
@@ -32,6 +34,22 @@ The suite in `tests/regression-cases.md` has two levels:
    Fast; catches accidental deletion of a rule.
 
 2. **Behavioral (does it comply live?)** — feed each case's trigger to the kit in a fresh chat and check the binary PASS. Use an independent judge, not self-assessment. This is the real test; run it before any release.
+
+## Running the bank validator
+
+```
+node tests/lint-bank.mjs          the live bank: 14 competencies, 252 questions, 6 laws
+node tests/test-lint-bank.mjs     14 assertions that each law can actually fail
+```
+
+`drill` grades against an ideal frozen at registration, and its whole claim is that re-rendering a
+booklet cannot move the goalposts. Nothing checked the ideal was there. A question with an empty
+`ideal` does not fail loudly — drill grades against nothing and still reports a verdict, which is
+worse than refusing, because an unauditable verdict reads exactly like an earned one.
+
+Each law carries a `break` that is a MUTATION OF THE LIVE BANK, not a fixture file: a fixture
+drifts from the law the moment either changes and nothing compares them. `test-lint-bank` also
+asserts each break trips **only** its own law — a break that fires two laws proves neither.
 
 ## Why each rule exists (provenance)
 Every rule traces to a real failure caught during the kit's hardening. Don't undo one without understanding what it prevents.
