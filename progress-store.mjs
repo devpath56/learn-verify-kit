@@ -116,9 +116,18 @@ export function attempts({ dir = ATTEMPTS } = {}) {
 
 const str = (x) => typeof x === 'string' && x.trim().length > 0;
 export const rate = (a) => a.hit / a.of;
+/* UNRECORDED IS NOT ZERO, and this is the same could-not-look failure the rest of the file refuses,
+   one field down. The first version returned 0 for an empty `miss_codes`, which made two different
+   states identical: a learner who missed nothing, and a grader who did not write the codes down.
+   MEASURED in attempts/ on 2026-08-27: three graded questions carry misses and NO miss-code line
+   (`2026-08-24-retrieval-as-a-subagent` Q1 and Q2, `2026-08-24-continuous-eval-and-optimizer` Q2).
+   Read as 0, each one makes the next real attempt look like a rise in mechanism share and trips the
+   honesty rule for a reason nobody can act on. `null` says the share is unknown; a perfect score
+   still returns 0, because there a zero was actually earned. */
 export const mechanismShare = (a) => {
   const codes = a.miss_codes ?? [];
-  return codes.length ? codes.filter((c) => c === 'mechanism').length / codes.length : 0;
+  if (codes.length) return codes.filter((c) => c === 'mechanism').length / codes.length;
+  return (Number.isInteger(a?.hit) && Number.isInteger(a?.of) && a.hit === a.of) ? 0 : null;
 };
 
 export const series = (topic, opts) => attempts(opts).filter((a) => a.topic === topic);
@@ -158,12 +167,19 @@ export function verdict(topic, opts) {
   if (sl.state !== 'measured') return { state: 'UNEVALUABLE', why: sl.why, slope: sl };
   const a = s[0], b = s[s.length - 1];
   const rose = rate(b) > rate(a);
-  const shareFell = mechanismShare(b) < mechanismShare(a);
+  const from = mechanismShare(a), to = mechanismShare(b);
+  /* THE RULE NEEDS BOTH SHARES, and saying so is the whole point. Comparing against an unrecorded
+     share would decide `suspect` from a number nobody wrote, which is the arithmetic-over-assertions
+     shape this file already refuses one level up. It is only checked on a rise, because that is the
+     only direction the rule fires in. */
+  if (rose && (from === null || to === null))
+    return { state: 'UNEVALUABLE', slope: sl,
+             why: `hit rate rose ${rate(a).toFixed(2)} -> ${rate(b).toFixed(2)}, but mechanism share is unrecorded on ${from === null ? a.file ?? 'the first point' : b.file ?? 'the last point'} — a rise cannot be cleared or condemned against a share nobody wrote down` };
+  const shareFell = to < from;
   if (rose && !shareFell)
     return { state: 'suspect', slope: sl,
              why: `hit rate rose ${rate(a).toFixed(2)} -> ${rate(b).toFixed(2)} while mechanism share did not fall (${mechanismShare(a).toFixed(2)} -> ${mechanismShare(b).toFixed(2)})` };
-  return { state: 'measured', slope: sl,
-           mechanism_share: { from: mechanismShare(a), to: mechanismShare(b) } };
+  return { state: 'measured', slope: sl, mechanism_share: { from, to } };
 }
 
 /**

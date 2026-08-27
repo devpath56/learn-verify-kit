@@ -3,12 +3,12 @@
 ## Test it end to end in five minutes
 
 The one competency wired end to end today is **`agent-harness-l1-l2`** — inference and runtime,
-18 questions. Everything below is a real run, not a demo.
+20 questions. Everything below is a real run, not a demo.
 
 ### 1 · Check the machinery, before trusting anything it says
 
 ```
-node tests/lint-bank.mjs          # 6 laws over the question bank
+node tests/lint-bank.mjs          # 16 laws over the question bank
 node tests/test-lint-bank.mjs     # proves each law can actually fail
 node tests/test-progress-store.mjs
 ```
@@ -22,9 +22,18 @@ against nothing.
 node progress-store.mjs
 ```
 
-Expect **UNEVALUABLE** on both topics: `1 attempt(s) — a slope needs two points`. The two files in
-`attempts/` are **declared baselines** transcribed from a handoff, not observations. That is the
-honest starting state, and it is what step 5 changes.
+Expect **UNEVALUABLE** on both topics, and read the reason:
+
+```
+2 point(s), none observed — every one is declared or self-graded, so a slope
+over them measures the author
+```
+
+Both topics have two points, so the arithmetic is available — and it is still refused. Every point
+in `attempts/` was graded in-session by the same agent that set the questions, which is stated
+outright in the handoff (`attempts/2026-08-26-harness-standing-handoff.md`, §8). A slope over those
+measures the grader, not the learner. That is the honest starting state, and it is what step 6
+changes.
 
 ### 3 · START a Claude Code session on this directory
 
@@ -64,12 +73,21 @@ most likely `mechanism`. That is the miss this packet exists to attack.
 
 ```
 node progress-store.mjs --record --topic agent-harness-l2-runtime \
-  --question agent-harness-l1-l2.p1q1 --hit 3 --of 8 --miss mechanism,price --by isha
+  --question agent-harness-l1-l2.c3q1 --hit 3 --of 8 --miss mechanism,price --by isha
 
 node progress-store.mjs
 ```
 
-The topic now reads **measured**, with `(1 declared)` beside it — one point observed, one asserted.
+The topic now reads **measured** — and if you answered as step 5 asked, it reads **suspect**:
+
+```
+suspect     agent-harness-l2-runtime
+            0.25 -> 0.38 over 3.0d = 4.1 pts/day
+            hit rate rose 0.25 -> 0.38 while mechanism share did not fall (0.50 -> 0.50)
+```
+
+That is the metric working, not failing. The rate went up and the miss you were supposed to be
+attacking did not move, so the rise is not credited. Exit code is `1`.
 
 ### What should refuse you
 
@@ -86,8 +104,18 @@ same process that wrote it.
 
 ### What is honestly not done
 
-- No human has answered a bank question yet, so every slope you see is seeded from step 6.
+- No human has answered a bank question yet, so every slope you see is seeded from step 6. Both
+  in-scope topics read `none observed` until one does.
 - Only `agent-harness-l1-l2` is wired. The other 13 competencies have banks but no packet rules.
+- Five attempt records in `attempts/` cover out-of-packet topics (L3 observability, L4 identity,
+  L5 context/retrieval, continuous eval) and are **not yet readable by `progress-store`**. Three of
+  their graded questions record misses with no miss codes, so filing them would put an unknown
+  share into the store. `mechanismShare` now returns `null` rather than `0` for that case, so the
+  gap reports itself instead of quietly clearing a rise — but the records still need their codes
+  written before they can carry a curve.
+- The NotebookLM pack's authority map is **not ratified**: `ratified_by_operator: false`, on
+  purpose. The writer does not self-certify. Nothing downstream should present the pack as approved
+  until the operator says so.
 
 ---
 
@@ -161,7 +189,7 @@ Everything needed to evolve this kit lives in this repo — no external context.
 
 - **`CLAUDE.md`** — how Claude should maintain the repo (architecture, the "one rule, one home" principle, guardrails).
 - **`MAINTAINING.md`** — structure, how to run the regression suite, and *why each rule exists* (provenance).
-- **`tests/regression-cases.md`** — 32 guardrail tests, one per real error.
+- **`tests/regression-cases.md`** — 37 guardrail tests, one per real error.
 - Licensed under MIT — see `LICENSE`.
 
 ## Files
@@ -178,5 +206,12 @@ Everything needed to evolve this kit lives in this repo — no external context.
     track/SKILL.md          # session log + review-on-cue
     concept-sketch/SKILL.md
     concept-sketch/references/recall-rubric.md
+    drill/SKILL.md          # quiz from the registered bank, grade against the frozen ideal
+attempts/                   # one file per graded attempt — the evidence behind every score
+packets/                    # per-competency packets (sources, questions, NotebookLM pack)
+resources/
+  competency-progress.json  # the registered question bank — 14 competencies, 254 questions
+tests/
+progress-store.mjs          # the learning curve, derived from attempts/ rather than asserted
 README.md
 ```

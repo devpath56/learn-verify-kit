@@ -1,6 +1,21 @@
-# 2026-08-24 — Agent harness: five layers + deterministic steps stay in code
+---
+topic: agent-harness-l1-inference
+at: 2026-08-24
+hit: 2
+of: 4
+miss_codes: [mechanism, price]
+mode: online
+assigned_by: claude
+declared: false
+---
+
+# 2026-08-24 — L1 inference: quality drift is not a model problem
 
 Source: ByteByteGo, "How Microsoft Ships AI Agents at Scale". Mode: online (typed in chat).
+Split out of the `agent-harness-five-layers` session record on 2026-08-27: one file per graded
+attempt is what `attempts/README.md` specifies and what `progress-store.mjs` can read. Q2 of the
+same session is `2026-08-24-agent-harness-l2-runtime.md`. Graded in-session by the same agent
+that set the questions (see the handoff, §8), so it is self-graded and cannot count as observed.
 
 ## Q1 — verbatim
 > `invoice-bot` was 94% correct last month, 71% this month. Same code, same model, same prompts. Every run completes without error. Lead says: "Opus 4.8 just shipped, let's swap the model in — that should fix it." What is wrong with that reasoning, and which layer of the harness would have caught this before your lead noticed?
@@ -17,20 +32,3 @@ Source: ByteByteGo, "How Microsoft Ships AI Agents at Scale". Mode: online (type
 **Checklist:** 1 hit · 2 hit · 3 miss · 4 miss → 2/4, partial
 **Miss codes:** mechanism, price
 **Reread:** the anchor sketch (control plane position) and the trade-offs on model swaps.
-
-## Q2 — verbatim
-> `dispute-bot` built on CrewAI. Lead: "CrewAI is the harness, so a runtime move means we rebuild everything — two quarters." Also: the agent sends the model `$412.50` and tier `gold` (cap `$500`) and asks whether it is under the cap. (a) What is wrong with the framing? (b) What is wrong with that step, and what rule does it break?
-
-**Frozen ideal (4 elements)**
-1. CrewAI is an agent framework (authoring layer), not the harness.
-2. Framework neutrality — a runtime move should not require a harness rewrite; the two-quarter budget prices a rewrite that shouldn't be needed.
-3. `$412.50 <= $500` is fully determined by its inputs.
-4. Breaks the runtime rule: deterministic steps stay in code, no inference call; fails silently, like S3.
-
-**Attempt (verbatim, uncorrected)**
-> 1. runtime is loop, tool call and conversation state change in the harness.
-> 2. dont know
-
-**Checklist:** 1 miss (recited the runtime definition, did not draw the framework/harness boundary) · 2 miss · 3 miss · 4 miss → 1/4, fail
-**Miss codes:** boundary, mechanism
-**Reread:** the boundary column, framework vs harness row.

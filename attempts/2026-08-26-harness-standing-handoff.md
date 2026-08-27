@@ -100,11 +100,14 @@ Verbatim attempts, frozen ideals, and hit/miss checklists:
 
 | File | Covers |
 |---|---|
-| `attempts/2026-08-26-inference-and-runtime.md` | L1 Q1/Q2/mini, L2 Q1/Q2 |
+| `attempts/2026-08-26-agent-harness-l1-inference.md` | L1 Q1/Q2/mini |
+| `attempts/2026-08-26-agent-harness-l2-runtime.md` | L2 Q1/Q2 |
 | `attempts/2026-08-26-observability-and-governance.md` | L3 Q1/Q2 + the denominator-blindness generalisation |
 | `attempts/2026-08-26-identity-and-tool-boundary.md` | L4 Q1/Q2 |
 | `attempts/2026-08-26-context-and-retrieval.md` | L5 Q1/Q2 |
-| `attempts/2026-08-24-*.md` | the first pass, for trajectory |
+| `attempts/2026-08-24-agent-harness-l1-inference.md` | the L1 first pass, for trajectory |
+| `attempts/2026-08-24-agent-harness-l2-runtime.md` | the L2 first pass, for trajectory |
+| `attempts/2026-08-24-*.md` (others) | the first pass on the out-of-packet layers |
 | `progress.json` | rolled-up scores, gap counts, review dates |
 
 Recall scaffold (13 self-test nodes, chunked Send · Loop · Watch), published 2026-08-26:
@@ -115,3 +118,8 @@ https://claude.ai/code/artifact/208c36fd-2a1a-4519-a177-520ee84f414c
 ## 8. Caveat for whoever picks this up
 
 Grading was done by the same agent that wrote the questions and taught the material. The frozen ideals and verbatim attempts are filed precisely so that arrangement can be checked rather than trusted. If scores rise on a topic while its miss counts do not fall, treat the rise as suspect — comfort is the failure mode of a checker who also built the test.
+
+Split note (2026-08-27): the two 2026-08-24 and 2026-08-26 session records that each covered
+more than one topic were split into one file per topic, which is the shape `attempts/README.md`
+specifies and the only shape `progress-store.mjs` can read. No prose was changed; the rolled-up
+hit/of and miss codes now live in each file's frontmatter.

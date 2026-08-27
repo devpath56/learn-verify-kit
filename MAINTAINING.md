@@ -12,7 +12,7 @@ Everything you need to evolve this kit lives in this repo. No external context r
   revise/         Recall Rubric + self-check   → references/certification-gate.md
   concept-sketch/ dual-coded sketch + decision card  → references/recall-rubric.md
   track/          session log + spaced review
-tests/regression-cases.md   32 guardrail tests, one per real error
+tests/regression-cases.md   37 guardrail tests, one per real error
 tests/lint-bank.mjs         the question bank's six laws, bound to an exit code
 tests/test-lint-bank.mjs    proves each law can fail; breaks are mutations of the live bank
 attempts/         graded attempt records — evidence behind progress.json
@@ -38,7 +38,7 @@ The suite in `tests/regression-cases.md` has two levels:
 ## Running the bank validator
 
 ```
-node tests/lint-bank.mjs          the live bank: 14 competencies, 252 questions, 6 laws
+node tests/lint-bank.mjs          the live bank: 14 competencies, 254 questions, 16 laws
 node tests/test-lint-bank.mjs     14 assertions that each law can actually fail
 ```
 

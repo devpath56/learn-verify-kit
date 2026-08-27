@@ -115,6 +115,35 @@ ok('and the slope says how many of its points were declared, not measured',
   ok('and how many were self-graded', b.self_graded_points === 1, String(b.self_graded_points));
 }
 
+/* ---- 8. AN UNRECORDED MISS SHARE IS UNKNOWN, NOT ZERO ----
+   Found in this repo's own attempts/ on 2026-08-27: three graded questions carry misses and no
+   miss-code line. Read as a share of 0, the first honest re-test after them looks like a rise in
+   mechanism share and is condemned as suspect for a reason the learner cannot act on — and the
+   opposite mistake is just as available, since a 0 that was never earned can also clear a rise. */
+{
+  ok('a perfect score with no miss codes is a share of 0 — that zero was earned',
+     mechanismShare({ hit: 4, of: 4, miss_codes: [] }) === 0);
+  ok('an imperfect score with no miss codes is UNKNOWN, never 0',
+     mechanismShare({ hit: 1, of: 4, miss_codes: [] }) === null);
+  ok('and codes present still give the share', mechanismShare({ hit: 1, of: 4, miss_codes: ['mechanism', 'price'] }) === 0.5);
+
+  write('h1', { topic: 'unrecorded', at: '2026-08-24T09:00:00Z', hit: 1, of: 8 });
+  write('h2', { topic: 'unrecorded', at: '2026-08-28T09:00:00Z', hit: 6, of: 8, miss_codes: ['mechanism'] });
+  const u = verdict('unrecorded', O);
+  ok('a rise against an unrecorded share is UNEVALUABLE, not suspect and not measured',
+     u.state === 'UNEVALUABLE', JSON.stringify(u));
+  ok('and it names the missing share rather than the learner',
+     /nobody wrote down/.test(u.why ?? ''), u.why);
+  ok('the slope is still reported — the rate is knowable even when the share is not',
+     u.slope.state === 'measured', JSON.stringify(u.slope));
+
+  /* THE OTHER DIRECTION MUST STILL WORK. A fall needs no share at all, so it is still measured. */
+  write('i1', { topic: 'fell', at: '2026-08-24T09:00:00Z', hit: 6, of: 8 });
+  write('i2', { topic: 'fell', at: '2026-08-28T09:00:00Z', hit: 1, of: 8 });
+  ok('a FALL with no codes is still measured — the honesty rule only fires on a rise',
+     verdict('fell', O).state === 'measured', JSON.stringify(verdict('fell', O)));
+}
+
 console.log(`\n${pass} passed · ${fails.length} failed`);
 if (fails.length) { console.log(`  failing: ${fails.join(', ')}`); process.exit(1); }
 process.exit(0);

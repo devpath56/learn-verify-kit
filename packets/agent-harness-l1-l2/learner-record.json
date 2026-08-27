@@ -4,8 +4,8 @@
   "privacy_note": "Pseudonymous by design. This repo is public and its CLAUDE.md forbids personal data. Do NOT commit real names, handles, or verbatim attempt text here. Verbatim attempts belong in the learner's own private repo; only rolled-up scores travel.",
   "carried_from": {
     "source": "handoff document, re-teach session 2026-08-26",
-    "attempt_files_present_on_this_machine": false,
-    "note": "The attempts/2026-08-26-*.md files named in the handoff are not on this machine. Rolled-up scores and miss counts are carried; verbatim attempts are referenced, not copied."
+    "attempt_files_present_on_this_machine": true,
+    "note": "CORRECTED 2026-08-27: the attempts/2026-08-26-*.md files ARE on this machine and carry the verbatim attempts, the frozen ideals and per-question miss codes. The earlier claim that they were absent was written from the handoff rather than from the directory, and it is what made the per-layer miss counts below look unrecoverable."
   },
   "slope": {
     "definition": "slope = (hit_rate_now - hit_rate_prev) / days_between. Units: hit-rate points per day.",
@@ -22,8 +22,8 @@
       "in_scope": true,
       "hit_rate": 0.125,
       "hit_rate_detail": "Q1 0/6, Q2 1/2",
-      "gaps": { "mechanism": null, "price": null, "boundary": null },
-      "gaps_note": "L1 and L2 share ONE row in the learner's progress.json (mechanism 5, price 4, boundary 2). Those counts are combined and CANNOT be split. Any per-layer miss count for L1 or L2 is a number the log does not contain.",
+      "gaps": { "mechanism": 1, "price": 2, "boundary": 1 },
+      "gaps_note": "SPLIT 2026-08-27, counted from the per-question miss-code lines in attempts/2026-08-26-agent-harness-l2-runtime.md (Q1 mechanism+price, Q2 price+boundary). The learner's own progress.json still holds one combined L1+L2 row (mechanism 5, price 4, boundary 2) covering all five layers; that row is not the source here and the two are not the same denominator.",
       "last_reviewed": "2026-08-26",
       "next_review": "2026-08-27",
       "verdict": "genuinely weakest — honest attempts, near-empty returns, failed two consecutive sessions",
@@ -35,8 +35,8 @@
       "in_scope": true,
       "hit_rate": 0.1,
       "hit_rate_detail": "Q1 1/4, Q2 0/4, mini 0/2",
-      "gaps": { "mechanism": null, "price": null, "boundary": null },
-      "gaps_note": "same shared row as L2 — not separable",
+      "gaps": { "mechanism": 2, "price": 3, "boundary": 1 },
+      "gaps_note": "SPLIT 2026-08-27 from attempts/2026-08-26-agent-harness-l1-inference.md (Q1 mechanism+price, Q2 mechanism+price, mini price+boundary).",
       "last_reviewed": "2026-08-26",
       "next_review": "2026-08-27",
       "verdict": "UNDER-MEASURED, not failed. All three copy-paste answers landed here, so the layer was barely tested.",
