@@ -105,13 +105,35 @@ export function validateAttempt(a) {
   return e;
 }
 
+/* WHICH FILES ARE EVEN CANDIDATES. One named exception, and it is the directory's own prose:
+   `attempts/README.md` is not a malformed record, it is not a record. Everything else that ends in
+   `.md` is a candidate, so an omission cannot hide behind a filename that misses a convention.
+   The first cut of this filtered on the documented `<YYYY-MM-DD>-<slug>.md` shape instead, which
+   put the record's identity in the FILENAME as well as in its `topic`/`at` frontmatter — two homes
+   for one fact, and the store would have started disagreeing with itself the first time a file was
+   renamed. */
+export const isAttemptFile = (f) => f.endsWith('.md') && f !== 'README.md';
+
 export function attempts({ dir = ATTEMPTS } = {}) {
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).filter((f) => f.endsWith('.md'))
+  return fs.readdirSync(dir).filter(isAttemptFile)
     .map((f) => ({ file: f, fm: parseFrontmatter(fs.readFileSync(path.join(dir, f), 'utf8')) }))
     .filter((x) => x.fm && validateAttempt(x.fm).length === 0)
     .map((x) => ({ ...x.fm, file: x.file }))
     .sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+}
+
+/* WHAT `attempts()` THREW AWAY, and why silence here is the same defect twice. `attempts()` drops
+   any file it cannot parse or validate, and reported nothing about it — so nine graded records sat
+   in `attempts/` and the store said `no attempt records`, which reads as "there is no evidence"
+   rather than "I could not read the evidence". A reader cannot tell a clean directory from an
+   unreadable one, and that is the failure this whole file exists to refuse. */
+export function skipped({ dir = ATTEMPTS } = {}) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter(isAttemptFile)
+    .map((f) => ({ file: f, fm: parseFrontmatter(fs.readFileSync(path.join(dir, f), 'utf8')) }))
+    .filter((x) => !x.fm || validateAttempt(x.fm).length > 0)
+    .map((x) => ({ file: x.file, why: x.fm ? validateAttempt(x.fm).join('; ') : 'no frontmatter block' }));
 }
 
 const str = (x) => typeof x === 'string' && x.trim().length > 0;
@@ -261,6 +283,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(r.state === 'RECORDED' ? 0 : 1);
   }
   const all = attempts();
+  const missed = skipped();
+  /* NAMED, NOT COUNTED. "3 files skipped" is the same could-not-look-reads-as-nothing-wrong shape:
+     the reader still cannot act on it without opening the directory themselves. */
+  for (const m of missed) console.log(`  skipped     ${m.file} — ${m.why}`);
+  if (missed.length) console.log('');
   if (!all.length) { console.log('  no attempt records with valid frontmatter under attempts/'); process.exit(0); }
   const topics = [...new Set(all.map((a) => a.topic))].filter((t) => !only || t === only);
   let suspect = 0;

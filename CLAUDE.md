@@ -10,7 +10,7 @@ Eight skills under `.claude/skills/` that turn Claude into a quizzing tutor (tea
 - `learn/SKILL.md` — the teaching loop (disambiguate → research → roadmap → per-chunk teach+test → consolidate).
 - `clarify`, `understand`, `revise`, `start`, `concept-sketch`, `track` — the other verbs; each is one `SKILL.md`.
 - `drill` — the checker half: quizzes from the **registered** bank in `resources/competency-progress.json` and grades against the ideal frozen when the question was registered. It cannot invent a question, which is why it is useless before `learn` has delivered the material.
-- `tests/regression-cases.md` — 37 behavioral guardrail tests, each derived from a real error.
+- `tests/regression-cases.md` — 38 behavioral guardrail tests, each derived from a real error.
 - `progress-store.mjs` + `attempts/` — the learning curve, derived from graded attempt records rather than asserted. One topic per file; a point graded by the same agent that set the questions is recorded but never counted as observed.
 - `progress.json` — the durable "revise DB" for the **Claude Code surface only**: a git-tracked mirror of the `track` learning log (fields: `topic`, `depth_reached`, `last_score`, `last_reviewed`, `next_review`). Claude reads it at the start of a review and, **automatically at consolidation (no manual "track" trigger)**, upserts + commits a row and merges **`progress.json` only** to the default branch when a topic finishes or is re-quizzed. On claude.ai / Cowork it is ignored — chat stays the source of truth, so the zero-setup guarantee holds. The read/write/commit rules live in `track/SKILL.md` → "File-backed persistence."
 
