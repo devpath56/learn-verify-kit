@@ -24,6 +24,32 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const MAP = join(HERE, 'packets/agent-harness-l1-l2/notebooklm/authority-map.json');
 export const OUT = join(HERE, 'packets/agent-harness-l1-l2/notebooklm/NOTEBOOKLM-PACK.md');
 
+// WHERE A TOPIC PACK LANDS. One file per brief, because a reader setting up NotebookLM for ONE
+// topic should not have to work out which half of a combined pack is theirs.
+export const outFor = (topic) => topic
+  ? join(HERE, `packets/agent-harness-l1-l2/notebooklm/NOTEBOOKLM-PACK-${topic}.md`)
+  : OUT;
+
+// THE BRIEF IS DATA NOW, and it was not before. It lived as ~46 `P('...')` calls in this file, which
+// made the module's own instruction - "edit the map and re-render" - half a lie: the SOURCES were
+// data and the AIM was code, so a second topic could not get a second brief without a code change.
+// That is the shape a reader cannot see from the pack, and it is why the L2-runtime topic went
+// months with a brief that pressed termination and never once pressed how the cap is sized.
+export const briefFor = (m, topic) => {
+  const b = (m.briefs ?? {})[topic ?? 'default'];
+  if (!b) throw new Error(`no brief '${topic}' in the map - have: ${Object.keys(m.briefs ?? {}).join(', ')}`);
+  return b;
+};
+
+// Sources a brief is scoped to, in the map's own order. `competencies: null` means the whole map.
+export const scopedSources = (m, brief) => {
+  if (!brief.competencies) return sourceRows(m);
+  const want = new Set((m.competencies ?? [])
+    .filter((c) => brief.competencies.includes(c.id))
+    .flatMap((c) => (c.sources ?? []).map((s) => s.source)));
+  return sourceRows(m).filter(([k]) => want.has(k));
+};
+
 export const loadMap = (p = MAP) => JSON.parse(readFileSync(p, 'utf8'));
 
 // A `$`-prefixed key is commentary, not a source. The convention is advisor-builder's, and
@@ -36,16 +62,18 @@ export const sourceRows = (m) =>
 export const unverified = (m) => sourceRows(m).filter(([, s]) => !s.verified).map(([k]) => k);
 
 /** Only what a reader can actually fetch. A source with no URL is theirs to bring. */
-export const fetchable = (m) => sourceRows(m).filter(([, s]) => s.url);
-export const bringYourOwn = (m) => sourceRows(m).filter(([, s]) => !s.url);
+export const fetchable = (m, rows = sourceRows(m)) => rows.filter(([, s]) => s.url);
+export const bringYourOwn = (m, rows = sourceRows(m)) => rows.filter(([, s]) => !s.url);
 
 const bullets = (xs) => xs.map((x) => `- ${x}`).join('\n');
 
-export function render(m = loadMap()) {
+export function render(m = loadMap(), topic = null) {
   const L = [];
   const P = (s = '') => L.push(s);
+  const brief = briefFor(m, topic);
+  const rows = scopedSources(m, brief);
 
-  P('# NotebookLM source pack — agent harness, L1 inference and L2 runtime');
+  P(`# NotebookLM source pack — ${brief.title}`);
   P();
   P('**You are holding the INPUT to a podcast, not a podcast.** Nothing here is a script. These are');
   P('the sources; NotebookLM generates the debate from them. The brief at the bottom is what to paste');
@@ -55,10 +83,10 @@ export function render(m = loadMap()) {
   P('Do not hand-edit this file — edit the map and re-render, or `--check` will fail.');
   P();
 
-  const unver = unverified(m);
+  const unver = rows.filter(([, s]) => !s.verified).map(([k]) => k);
   P('## Provenance, stated up front');
   P();
-  P(`- Sources: **${sourceRows(m).length}**, of which **${sourceRows(m).length - unver.length}** were opened and read on a named date.`);
+  P(`- Sources: **${rows.length}**, of which **${rows.length - unver.length}** were opened and read on a named date.`);
   if (unver.length) P(`- **UNVERIFIED — cited but not opened: ${unver.join(', ')}.** Treat as a lead, not a source.`);
   else P('- **Every source below was opened and read.** None is cited from memory.');
   P(`- Ratified by the operator: **${m.ratified_by_operator ? 'yes' : 'NOT YET'}**.`);
@@ -72,7 +100,7 @@ export function render(m = loadMap()) {
   P();
   P('Add these as sources. NotebookLM fetches URLs directly.');
   P();
-  for (const [id, s] of fetchable(m)) {
+  for (const [id, s] of fetchable(m, rows)) {
     P(`### ${s.title}`);
     P();
     P(`- **Who** — ${s.author ?? 'unattributed'}${s.published ? ` · published ${s.published}` : ''}`);
@@ -89,7 +117,7 @@ export function render(m = loadMap()) {
     P();
   }
 
-  const byo = bringYourOwn(m);
+  const byo = bringYourOwn(m, rows);
   if (byo.length) {
     P('## Bring your own copy');
     P();
@@ -111,52 +139,7 @@ export function render(m = loadMap()) {
   P('## The brief — paste this into NotebookLM');
   P();
   P('```');
-  P('Generate a roughly 30-minute debate between two experienced practitioners who disagree.');
-  P('Do not let them converge politely. The sources genuinely conflict; hold the conflict open.');
-  P();
-  P('THE QUESTION: In an agent that runs a model in a loop, who terminates the loop?');
-  P();
-  P('THE FAULT LINE, and it is real — these sources point in opposite directions:');
-  P();
-  P('  * Nygard, writing from production outages, assumes the thing you called will NEVER stop.');
-  P('    So the CALLER imposes the ending: a timeout, and a circuit breaker when timeouts repeat.');
-  P();
-  P('  * Anthropic\'s long-running-agents report finds the OPPOSITE failure. The agent stops too');
-  P('    EARLY: it looks around, sees progress was made, and declares the job done. A timeout would');
-  P('    not have caught that. Their fix is a completion predicate the agent does not own — a feature');
-  P('    list it may only mark passing, never delete from.');
-  P();
-  P('  * Anthropic\'s earlier post offers the plain fallback: a maximum number of iterations,');
-  P('    "to maintain control."');
-  P();
-  P('  * DeepSeek Harness makes the loop a PLUGIN, swappable in configuration next to models and');
-  P('    tools — so termination stops being a property of the model and becomes a thing you choose.');
-  P();
-  P('  * NVIDIA NOOA names "decides when a task is done" as a harness responsibility outright, and');
-  P('    reports that harness design alone swings benchmark results by double digits on the SAME model.');
-  P();
-  P('PRESS ON THESE, and make the speakers actually disagree:');
-  P();
-  P('  1. Is a max-iteration cap a stop condition, or an admission that nobody has a completion');
-  P('     predicate? Have one speaker defend it as honest engineering and the other call it a fig leaf.');
-  P();
-  P('  2. Nygard bounds a callee that never stops. Agents stop too eagerly. Does the timeout tradition');
-  P('     transfer to agents at all, or is it being cargo-culted onto the wrong failure direction?');
-  P();
-  P('  3. If the harness owns termination, and NVIDIA says the model can write its own orchestration');
-  P('     loop — has the model just taken back the decision the harness was supposed to hold?');
-  P();
-  P('  4. AGENT = MODEL + HARNESS, says DeepSeek. When a run fails, how would you actually tell which');
-  P('     side failed? What experiment separates them? (NOOA holds the model fixed; DeepSeek ships a');
-  P('     two-tool Minimal mode. Are those the same experiment?)');
-  P();
-  P('GROUND RULES:');
-  P('  - Cite the sources by name as you go. If something is not in them, say so out loud.');
-  P('  - The DeepSeek docs are a v0.1 developer preview with breaking changes expected — argue the');
-  P('    architecture, not the API.');
-  P('  - The Anthropic 2024 post is stale by its own banner; its definitions stand, its tooling list');
-  P('    does not.');
-  P('  - The NVIDIA benchmark numbers are self-reported by NVIDIA about NVIDIA. Let one speaker say so.');
+  for (const line of brief.lines) P(line);
   P('```');
   P();
 
@@ -165,7 +148,7 @@ export function render(m = loadMap()) {
   P(bullets([
     'Play it and see whether the two speakers actually disagree, or whether they agreed by minute six. If they agreed, the brief was too soft — sharpen fault line 1 and regenerate.',
     'Listen for whether "who terminates the loop" gets FOUR answers or one. Four means the sources came through. One means it flattened them.',
-    'Then run `learn agent-harness-l1-l2` in this repo, and see whether the podcast made the recall questions easier. That is the only test of it that matters.',
+    `Then run \`learn ${topic ?? 'agent-harness-l1-l2'}\` in this repo, and see whether the podcast made the recall questions easier. That is the only test of it that matters.`,
   ]));
   P();
 
@@ -174,20 +157,33 @@ export function render(m = loadMap()) {
 
 function main(argv) {
   const check = argv.includes('--check');
-  const text = render();
-  if (!check) {
-    writeFileSync(OUT, text);
-    console.log(`  wrote ${OUT}`);
-    console.log(`  ${sourceRows(loadMap()).length} sources · ${unverified(loadMap()).length} unverified`);
-    return 0;
+  const i = argv.indexOf('--topic');
+  const only = i >= 0 ? argv[i + 1] : null;
+  const m = loadMap();
+  /* EVERY BRIEF, NOT JUST THE ONE NAMED. `--check` with no `--topic` used to check the single pack,
+     which is exactly how a second pack drifts unnoticed: nothing looked at it. */
+  const topics = only ? [only] : [null, ...Object.keys(m.briefs ?? {}).filter((k) => k !== 'default')];
+
+  let bad = 0;
+  for (const t of topics) {
+    const text = render(m, t);
+    const out = outFor(t);
+    const rows = scopedSources(m, briefFor(m, t));
+    if (!check) {
+      writeFileSync(out, text);
+      console.log(`  wrote ${out}`);
+      console.log(`  ${rows.length} sources · ${rows.filter(([, s]) => !s.verified).length} unverified`);
+      continue;
+    }
+    let onDisk;
+    try { onDisk = readFileSync(out, 'utf8'); }
+    catch { console.error(`  REFUSED: ${out} absent. Run without --check to render it.`); bad++; continue; }
+    if (onDisk === text) { console.log(`  pack matches the map: ${out}`); continue; }
+    console.error(`  REFUSED: the pack on disk is not what the map renders: ${out}`);
+    console.error('  Someone hand-edited the pack, or the map moved under it. Re-render.');
+    bad++;
   }
-  let onDisk;
-  try { onDisk = readFileSync(OUT, 'utf8'); }
-  catch { console.error('  REFUSED: pack absent. Run without --check to render it.'); return 1; }
-  if (onDisk === text) { console.log('  pack matches the map.'); return 0; }
-  console.error('  REFUSED: the pack on disk is not what the map renders.');
-  console.error('  Someone hand-edited the pack, or the map moved under it. Re-render.');
-  return 1;
+  return bad ? 1 : 0;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) process.exit(main(process.argv.slice(2)));

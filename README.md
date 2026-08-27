@@ -12,9 +12,10 @@ node tests/lint-bank.mjs          # 16 laws over the question bank
 node tests/test-lint-bank.mjs     # proves each law can actually fail
 node tests/test-progress-store.mjs
 node tests/test-docs-match-code.mjs # every count in this file, checked against the code
+node render-source-pack.mjs --check  # every NotebookLM pack still matches the authority map
 ```
 
-All four exit 0. If `lint-bank` fails, a question has lost its frozen ideal and `drill` would grade
+All five exit 0. If `lint-bank` fails, a question has lost its frozen ideal and `drill` would grade
 against nothing.
 
 ### 2 · Look at the curve before you start
@@ -190,7 +191,7 @@ Everything needed to evolve this kit lives in this repo — no external context.
 
 - **`CLAUDE.md`** — how Claude should maintain the repo (architecture, the "one rule, one home" principle, guardrails).
 - **`MAINTAINING.md`** — structure, how to run the regression suite, and *why each rule exists* (provenance).
-- **`tests/regression-cases.md`** — 38 guardrail tests, one per real error.
+- **`tests/regression-cases.md`** — 39 guardrail tests, one per real error.
 - Licensed under MIT — see `LICENSE`.
 
 ## Files

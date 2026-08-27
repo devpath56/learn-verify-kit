@@ -8,63 +8,95 @@
   "b1_met": true,
   "ratified_by_operator": false,
   "$ratification_note": "B5 is deliberately NOT met. The operator accepts requirements; the writer does not self-certify. Nothing downstream may treat this as ratified until he says so.",
-  "cartridges": ["ic-principal-swe"],
-
+  "cartridges": [
+    "ic-principal-swe"
+  ],
   "competencies": [
     {
       "id": "ah-l1",
       "cartridge": "ic-principal-swe",
-      "name": "L1 inference — what the model itself contributes",
+      "name": "L1 inference \u2014 what the model itself contributes",
       "track": "ic",
       "layer": "101",
       "decision": "when a run fails, was it the model or the thing around it?",
       "authority_declared": "NVIDIA NOOA is the only source here that HOLDS THE MODEL FIXED and varies the harness, which is the one experiment that can answer this question at all",
       "sources": [
-        {"source": "nvidia-noaa-harness", "why": "same model, double-digit benchmark swing from harness design alone — the measurement that makes L1 and L2 separable rather than a figure of speech"},
-        {"source": "dsh-docs", "why": "Minimal mode is a two-tool agent (persistent bash + str_replace_editor): a deliberately thin harness, which is the control condition for measuring a model"}
+        {
+          "source": "nvidia-noaa-harness",
+          "why": "same model, double-digit benchmark swing from harness design alone \u2014 the measurement that makes L1 and L2 separable rather than a figure of speech"
+        },
+        {
+          "source": "dsh-docs",
+          "why": "Minimal mode is a two-tool agent (persistent bash + str_replace_editor): a deliberately thin harness, which is the control condition for measuring a model"
+        }
       ]
     },
     {
       "id": "ah-l2-term",
       "cartridge": "ic-principal-swe",
-      "name": "L2 runtime — who terminates the loop",
+      "name": "L2 runtime \u2014 who terminates the loop",
       "track": "both",
       "layer": "101",
       "decision": "the run is going; what stops it, and who owns that decision?",
       "authority_declared": "the four sources DISAGREE, and the disagreement is the lesson: Nygard bounds a callee that never stops, Young reports an agent that stops too eagerly, Anthropic 2024 offers a max-iteration cap, DeepSeek makes the loop a swappable plugin",
       "sources": [
-        {"source": "release-it-stability", "slices": ["c01"], "files": ["c01_release-it_ch4-5_stability.txt"], "why": "the caller-side Timeout and the Circuit Breaker: termination imposed from outside because the callee will never do it"},
-        {"source": "anthropic-long-running", "why": "the documented failure runs the OTHER way — the agent declares victory early — and the fix is a completion predicate the agent does not own"},
-        {"source": "anthropic-effective-agents", "why": "states the plain fallback: stopping conditions such as a maximum number of iterations, to maintain control"},
-        {"source": "dsh-docs", "why": "loops are listed as a plugin alongside models and tools, so termination becomes a configuration choice rather than a property of the model"}
+        {
+          "source": "release-it-stability",
+          "slices": [
+            "c01"
+          ],
+          "files": [
+            "c01_release-it_ch4-5_stability.txt"
+          ],
+          "why": "the caller-side Timeout and the Circuit Breaker: termination imposed from outside because the callee will never do it"
+        },
+        {
+          "source": "anthropic-long-running",
+          "why": "the documented failure runs the OTHER way \u2014 the agent declares victory early \u2014 and the fix is a completion predicate the agent does not own"
+        },
+        {
+          "source": "anthropic-effective-agents",
+          "why": "states the plain fallback: stopping conditions such as a maximum number of iterations, to maintain control"
+        },
+        {
+          "source": "dsh-docs",
+          "why": "loops are listed as a plugin alongside models and tools, so termination becomes a configuration choice rather than a property of the model"
+        }
       ]
     },
     {
       "id": "ah-l2-boundary",
       "cartridge": "ic-principal-swe",
-      "name": "L2 runtime — framework versus harness",
+      "name": "L2 runtime \u2014 framework versus harness",
       "track": "lead",
       "layer": "201",
       "decision": "adopt a framework, or build the harness thin and keep the seams?",
-      "authority_declared": "Anthropic argues down from abstraction; DeepSeek and NVIDIA both argue for an inspectable substrate, one via plugins and one via plain Python — three practitioner answers, not one",
+      "authority_declared": "Anthropic argues down from abstraction; DeepSeek and NVIDIA both argue for an inspectable substrate, one via plugins and one via plain Python \u2014 three practitioner answers, not one",
       "sources": [
-        {"source": "anthropic-effective-agents", "why": "frameworks 'often create extra layers of abstraction that can obscure the underlying prompts and responses, making them harder to debug'"},
-        {"source": "dsh-docs", "why": "AGENT = MODEL + HARNESS, stated as an identity, with every capability swappable in configuration"},
-        {"source": "nvidia-noaa-harness", "why": "collapses the boundary into syntax: a method body of `...` is completed by an LLM loop, a normal body runs as deterministic Python"}
+        {
+          "source": "anthropic-effective-agents",
+          "why": "frameworks 'often create extra layers of abstraction that can obscure the underlying prompts and responses, making them harder to debug'"
+        },
+        {
+          "source": "dsh-docs",
+          "why": "AGENT = MODEL + HARNESS, stated as an identity, with every capability swappable in configuration"
+        },
+        {
+          "source": "nvidia-noaa-harness",
+          "why": "collapses the boundary into syntax: a method body of `...` is completed by an LLM loop, a normal body runs as deterministic Python"
+        }
       ]
     }
   ],
-
   "sources": {
     "$note": "`verified` is not decoration. It is the receipt that this row was read rather than recalled, and it is what CF-026 exists to force.",
-
     "nvidia-noaa-harness": {
       "title": "Six Agent Harness Capabilities for Higher Model Performance (NVIDIA Labs Object-Oriented Agents, NOOA)",
       "author": "Ricardo Silveira Cabral and Paul Furgale, distinguished research scientists, NVIDIA",
       "url": "https://developer.nvidia.com/blog/six-agent-harness-capabilities-for-higher-model-performance/",
       "published": "2026-07-27",
       "genre": "practitioner-corpus",
-      "audience": "ICP1 and ICP2 both — it is the only source that prices harness design in benchmark points AND in tokens, which is the pair of currencies the two readers each care about separately",
+      "audience": "ICP1 and ICP2 both \u2014 it is the only source that prices harness design in benchmark points AND in tokens, which is the pair of currencies the two readers each care about separately",
       "ranking_criterion": "it runs the controlled experiment: the model is held fixed and the harness is varied, and the swing is reported in both score and token cost. Every other source here asserts that the harness matters; this one measures how much.",
       "provenance": "operator",
       "on_disk": false,
@@ -82,15 +114,17 @@
       },
       "caveat": "NVIDIA's own engineering blog reporting NVIDIA's framework. The benchmark numbers are self-reported and the comparison harnesses are unnamed in the post. Read the technical report before quoting the delta as settled."
     },
-
     "dsh-docs": {
-      "title": "DeepSeek Harness (dsh) — developer preview site and developer documentation",
+      "title": "DeepSeek Harness (dsh) \u2014 developer preview site and developer documentation",
       "author": "DeepSeek",
       "url": "https://deepseek.com/harness/en/",
-      "also": ["https://deepseek-harness.github.io/deepseek-harness/en/guide/quickstart", "https://github.com/deepseek-ai/deepseek-harness"],
+      "also": [
+        "https://deepseek-harness.github.io/deepseek-harness/en/guide/quickstart",
+        "https://github.com/deepseek-ai/deepseek-harness"
+      ],
       "published": "2026-08-13",
       "genre": "reference-specification",
-      "audience": "ICP2 first — a founder can read the plugin list and know exactly which pieces are hers to own; ICP1 second, as the vocabulary for arguing about a build-versus-adopt boundary in review",
+      "audience": "ICP2 first \u2014 a founder can read the plugin list and know exactly which pieces are hers to own; ICP1 second, as the vocabulary for arguing about a build-versus-adopt boundary in review",
       "ranking_criterion": "it is the only source that ENUMERATES the harness rather than describing it: models, tools, skills, sessions, sandboxes, storage, loops, scheduling and the UI are named as separately swappable plugins, so 'what is the runtime' has a checkable answer instead of a metaphor",
       "provenance": "operator",
       "on_disk": false,
@@ -108,14 +142,13 @@
       },
       "caveat": "DEVELOPER PREVIEW, and the project says so in capitals: compatibility-breaking changes are expected and the core plugins and APIs are still moving. Teach the ARCHITECTURE, which is the durable part; do not teach the API surface, which will not survive."
     },
-
     "anthropic-long-running": {
       "title": "Effective harnesses for long-running agents",
       "author": "Justin Young, Engineering at Anthropic",
       "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
       "published": "2025-11-26",
       "genre": "practitioner-corpus",
-      "audience": "ICP2 — it is a field report on getting an agent to keep working across many context windows, which is the founder's actual problem; ICP1 will recognise the fix as a checklist the implementer may not edit",
+      "audience": "ICP2 \u2014 it is a field report on getting an agent to keep working across many context windows, which is the founder's actual problem; ICP1 will recognise the fix as a checklist the implementer may not edit",
       "ranking_criterion": "it reports the failure that runs OPPOSITE to the one everyone expects. The agent does not run away; it looks around, sees progress, and declares the job done. A source that inverts the reader's prior earns its place ahead of one that confirms it.",
       "provenance": "operator",
       "on_disk": false,
@@ -131,15 +164,14 @@
         "numbers": "the claude.ai clone example expands one prompt into over 200 end-to-end features in a JSON file, all initially marked failing; coding agents may only flip the `passes` field."
       }
     },
-
     "anthropic-effective-agents": {
       "title": "Building effective agents",
       "author": "Engineering at Anthropic",
       "url": "https://www.anthropic.com/engineering/building-effective-agents",
       "published": "2024-12-19",
       "genre": "practitioner-corpus",
-      "audience": "both — it is the shared vocabulary. The workflow-versus-agent split is the phrasing ICP1 and ICP2 are both most likely to have already met, which makes it the cheapest common ground to argue from.",
-      "ranking_criterion": "it draws the boundary that the whole L1/L2 distinction rests on — predefined code paths versus the model directing its own process — and it is the boundary the other three sources each redraw differently",
+      "audience": "both \u2014 it is the shared vocabulary. The workflow-versus-agent split is the phrasing ICP1 and ICP2 are both most likely to have already met, which makes it the cheapest common ground to argue from.",
+      "ranking_criterion": "it draws the boundary that the whole L1/L2 distinction rests on \u2014 predefined code paths versus the model directing its own process \u2014 and it is the boundary the other three sources each redraw differently",
       "provenance": "operator",
       "on_disk": false,
       "acquisition": "read in the browser 2026-08-26; not ingested into a cartridge corpus",
@@ -155,12 +187,11 @@
       },
       "caveat": "STALE BY THE PUBLISHER'S OWN ADMISSION. The post carries a banner: much of the tooling landscape described has changed since December 2024. The DEFINITIONS are what is being cited here; the tooling list is not."
     },
-
     "release-it-stability": {
-      "title": "Release It! — Stability Antipatterns and Stability Patterns (Timeouts, Circuit Breaker, Bulkheads, Fail Fast)",
+      "title": "Release It! \u2014 Stability Antipatterns and Stability Patterns (Timeouts, Circuit Breaker, Bulkheads, Fail Fast)",
       "author": "Michael T. Nygard",
       "genre": "expository-book",
-      "audience": "ICP1 — this is the vocabulary a principal IC's reviewers already argue in. A founder can skip it; a principal IC who calls a retry storm anything other than a cascading failure will be corrected in review.",
+      "audience": "ICP1 \u2014 this is the vocabulary a principal IC's reviewers already argue in. A founder can skip it; a principal IC who calls a retry storm anything other than a cascading failure will be corrected in review.",
       "ranking_criterion": "it is the only source here that treats termination as a PROPERTY OF THE CALLER, arrived at from production incidents rather than from agent design, which is what lets the packet ask whether an agent loop is a new problem or an old one wearing new words",
       "provenance": "builder",
       "on_disk": true,
@@ -172,18 +203,179 @@
           "The timeout is a simple mechanism allowing you to stop waiting for an answer once you think it will not come."
         ],
         "numbers": "book.index.jsonl, 785 indexed pages. Densest content pages for the termination question: c01 pages 104-110 (Timeouts, then Circuit Breaker). Term counts across the corpus: timeout 108, circuit breaker 68, blocked thread 42, fail fast 32, bulkhead 26, unbounded/runaway 21. c02 pages 345-358 also match on these terms but are the BACK-OF-BOOK INDEX, not content, and are excluded."
-        },
+      },
       "caveat": "COPYRIGHTED BOOK TEXT. The extracted corpus stays local and is never committed to the public packet repo and never uploaded. What travels is the citation and the page range; the reader brings their own copy."
     }
   },
-
   "operator_supplied": [
-    {"source": "dsh-docs", "verdict": "accept", "note": "operator: 'read the deepseek latest harness documentation, that should be the biggest authority source on harness, it was a big news this week'"},
-    {"source": "nvidia-noaa-harness", "verdict": "accept", "note": "operator: 'include the nvidia new agent architecture as python function which is going to disrupt langchain and other agent frameworks'. Recorded correction: the operator placed this in the last week; the post is dated 2026-07-27. The third-party NOOA commentary is what appeared this month."},
-    {"source": "langchain-comparison", "verdict": "decline", "reason": "the operator framed NOOA as disrupting LangChain, so LangChain is the natural comparison — but every LangChain-versus-harness piece surfaced was a vendor blog or an SEO aggregator (Atlan, Arize, FutureAGI, MindStudio, Credal, deepseekharness.io), and house-style rejects vendor pages and marketing for the taught domain. Declined for want of a practitioner source, NOT because the comparison is uninteresting. Reopen if a working engineer writes it up."},
-    {"source": "arxiv-harness-papers", "verdict": "decline", "reason": "three arXiv papers on harness architecture surfaced in the same searches. House-style rejects academic sources for the taught domain — the operator's standing instruction, given verbatim: 'this is academic sources. use practicioner, no academic no marketing.'"}
+    {
+      "source": "dsh-docs",
+      "verdict": "accept",
+      "note": "operator: 'read the deepseek latest harness documentation, that should be the biggest authority source on harness, it was a big news this week'"
+    },
+    {
+      "source": "nvidia-noaa-harness",
+      "verdict": "accept",
+      "note": "operator: 'include the nvidia new agent architecture as python function which is going to disrupt langchain and other agent frameworks'. Recorded correction: the operator placed this in the last week; the post is dated 2026-07-27. The third-party NOOA commentary is what appeared this month."
+    },
+    {
+      "source": "langchain-comparison",
+      "verdict": "decline",
+      "reason": "the operator framed NOOA as disrupting LangChain, so LangChain is the natural comparison \u2014 but every LangChain-versus-harness piece surfaced was a vendor blog or an SEO aggregator (Atlan, Arize, FutureAGI, MindStudio, Credal, deepseekharness.io), and house-style rejects vendor pages and marketing for the taught domain. Declined for want of a practitioner source, NOT because the comparison is uninteresting. Reopen if a working engineer writes it up."
+    },
+    {
+      "source": "arxiv-harness-papers",
+      "verdict": "decline",
+      "reason": "three arXiv papers on harness architecture surfaced in the same searches. House-style rejects academic sources for the taught domain \u2014 the operator's standing instruction, given verbatim: 'this is academic sources. use practicioner, no academic no marketing.'"
+    }
   ],
-
   "unmapped_sources": [],
-  "spec_gaps": ["no source here has been ingested into a cartridge corpus except release-it-stability; the other four are read-and-cited, which is honest but is not extraction. Track 2 should run web_map.py over the four URLs so the quotes above become checkable against stored text with a recorded sha256."]
+  "spec_gaps": [
+    "no source here has been ingested into a cartridge corpus except release-it-stability; the other four are read-and-cited, which is honest but is not extraction. Track 2 should run web_map.py over the four URLs so the quotes above become checkable against stored text with a recorded sha256."
+  ],
+  "$briefs_note": "The brief used to be hardcoded in render-source-pack.mjs, which made 'edit the map and re-render' only half true: the sources were data and the aim was code, so a second topic could not have a second brief without editing the renderer. Each entry is the block a reader pastes into NotebookLM, verbatim, one line per array element.",
+  "briefs": {
+    "default": {
+      "title": "agent harness, L1 inference and L2 runtime",
+      "competencies": null,
+      "lines": [
+        "Generate a roughly 30-minute debate between two experienced practitioners who disagree.",
+        "Do not let them converge politely. The sources genuinely conflict; hold the conflict open.",
+        "",
+        "THE QUESTION: In an agent that runs a model in a loop, who terminates the loop?",
+        "",
+        "THE FAULT LINE, and it is real \u2014 these sources point in opposite directions:",
+        "",
+        "  * Nygard, writing from production outages, assumes the thing you called will NEVER stop.",
+        "    So the CALLER imposes the ending: a timeout, and a circuit breaker when timeouts repeat.",
+        "",
+        "  * Anthropic's long-running-agents report finds the OPPOSITE failure. The agent stops too",
+        "    EARLY: it looks around, sees progress was made, and declares the job done. A timeout would",
+        "    not have caught that. Their fix is a completion predicate the agent does not own \u2014 a feature",
+        "    list it may only mark passing, never delete from.",
+        "",
+        "  * Anthropic's earlier post offers the plain fallback: a maximum number of iterations,",
+        "    \"to maintain control.\"",
+        "",
+        "  * DeepSeek Harness makes the loop a PLUGIN, swappable in configuration next to models and",
+        "    tools \u2014 so termination stops being a property of the model and becomes a thing you choose.",
+        "",
+        "  * NVIDIA NOOA names \"decides when a task is done\" as a harness responsibility outright, and",
+        "    reports that harness design alone swings benchmark results by double digits on the SAME model.",
+        "",
+        "PRESS ON THESE, and make the speakers actually disagree:",
+        "",
+        "  1. Is a max-iteration cap a stop condition, or an admission that nobody has a completion",
+        "     predicate? Have one speaker defend it as honest engineering and the other call it a fig leaf.",
+        "",
+        "  2. Nygard bounds a callee that never stops. Agents stop too eagerly. Does the timeout tradition",
+        "     transfer to agents at all, or is it being cargo-culted onto the wrong failure direction?",
+        "",
+        "  3. If the harness owns termination, and NVIDIA says the model can write its own orchestration",
+        "     loop \u2014 has the model just taken back the decision the harness was supposed to hold?",
+        "",
+        "  4. AGENT = MODEL + HARNESS, says DeepSeek. When a run fails, how would you actually tell which",
+        "     side failed? What experiment separates them? (NOOA holds the model fixed; DeepSeek ships a",
+        "     two-tool Minimal mode. Are those the same experiment?)",
+        "",
+        "GROUND RULES:",
+        "  - Cite the sources by name as you go. If something is not in them, say so out loud.",
+        "  - The DeepSeek docs are a v0.1 developer preview with breaking changes expected \u2014 argue the",
+        "    architecture, not the API.",
+        "  - The Anthropic 2024 post is stale by its own banner; its definitions stand, its tooling list",
+        "    does not.",
+        "  - The NVIDIA benchmark numbers are self-reported by NVIDIA about NVIDIA. Let one speaker say so."
+      ]
+    },
+    "agent-harness-l2-runtime": {
+      "title": "agent harness, L2 runtime \u2014 who stops the loop, and what a harness even is",
+      "competencies": [
+        "ah-l2-term",
+        "ah-l2-boundary"
+      ],
+      "$why": "The learner's open gap on this topic, from learner-record.json: 'who terminates a loop and how the cap is sized; framework != harness'. The default brief presses termination and only glances at the boundary, and it does not press cap sizing at all \u2014 which is the exact thing the learner answered 'dont know the number' to.",
+      "lines": [
+        "Generate a roughly 30-minute debate between two experienced practitioners who disagree.",
+        "Do not let them converge politely. The sources genuinely conflict; hold the conflict open.",
+        "",
+        "THE TWO QUESTIONS, and they are not the same question:",
+        "  A. In an agent that runs a model in a loop, who terminates the loop \u2014 and what SIZES the number?",
+        "  B. Is the framework you build on the same thing as the harness you own?",
+        "",
+        "FAULT LINE A \u2014 termination. These sources point in opposite directions:",
+        "",
+        "  * Nygard, writing from production outages, assumes the thing you called will NEVER stop.",
+        "    So the CALLER imposes the ending: a timeout, and a circuit breaker when timeouts repeat.",
+        "",
+        "  * Anthropic's long-running-agents report finds the OPPOSITE failure. The agent stops too",
+        "    EARLY: \"a later agent instance would look around, see that progress had been made, and",
+        "    declare the job done.\" A timeout would not have caught that. Their fix is a completion",
+        "    predicate the agent does not own \u2014 a feature list it may only mark passing, never delete from.",
+        "",
+        "  * Anthropic's earlier post offers the plain fallback: stopping conditions \"such as a maximum",
+        "    number of iterations\", to maintain control.",
+        "",
+        "  * DeepSeek Harness makes the loop a PLUGIN, swappable in configuration next to models and",
+        "    tools \u2014 so termination stops being a property of the model and becomes a thing you choose.",
+        "",
+        "  * NVIDIA NOOA names \"decides when a task is done\" as a harness responsibility outright.",
+        "",
+        "THE HOLE IN FAULT LINE A, and I want it named on air: NONE of these sources tells you how to",
+        "SIZE the cap. They tell you to have one. Anthropic says \"a maximum number of iterations\" and",
+        "stops. So:",
+        "",
+        "  1. Where does the number come from? Have one speaker argue it can only come from the",
+        "     distribution of HEALTHY runs \u2014 a small multiple of their p99 \u2014 and the other argue that any",
+        "     number you can defend that way is a number you did not need, because you already had the",
+        "     telemetry to detect the runaway directly.",
+        "",
+        "  2. A team times out at 190 turns and sets the cap to 200. Attack that number. Is a cap derived",
+        "     from the incident a control at all, or a rename of the failure?",
+        "",
+        "  3. A timeout ends a run that is STUCK. What ends a run that is WORKING, and will not stop, and",
+        "     is quietly spending money? Are those the same control with two names, or two controls?",
+        "",
+        "  4. Is a max-iteration cap a stop condition, or an admission that nobody has a completion",
+        "     predicate? One speaker defends it as honest engineering; the other calls it a fig leaf.",
+        "",
+        "FAULT LINE B \u2014 framework versus harness. This is the boundary, and the sources redraw it three ways:",
+        "",
+        "  * Anthropic argues DOWN from abstraction: frameworks \"often create extra layers of abstraction",
+        "    that can obscure the underlying prompts and responses, making them harder to debug.\"",
+        "",
+        "  * DeepSeek states an identity \u2014 \"AGENT = MODEL + HARNESS\" \u2014 and then enumerates the harness:",
+        "    \"models, tools, skills, sessions, sandboxes, storage, loops, scheduling, and the UI\", every one",
+        "    a swappable plugin.",
+        "",
+        "  * NVIDIA collapses the boundary into SYNTAX: a Python method whose body is an ellipsis is",
+        "    completed at runtime by an LLM-driven loop; a normal body runs as deterministic Python.",
+        "",
+        "PRESS ON THESE:",
+        "",
+        "  5. A team says \"our framework IS our harness, so changing frameworks means two quarters to",
+        "     rebuild.\" Is that a statement about the framework, or a confession about where they put",
+        "     their identity, traces, evals and quotas? What would you ask to tell the difference?",
+        "",
+        "  6. Run DeepSeek's enumeration as a checklist against a framework you know. Which items does the",
+        "     framework own, and which were yours the whole time?",
+        "",
+        "  7. If the harness owns termination, and NVIDIA says the model can write its own orchestration",
+        "     loop in ordinary Python \u2014 has the model just taken back the decision the harness was",
+        "     supposed to hold?",
+        "",
+        "  8. When a run fails, how would you actually tell which side failed? What experiment separates",
+        "     them? (NOOA holds the model fixed; DeepSeek ships a two-tool Minimal mode \u2014 persistent bash",
+        "     and str_replace_editor only. Are those the same experiment?)",
+        "",
+        "GROUND RULES:",
+        "  - Cite the sources by name as you go. If something is not in them, SAY SO OUT LOUD \u2014 especially",
+        "    on cap sizing, where the silence is the finding.",
+        "  - The DeepSeek docs are a v0.1 developer preview with breaking changes expected \u2014 argue the",
+        "    architecture, not the API.",
+        "  - The Anthropic 2024 post is stale by its own banner; its definitions stand, its tooling list",
+        "    does not.",
+        "  - The NVIDIA benchmark numbers are self-reported by NVIDIA about NVIDIA. Let one speaker say so."
+      ]
+    }
+  }
 }
